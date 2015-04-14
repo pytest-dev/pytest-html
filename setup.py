@@ -1,0 +1,27 @@
+from setuptools import setup
+
+setup(name='pytest-html',
+      version='1.0',
+      description='pytest plugin for generating HTML reports',
+      author='Dave Hunt',
+      author_email='dhunt@mozilla.com',
+      url='https://github.com/davehunt/pytest-html',
+      data_files=[('', ['style.css', 'main.js'])],
+      py_modules=['pytest_html'],
+      entry_points={'pytest11': ['html = pytest_html']},
+      install_requires=['pytest'],
+      license='Mozilla Public License 2.0 (MPL 2.0)',
+      keywords='py.test pytest html report',
+      classifiers=[
+          'Development Status :: 5 - Production/Stable',
+          'Intended Audience :: Developers',
+          'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
+          'Operating System :: POSIX',
+          'Operating System :: Microsoft :: Windows',
+          'Operating System :: MacOS :: MacOS X',
+          'Topic :: Software Development :: Quality Assurance',
+          'Topic :: Software Development :: Testing',
+          'Topic :: Utilities',
+          'Programming Language :: Python',
+          'Programming Language :: Python :: 2.6',
+          'Programming Language :: Python :: 2.7'])

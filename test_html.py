@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import random
 import re
 
 pytest_plugins = "pytester",
@@ -39,25 +40,80 @@ class TestHTML:
                 time.sleep(%f)
         """ % sleep)
         result, html = run(testdir)
+        assert result.ret == 0
         assert_summary(html, duration=sleep)
         p = re.compile('<td class="col-duration">([\d,.]+)</td>')
         m = p.search(html)
         assert float(m.group(1)) >= sleep
 
-    def test_skip(self, testdir):
+    def test_pass(self, testdir):
         testdir.makepyfile("""
-            import pytest
-            def test_skip():
-                pytest.skip("hello23")
+            def test_pass():
+                pass
         """)
         result, html = run(testdir)
         assert result.ret == 0
+        assert_summary(html)
+
+    def test_skip(self, testdir):
+        reason = random.random()
+        testdir.makepyfile("""
+            import pytest
+            def test_skip():
+                pytest.skip("%s")
+        """ % reason)
+        result, html = run(testdir)
+        assert result.ret == 0
         assert_summary(html, tests=0, passed=0, skipped=1)
-        assert 'Skipped: hello23' in html
+        assert 'Skipped: %s' % reason in html
+
+    def test_fail(self, testdir):
+        testdir.makepyfile("""
+            def test_fail():
+                assert False
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        assert_summary(html, passed=0, failed=1)
+        assert 'AssertionError' in html
+
+    def test_setup_error(self, testdir):
+        testdir.makepyfile("""
+            def pytest_funcarg__arg(request):
+                raise ValueError()
+            def test_function(arg):
+                pass
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        assert_summary(html, tests=0, passed=0, errors=1)
+        assert 'ValueError' in html
+
+    def test_xfail(self, testdir):
+        reason = random.random()
+        testdir.makepyfile("""
+            import pytest
+            def test_xfail():
+                pytest.xfail("%s")
+        """ % reason)
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_summary(html, passed=0, xfailed=1)
+        assert 'XFailed: %s' % reason in html
+
+    def test_xpass(self, testdir):
+        testdir.makepyfile("""
+            import pytest
+            @pytest.mark.xfail()
+            def test_xpass():
+                pass
+        """)
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_summary(html, passed=0, xpassed=1)
 
 # report in subdirectory
 # resources are present
 # additional html works
 # links work
 # images work
-# xfail, xpass, pass, fail, error, skip

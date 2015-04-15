@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import pkg_resources
 import random
 import re
 
@@ -123,7 +124,18 @@ class TestHTML:
         assert result.ret == 0
         assert_summary(html)
 
-# resources are present
+    def test_resources(self, testdir):
+        testdir.makepyfile("""
+            def test_pass():
+                pass
+        """)
+        result, html = run(testdir)
+        assert result.ret == 0
+        for resource in ['style.css', 'main.js']:
+            content = pkg_resources.resource_string(__name__, 'style.css')
+            assert content
+            assert content in html
+
 # additional html works
 # links work
 # images work

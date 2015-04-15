@@ -18,9 +18,9 @@ You will need the following prerequisites in order to use pytest-html:
 Installation
 ------------
 
-To install pytest-instafail::
+To install pytest-html::
 
-    $ pip install pytest-instafail
+    $ pip install pytest-html
 
 Then run your tests with::
 

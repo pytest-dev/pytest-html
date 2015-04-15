@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from base64 import b64encode
 import os
 import pkg_resources
 import random
@@ -136,7 +137,7 @@ class TestHTML:
             assert content
             assert content in html
 
-    def test_additional_html(self, testdir):
+    def test_html_debug(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
             def pytest_runtest_makereport(__multicall__, item):
@@ -156,6 +157,46 @@ class TestHTML:
         assert result.ret
         assert content in html
 
-# links work
+    def test_text_debug(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            def pytest_runtest_makereport(__multicall__, item):
+                report = __multicall__.execute()
+                if report.when == 'call':
+                    from pytest_html import HTMLDebug
+                    report.debug = [
+                        HTMLDebug('Text', '%s', format='text')]
+                return report
+        """ % content)
+        testdir.makepyfile("""
+            def test_fail():
+                assert False
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        href = 'data:text/plain;charset=utf-8;base64,%s' % b64encode(content)
+        link = '<a class="text" href="%s" target="_blank">Text</a>' % href
+        assert link in html
+
+    def test_url_debug(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            def pytest_runtest_makereport(__multicall__, item):
+                report = __multicall__.execute()
+                if report.when == 'call':
+                    from pytest_html import HTMLDebug
+                    report.debug = [
+                        HTMLDebug('URL', '%s', format='url')]
+                return report
+        """ % content)
+        testdir.makepyfile("""
+            def test_fail():
+                assert False
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        link = '<a class="url" href="%s" target="_blank">URL</a>' % content
+        assert link in html
+
 # images work
 # environment works

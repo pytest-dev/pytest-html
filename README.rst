@@ -7,6 +7,14 @@ HTML report for the test results.
 .. image:: https://travis-ci.org/davehunt/pytest-html.svg
     :target: https://travis-ci.org/davehunt/pytest-html
 
+Requirements
+------------
+
+You will need the following prerequisites in order to use pytest-html:
+
+- Python 2.6, 2.7 or PyPy
+- py.test 2.3 or newer
+
 Installation
 ------------
 

@@ -58,7 +58,7 @@ class TestHTML:
         assert_summary(html)
 
     def test_skip(self, testdir):
-        reason = random.random()
+        reason = str(random.random())
         testdir.makepyfile("""
             import pytest
             def test_skip():
@@ -92,7 +92,7 @@ class TestHTML:
         assert 'ValueError' in html
 
     def test_xfail(self, testdir):
-        reason = random.random()
+        reason = str(random.random())
         testdir.makepyfile("""
             import pytest
             def test_xfail():
@@ -136,7 +136,26 @@ class TestHTML:
             assert content
             assert content in html
 
-# additional html works
+    def test_additional_html(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            def pytest_runtest_makereport(__multicall__, item):
+                report = __multicall__.execute()
+                if report.when == 'call':
+                    from py.xml import html
+                    from pytest_html import HTMLDebug
+                    report.debug = [
+                        HTMLDebug('HTML', html.div(%s), format='html')]
+                return report
+        """ % content)
+        testdir.makepyfile("""
+            def test_fail():
+                assert False
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        assert content in html
+
 # links work
 # images work
 # environment works

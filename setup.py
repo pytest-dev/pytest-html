@@ -3,6 +3,7 @@ from setuptools import setup
 setup(name='pytest-html',
       version='1.0',
       description='pytest plugin for generating HTML reports',
+      long_description=open('README.rst').read(),
       author='Dave Hunt',
       author_email='dhunt@mozilla.com',
       url='https://github.com/davehunt/pytest-html',

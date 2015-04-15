@@ -160,7 +160,7 @@ class HTMLReport(object):
                 __name__, 'style.css'))))
 
         summary = [html.h2('Summary'), html.p(
-            '%i tests ran in %i seconds.' % (numtests, suite_time_delta),
+            '%i tests ran in %.2f seconds.' % (numtests, suite_time_delta),
             html.br(),
             html.span('%i passed' % self.passed, class_='passed'), ', ',
             html.span('%i skipped' % self.skipped, class_='skipped'), ', ',

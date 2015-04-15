@@ -2,14 +2,15 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
 import random
 import re
 
 pytest_plugins = "pytester",
 
 
-def run(testdir, *args):
-    path = testdir.tmpdir.join('report.html')
+def run(testdir, path='report.html', *args):
+    path = testdir.tmpdir.join(path)
     result = testdir.runpytest('--html=%s' % path, *args)
     with open(str(path)) as f:
         html = f.read()
@@ -112,8 +113,18 @@ class TestHTML:
         assert result.ret == 0
         assert_summary(html, passed=0, xpassed=1)
 
-# report in subdirectory
+    def test_create_report_path(self, testdir):
+        testdir.makepyfile("""
+            def test_pass():
+                pass
+        """)
+        path = os.path.join('directory', 'report.html')
+        result, html = run(testdir, path)
+        assert result.ret == 0
+        assert_summary(html)
+
 # resources are present
 # additional html works
 # links work
 # images work
+# environment works

@@ -43,7 +43,7 @@ class HTMLReport(object):
 
     def __init__(self, logfile, environment=None):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
-        self.logfile = os.path.normpath(logfile)
+        self.logfile = os.path.abspath(logfile)
         self.environment = environment or {}
         self.test_logs = []
         self.errors = self.failed = 0
@@ -147,6 +147,8 @@ class HTMLReport(object):
         self.suite_start_time = time.time()
 
     def pytest_sessionfinish(self):
+        if not os.path.exists(os.path.dirname(self.logfile)):
+            os.makedirs(os.path.dirname(self.logfile))
         logfile = open(self.logfile, 'w', encoding='utf-8')
         suite_stop_time = time.time()
         suite_time_delta = suite_stop_time - self.suite_start_time

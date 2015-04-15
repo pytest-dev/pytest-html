@@ -95,7 +95,7 @@ span.error, span.failed, span.xpassed, .failed .col-result, .xpassed .col-result
 	padding: 5px;
 	white-space: pre-wrap
 }
-div.image, div.video {
+div.image {
 	border: 1px solid #e6e6e6;
 	float: right;
 	height: 240px;

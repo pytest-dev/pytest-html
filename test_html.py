@@ -198,5 +198,25 @@ class TestHTML:
         link = '<a class="url" href="%s" target="_blank">URL</a>' % content
         assert link in html
 
-# images work
+    def test_image_debug(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            def pytest_runtest_makereport(__multicall__, item):
+                report = __multicall__.execute()
+                if report.when == 'call':
+                    from pytest_html import HTMLDebug
+                    report.debug = [
+                        HTMLDebug('Image', '%s', format='image')]
+                return report
+        """ % content)
+        testdir.makepyfile("""
+            def test_fail():
+                assert False
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        assert '<a class="image" href="#" target="_blank">Image</a>' in html
+        src = 'data:image/png;base64,%s' % content
+        assert '<a href="#"><img src="%s"/></a>' % src in html
+
 # environment works

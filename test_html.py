@@ -133,7 +133,7 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         for resource in ['style.css', 'main.js']:
-            content = pkg_resources.resource_string(__name__, 'style.css')
+            content = pkg_resources.resource_string('pytest_html', 'style.css')
             assert content
             assert content in html
 

@@ -22,4 +22,4 @@ Resources
 ---------
 
 - `Issue Tracker <http://github.com/davehunt/pytest-html/issues>`_
-- `Code <http://github.com/davehunt/pytest-instafail/>`_
+- `Code <http://github.com/davehunt/pytest-html/>`_

@@ -26,7 +26,7 @@ function find_all(selector, elem) {
 addEventListener("DOMContentLoaded", function() {
     reset_sort_headers();
 
-    split_debug_onto_two_rows();
+    split_extra_onto_two_rows();
 
     find_all('.col-links a.image').forEach(function(elem) {
         elem.addEventListener("click",
@@ -37,7 +37,7 @@ addEventListener("DOMContentLoaded", function() {
                                   }
                                   if (node != null) {
                                       if (node.nextSibling &&
-                                          node.nextSibling.classList.contains("debug")) {
+                                          node.nextSibling.classList.contains("extra")) {
                                           var href = find('.image img', node.nextSibling).src;
                                           window.open(href);
                                       }
@@ -78,7 +78,7 @@ function sort_table(clicked, key_func) {
         parent.appendChild(elem);
     });
 
-    split_debug_onto_two_rows();
+    split_extra_onto_two_rows();
 }
 
 function sort(items, key_func, reversed) {
@@ -140,12 +140,12 @@ function toggle_sort_states(elem) {
     }
 }
 
-function split_debug_onto_two_rows() {
+function split_extra_onto_two_rows() {
     find_all('tr.results-table-row').forEach(function(elem) {
         var new_row = document.createElement("tr")
-        new_row.className = "debug";
+        new_row.className = "extra";
         elem.parentNode.insertBefore(new_row, elem.nextSibling);
-        find_all(".debug", elem).forEach(function (td_elem) {
+        find_all(".extra", elem).forEach(function (td_elem) {
             if (find(".log", td_elem)) {
                 new_row.appendChild(td_elem);
                 td_elem.colSpan=5;
@@ -158,14 +158,14 @@ function split_debug_onto_two_rows() {
 
 function one_row_for_data() {
     find_all('tr.results-table-row').forEach(function(elem) {
-        if (elem.nextSibling.classList.contains('debug')) {
+        if (elem.nextSibling.classList.contains('extra')) {
             toArray(elem.nextSibling.childNodes).forEach(
                 function (td_elem) {
                     elem.appendChild(td_elem);
                 })
         } else {
             var new_td = document.createElement("td");
-            new_td.className = "debug";
+            new_td.className = "extra";
             elem.appendChild(new_td);
         }
     });

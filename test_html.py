@@ -137,16 +137,15 @@ class TestHTML:
             assert content
             assert content in html
 
-    def test_html_debug(self, testdir):
+    def test_extra_html(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
                     from py.xml import html
-                    from pytest_html import HTMLDebug
-                    report.debug = [
-                        HTMLDebug('HTML', html.div(%s), format='html')]
+                    from pytest_html import HTML
+                    report.extra = [HTML(html.div(%s))]
                 return report
         """ % content)
         testdir.makepyfile("""
@@ -157,15 +156,14 @@ class TestHTML:
         assert result.ret
         assert content in html
 
-    def test_text_debug(self, testdir):
+    def test_extra_text(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from pytest_html import HTMLDebug
-                    report.debug = [
-                        HTMLDebug('Text', '%s', format='text')]
+                    from pytest_html import Text
+                    report.extra = [Text('%s')]
                 return report
         """ % content)
         testdir.makepyfile("""
@@ -178,15 +176,14 @@ class TestHTML:
         link = '<a class="text" href="%s" target="_blank">Text</a>' % href
         assert link in html
 
-    def test_url_debug(self, testdir):
+    def test_extra_url(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from pytest_html import HTMLDebug
-                    report.debug = [
-                        HTMLDebug('URL', '%s', format='url')]
+                    from pytest_html import URL
+                    report.extra = [URL('%s')]
                 return report
         """ % content)
         testdir.makepyfile("""
@@ -198,15 +195,14 @@ class TestHTML:
         link = '<a class="url" href="%s" target="_blank">URL</a>' % content
         assert link in html
 
-    def test_image_debug(self, testdir):
+    def test_extra_image(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from pytest_html import HTMLDebug
-                    report.debug = [
-                        HTMLDebug('Image', '%s', format='image')]
+                    from pytest_html import Image
+                    report.extra = [Image('%s')]
                 return report
         """ % content)
         testdir.makepyfile("""

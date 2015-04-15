@@ -52,7 +52,7 @@ span.error, span.failed, span.xpassed, .failed .col-result, .xpassed .col-result
  * RESULTS TABLE
  * 
  * 1. Table Layout
- * 2. Debug
+ * 2. Extra
  * 3. Sorting items
  * 
  ******************************/
@@ -78,7 +78,7 @@ span.error, span.failed, span.xpassed, .failed .col-result, .xpassed .col-result
 }
 
 /*------------------
- * 2. Debug
+ * 2. Extra
  *------------------*/
 
 .log:only-child {
@@ -107,8 +107,8 @@ div.image img {
 	width: 320px
 }
 
-/*if the result is passed or xpassed don't show debug row*/
-.passed + .debug, .xpassed + .debug {
+/*if the result is passed or xpassed don't show extra row*/
+.passed + .extra, .xpassed + .extra {
 	display: none;
 }
 

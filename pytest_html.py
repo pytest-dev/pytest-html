@@ -58,26 +58,26 @@ class HTMLReport(object):
 
         if 'Passed' not in result:
 
-            for debug in getattr(report, 'debug', []):
+            for extra in getattr(report, 'extra', []):
                 href = None
-                if debug.format == 'image':
+                if type(extra) is Image:
                     href = '#'
-                    image = 'data:image/png;base64,%s' % debug.content
+                    image = 'data:image/png;base64,%s' % extra.content
                     additional_html.append(html.div(
                         html.a(html.img(src=image), href="#"),
-                        class_=debug.format))
-                elif debug.format == 'html':
-                    additional_html.append(debug.content)
-                elif debug.format == 'text':
+                        class_='image'))
+                elif type(extra) is HTML:
+                    additional_html.append(extra.content)
+                elif type(extra) is Text:
                     href = 'data:text/plain;charset=utf-8;base64,%s' % \
-                        b64encode(debug.content)
-                elif debug.format == 'url':
-                    href = debug.content
+                        b64encode(extra.content)
+                elif type(extra) is URL:
+                    href = extra.content
 
                 if href is not None:
                     links_html.append(html.a(
-                        debug.name,
-                        class_=debug.format.lower(),
+                        extra.name,
+                        class_=extra.__class__.__name__.lower(),
                         href=href,
                         target='_blank'))
                     links_html.append(' ')
@@ -104,7 +104,7 @@ class HTMLReport(object):
             html.td(report.nodeid, class_='col-name'),
             html.td('%.2f' % time, class_='col-duration'),
             html.td(links_html, class_='col-links'),
-            html.td(additional_html, class_='debug')],
+            html.td(additional_html, class_='extra')],
             class_=result.lower() + ' results-table-row'))
 
     def append_pass(self, report):
@@ -213,9 +213,28 @@ class HTMLReport(object):
             self.logfile))
 
 
-class HTMLDebug(object):
+class HTML(object):
 
-    def __init__(self, name, content, format='text'):
-        self.name = name
+    def __init__(self, content):
         self.content = content
-        self.format = format
+
+
+class Image(object):
+
+    def __init__(self, content, name='Image'):
+        self.content = content
+        self.name = name
+
+
+class Text(object):
+
+    def __init__(self, content, name='Text'):
+        self.content = content
+        self.name = name
+
+
+class URL(object):
+
+    def __init__(self, content, name='URL'):
+        self.content = content
+        self.name = name

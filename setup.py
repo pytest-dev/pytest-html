@@ -10,7 +10,7 @@ setup(name='pytest-html',
       data_files=[('', ['style.css', 'main.js'])],
       py_modules=['pytest_html'],
       entry_points={'pytest11': ['html = pytest_html']},
-      install_requires=['pytest'],
+      install_requires=['pytest>=2.3'],
       license='Mozilla Public License 2.0 (MPL 2.0)',
       keywords='py.test pytest html report',
       classifiers=[

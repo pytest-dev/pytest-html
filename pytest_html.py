@@ -17,6 +17,11 @@ if sys.version_info[0] < 3:
     from codecs import open
 
 
+def pytest_addhooks(pluginmanager):
+    import newhooks
+    pluginmanager.addhooks(newhooks)
+
+
 def pytest_addoption(parser):
     group = parser.getgroup('terminal reporting')
     group.addoption('--html', action='store', dest='htmlpath',
@@ -28,7 +33,8 @@ def pytest_configure(config):
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
-        config._html = HTMLReport(htmlpath)
+        environment = config.hook.pytest_html_environment(config=config)
+        config._html = HTMLReport(htmlpath, environment)
         config.pluginmanager.register(config._html)
 
 
@@ -44,7 +50,7 @@ class HTMLReport(object):
     def __init__(self, logfile, environment=None):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
-        self.environment = environment or {}
+        self.environment = environment or []
         self.test_logs = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
@@ -192,12 +198,17 @@ class HTMLReport(object):
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S'))))
 
-        if self.environment:
+        environment = {}
+        for e in self.environment:
+            for k, v in e.items():
+                environment[k] = v
+
+        if environment:
             body.append(html.h2('Environment'))
             body.append(html.table(
                 [html.tr(html.td(k), html.td(v)) for k, v in sorted(
-                    self.environment.items()) if v]),
-                id='environment')
+                    environment.items()) if v],
+                id='environment'))
 
         body.extend(summary)
         body.extend(results)

@@ -50,10 +50,7 @@ class TestHTML:
         assert float(m.group(1)) >= sleep
 
     def test_pass(self, testdir):
-        testdir.makepyfile("""
-            def test_pass():
-                pass
-        """)
+        testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
         assert result.ret == 0
         assert_summary(html)
@@ -71,10 +68,7 @@ class TestHTML:
         assert 'Skipped: %s' % reason in html
 
     def test_fail(self, testdir):
-        testdir.makepyfile("""
-            def test_fail():
-                assert False
-        """)
+        testdir.makepyfile("def test_fail(): assert False")
         result, html = run(testdir)
         assert result.ret
         assert_summary(html, passed=0, failed=1)
@@ -116,20 +110,14 @@ class TestHTML:
         assert_summary(html, passed=0, xpassed=1)
 
     def test_create_report_path(self, testdir):
-        testdir.makepyfile("""
-            def test_pass():
-                pass
-        """)
+        testdir.makepyfile("def test_pass(): pass")
         path = os.path.join('directory', 'report.html')
         result, html = run(testdir, path)
         assert result.ret == 0
         assert_summary(html)
 
     def test_resources(self, testdir):
-        testdir.makepyfile("""
-            def test_pass():
-                pass
-        """)
+        testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
         assert result.ret == 0
         for resource in ['style.css', 'main.js']:
@@ -148,10 +136,7 @@ class TestHTML:
                     report.extra = [HTML(html.div(%s))]
                 return report
         """ % content)
-        testdir.makepyfile("""
-            def test_fail():
-                assert False
-        """)
+        testdir.makepyfile("def test_fail(): assert False")
         result, html = run(testdir)
         assert result.ret
         assert content in html
@@ -166,10 +151,7 @@ class TestHTML:
                     report.extra = [Text('%s')]
                 return report
         """ % content)
-        testdir.makepyfile("""
-            def test_fail():
-                assert False
-        """)
+        testdir.makepyfile("def test_fail(): assert False")
         result, html = run(testdir)
         assert result.ret
         href = 'data:text/plain;charset=utf-8;base64,%s' % b64encode(content)
@@ -186,10 +168,7 @@ class TestHTML:
                     report.extra = [URL('%s')]
                 return report
         """ % content)
-        testdir.makepyfile("""
-            def test_fail():
-                assert False
-        """)
+        testdir.makepyfile("def test_fail(): assert False")
         result, html = run(testdir)
         assert result.ret
         link = '<a class="url" href="%s" target="_blank">URL</a>' % content
@@ -205,14 +184,28 @@ class TestHTML:
                     report.extra = [Image('%s')]
                 return report
         """ % content)
-        testdir.makepyfile("""
-            def test_fail():
-                assert False
-        """)
+        testdir.makepyfile("def test_fail(): assert False")
         result, html = run(testdir)
         assert result.ret
         assert '<a class="image" href="#" target="_blank">Image</a>' in html
         src = 'data:image/png;base64,%s' % content
         assert '<a href="#"><img src="%s"/></a>' % src in html
 
-# environment works
+    def test_no_environment(self, testdir):
+        testdir.makepyfile("def test_pass(): pass")
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert 'Environment' not in html
+
+    def test_environment(self, testdir):
+        content = (str(random.random()), str(random.random()))
+        testdir.makeconftest("""
+            def pytest_html_environment(config):
+                return {'%s': %s}
+        """ % content)
+        testdir.makepyfile("def test_pass(): pass")
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert 'Environment' in html
+        for c in content:
+            assert c in html

@@ -121,7 +121,8 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         for resource in ['style.css', 'main.js']:
-            content = pkg_resources.resource_string('pytest_html', 'style.css')
+            content = pkg_resources.resource_string(
+                'html', os.path.join('resources', resource))
             assert content
             assert content in html
 
@@ -132,8 +133,8 @@ class TestHTML:
                 report = __multicall__.execute()
                 if report.when == 'call':
                     from py.xml import html
-                    from pytest_html import HTML
-                    report.extra = [HTML(html.div(%s))]
+                    from html import extras
+                    report.extra = [extras.html(html.div(%s))]
                 return report
         """ % content)
         testdir.makepyfile("def test_fail(): assert False")
@@ -147,8 +148,8 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from pytest_html import Text
-                    report.extra = [Text('%s')]
+                    from html import extras
+                    report.extra = [extras.text('%s')]
                 return report
         """ % content)
         testdir.makepyfile("def test_fail(): assert False")
@@ -164,8 +165,8 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from pytest_html import URL
-                    report.extra = [URL('%s')]
+                    from html import extras
+                    report.extra = [extras.url('%s')]
                 return report
         """ % content)
         testdir.makepyfile("def test_fail(): assert False")
@@ -180,8 +181,8 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from pytest_html import Image
-                    report.extra = [Image('%s')]
+                    from html import extras
+                    report.extra = [extras.image('%s')]
                 return report
         """ % content)
         testdir.makepyfile("def test_fail(): assert False")

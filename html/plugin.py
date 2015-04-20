@@ -12,13 +12,15 @@ import time
 
 from py.xml import html, raw
 
+import extras
+
 # Python 2.X and 3.X compatibility
 if sys.version_info[0] < 3:
     from codecs import open
 
 
 def pytest_addhooks(pluginmanager):
-    import newhooks
+    from html import newhooks
     pluginmanager.addhooks(newhooks)
 
 
@@ -66,24 +68,24 @@ class HTMLReport(object):
 
             for extra in getattr(report, 'extra', []):
                 href = None
-                if type(extra) is Image:
+                if extra.get('format') == extras.FORMAT_IMAGE:
                     href = '#'
-                    image = 'data:image/png;base64,%s' % extra.content
+                    image = 'data:image/png;base64,%s' % extra.get('content')
                     additional_html.append(html.div(
                         html.a(html.img(src=image), href="#"),
                         class_='image'))
-                elif type(extra) is HTML:
-                    additional_html.append(extra.content)
-                elif type(extra) is Text:
+                elif extra.get('format') == extras.FORMAT_HTML:
+                    additional_html.append(extra.get('content'))
+                elif extra.get('format') == extras.FORMAT_TEXT:
                     href = 'data:text/plain;charset=utf-8;base64,%s' % \
-                        b64encode(extra.content)
-                elif type(extra) is URL:
-                    href = extra.content
+                        b64encode(extra.get('content'))
+                elif extra.get('format') == extras.FORMAT_URL:
+                    href = extra.get('content')
 
                 if href is not None:
                     links_html.append(html.a(
-                        extra.name,
-                        class_=extra.__class__.__name__.lower(),
+                        extra.get('name'),
+                        class_=extra.get('format'),
                         href=href,
                         target='_blank'))
                     links_html.append(' ')
@@ -165,7 +167,7 @@ class HTMLReport(object):
             html.meta(charset='utf-8'),
             html.title('Test Report'),
             html.style(raw(pkg_resources.resource_string(
-                __name__, 'style.css'))))
+                __name__, os.path.join('resources', 'style.css')))))
 
         summary = [html.h2('Summary'), html.p(
             '%i tests ran in %.2f seconds.' % (numtests, suite_time_delta),
@@ -193,7 +195,7 @@ class HTMLReport(object):
 
         body = html.body(
             html.script(raw(pkg_resources.resource_string(
-                __name__, 'main.js'))),
+                __name__, os.path.join('resources', 'main.js')))),
             html.p('Report generated on %s at %s' % (
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S'))))
@@ -222,30 +224,3 @@ class HTMLReport(object):
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: %s' % (
             self.logfile))
-
-
-class HTML(object):
-
-    def __init__(self, content):
-        self.content = content
-
-
-class Image(object):
-
-    def __init__(self, content, name='Image'):
-        self.content = content
-        self.name = name
-
-
-class Text(object):
-
-    def __init__(self, content, name='Text'):
-        self.content = content
-        self.name = name
-
-
-class URL(object):
-
-    def __init__(self, content, name='URL'):
-        self.content = content
-        self.name = name

@@ -47,7 +47,7 @@ conftest.py file:
 .. code-block:: python
 
   from py.xml import html
-  from pytest_html import HTML, Image, Text, URL
+  from html import extras
 
   def pytest_runtest_makereport(__multicall__, item):
       report = __multicall__.execute()
@@ -56,12 +56,12 @@ conftest.py file:
           xfail = hasattr(report, 'wasxfail')
           if (report.skipped and xfail) or (report.failed and not xfail):
               url = TestSetup.selenium.current_url
-              report.extra.append(URL(url))
+              report.extra.append(extras.url(url))
               screenshot = TestSetup.selenium.get_screenshot_as_base64()
-              report.extra.append(Image(screenshot, 'Screenshot'))
+              report.extra.append(extras.image(screenshot, 'Screenshot'))
               html = TestSetup.selenium.page_source.encode('utf-8')
-              report.extra.append(Text(html, 'HTML'))
-              report.extra.append(HTML(html.div('Additional HTML')))
+              report.extra.append(extra.text(html, 'HTML'))
+              report.extra.append(extra.html(html.div('Additional HTML')))
       return report
 
 Resources

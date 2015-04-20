@@ -51,7 +51,7 @@ conftest.py file:
 
   def pytest_runtest_makereport(__multicall__, item):
       report = __multicall__.execute()
-      report.extra = []
+      extra = getattr(report, 'extra', [])
       if report.when == 'call':
           xfail = hasattr(report, 'wasxfail')
           if (report.skipped and xfail) or (report.failed and not xfail):
@@ -62,6 +62,7 @@ conftest.py file:
               html = TestSetup.selenium.page_source.encode('utf-8')
               report.extra.append(extra.text(html, 'HTML'))
               report.extra.append(extra.html(html.div('Additional HTML')))
+          report.extra = extra
       return report
 
 Resources

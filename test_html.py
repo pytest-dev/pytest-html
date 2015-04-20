@@ -36,7 +36,7 @@ def assert_summary(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
 class TestHTML:
 
     def test_durations(self, testdir):
-        sleep = float(0.1)
+        sleep = float(0.2)
         testdir.makepyfile("""
             import time
             def test_sleep():

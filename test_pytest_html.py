@@ -159,7 +159,11 @@ class TestHTML:
         testdir.makepyfile("def test_fail(): assert False")
         result, html = run(testdir)
         assert result.ret
-        href = 'data:text/plain;charset=utf-8;base64,%s' % b64encode(content)
+        if PY3:
+            data = b64encode(content.encode('utf-8')).decode('ascii')
+        else:
+            data = b64encode(content)
+        href = 'data:text/plain;charset=utf-8;base64,%s' % data
         link = '<a class="text" href="%s" target="_blank">Text</a>' % href
         assert link in html
 

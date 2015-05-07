@@ -81,8 +81,12 @@ class HTMLReport(object):
                 elif extra.get('format') == extras.FORMAT_HTML:
                     additional_html.append(extra.get('content'))
                 elif extra.get('format') == extras.FORMAT_TEXT:
-                    href = 'data:text/plain;charset=utf-8;base64,%s' % \
-                        b64encode(extra.get('content'))
+                    if PY3:
+                        data = b64encode(extra.get('content').encode('utf-8'))
+                        data = data.decode('ascii')
+                    else:
+                        data = b64encode(extra.get('content'))
+                    href = 'data:text/plain;charset=utf-8;base64,%s' % data
                 elif extra.get('format') == extras.FORMAT_URL:
                     href = extra.get('content')
 

@@ -125,6 +125,8 @@ class TestHTML:
         for resource in ['style.css', 'main.js']:
             content = pkg_resources.resource_string(
                 'pytest_html', os.path.join('resources', resource))
+            if PY3:
+                content = content.decode('utf-8')
             assert content
             assert content in html
 

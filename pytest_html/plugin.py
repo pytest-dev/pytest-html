@@ -167,11 +167,15 @@ class HTMLReport(object):
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
+        style_css = pkg_resources.resource_string(
+            __name__, os.path.join('resources', 'style.css'))
+        if PY3:
+            style_css = style_css.decode('utf-8')
+
         head = html.head(
             html.meta(charset='utf-8'),
             html.title('Test Report'),
-            html.style(raw(pkg_resources.resource_string(
-                __name__, os.path.join('resources', 'style.css')))))
+            html.style(raw(style_css)))
 
         summary = [html.h2('Summary'), html.p(
             '%i tests ran in %.2f seconds.' % (numtests, suite_time_delta),
@@ -197,9 +201,13 @@ class HTMLReport(object):
             html.tbody(*self.test_logs, id='results-table-body')],
             id='results-table')]
 
+        main_js = pkg_resources.resource_string(
+            __name__, os.path.join('resources', 'main.js'))
+        if PY3:
+            main_js = main_js.decode('utf-8')
+
         body = html.body(
-            html.script(raw(pkg_resources.resource_string(
-                __name__, os.path.join('resources', 'main.js')))),
+            html.script(raw(main_js)),
             html.p('Report generated on %s at %s' % (
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S'))))

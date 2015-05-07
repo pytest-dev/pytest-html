@@ -16,8 +16,10 @@ from py.xml import html, raw
 
 from . import extras
 
+PY3 = sys.version_info[0] == 3
+
 # Python 2.X and 3.X compatibility
-if sys.version_info[0] < 3:
+if not PY3:
     from codecs import open
 
 

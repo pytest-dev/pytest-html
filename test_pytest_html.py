@@ -4,10 +4,12 @@
 
 from base64 import b64encode
 import os
+import sys
 import pkg_resources
 import random
 import re
 
+PY3 = sys.version_info[0] == 3
 pytest_plugins = "pytester",
 
 

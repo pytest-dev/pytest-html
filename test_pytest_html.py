@@ -122,7 +122,7 @@ class TestHTML:
         assert result.ret == 0
         for resource in ['style.css', 'main.js']:
             content = pkg_resources.resource_string(
-                'html', os.path.join('resources', resource))
+                'pytest_html', os.path.join('resources', resource))
             assert content
             assert content in html
 
@@ -133,7 +133,7 @@ class TestHTML:
                 report = __multicall__.execute()
                 if report.when == 'call':
                     from py.xml import html
-                    from html import extras
+                    from pytest_html import extras
                     report.extra = [extras.html(html.div(%s))]
                 return report
         """ % content)
@@ -148,7 +148,7 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from html import extras
+                    from pytest_html import extras
                     report.extra = [extras.text('%s')]
                 return report
         """ % content)
@@ -165,7 +165,7 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from html import extras
+                    from pytest_html import extras
                     report.extra = [extras.url('%s')]
                 return report
         """ % content)
@@ -181,7 +181,7 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from html import extras
+                    from pytest_html import extras
                     report.extra = [extras.image('%s')]
                 return report
         """ % content)

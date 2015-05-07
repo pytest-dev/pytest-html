@@ -20,7 +20,7 @@ if sys.version_info[0] < 3:
 
 
 def pytest_addhooks(pluginmanager):
-    from html import newhooks
+    from pytest_html import newhooks
     pluginmanager.addhooks(newhooks)
 
 

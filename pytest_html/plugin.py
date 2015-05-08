@@ -234,7 +234,7 @@ class HTMLReport(object):
 
         doc = html.html(head, body)
 
-        logfile.write(u'<!DOCTYPE html>')
+        logfile.write('<!DOCTYPE html>')
         logfile.write(doc.unicode(indent=2))
         logfile.close()
 

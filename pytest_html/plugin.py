@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from __future__ import absolute_import
+
 from base64 import b64encode
 import cgi
 import datetime
@@ -12,15 +14,17 @@ import time
 
 from py.xml import html, raw
 
-import extras
+from . import extras
+
+PY3 = sys.version_info[0] == 3
 
 # Python 2.X and 3.X compatibility
-if sys.version_info[0] < 3:
+if not PY3:
     from codecs import open
 
 
 def pytest_addhooks(pluginmanager):
-    from html import newhooks
+    from pytest_html import newhooks
     pluginmanager.addhooks(newhooks)
 
 
@@ -77,8 +81,12 @@ class HTMLReport(object):
                 elif extra.get('format') == extras.FORMAT_HTML:
                     additional_html.append(extra.get('content'))
                 elif extra.get('format') == extras.FORMAT_TEXT:
-                    href = 'data:text/plain;charset=utf-8;base64,%s' % \
-                        b64encode(extra.get('content'))
+                    if PY3:
+                        data = b64encode(extra.get('content').encode('utf-8'))
+                        data = data.decode('ascii')
+                    else:
+                        data = b64encode(extra.get('content'))
+                    href = 'data:text/plain;charset=utf-8;base64,%s' % data
                 elif extra.get('format') == extras.FORMAT_URL:
                     href = extra.get('content')
 
@@ -93,7 +101,8 @@ class HTMLReport(object):
             if report.longrepr:
                 log = html.div(class_='log')
                 for line in str(report.longrepr).splitlines():
-                    line = line.decode('utf-8')
+                    if not PY3:
+                        line = line.decode('utf-8')
                     separator = line.startswith('_ ' * 10)
                     if separator:
                         log.append(line[:80])
@@ -163,11 +172,15 @@ class HTMLReport(object):
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
+        style_css = pkg_resources.resource_string(
+            __name__, os.path.join('resources', 'style.css'))
+        if PY3:
+            style_css = style_css.decode('utf-8')
+
         head = html.head(
             html.meta(charset='utf-8'),
             html.title('Test Report'),
-            html.style(raw(pkg_resources.resource_string(
-                __name__, os.path.join('resources', 'style.css')))))
+            html.style(raw(style_css)))
 
         summary = [html.h2('Summary'), html.p(
             '%i tests ran in %.2f seconds.' % (numtests, suite_time_delta),
@@ -193,9 +206,13 @@ class HTMLReport(object):
             html.tbody(*self.test_logs, id='results-table-body')],
             id='results-table')]
 
+        main_js = pkg_resources.resource_string(
+            __name__, os.path.join('resources', 'main.js'))
+        if PY3:
+            main_js = main_js.decode('utf-8')
+
         body = html.body(
-            html.script(raw(pkg_resources.resource_string(
-                __name__, os.path.join('resources', 'main.js')))),
+            html.script(raw(main_js)),
             html.p('Report generated on %s at %s' % (
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S'))))
@@ -217,7 +234,7 @@ class HTMLReport(object):
 
         doc = html.html(head, body)
 
-        logfile.write(u'<!DOCTYPE html>')
+        logfile.write('<!DOCTYPE html>')
         logfile.write(doc.unicode(indent=2))
         logfile.close()
 

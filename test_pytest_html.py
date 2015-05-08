@@ -4,10 +4,12 @@
 
 from base64 import b64encode
 import os
+import sys
 import pkg_resources
 import random
 import re
 
+PY3 = sys.version_info[0] == 3
 pytest_plugins = "pytester",
 
 
@@ -122,7 +124,9 @@ class TestHTML:
         assert result.ret == 0
         for resource in ['style.css', 'main.js']:
             content = pkg_resources.resource_string(
-                'html', os.path.join('resources', resource))
+                'pytest_html', os.path.join('resources', resource))
+            if PY3:
+                content = content.decode('utf-8')
             assert content
             assert content in html
 
@@ -133,7 +137,7 @@ class TestHTML:
                 report = __multicall__.execute()
                 if report.when == 'call':
                     from py.xml import html
-                    from html import extras
+                    from pytest_html import extras
                     report.extra = [extras.html(html.div(%s))]
                 return report
         """ % content)
@@ -148,14 +152,18 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from html import extras
+                    from pytest_html import extras
                     report.extra = [extras.text('%s')]
                 return report
         """ % content)
         testdir.makepyfile("def test_fail(): assert False")
         result, html = run(testdir)
         assert result.ret
-        href = 'data:text/plain;charset=utf-8;base64,%s' % b64encode(content)
+        if PY3:
+            data = b64encode(content.encode('utf-8')).decode('ascii')
+        else:
+            data = b64encode(content)
+        href = 'data:text/plain;charset=utf-8;base64,%s' % data
         link = '<a class="text" href="%s" target="_blank">Text</a>' % href
         assert link in html
 
@@ -165,7 +173,7 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from html import extras
+                    from pytest_html import extras
                     report.extra = [extras.url('%s')]
                 return report
         """ % content)
@@ -181,7 +189,7 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from html import extras
+                    from pytest_html import extras
                     report.extra = [extras.image('%s')]
                 return report
         """ % content)

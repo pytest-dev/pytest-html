@@ -6,14 +6,19 @@ HTML report for the test results.
 
 .. image:: https://img.shields.io/pypi/l/pytest-html.svg
    :target: https://github.com/davehunt/pytest-html/blob/master/LICENSE
+   :alt: License
 .. image:: https://img.shields.io/pypi/v/pytest-html.svg
    :target: https://pypi.python.org/pypi/pytest-html/
+   :alt: PyPI
 .. image:: https://img.shields.io/travis/davehunt/pytest-html.svg
    :target: https://travis-ci.org/davehunt/pytest-html/
+   :alt: Travis
 .. image:: https://img.shields.io/github/issues-raw/davehunt/pytest-html.svg
    :target: https://github.com/davehunt/pytest-html/issues
+   :alt: Issues
 .. image:: https://img.shields.io/requires/github/davehunt/pytest-html.svg
    :target: https://requires.io/github/davehunt/pytest-html/requirements/?branch=master
+   :alt: Requirements
 
 Requirements
 ------------

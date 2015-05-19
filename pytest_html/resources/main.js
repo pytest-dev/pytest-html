@@ -26,7 +26,14 @@ function find_all(selector, elem) {
 function sort_column(elem) {
     toggle_sort_states(elem);
     var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
-    var key = elem.classList.contains('numeric') ? key_num : key_alpha;
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
     sort_table(elem, key(colIndex));
 }
 
@@ -113,6 +120,14 @@ function key_alpha(col_index) {
 function key_num(col_index) {
     return function(elem) {
         return parseFloat(elem.childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'XFailed', 'XPassed', 'Skipped',
+                       'Passed'];
+        return strings.indexOf(elem.childNodes[col_index].firstChild.data);
     };
 }
 

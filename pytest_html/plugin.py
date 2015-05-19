@@ -5,7 +5,6 @@
 from __future__ import absolute_import
 
 from base64 import b64encode
-import cgi
 import datetime
 import os
 import pkg_resources
@@ -19,8 +18,11 @@ from . import extras
 PY3 = sys.version_info[0] == 3
 
 # Python 2.X and 3.X compatibility
-if not PY3:
+if PY3:
+    from html import escape
+else:
     from codecs import open
+    from cgi import escape
 
 
 def pytest_addhooks(pluginmanager):
@@ -109,10 +111,10 @@ class HTMLReport(object):
                     else:
                         exception = line.startswith("E   ")
                         if exception:
-                            log.append(html.span(raw(cgi.escape(line)),
+                            log.append(html.span(raw(escape(line)),
                                                  class_='error'))
                         else:
-                            log.append(raw(cgi.escape(line)))
+                            log.append(raw(escape(line)))
                     log.append(html.br())
                 additional_html.append(log)
 

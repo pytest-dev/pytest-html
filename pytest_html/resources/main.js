@@ -23,10 +23,18 @@ function find_all(selector, elem) {
     return toArray(elem.querySelectorAll(selector));
 }
 
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key = elem.classList.contains('numeric') ? key_num : key_alpha;
+    sort_table(elem, key(colIndex));
+}
+
 addEventListener("DOMContentLoaded", function() {
     reset_sort_headers();
 
     split_extra_onto_two_rows();
+    sort_column(find('.initial-sort'));
 
     find_all('.col-links a.image').forEach(function(elem) {
         elem.addEventListener("click",
@@ -57,10 +65,7 @@ addEventListener("DOMContentLoaded", function() {
     find_all('.sortable').forEach(function(elem) {
         elem.addEventListener("click",
                               function(event) {
-                                  toggle_sort_states(elem);
-                                  var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
-                                  var key = elem.classList.contains('numeric') ? key_num : key_alpha;
-                                  sort_table(elem, key(colIndex));
+                                  sort_column(elem);
                               }, false)
     });
 

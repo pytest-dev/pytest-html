@@ -52,7 +52,7 @@ class TestHTML:
         assert float(m.group(1)) >= sleep
 
     def test_pass(self, testdir):
-        testdir.makepyfile("def test_pass(): pass")
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
         assert_summary(html)
@@ -62,7 +62,7 @@ class TestHTML:
         testdir.makepyfile("""
             import pytest
             def test_skip():
-                pytest.skip("%s")
+                pytest.skip('%s')
         """ % reason)
         result, html = run(testdir)
         assert result.ret == 0
@@ -70,7 +70,7 @@ class TestHTML:
         assert 'Skipped: %s' % reason in html
 
     def test_fail(self, testdir):
-        testdir.makepyfile("def test_fail(): assert False")
+        testdir.makepyfile('def test_fail(): assert False')
         result, html = run(testdir)
         assert result.ret
         assert_summary(html, passed=0, failed=1)
@@ -93,7 +93,7 @@ class TestHTML:
         testdir.makepyfile("""
             import pytest
             def test_xfail():
-                pytest.xfail("%s")
+                pytest.xfail('%s')
         """ % reason)
         result, html = run(testdir)
         assert result.ret == 0
@@ -112,14 +112,14 @@ class TestHTML:
         assert_summary(html, passed=0, xpassed=1)
 
     def test_create_report_path(self, testdir):
-        testdir.makepyfile("def test_pass(): pass")
+        testdir.makepyfile('def test_pass(): pass')
         path = os.path.join('directory', 'report.html')
         result, html = run(testdir, path)
         assert result.ret == 0
         assert_summary(html)
 
     def test_resources(self, testdir):
-        testdir.makepyfile("def test_pass(): pass")
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
         for resource in ['style.css', 'main.js']:
@@ -141,7 +141,7 @@ class TestHTML:
                     report.extra = [extras.html(html.div(%s))]
                 return report
         """ % content)
-        testdir.makepyfile("def test_fail(): assert False")
+        testdir.makepyfile('def test_fail(): assert False')
         result, html = run(testdir)
         assert result.ret
         assert content in html
@@ -156,7 +156,7 @@ class TestHTML:
                     report.extra = [extras.text('%s')]
                 return report
         """ % content)
-        testdir.makepyfile("def test_fail(): assert False")
+        testdir.makepyfile('def test_fail(): assert False')
         result, html = run(testdir)
         assert result.ret
         if PY3:
@@ -177,7 +177,7 @@ class TestHTML:
                     report.extra = [extras.url('%s')]
                 return report
         """ % content)
-        testdir.makepyfile("def test_fail(): assert False")
+        testdir.makepyfile('def test_fail(): assert False')
         result, html = run(testdir)
         assert result.ret
         link = '<a class="url" href="%s" target="_blank">URL</a>' % content
@@ -193,7 +193,7 @@ class TestHTML:
                     report.extra = [extras.image('%s')]
                 return report
         """ % content)
-        testdir.makepyfile("def test_fail(): assert False")
+        testdir.makepyfile('def test_fail(): assert False')
         result, html = run(testdir)
         assert result.ret
         assert '<a class="image" href="#" target="_blank">Image</a>' in html
@@ -201,7 +201,7 @@ class TestHTML:
         assert '<a href="#"><img src="%s"/></a>' % src in html
 
     def test_no_environment(self, testdir):
-        testdir.makepyfile("def test_pass(): pass")
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
         assert 'Environment' not in html
@@ -212,7 +212,7 @@ class TestHTML:
             def pytest_html_environment(config):
                 return {'%s': %s}
         """ % content)
-        testdir.makepyfile("def test_pass(): pass")
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
         assert 'Environment' in html

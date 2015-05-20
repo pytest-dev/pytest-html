@@ -33,11 +33,11 @@ Installation
 
 To install pytest-html::
 
-    $ pip install pytest-html
+  pip install pytest-html
 
 Then run your tests with::
 
-    $ py.test --html=report.html
+  py.test --html=report.html
 
 
 Enhancing reports

@@ -79,33 +79,33 @@ class HTMLReport(object):
         additional_html = []
         links_html = []
 
+        for extra in getattr(report, 'extra', []):
+            href = None
+            if extra.get('format') == extras.FORMAT_IMAGE:
+                href = '#'
+                image = 'data:image/png;base64,%s' % extra.get('content')
+                additional_html.append(html.div(
+                    html.a(html.img(src=image), href="#"),
+                    class_='image'))
+            elif extra.get('format') == extras.FORMAT_HTML:
+                additional_html.append(extra.get('content'))
+            elif extra.get('format') == extras.FORMAT_JSON:
+                href = data_uri(json.dumps(extra.get('content')),
+                                mime_type='application/json')
+            elif extra.get('format') == extras.FORMAT_TEXT:
+                href = data_uri(extra.get('content'))
+            elif extra.get('format') == extras.FORMAT_URL:
+                href = extra.get('content')
+
+            if href is not None:
+                links_html.append(html.a(
+                    extra.get('name'),
+                    class_=extra.get('format'),
+                    href=href,
+                    target='_blank'))
+                links_html.append(' ')
+
         if 'Passed' not in result:
-
-            for extra in getattr(report, 'extra', []):
-                href = None
-                if extra.get('format') == extras.FORMAT_IMAGE:
-                    href = '#'
-                    image = 'data:image/png;base64,%s' % extra.get('content')
-                    additional_html.append(html.div(
-                        html.a(html.img(src=image), href="#"),
-                        class_='image'))
-                elif extra.get('format') == extras.FORMAT_HTML:
-                    additional_html.append(extra.get('content'))
-                elif extra.get('format') == extras.FORMAT_JSON:
-                    href = data_uri(json.dumps(extra.get('content')),
-                                    mime_type='application/json')
-                elif extra.get('format') == extras.FORMAT_TEXT:
-                    href = data_uri(extra.get('content'))
-                elif extra.get('format') == extras.FORMAT_URL:
-                    href = extra.get('content')
-
-                if href is not None:
-                    links_html.append(html.a(
-                        extra.get('name'),
-                        class_=extra.get('format'),
-                        href=href,
-                        target='_blank'))
-                    links_html.append(' ')
 
             if report.longrepr:
                 log = html.div(class_='log')

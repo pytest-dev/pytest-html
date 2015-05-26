@@ -142,9 +142,9 @@ class TestHTML:
                     report.extra = [extras.html(html.div(%s))]
                 return report
         """ % content)
-        testdir.makepyfile('def test_fail(): assert False')
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        assert result.ret
+        assert result.ret == 0
         assert content in html
 
     def test_extra_text(self, testdir):
@@ -157,9 +157,9 @@ class TestHTML:
                     report.extra = [extras.text('%s')]
                 return report
         """ % content)
-        testdir.makepyfile('def test_fail(): assert False')
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        assert result.ret
+        assert result.ret == 0
         if PY3:
             data = b64encode(content.encode('utf-8')).decode('ascii')
         else:
@@ -178,9 +178,9 @@ class TestHTML:
                     report.extra = [extras.url('%s')]
                 return report
         """ % content)
-        testdir.makepyfile('def test_fail(): assert False')
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        assert result.ret
+        assert result.ret == 0
         link = '<a class="url" href="%s" target="_blank">URL</a>' % content
         assert link in html
 
@@ -194,9 +194,9 @@ class TestHTML:
                     report.extra = [extras.image('%s')]
                 return report
         """ % content)
-        testdir.makepyfile('def test_fail(): assert False')
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        assert result.ret
+        assert result.ret == 0
         assert '<a class="image" href="#" target="_blank">Image</a>' in html
         src = 'data:image/png;base64,%s' % content
         assert '<a href="#"><img src="%s"/></a>' % src in html
@@ -211,9 +211,9 @@ class TestHTML:
                     report.extra = [extras.json({0})]
                 return report
         """.format(content))
-        testdir.makepyfile('def test_fail(): assert False')
+        testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        assert result.ret
+        assert result.ret == 0
         content_str = json.dumps(content)
         if PY3:
             data = b64encode(content_str.encode('utf-8')).decode('ascii')

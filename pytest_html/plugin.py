@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 from base64 import b64encode
 import datetime
+import json
 import os
 import pkg_resources
 import sys
@@ -53,6 +54,14 @@ def pytest_unconfigure(config):
         config.pluginmanager.unregister(html)
 
 
+def data_uri(content, mime_type='text/plain', charset='utf-8'):
+    if PY3:
+        data = b64encode(content).encode(charset).decode('ascii')
+    else:
+        data = b64encode(content)
+    return 'data:%s;charset=%s;base64,%s' % (mime_type, charset, data)
+
+
 class HTMLReport(object):
 
     def __init__(self, logfile, environment=None):
@@ -82,13 +91,11 @@ class HTMLReport(object):
                         class_='image'))
                 elif extra.get('format') == extras.FORMAT_HTML:
                     additional_html.append(extra.get('content'))
+                elif extra.get('format') == extras.FORMAT_JSON:
+                    href = data_uri(json.dumps(extra.get('content')),
+                                    mime_type='application/json')
                 elif extra.get('format') == extras.FORMAT_TEXT:
-                    if PY3:
-                        data = b64encode(extra.get('content').encode('utf-8'))
-                        data = data.decode('ascii')
-                    else:
-                        data = b64encode(extra.get('content'))
-                    href = 'data:text/plain;charset=utf-8;base64,%s' % data
+                    href = data_uri(extra.get('content'))
                 elif extra.get('format') == extras.FORMAT_URL:
                     href = extra.get('content')
 

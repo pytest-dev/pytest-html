@@ -4,6 +4,7 @@
 
 FORMAT_HTML = 'html'
 FORMAT_IMAGE = 'image'
+FORMAT_JSON = 'json'
 FORMAT_TEXT = 'text'
 FORMAT_URL = 'url'
 
@@ -18,6 +19,10 @@ def html(content):
 
 def image(content, name='Image'):
     return extra(content, FORMAT_IMAGE, name)
+
+
+def json(content, name='JSON'):
+    return extra(content, FORMAT_JSON, name)
 
 
 def text(content, name='Text'):

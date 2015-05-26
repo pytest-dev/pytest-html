@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from base64 import b64encode
+import json
 import os
 import sys
 import pkg_resources
@@ -199,6 +200,28 @@ class TestHTML:
         assert '<a class="image" href="#" target="_blank">Image</a>' in html
         src = 'data:image/png;base64,%s' % content
         assert '<a href="#"><img src="%s"/></a>' % src in html
+
+    def test_extra_json(self, testdir):
+        content = {str(random.random()): str(random.random())}
+        testdir.makeconftest("""
+            def pytest_runtest_makereport(__multicall__, item):
+                report = __multicall__.execute()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.json({0})]
+                return report
+        """.format(content))
+        testdir.makepyfile('def test_fail(): assert False')
+        result, html = run(testdir)
+        assert result.ret
+        content_str = json.dumps(content)
+        if PY3:
+            data = b64encode(content_str.encode('utf-8')).decode('ascii')
+        else:
+            data = b64encode(content_str)
+        href = 'data:application/json;charset=utf-8;base64,%s' % data
+        link = '<a class="json" href="%s" target="_blank">JSON</a>' % href
+        assert link in html
 
     def test_no_environment(self, testdir):
         testdir.makepyfile('def test_pass(): pass')

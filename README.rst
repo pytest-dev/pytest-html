@@ -60,18 +60,18 @@ conftest.py file:
 .. code-block:: python
 
   from py.xml import html
-  from html import extras
 
   def pytest_runtest_makereport(__multicall__, item):
+      pytest_html = item.config.pluginmanager.getplugin('html')
       report = __multicall__.execute()
       extra = getattr(report, 'extra', [])
       if report.when == 'call':
           # always add url to report
-          extra.append(extras.url('http://www.example.com/'))
+          extra.append(pytest_html.extras.url('http://www.example.com/'))
           xfail = hasattr(report, 'wasxfail')
           if (report.skipped and xfail) or (report.failed and not xfail):
               # only add additional html on failure
-              extra.append(extra.html(html.div('Additional HTML')))
+              extra.append(pytest_html.extras.html(html.div('Additional HTML')))
           report.extra = extra
       return report
 

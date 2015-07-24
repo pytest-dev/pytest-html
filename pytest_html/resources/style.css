@@ -50,11 +50,11 @@ span.error, span.failed, span.xpassed, .failed .col-result, .xpassed .col-result
 
 /******************************
  * RESULTS TABLE
- * 
+ *
  * 1. Table Layout
  * 2. Extra
  * 3. Sorting items
- * 
+ *
  ******************************/
 
 /*------------------
@@ -105,11 +105,6 @@ div.image {
 }
 div.image img {
 	width: 320px
-}
-
-/*if the result is passed or xpassed don't show extra row*/
-.passed + .extra, .xpassed + .extra {
-	display: none;
 }
 
 /*------------------

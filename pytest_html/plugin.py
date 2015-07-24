@@ -105,25 +105,26 @@ class HTMLReport(object):
                     target='_blank'))
                 links_html.append(' ')
 
-        if 'Passed' not in result:
-
-            if report.longrepr:
-                log = html.div(class_='log')
-                for line in str(report.longrepr).splitlines():
-                    if not PY3:
-                        line = line.decode('utf-8')
-                    separator = line.startswith('_ ' * 10)
-                    if separator:
-                        log.append(line[:80])
+        if report.longrepr:
+            log = html.div(class_='log')
+            for line in str(report.longrepr).splitlines():
+                if not PY3:
+                    line = line.decode('utf-8')
+                separator = line.startswith('_ ' * 10)
+                if separator:
+                    log.append(line[:80])
+                else:
+                    exception = line.startswith("E   ")
+                    if exception:
+                        log.append(html.span(raw(escape(line)),
+                                             class_='error'))
                     else:
-                        exception = line.startswith("E   ")
-                        if exception:
-                            log.append(html.span(raw(escape(line)),
-                                                 class_='error'))
-                        else:
-                            log.append(raw(escape(line)))
-                    log.append(html.br())
-                additional_html.append(log)
+                        log.append(raw(escape(line)))
+                log.append(html.br())
+        else:
+            log = html.div(class_='empty log')
+            log.append('No log output captured.')
+        additional_html.append(log)
 
         self.test_logs.append(html.tr([
             html.td(result, class_='col-result'),

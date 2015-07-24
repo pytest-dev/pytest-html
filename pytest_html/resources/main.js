@@ -166,7 +166,7 @@ function split_extra_onto_two_rows() {
         new_row.className = "extra";
         elem.parentNode.insertBefore(new_row, elem.nextSibling);
         find_all(".extra", elem).forEach(function (td_elem) {
-            if (find(".log", td_elem)) {
+            if (find("*:not(.empty)", td_elem)) {
                 new_row.appendChild(td_elem);
                 td_elem.colSpan=5;
             } else {

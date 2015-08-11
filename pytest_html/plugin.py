@@ -247,7 +247,13 @@ class HTMLReport(object):
         doc = html.html(head, body)
 
         logfile.write('<!DOCTYPE html>')
-        logfile.write(doc.unicode(indent=2))
+        unicode_doc = doc.unicode(indent=2)
+        if PY3:
+            # Fix encoding issues, e.g. with surrogates
+            unicode_doc = unicode_doc.encode('utf-8',
+                                             errors='xmlcharrefreplace')
+            unicode_doc = unicode_doc.decode('utf-8')
+        logfile.write(unicode_doc)
         logfile.close()
 
     def pytest_terminal_summary(self, terminalreporter):

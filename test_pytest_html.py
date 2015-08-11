@@ -241,3 +241,15 @@ class TestHTML:
         assert 'Environment' in html
         for c in content:
             assert c in html
+
+    def test_utf8_surrogate(self, testdir):
+        testdir.makepyfile(r"""
+            import pytest
+
+            @pytest.mark.parametrize('val', ['\ud800'])
+            def test_foo(val):
+                pass
+        """)
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_summary(html, passed=1)

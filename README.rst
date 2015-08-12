@@ -26,7 +26,7 @@ Requirements
 You will need the following prerequisites in order to use pytest-html:
 
 - Python 2.6, 2.7, 3.2, 3.3, 3.4, PyPy, or PyPy3
-- py.test 2.3 or newer
+- py.test 2.6 or newer
 
 Installation
 ------------

@@ -8,9 +8,6 @@ python:
   - pypy
   - pypy3
 env:
-  - PYTEST=2.3.5
-  - PYTEST=2.4.2
-  - PYTEST=2.5.2
   - PYTEST=2.6.4
   - PYTEST=2.7.2
 install:

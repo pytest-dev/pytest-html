@@ -14,11 +14,3 @@ install:
   - pip install -q pytest==$PYTEST
   - pip install -q -e .
 script: py.test
-deploy:
-  provider: pypi
-  user: davehunt
-  password:
-    secure: IkjwxCwrGmzYKKsOnNqdADoKRNQmR3xnD0cV0QCfNyvNgcDdPv/3AeX+0TamZSkcQZHusF1qfxHMTPKnzzShdzjGjscV0tHT00kVgYOtJub9I35mfBSltTcosvT6uLsaBJ23O3vaO3dPHVD10IF6LoMbIASNO92h3j6uK18LFx4=
-  on:
-    tags: true
-    repo: davehunt/pytest-html

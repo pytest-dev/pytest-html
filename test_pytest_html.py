@@ -16,7 +16,7 @@ pytest_plugins = "pytester",
 
 def run(testdir, path='report.html', *args):
     path = testdir.tmpdir.join(path)
-    result = testdir.runpytest('--html=%s' % path, *args)
+    result = testdir.runpytest('--html={0}'.format(path), *args)
     with open(str(path)) as f:
         html = f.read()
     return result, html
@@ -43,8 +43,8 @@ class TestHTML:
         testdir.makepyfile("""
             import time
             def test_sleep():
-                time.sleep(%f)
-        """ % sleep)
+                time.sleep({0:f})
+        """.format(sleep))
         result, html = run(testdir)
         assert result.ret == 0
         assert_summary(html, duration=sleep)
@@ -63,12 +63,12 @@ class TestHTML:
         testdir.makepyfile("""
             import pytest
             def test_skip():
-                pytest.skip('%s')
-        """ % reason)
+                pytest.skip('{0}')
+        """.format(reason))
         result, html = run(testdir)
         assert result.ret == 0
         assert_summary(html, tests=0, passed=0, skipped=1)
-        assert 'Skipped: %s' % reason in html
+        assert 'Skipped: {0}'.format(reason) in html
 
     def test_fail(self, testdir):
         testdir.makepyfile('def test_fail(): assert False')
@@ -94,12 +94,12 @@ class TestHTML:
         testdir.makepyfile("""
             import pytest
             def test_xfail():
-                pytest.xfail('%s')
-        """ % reason)
+                pytest.xfail('{0}')
+        """.format(reason))
         result, html = run(testdir)
         assert result.ret == 0
         assert_summary(html, passed=0, xfailed=1)
-        assert 'XFailed: %s' % reason in html
+        assert 'XFailed: {0}'.format(reason) in html
 
     def test_xpass(self, testdir):
         testdir.makepyfile("""
@@ -139,9 +139,9 @@ class TestHTML:
                 if report.when == 'call':
                     from py.xml import html
                     from pytest_html import extras
-                    report.extra = [extras.html(html.div(%s))]
+                    report.extra = [extras.html(html.div({0}))]
                 return report
-        """ % content)
+        """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
@@ -154,9 +154,9 @@ class TestHTML:
                 report = __multicall__.execute()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.text('%s')]
+                    report.extra = [extras.text('{0}')]
                 return report
-        """ % content)
+        """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
@@ -164,8 +164,9 @@ class TestHTML:
             data = b64encode(content.encode('utf-8')).decode('ascii')
         else:
             data = b64encode(content)
-        href = 'data:text/plain;charset=utf-8;base64,%s' % data
-        link = '<a class="text" href="%s" target="_blank">Text</a>' % href
+        href = 'data:text/plain;charset=utf-8;base64,{0}'.format(data)
+        link = '<a class="text" href="{0}" target="_blank">Text</a>'.format(
+            href)
         assert link in html
 
     def test_extra_url(self, testdir):
@@ -175,13 +176,14 @@ class TestHTML:
                 report = __multicall__.execute()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.url('%s')]
+                    report.extra = [extras.url('{0}')]
                 return report
-        """ % content)
+        """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
-        link = '<a class="url" href="%s" target="_blank">URL</a>' % content
+        link = '<a class="url" href="{0}" target="_blank">URL</a>'.format(
+            content)
         assert link in html
 
     def test_extra_image(self, testdir):
@@ -191,15 +193,15 @@ class TestHTML:
                 report = __multicall__.execute()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.image('%s')]
+                    report.extra = [extras.image('{0}')]
                 return report
-        """ % content)
+        """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
         assert '<a class="image" href="#" target="_blank">Image</a>' in html
-        src = 'data:image/png;base64,%s' % content
-        assert '<a href="#"><img src="%s"/></a>' % src in html
+        src = 'data:image/png;base64,{0}'.format(content)
+        assert '<a href="#"><img src="{0}"/></a>'.format(src) in html
 
     def test_extra_json(self, testdir):
         content = {str(random.random()): str(random.random())}
@@ -219,8 +221,9 @@ class TestHTML:
             data = b64encode(content_str.encode('utf-8')).decode('ascii')
         else:
             data = b64encode(content_str)
-        href = 'data:application/json;charset=utf-8;base64,%s' % data
-        link = '<a class="json" href="%s" target="_blank">JSON</a>' % href
+        href = 'data:application/json;charset=utf-8;base64,{0}'.format(data)
+        link = '<a class="json" href="{0}" target="_blank">JSON</a>'.format(
+            href)
         assert link in html
 
     def test_no_environment(self, testdir):

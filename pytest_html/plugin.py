@@ -65,7 +65,7 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
         data = b64encode(content.encode(charset)).decode('ascii')
     else:
         data = b64encode(content)
-    return 'data:%s;charset=%s;base64,%s' % (mime_type, charset, data)
+    return 'data:{0};charset={1};base64,{2}'.format(mime_type, charset, data)
 
 
 class HTMLReport(object):
@@ -89,7 +89,8 @@ class HTMLReport(object):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
                 href = '#'
-                image = 'data:image/png;base64,%s' % extra.get('content')
+                image = 'data:image/png;base64,{0}'.format(
+                    extra.get('content'))
                 additional_html.append(html.div(
                     html.a(html.img(src=image), href="#"),
                     class_='image'))
@@ -135,7 +136,7 @@ class HTMLReport(object):
         self.test_logs.append(html.tr([
             html.td(result, class_='col-result'),
             html.td(report.nodeid, class_='col-name'),
-            html.td('%.2f' % time, class_='col-duration'),
+            html.td('{0:.2f}'.format(time), class_='col-duration'),
             html.td(links_html, class_='col-links'),
             html.td(additional_html, class_='extra')],
             class_=result.lower() + ' results-table-row'))
@@ -199,17 +200,22 @@ class HTMLReport(object):
             html.style(raw(style_css)))
 
         summary = [html.h2('Summary'), html.p(
-            '%i tests ran in %.2f seconds.' % (numtests, suite_time_delta),
+            '{0} tests ran in {1:.2f} seconds.'.format(
+                numtests, suite_time_delta),
             html.br(),
-            html.span('%i passed' % self.passed, class_='passed'), ', ',
-            html.span('%i skipped' % self.skipped, class_='skipped'), ', ',
-            html.span('%i failed' % self.failed, class_='failed'), ', ',
-            html.span('%i errors' % self.errors, class_='error'), '.',
+            html.span('{0} passed'.format(
+                self.passed), class_='passed'), ', ',
+            html.span('{0} skipped'.format(
+                self.skipped), class_='skipped'), ', ',
+            html.span('{0} failed'.format(
+                self.failed), class_='failed'), ', ',
+            html.span('{0} errors'.format(
+                self.errors), class_='error'), '.',
             html.br(),
-            html.span('%i expected failures' % self.xfailed,
-                      class_='skipped'), ', ',
-            html.span('%i unexpected passes' % self.xpassed,
-                      class_='failed'), '.')]
+            html.span('{0} expected failures'.format(
+                self.xfailed), class_='skipped'), ', ',
+            html.span('{0} unexpected passes'.format(
+                self.xpassed), class_='failed'), '.')]
 
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([
@@ -231,7 +237,7 @@ class HTMLReport(object):
 
         body = html.body(
             html.script(raw(main_js)),
-            html.p('Report generated on %s at %s' % (
+            html.p('Report generated on {0} at {1}'.format(
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S'))))
 
@@ -258,5 +264,5 @@ class HTMLReport(object):
         logfile.close()
 
     def pytest_terminal_summary(self, terminalreporter):
-        terminalreporter.write_sep('-', 'generated html file: %s' % (
+        terminalreporter.write_sep('-', 'generated html file: {0}'.format(
             self.logfile))

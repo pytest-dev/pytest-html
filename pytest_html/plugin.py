@@ -28,7 +28,7 @@ else:
     from cgi import escape
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope='session', autouse=True)
 def environment(request):
     """Provide environment details for HTML report"""
     if hasattr(request.config, '_html'):

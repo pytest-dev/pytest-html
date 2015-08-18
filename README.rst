@@ -31,14 +31,17 @@ You will need the following prerequisites in order to use pytest-html:
 Installation
 ------------
 
-To install pytest-html::
+To install pytest-html:
 
-  pip install pytest-html
+.. code-block:: bash
 
-Then run your tests with::
+  $ pip install pytest-html
 
-  py.test --html=report.html
+Then run your tests with:
 
+.. code-block:: bash
+
+  $ py.test --html=report.html
 
 Enhancing reports
 -----------------

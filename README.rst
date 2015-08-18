@@ -43,14 +43,14 @@ Then run your tests with::
 Enhancing reports
 -----------------
 
-You can add an *Environment* section to the report by implementing the
-:code:`pytest_html_environment` hook and returning a dict representing the test
-environment. For example:
+You can add change the *Environment* section of the report by modifying
+``request.config._html.environment`` from a fixture:
 
 .. code-block:: python
 
-  def pytest_html_environment(config):
-      return {'foo': 'bar'}
+  @pytest.fixture(autouse=True)
+  def _environment(request):
+      request.config._html.environment.append(('foo', 'bar'))
 
 You can add details to the HTML reports by creating an 'extra' list on the
 report object. The following example adds the various types of extras using a

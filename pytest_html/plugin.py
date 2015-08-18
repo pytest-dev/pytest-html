@@ -9,9 +9,11 @@ import datetime
 import json
 import os
 import pkg_resources
+import platform
 import sys
 import time
 
+import pytest
 from py.xml import html, raw
 
 from . import extras
@@ -26,9 +28,14 @@ else:
     from cgi import escape
 
 
-def pytest_addhooks(pluginmanager):
-    from pytest_html import newhooks
-    pluginmanager.addhooks(newhooks)
+@pytest.fixture(autouse=True)
+def environment(request):
+    """Provide environment details for HTML report"""
+    if hasattr(request.config, '_html'):
+        environment = request.config._html.environment
+        environment.extend([
+            ('Python', platform.python_version()),
+            ('Platform', platform.platform())])
 
 
 def pytest_addoption(parser):
@@ -42,8 +49,7 @@ def pytest_configure(config):
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
-        environment = config.hook.pytest_html_environment(config=config)
-        config._html = HTMLReport(htmlpath, environment)
+        config._html = HTMLReport(htmlpath)
         config.pluginmanager.register(config._html)
 
 
@@ -64,10 +70,10 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
 
 class HTMLReport(object):
 
-    def __init__(self, logfile, environment=None):
+    def __init__(self, logfile):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
-        self.environment = environment or []
+        self.environment = []
         self.test_logs = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
@@ -229,16 +235,11 @@ class HTMLReport(object):
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S'))))
 
-        environment = {}
-        for e in self.environment:
-            for k, v in e.items():
-                environment[k] = v
-
-        if environment:
+        if self.environment is not None:
             body.append(html.h2('Environment'))
             body.append(html.table(
-                [html.tr(html.td(k), html.td(v)) for k, v in sorted(
-                    environment.items()) if v],
+                [html.tr(html.td(e[0]), html.td(e[1])) for e in sorted(
+                    self.environment, key=lambda e: e[0]) if e[1]],
                 id='environment'))
 
         body.extend(summary)

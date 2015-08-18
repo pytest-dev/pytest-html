@@ -224,6 +224,12 @@ class TestHTML:
         assert link in html
 
     def test_no_environment(self, testdir):
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(autouse=True)
+            def _environment(request):
+                request.config._html.environment = None
+        """)
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
@@ -232,9 +238,11 @@ class TestHTML:
     def test_environment(self, testdir):
         content = (str(random.random()), str(random.random()))
         testdir.makeconftest("""
-            def pytest_html_environment(config):
-                return {'%s': %s}
-        """ % content)
+            import pytest
+            @pytest.fixture(autouse=True)
+            def _environment(request):
+                request.config._html.environment.append(('{0[0]}', '{0[1]}'))
+        """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0

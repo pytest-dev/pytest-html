@@ -77,6 +77,22 @@ class TestHTML:
         assert_summary(html, passed=0, failed=1)
         assert 'AssertionError' in html
 
+    def test_conditional_xfails(self, testdir):
+        testdir.makepyfile("""
+            import pytest
+            @pytest.mark.xfail(False, reason='reason')
+            def test_fail(): assert False
+            @pytest.mark.xfail(False, reason='reason')
+            def test_pass(): pass
+            @pytest.mark.xfail(True, reason='reason')
+            def test_xfail(): assert False
+            @pytest.mark.xfail(True, reason='reason')
+            def test_xpass(): pass
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        assert_summary(html, tests=4, passed=1, failed=1, xfailed=1, xpassed=1)
+
     def test_setup_error(self, testdir):
         testdir.makepyfile("""
             def pytest_funcarg__arg(request):

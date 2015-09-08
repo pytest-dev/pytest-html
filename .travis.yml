@@ -11,6 +11,6 @@ env:
   - PYTEST=2.6.4
   - PYTEST=2.7.2
 install:
-  - pip install -q pytest==$PYTEST
+  - pip install -q pytest==$PYTEST pytest-xdist
   - pip install -q -e .
 script: py.test

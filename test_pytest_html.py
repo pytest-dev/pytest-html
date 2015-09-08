@@ -16,7 +16,7 @@ pytest_plugins = "pytester",
 
 def run(testdir, path='report.html', *args):
     path = testdir.tmpdir.join(path)
-    result = testdir.runpytest('--html={0}'.format(path), *args)
+    result = testdir.runpytest('--html', path, *args)
     with open(str(path)) as f:
         html = f.read()
     return result, html
@@ -247,7 +247,7 @@ class TestHTML:
             import pytest
             @pytest.fixture(autouse=True)
             def _environment(request):
-                request.config._html.environment = None
+                request.config._environment = None
         """)
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
@@ -260,10 +260,25 @@ class TestHTML:
             import pytest
             @pytest.fixture(autouse=True)
             def _environment(request):
-                request.config._html.environment.append(('{0[0]}', '{0[1]}'))
+                request.config._environment.append(('{0[0]}', '{0[1]}'))
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
+        assert result.ret == 0
+        assert 'Environment' in html
+        for c in content:
+            assert c in html
+
+    def test_environment_xdist(self, testdir):
+        content = (str(random.random()), str(random.random()))
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(autouse=True)
+            def _environment(request):
+                request.config._environment.append(('{0[0]}', '{0[1]}'))
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir, 'report.html', '-n', '1')
         assert result.ret == 0
         assert 'Environment' in html
         for c in content:

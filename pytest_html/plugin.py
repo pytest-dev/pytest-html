@@ -31,11 +31,9 @@ else:
 @pytest.fixture(scope='session', autouse=True)
 def environment(request):
     """Provide environment details for HTML report"""
-    if hasattr(request.config, '_html'):
-        environment = request.config._html.environment
-        environment.extend([
-            ('Python', platform.python_version()),
-            ('Platform', platform.platform())])
+    request.config._environment.extend([
+        ('Python', platform.python_version()),
+        ('Platform', platform.platform())])
 
 
 def pytest_addoption(parser):
@@ -46,11 +44,19 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
+    config._environment = []
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
         config._html = HTMLReport(htmlpath)
         config.pluginmanager.register(config._html)
+    if hasattr(config, 'slaveoutput'):
+        config.slaveoutput['environment'] = config._environment
+
+
+@pytest.mark.optionalhook
+def pytest_testnodedown(node):
+    node.config._environment = node.slaveoutput['environment']
 
 
 def pytest_unconfigure(config):
@@ -73,7 +79,6 @@ class HTMLReport(object):
     def __init__(self, logfile):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
-        self.environment = []
         self.test_logs = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
@@ -180,7 +185,7 @@ class HTMLReport(object):
     def pytest_sessionstart(self, session):
         self.suite_start_time = time.time()
 
-    def pytest_sessionfinish(self):
+    def pytest_sessionfinish(self, session):
         if not os.path.exists(os.path.dirname(self.logfile)):
             os.makedirs(os.path.dirname(self.logfile))
         logfile = open(self.logfile, 'w', encoding='utf-8')
@@ -241,11 +246,11 @@ class HTMLReport(object):
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S'))))
 
-        if self.environment is not None:
+        if session.config._environment:
             body.append(html.h2('Environment'))
             body.append(html.table(
                 [html.tr(html.td(e[0]), html.td(e[1])) for e in sorted(
-                    self.environment, key=lambda e: e[0]) if e[1]],
+                    session.config._environment, key=lambda e: e[0]) if e[1]],
                 id='environment'))
 
         body.extend(summary)

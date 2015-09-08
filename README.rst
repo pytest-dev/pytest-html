@@ -53,8 +53,7 @@ You can add change the *Environment* section of the report by modifying
 
   @pytest.fixture(autouse=True)
   def _environment(request):
-      if hasattr(request.config, '_html'):
-          request.config._html.environment.append(('foo', 'bar'))
+      request.config._environment.append(('foo', 'bar'))
 
 You can add details to the HTML reports by creating an 'extra' list on the
 report object. The following example adds the various types of extras using a

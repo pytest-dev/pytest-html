@@ -119,22 +119,27 @@ class HTMLReport(object):
                     target='_blank'))
                 links_html.append(' ')
 
+        sections = [t for tpl in report.sections for t in tpl]
         if report.longrepr:
+            sections = [report.longrepr] + sections
+
+        if sections:
             log = html.div(class_='log')
-            for line in str(report.longrepr).splitlines():
-                if not PY3:
-                    line = line.decode('utf-8')
-                separator = line.startswith('_ ' * 10)
-                if separator:
-                    log.append(line[:80])
-                else:
-                    exception = line.startswith("E   ")
-                    if exception:
-                        log.append(html.span(raw(escape(line)),
-                                             class_='error'))
+            for section in sections:
+                for line in str(section).splitlines():
+                    if not PY3:
+                        line = line.decode('utf-8')
+                    separator = line.startswith('_ ' * 10)
+                    if separator:
+                        log.append(line[:80])
                     else:
-                        log.append(raw(escape(line)))
-                log.append(html.br())
+                        exception = line.startswith("E   ")
+                        if exception:
+                            log.append(html.span(raw(escape(line)),
+                                                 class_='error'))
+                        else:
+                            log.append(raw(escape(line)))
+                    log.append(html.br())
         else:
             log = html.div(class_='empty log')
             log.append('No log output captured.')

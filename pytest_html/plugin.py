@@ -27,6 +27,7 @@ else:
     from codecs import open
     from cgi import escape
 
+index = 0
 
 @pytest.fixture(scope='session', autouse=True)
 def environment(request):
@@ -119,28 +120,33 @@ class HTMLReport(object):
                     target='_blank'))
                 links_html.append(' ')
 
+        sections = [t for tpl in report.sections for t in tpl]
         if report.longrepr:
-            log = html.div(class_='log')
-            for line in str(report.longrepr).splitlines():
-                if not PY3:
-                    line = line.decode('utf-8')
-                separator = line.startswith('_ ' * 10)
-                if separator:
-                    log.append(line[:80])
-                else:
-                    exception = line.startswith("E   ")
-                    if exception:
-                        log.append(html.span(raw(escape(line)),
-                                             class_='error'))
-                    else:
-                        log.append(raw(escape(line)))
-                log.append(html.br())
-        else:
-            log = html.div(class_='empty log')
-            log.append('No log output captured.')
-        additional_html.append(log)
+            sections = [report.longrepr] + sections
 
+        if sections:
+            log = html.div(class_='log')
+            for section in sections:
+                for line in str(section).splitlines():
+                    if not PY3:
+                        line = line.decode('utf-8')
+                    separator = line.startswith('_ ' * 10)
+                    if separator:
+                        log.append(line[:80])
+                    else:
+                        exception = line.startswith("E   ")
+                        if exception:
+                            log.append(html.span(raw(escape(line)),
+                                                 class_='error'))
+                        else:
+                            log.append(raw(escape(line)))
+                    log.append(html.br())
+            additional_html.append(log)
+
+        global index
+        index += 1
         self.test_logs.append(html.tr([
+            html.td(index, class_='col-index'),
             html.td(result, class_='col-result'),
             html.td(report.nodeid, class_='col-name'),
             html.td('{0:.2f}'.format(time), class_='col-duration'),
@@ -226,8 +232,9 @@ class HTMLReport(object):
 
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([
+                html.th('Nr', class_='sortable initial-sort numeric',col='index'),
                 html.th('Result',
-                        class_='sortable initial-sort result',
+                        class_='sortable result',
                         col='result'),
                 html.th('Test', class_='sortable', col='name'),
                 html.th('Duration',

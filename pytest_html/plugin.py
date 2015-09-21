@@ -27,6 +27,7 @@ else:
     from codecs import open
     from cgi import escape
 
+index = 0
 
 @pytest.fixture(scope='session', autouse=True)
 def environment(request):
@@ -140,12 +141,12 @@ class HTMLReport(object):
                         else:
                             log.append(raw(escape(line)))
                     log.append(html.br())
-        else:
-            log = html.div(class_='empty log')
-            log.append('No log output captured.')
-        additional_html.append(log)
+            additional_html.append(log)
 
+        global index
+        index += 1
         self.test_logs.append(html.tr([
+            html.td(index, class_='col-index'),
             html.td(result, class_='col-result'),
             html.td(report.nodeid, class_='col-name'),
             html.td('{0:.2f}'.format(time), class_='col-duration'),
@@ -231,8 +232,9 @@ class HTMLReport(object):
 
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([
+                html.th('Nr', class_='sortable initial-sort numeric',col='index'),
                 html.th('Result',
-                        class_='sortable initial-sort result',
+                        class_='sortable result',
                         col='result'),
                 html.th('Test', class_='sortable', col='name'),
                 html.th('Duration',

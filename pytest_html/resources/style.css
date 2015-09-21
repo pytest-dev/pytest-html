@@ -46,6 +46,9 @@ span.skipped, span.xfailed, .skipped .col-result, .xfailed .col-result {
 span.error, span.failed, span.xpassed, .failed .col-result, .xpassed .col-result  {
 	color: red;
 }
+.col-index {
+    width: 4%;
+}
 
 
 /******************************

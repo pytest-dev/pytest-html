@@ -147,6 +147,16 @@ class TestHTML:
             assert content
             assert content in html
 
+    def test_stdout(self, testdir):
+        content = str(random.random())
+        testdir.makepyfile("""
+            def test_fail():
+                print {0}
+                assert False""".format(content))
+        result, html = run(testdir)
+        assert result.ret
+        assert content in html
+
     def test_extra_html(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""

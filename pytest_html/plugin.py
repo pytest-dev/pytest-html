@@ -135,6 +135,10 @@ class HTMLReport(object):
                     else:
                         log.append(raw(escape(line)))
                 log.append(html.br())
+            for header, content in report.sections:
+                log.append(' {0} '.format(header).center(80, '-'))
+                log.append(html.br())
+                log.append(content)
         else:
             log = html.div(class_='empty log')
             log.append('No log output captured.')

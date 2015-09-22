@@ -151,7 +151,7 @@ class TestHTML:
         content = str(random.random())
         testdir.makepyfile("""
             def test_fail():
-                print {0}
+                print({0})
                 assert False""".format(content))
         result, html = run(testdir)
         assert result.ret

@@ -62,8 +62,6 @@ conftest.py file:
 
 .. code-block:: python
 
-  from py.xml import html
-
   def pytest_runtest_makereport(__multicall__, item):
       pytest_html = item.config.pluginmanager.getplugin('html')
       report = __multicall__.execute()
@@ -74,7 +72,7 @@ conftest.py file:
           xfail = hasattr(report, 'wasxfail')
           if (report.skipped and xfail) or (report.failed and not xfail):
               # only add additional html on failure
-              extra.append(pytest_html.extras.html(html.div('Additional HTML')))
+              extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
           report.extra = extra
       return report
 

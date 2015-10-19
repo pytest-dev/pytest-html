@@ -294,16 +294,6 @@ class TestHTML:
         for c in content:
             assert c in html
 
-    def test_xdist_crashing_slave(self, testdir):
-        """https://github.com/davehunt/pytest-html/issues/21"""
-        testdir.makepyfile("""
-            import os
-            def test_exit():
-                os._exit(0)
-        """)
-        result, html = run(testdir, 'report.html', '-n', '1')
-        assert 'INTERNALERROR>' not in result.stdout.str()
-
     def test_utf8_surrogate(self, testdir):
         testdir.makepyfile(r"""
             import pytest

@@ -10,6 +10,8 @@ import pkg_resources
 import random
 import re
 
+import pytest
+
 PY3 = sys.version_info[0] == 3
 pytest_plugins = "pytester",
 
@@ -294,6 +296,10 @@ class TestHTML:
         for c in content:
             assert c in html
 
+    @pytest.mark.xfail(sys.version_info < (3, 2)
+                       and pytest.__version__ < (2, 8),
+                       reason='Fails on earlier versions of Python and pytest',
+                       run=False)
     def test_xdist_crashing_slave(self, testdir):
         """https://github.com/davehunt/pytest-html/issues/21"""
         testdir.makepyfile("""

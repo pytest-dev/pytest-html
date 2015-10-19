@@ -4,7 +4,7 @@ pytest-html
 pytest-html is a plugin for `py.test <http://pytest.org>`_ that generates a
 HTML report for the test results.
 
-.. image:: https://img.shields.io/pypi/l/pytest-html.svg
+.. image:: https://img.shields.io/badge/license-MPL%202.0-blue.svg
    :target: https://github.com/davehunt/pytest-html/blob/master/LICENSE
    :alt: License
 .. image:: https://img.shields.io/pypi/v/pytest-html.svg

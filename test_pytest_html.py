@@ -165,9 +165,8 @@ class TestHTML:
             def pytest_runtest_makereport(__multicall__, item):
                 report = __multicall__.execute()
                 if report.when == 'call':
-                    from py.xml import html
                     from pytest_html import extras
-                    report.extra = [extras.html(html.div({0}))]
+                    report.extra = [extras.html('<div>{0}</div>')]
                 return report
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')

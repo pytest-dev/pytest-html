@@ -58,7 +58,8 @@ def pytest_configure(config):
 def pytest_testnodedown(node):
     # note that any environments from remote slaves will be replaced with the
     # environment from the final slave to quit
-    node.config._environment = node.slaveoutput['environment']
+    if hasattr(node, 'slaveoutput'):
+        node.config._environment = node.slaveoutput['environment']
 
 
 def pytest_unconfigure(config):

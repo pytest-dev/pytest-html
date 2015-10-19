@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from base64 import b64encode
+from distutils.version import LooseVersion
 import json
 import os
 import sys
@@ -295,10 +296,11 @@ class TestHTML:
         for c in content:
             assert c in html
 
-    @pytest.mark.xfail(sys.version_info < (3, 2)
-                       and pytest.__version__ < (2, 8),
-                       reason='Fails on earlier versions of Python and pytest',
-                       run=False)
+    @pytest.mark.xfail(
+        sys.version_info < (3, 2)
+        and LooseVersion(pytest.__version__) >= LooseVersion('2.8.0'),
+        reason='Fails on earlier versions of Python and pytest',
+        run=False)
     def test_xdist_crashing_slave(self, testdir):
         """https://github.com/davehunt/pytest-html/issues/21"""
         testdir.makepyfile("""

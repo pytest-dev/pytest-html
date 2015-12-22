@@ -1,4 +1,7 @@
+__pycache__
 .DS_Store
+.cache
+.tox
 build
 dist
 *.egg-info

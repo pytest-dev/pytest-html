@@ -76,6 +76,13 @@ conftest.py file:
           report.extra = extra
       return report
 
+Screenshots
+-----------
+
+.. image:: https://cloud.githubusercontent.com/assets/122800/11952194/62daa964-a88e-11e5-9745-2aa5b714c8bb.png
+   :target: https://cloud.githubusercontent.com/assets/122800/11951695/f371b926-a88a-11e5-91c2-499166776bd3.png
+   :alt: Enhanced HTML report
+
 Resources
 ---------
 

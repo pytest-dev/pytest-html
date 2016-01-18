@@ -163,12 +163,14 @@ class TestHTML:
     def test_extra_html(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
-            def pytest_runtest_makereport(__multicall__, item):
-                report = __multicall__.execute()
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
                     report.extra = [extras.html('<div>{0}</div>')]
-                return report
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
@@ -178,12 +180,14 @@ class TestHTML:
     def test_extra_text(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
-            def pytest_runtest_makereport(__multicall__, item):
-                report = __multicall__.execute()
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
                     report.extra = [extras.text('{0}')]
-                return report
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
@@ -200,12 +204,14 @@ class TestHTML:
     def test_extra_url(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
-            def pytest_runtest_makereport(__multicall__, item):
-                report = __multicall__.execute()
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
                     report.extra = [extras.url('{0}')]
-                return report
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
@@ -217,12 +223,14 @@ class TestHTML:
     def test_extra_image(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
-            def pytest_runtest_makereport(__multicall__, item):
-                report = __multicall__.execute()
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
                     report.extra = [extras.image('{0}')]
-                return report
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
@@ -234,12 +242,14 @@ class TestHTML:
     def test_extra_json(self, testdir):
         content = {str(random.random()): str(random.random())}
         testdir.makeconftest("""
-            def pytest_runtest_makereport(__multicall__, item):
-                report = __multicall__.execute()
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
                     report.extra = [extras.json({0})]
-                return report
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)

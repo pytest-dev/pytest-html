@@ -62,9 +62,12 @@ conftest.py file:
 
 .. code-block:: python
 
-  def pytest_runtest_makereport(__multicall__, item):
+  import pytest
+  @pytest.mark.hookwrapper
+  def pytest_runtest_makereport(item, call):
       pytest_html = item.config.pluginmanager.getplugin('html')
-      report = __multicall__.execute()
+      outcome = yield
+      report = outcome.get_result()
       extra = getattr(report, 'extra', [])
       if report.when == 'call':
           # always add url to report
@@ -74,7 +77,6 @@ conftest.py file:
               # only add additional html on failure
               extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
           report.extra = extra
-      return report
 
 Screenshots
 -----------

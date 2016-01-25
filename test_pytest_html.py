@@ -106,6 +106,7 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret
         assert_summary(html, tests=0, passed=0, errors=1)
+        assert '::setup' in html
         assert 'ValueError' in html
 
     def test_xfail(self, testdir):

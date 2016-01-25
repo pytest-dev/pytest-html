@@ -145,9 +145,13 @@ class HTMLReport(object):
             log.append('No log output captured.')
         additional_html.append(log)
 
+        test_id = report.nodeid
+        if report.when != 'call':
+            test_id = '::'.join([report.nodeid, report.when])
+
         self.test_logs.append(html.tr([
             html.td(result, class_='col-result'),
-            html.td(report.nodeid, class_='col-name'),
+            html.td(test_id, class_='col-name'),
             html.td('{0:.2f}'.format(time), class_='col-duration'),
             html.td(links_html, class_='col-links'),
             html.td(additional_html, class_='extra')],

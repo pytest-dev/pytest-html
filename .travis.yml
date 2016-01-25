@@ -1,13 +1,21 @@
 language: python
 env:
-  - TOXENV=py26
-  - TOXENV=py27
-  - TOXENV=py32
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=py35
-  - TOXENV=pypy
-  - TOXENV=pypy3
+  - TOXENV=py26-pytest27
+  - TOXENV=py26-pytest28
+  - TOXENV=py27-pytest27
+  - TOXENV=py27-pytest28
+  - TOXENV=py32-pytest27
+  - TOXENV=py32-pytest28
+  - TOXENV=py33-pytest27
+  - TOXENV=py33-pytest28
+  - TOXENV=py34-pytest27
+  - TOXENV=py34-pytest28
+  - TOXENV=py35-pytest27
+  - TOXENV=py35-pytest28
+  - TOXENV=pypy-pytest27
+  - TOXENV=pypy-pytest28
+  - TOXENV=pypy3-pytest27
+  - TOXENV=pypy3-pytest28
   - TOXENV=flake8
 install:
   - pip install tox

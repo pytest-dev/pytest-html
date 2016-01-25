@@ -43,7 +43,7 @@ span.passed, .passed .col-result {
 span.skipped, span.xfailed, .skipped .col-result, .xfailed .col-result {
 	color: orange;
 }
-span.error, span.failed, span.xpassed, .failed .col-result, .xpassed .col-result  {
+span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, .xpassed .col-result  {
 	color: red;
 }
 

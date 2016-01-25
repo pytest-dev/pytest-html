@@ -307,8 +307,8 @@ class TestHTML:
             assert c in html
 
     @pytest.mark.xfail(
-        sys.version_info < (3, 2)
-        and LooseVersion(pytest.__version__) >= LooseVersion('2.8.0'),
+        sys.version_info < (3, 2) and
+        LooseVersion(pytest.__version__) >= LooseVersion('2.8.0'),
         reason='Fails on earlier versions of Python and pytest',
         run=False)
     def test_xdist_crashing_slave(self, testdir):

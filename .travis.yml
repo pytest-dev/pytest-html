@@ -1,16 +1,15 @@
 language: python
-python:
-  - 2.6
-  - 2.7
-  - 3.2
-  - 3.3
-  - 3.4
-  - pypy
-  - pypy3
 env:
-  - PYTEST=2.7.3
-  - PYTEST=2.8.2
+  - TOXENV=py26
+  - TOXENV=py27
+  - TOXENV=py32
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=py35
+  - TOXENV=pypy
+  - TOXENV=pypy3
+  - TOXENV=flake8
 install:
-  - pip install -q pytest==$PYTEST pytest-xdist
-  - pip install -q -e .
-script: py.test
+  - pip install tox
+script:
+  - tox

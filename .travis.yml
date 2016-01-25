@@ -4,6 +4,8 @@ env:
   - TOXENV=py26-pytest28
   - TOXENV=py27-pytest27
   - TOXENV=py27-pytest28
+  - TOXENV=py32-pytest27
+  - TOXENV=py32-pytest28
   - TOXENV=py33-pytest27
   - TOXENV=py33-pytest28
   - TOXENV=py34-pytest27

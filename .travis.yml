@@ -19,3 +19,9 @@ install:
   - pip install tox
 script:
   - tox
+addons:
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - python3.5

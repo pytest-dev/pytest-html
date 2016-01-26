@@ -88,5 +88,6 @@ Screenshots
 Resources
 ---------
 
+- `Release Notes <http://github.com/davehunt/pytest-html/blob/master/CHANGES.rst>`_
 - `Issue Tracker <http://github.com/davehunt/pytest-html/issues>`_
 - `Code <http://github.com/davehunt/pytest-html/>`_

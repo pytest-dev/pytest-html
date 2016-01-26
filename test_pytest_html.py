@@ -202,6 +202,31 @@ class TestHTML:
             href)
         assert link in html
 
+    @pytest.mark.xfail(
+        sys.version_info < (3, 2),
+        reason='Only affects Python versions later than 3.2',
+        run=False)
+    def test_extra_bytes(self, testdir):
+        content = bytes(str(random.random()), 'utf-8')
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.text({0})]
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+        data = b64encode(content).decode('ascii')
+        href = 'data:text/plain;charset=utf-8;base64,{0}'.format(data)
+        link = '<a class="text" href="{0}" target="_blank">Text</a>'.format(
+            href)
+        assert link in html
+
     def test_extra_url(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""

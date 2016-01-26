@@ -3,6 +3,7 @@ Release Notes
 
 **1.8 (unreleased)**
 
+* Added support for ``bytes`` objects from Python 3.x
 * Dropped support for Python 3.2
 * Indicated setup and teardown in report
 * Fixed colour of errors in report

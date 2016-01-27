@@ -146,6 +146,8 @@ class HTMLReport(object):
         additional_html.append(log)
 
         test_id = report.nodeid
+        if not PY3:
+            test_id = unicode(test_id, 'utf-8')
         if report.when != 'call':
             test_id = '::'.join([report.nodeid, report.when])
 

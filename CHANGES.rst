@@ -3,6 +3,7 @@ Release Notes
 
 **1.8 (unreleased)**
 
+* Remove duplication from the environment section
 * Dropped support for Python 3.2
 * Indicated setup and teardown in report
 * Fixed colour of errors in report

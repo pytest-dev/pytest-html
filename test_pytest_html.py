@@ -278,34 +278,49 @@ class TestHTML:
         assert 'Environment' not in html
 
     def test_environment(self, testdir):
-        content = (str(random.random()), str(random.random()))
+        content = str(random.random())
         testdir.makeconftest("""
             import pytest
             @pytest.fixture(autouse=True)
             def _environment(request):
-                request.config._environment.append(('{0[0]}', '{0[1]}'))
+                for i in range(2):
+                    request.config._environment.append(('content', '{0}'))
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
         assert 'Environment' in html
-        for c in content:
-            assert c in html
+        assert len(re.findall(content, html)) == 1
 
     def test_environment_xdist(self, testdir):
-        content = (str(random.random()), str(random.random()))
+        content = str(random.random())
         testdir.makeconftest("""
             import pytest
             @pytest.fixture(autouse=True)
             def _environment(request):
-                request.config._environment.append(('{0[0]}', '{0[1]}'))
+                for i in range(2):
+                    request.config._environment.append(('content', '{0}'))
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir, 'report.html', '-n', '1')
         assert result.ret == 0
         assert 'Environment' in html
-        for c in content:
-            assert c in html
+        assert len(re.findall(content, html)) == 1
+
+    def test_environment_xdist_reruns(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(autouse=True)
+            def _environment(request):
+                for i in range(2):
+                    request.config._environment.append(('content', '{0}'))
+        """.format(content))
+        testdir.makepyfile('def test_fail(): assert False')
+        result, html = run(testdir, 'report.html', '-n', '1', '--reruns', '1')
+        assert result.ret
+        assert 'Environment' in html
+        assert len(re.findall(content, html)) == 1
 
     @pytest.mark.xfail(
         sys.version_info < (3, 2) and

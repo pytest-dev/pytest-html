@@ -258,10 +258,11 @@ class HTMLReport(object):
                 generated.strftime('%H:%M:%S'))))
 
         if session.config._environment:
+            environment = set(session.config._environment)
             body.append(html.h2('Environment'))
             body.append(html.table(
                 [html.tr(html.td(e[0]), html.td(e[1])) for e in sorted(
-                    session.config._environment, key=lambda e: e[0]) if e[1]],
+                    environment, key=lambda e: e[0]) if e[1]],
                 id='environment'))
 
         body.extend(summary)

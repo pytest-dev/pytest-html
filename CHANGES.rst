@@ -1,7 +1,7 @@
 Release Notes
 -------------
 
-**1.8 (unreleased)**
+**1.8.0 (2015-02-24)**
 
 * Remove duplication from the environment section
 * Dropped support for Python 3.2

@@ -20,6 +20,38 @@ HTML report for the test results.
    :target: https://requires.io/github/davehunt/pytest-html/requirements/?branch=master
    :alt: Requirements
 
+Outreachy
+---------
+
+Mozilla is participating in the `Outreachy <http://www.outreachy.org>`_ program
+helping people from groups underrepresented in free and open source software
+to get involved. For the round running `May 23 to August 23, 2016 <https://wiki.gnome.org/Outreachy/2016/MayAugust>`_,
+there is `a project <https://wiki.mozilla.org/Outreachy#Enhancements_to_Python_testing_tool_plugin_for_generation_of_HTML_reports>`_
+to work on `several enhancements <https://github.com/davehunt/pytest-html/labels/outreachy>`_ to pytest-html.
+
+Application contributions
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Part of the application process requires that you make a relevant contribution.
+The following is a list of suitable tasks for you to select from:
+
+* `marketplace-tests #750 <https://github.com/mozilla/marketplace-tests/issues/750>`_
+  - Retire all mobile tests.
+* `marketplace-tests #751 <https://github.com/mozilla/marketplace-tests/issues/751>`_
+  - Retire all tests related to payments.
+* `Addon-Tests #820 <https://github.com/mozilla/Addon-Tests/issues/820>`_ -
+  Write a UI test for AMO to submit a WebExtension.
+* `Bug 1038901 <https://bugzilla.mozilla.org/show_bug.cgi?id=1038901>`_ - Write
+  a UI test for `One and Done <https://oneanddone.mozilla.org/>`_ to verify
+  duplicate usernames are not allowed.
+* `Bug 1043794 <https://bugzilla.mozilla.org/show_bug.cgi?id=1043794>`_ - Write
+  a UI test for `One and Done <https://oneanddone.mozilla.org/>`_ to verify
+  a one time task cannot be taken by a different user.
+
+Please make sure that the task is not already assigned, and that you create a
+`Bugzilla <https://bugzilla.mozilla.org/>`_ or `GitHub <https://github.com/>`_
+account and comment on the task before starting to work on it.
+
 Requirements
 ------------
 

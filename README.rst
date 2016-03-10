@@ -35,6 +35,8 @@ Application contributions
 Part of the application process requires that you make a relevant contribution.
 The following is a list of suitable tasks for you to select from:
 
+* `treeherder-tests #34 <https://github.com/mozilla/treeherder-tests/issues/34>`_
+  - Remove test classes.
 * `marketplace-tests #750 <https://github.com/mozilla/marketplace-tests/issues/750>`_
   - Retire all mobile tests.
 * `marketplace-tests #751 <https://github.com/mozilla/marketplace-tests/issues/751>`_

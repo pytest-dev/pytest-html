@@ -35,6 +35,8 @@ Application contributions
 Part of the application process requires that you make a relevant contribution.
 The following is a list of suitable tasks for you to select from:
 
+* `pytest-variables #8 <https://github.com/davehunt/pytest-variables/issues/8>`_ -
+  Remove print statement for unsupported format for files with no extension.
 * `treeherder-tests #34 <https://github.com/mozilla/treeherder-tests/issues/34>`_
   - Remove test classes.
 * `marketplace-tests #750 <https://github.com/mozilla/marketplace-tests/issues/750>`_

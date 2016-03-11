@@ -39,10 +39,6 @@ The following is a list of suitable tasks for you to select from:
   Remove print statement for unsupported format for files with no extension.
 * `treeherder-tests #34 <https://github.com/mozilla/treeherder-tests/issues/34>`_
   - Remove test classes.
-* `marketplace-tests #750 <https://github.com/mozilla/marketplace-tests/issues/750>`_
-  - Retire all mobile tests.
-* `marketplace-tests #751 <https://github.com/mozilla/marketplace-tests/issues/751>`_
-  - Retire all tests related to payments.
 * `Addon-Tests #820 <https://github.com/mozilla/Addon-Tests/issues/820>`_ -
   Write a UI test for AMO to submit a WebExtension.
 * `Bug 1038901 <https://bugzilla.mozilla.org/show_bug.cgi?id=1038901>`_ - Write

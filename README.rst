@@ -35,18 +35,11 @@ Application contributions
 Part of the application process requires that you make a relevant contribution.
 The following is a list of suitable tasks for you to select from:
 
-* `pytest-variables #8 <https://github.com/davehunt/pytest-variables/issues/8>`_ -
-  Remove print statement for unsupported format for files with no extension.
-* `treeherder-tests #34 <https://github.com/mozilla/treeherder-tests/issues/34>`_
-  - Remove test classes.
-* `Addon-Tests #820 <https://github.com/mozilla/Addon-Tests/issues/820>`_ -
-  Write a UI test for AMO to submit a WebExtension.
+* `Socorro-Tests #337 <https://github.com/mozilla/Socorro-Tests/issues/337>`_ -
+  Migrate Socorro-Tests to pytest-selenium
 * `Bug 1038901 <https://bugzilla.mozilla.org/show_bug.cgi?id=1038901>`_ - Write
   a UI test for `One and Done <https://oneanddone.mozilla.org/>`_ to verify
   duplicate usernames are not allowed.
-* `Bug 1043794 <https://bugzilla.mozilla.org/show_bug.cgi?id=1043794>`_ - Write
-  a UI test for `One and Done <https://oneanddone.mozilla.org/>`_ to verify
-  a one time task cannot be taken by a different user.
 
 Please make sure that the task is not already assigned, and that you create a
 `Bugzilla <https://bugzilla.mozilla.org/>`_ or `GitHub <https://github.com/>`_

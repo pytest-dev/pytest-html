@@ -46,6 +46,8 @@ The following is a list of suitable tasks for you to select from:
 * `Bug 1038901 <https://bugzilla.mozilla.org/show_bug.cgi?id=1038901>`_ - Write
   a UI test for `One and Done <https://oneanddone.mozilla.org/>`_ to verify
   duplicate usernames are not allowed.
+* `pytest #1351 <https://github.com/pytest-dev/pytest/issues/1351>`_ -
+  Explicitly passed parametrize IDs do not get escaped to ASCII.
 
 Please make sure that the task is not already assigned, and that you create a
 `Bugzilla <https://bugzilla.mozilla.org/>`_ or `GitHub <https://github.com/>`_

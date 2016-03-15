@@ -35,8 +35,14 @@ Application contributions
 Part of the application process requires that you make a relevant contribution.
 The following is a list of suitable tasks for you to select from:
 
+* `mozillians-tests #218 <https://github.com/mozilla/mozillians-tests/issues/218>`_
+  - Migrate from browserid to bidpom.
+* `moztrap-tests #181 <https://github.com/mozilla/moztrap-tests/issues/181>`_ -
+  Migrate from browserid to bidpom.
+* `Socorro-Tests #364 <https://github.com/mozilla/Socorro-Tests/issues/364>`_ -
+  Migrate from browserid to bidpom.
 * `Socorro-Tests #337 <https://github.com/mozilla/Socorro-Tests/issues/337>`_ -
-  Migrate Socorro-Tests to pytest-selenium
+  Migrate Socorro-Tests to pytest-selenium.
 * `Bug 1038901 <https://bugzilla.mozilla.org/show_bug.cgi?id=1038901>`_ - Write
   a UI test for `One and Done <https://oneanddone.mozilla.org/>`_ to verify
   duplicate usernames are not allowed.

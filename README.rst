@@ -29,30 +29,6 @@ to get involved. For the round running `May 23 to August 23, 2016 <https://wiki.
 there is `a project <https://wiki.mozilla.org/Outreachy#Enhancements_to_Python_testing_tool_plugin_for_generation_of_HTML_reports>`_
 to work on `several enhancements <https://github.com/davehunt/pytest-html/labels/outreachy>`_ to pytest-html.
 
-Application contributions
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Part of the application process requires that you make a relevant contribution.
-The following is a list of suitable tasks for you to select from:
-
-* `mozillians-tests #218 <https://github.com/mozilla/mozillians-tests/issues/218>`_
-  - Migrate from browserid to bidpom.
-* `moztrap-tests #181 <https://github.com/mozilla/moztrap-tests/issues/181>`_ -
-  Migrate from browserid to bidpom.
-* `Socorro-Tests #364 <https://github.com/mozilla/Socorro-Tests/issues/364>`_ -
-  Migrate from browserid to bidpom.
-* `Socorro-Tests #337 <https://github.com/mozilla/Socorro-Tests/issues/337>`_ -
-  Migrate Socorro-Tests to pytest-selenium.
-* `Bug 1038901 <https://bugzilla.mozilla.org/show_bug.cgi?id=1038901>`_ - Write
-  a UI test for `One and Done <https://oneanddone.mozilla.org/>`_ to verify
-  duplicate usernames are not allowed.
-* `pytest #1351 <https://github.com/pytest-dev/pytest/issues/1351>`_ -
-  Explicitly passed parametrize IDs do not get escaped to ASCII.
-
-Please make sure that the task is not already assigned, and that you create a
-`Bugzilla <https://bugzilla.mozilla.org/>`_ or `GitHub <https://github.com/>`_
-account and comment on the task before starting to work on it.
-
 Requirements
 ------------
 

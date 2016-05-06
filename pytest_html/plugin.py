@@ -270,6 +270,8 @@ class HTMLReport(object):
 
                         break
 
+        table_row.append(html.td(additional_html, class_='extra'))
+
         for extra in getattr(report, 'extra', []):
             href = None
 

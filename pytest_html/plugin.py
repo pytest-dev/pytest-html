@@ -119,8 +119,7 @@ class HTMLTableHeader(object):
 
     def insert_at(self, position, heading, _class="", _id=""):
         if position < 0 or position > len(self.headers):
-            # TODO raise exception
-            return
+            raise IndexError('index position out of range')
         if len(self.headers) == position:
             self.append(heading, _class, _id)
         else:
@@ -138,7 +137,6 @@ class HTMLTableHeader(object):
         index = self.exists(heading)
         if index is not None:
             self.headers = self.headers[:index] + self.headers[index+1:]
-        # TODO raise not found exception
 
     def html(self):
         results_headings = []

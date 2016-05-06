@@ -13,8 +13,8 @@ def extra(content, format, name=None):
     return {'name': name, 'format': format, 'content': content}
 
 
-def html(content):
-    return extra(content, FORMAT_HTML)
+def html(content, name=None):
+    return extra(content, FORMAT_HTML, name)
 
 
 def image(content, name='Image'):

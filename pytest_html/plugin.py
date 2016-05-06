@@ -40,14 +40,16 @@ def environment(request):
 def tableconf(request):
     """ Provide table header information for HTML report"""
     request.config._tableconf.append(
-        'Result', headerclass='sortable initial-sort result')
+        'Result', headerclass='sortable initial-sort result',
+        rowclass='col-result')
     request.config._tableconf.append(
-        'Test', headerclass='sortable')
+        'Test', headerclass='sortable', rowclass='col-name')
     request.config._tableconf.append(
-        'Duration', headerclass='sortable numeric')
+        'Duration', headerclass='sortable numeric', 
+        rowclass='col-duration')
     request.config._tableconf.append(
         'Links', headerclass='sortable initial-sort result',
-        _id='results-table-head')
+        rowclass='col-links', _id='results-table-head')
 
 
 def pytest_addoption(parser):

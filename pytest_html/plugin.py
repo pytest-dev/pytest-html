@@ -45,7 +45,7 @@ def tableconf(request):
     request.config._tableconf.append(
         'Test', headerclass='sortable', rowclass='col-name')
     request.config._tableconf.append(
-        'Duration', headerclass='sortable numeric', 
+        'Duration', headerclass='sortable numeric',
         rowclass='col-duration')
     request.config._tableconf.append(
         'Links', headerclass='sortable initial-sort result',
@@ -114,8 +114,8 @@ class HTMLTableHeader(object):
         for header in self.headers:
             if header.heading == heading:
                 return
-        self.headers.append(HTMLTableColumn(heading, 
-            headerclass, rowclass, _id))
+        self.headers.append(HTMLTableColumn(heading, headerclass,
+                                            rowclass, _id))
 
     def insert_at(self, position, heading, _class="", _id=""):
         if position < 0 or position > len(self.headers):

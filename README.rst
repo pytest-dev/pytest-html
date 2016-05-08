@@ -129,6 +129,7 @@ Then use a :code:`pytest_runtest_makereport` hook to add extras to the extra_col
       # Add ball.png as an image
       extra_col.append(
         pytest_html.extras.image('ball.png', name='Image Representation'))
+      report.extra_col = extra_col
 
 
 Screenshots

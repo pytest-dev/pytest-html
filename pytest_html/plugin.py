@@ -124,7 +124,7 @@ class HTMLTableHeader(object):
             self.append(heading, _class, _id)
         else:
             self.headers = self.headers[:position] + \
-                HTMLTableColumn(heading, _class, _id) + \
+                [HTMLTableColumn(heading, _class, _id)] + \
                 self.headers[position:]
 
     def exists(self, heading):
@@ -235,7 +235,7 @@ class HTMLReport(object):
                 table_row.append(html.td(links_html, class_=header.rowclass))
             else:
                 for extra in getattr(report, 'extra_col', []):
-                    if header.heading == extra.get('name'):
+                    if header.heading == extra.get('column'):
                         href = None
 
                         if extra.get('format') == extras.FORMAT_IMAGE:
@@ -262,16 +262,11 @@ class HTMLReport(object):
                                 class_=extra.get('format'),
                                 href=href,
                                 target='_blank')
-                            links_html.append(link)
-                            links_html.append(' ')
-                            table_row.append(link)
+                            table_row.append(html.td(link))
 
                         break
 
         table_row.append(html.td(additional_html, class_='extra'))
-
-        for extra in getattr(report, 'extra', []):
-            href = None
 
         self.test_logs.append(html.tr(table_row,
                                       class_=result.lower() +

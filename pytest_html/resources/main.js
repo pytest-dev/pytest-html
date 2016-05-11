@@ -24,6 +24,9 @@ function find_all(selector, elem) {
 }
 
 function sort_column(elem) {
+    if (elem == null)
+        return;
+
     toggle_sort_states(elem);
     var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
     var key;
@@ -41,6 +44,8 @@ addEventListener("DOMContentLoaded", function() {
     reset_sort_headers();
 
     split_extra_onto_two_rows();
+
+    window.sorted_index = find_all('.results-table-row').map(function(item, i) { return  i; });
     sort_column(find('.initial-sort'));
 
     find_all('.col-links a.image').forEach(function(elem) {
@@ -80,19 +85,17 @@ addEventListener("DOMContentLoaded", function() {
 
 function sort_table(clicked, key_func) {
     one_row_for_data();
-    var rows = find_all('.results-table-row');
+    var sorted_rows = find_all('.results-table-row');
+    var unsort_index = sort(window.sorted_index, function (a){return a;}, false);
+    var rows = unsort_index.map(function(elem) { return sorted_rows[elem]; });
 
     if (clicked.classList.contains('active'))
-    {
-       clicked.sorted_index = sort(rows, key_func, !clicked.classList.contains('asc'));
-    }
+       window.sorted_index = sort(rows, key_func, !clicked.classList.contains('asc'));
     else
-    {
-       clicked.sorted_index = sort(clicked.sorted_index, function (a){return a;}, false);
-    }
+       window.sorted_index = find_all('.results-table-row').map(function(item, i) { return  i; });
 
     var parent = document.getElementById('results-table-body');
-    clicked.sorted_index.forEach(function(elem) {
+    window.sorted_index.forEach(function(elem) {
         parent.appendChild(rows[elem]);
     });
 

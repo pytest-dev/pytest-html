@@ -81,13 +81,19 @@ addEventListener("DOMContentLoaded", function() {
 function sort_table(clicked, key_func) {
     one_row_for_data();
     var rows = find_all('.results-table-row');
-    var reversed = !clicked.classList.contains('asc');
 
-    var sorted_rows = sort(rows, key_func, reversed);
+    if (clicked.classList.contains('active'))
+    {
+       clicked.sorted_index = sort(rows, key_func, !clicked.classList.contains('asc'));
+    }
+    else
+    {
+       clicked.sorted_index = sort(clicked.sorted_index, function (a){return a;}, false);
+    }
 
     var parent = document.getElementById('results-table-body');
-    sorted_rows.forEach(function(elem) {
-        parent.appendChild(elem);
+    clicked.sorted_index.forEach(function(elem) {
+        parent.appendChild(rows[elem]);
     });
 
     split_extra_onto_two_rows();
@@ -106,8 +112,7 @@ function sort(items, key_func, reversed) {
     });
 
     return sort_array.map(function(item) {
-        var index = item[1];
-        return items[index];
+        return item[1];
     });
 }
 
@@ -146,10 +151,23 @@ function reset_sort_headers() {
 }
 
 function toggle_sort_states(elem) {
+
+    var noordernext = false;
+
     //if active, toggle between asc and desc
     if (elem.classList.contains('active')) {
-        elem.classList.toggle('asc');
-        elem.classList.toggle('desc');
+        noordernext = elem.classList.contains('desc');
+        if (!noordernext)
+        {
+          elem.classList.toggle('asc');
+          elem.classList.toggle('desc');
+        }
+        else
+        {
+          elem.classList.remove('active');
+          elem.classList.add('inactive');
+          return;
+        }
     }
 
     //if inactive, reset all other functions and add ascending active

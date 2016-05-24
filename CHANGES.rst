@@ -1,6 +1,10 @@
 Release Notes
 -------------
 
+**1.8.1 (2016-05-24)**
+
+* Include captured output for passing tests
+
 **1.8.0 (2015-02-24)**
 
 * Remove duplication from the environment section

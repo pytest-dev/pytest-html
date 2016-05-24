@@ -5,7 +5,7 @@ Release Notes
 
 * Include captured output for passing tests
 
-**1.8.0 (2015-02-24)**
+**1.8.0 (2016-02-24)**
 
 * Remove duplication from the environment section
 * Dropped support for Python 3.2

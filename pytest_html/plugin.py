@@ -120,8 +120,9 @@ class HTMLReport(object):
                     target='_blank'))
                 links_html.append(' ')
 
+        log = html.div(class_='log')
+
         if report.longrepr:
-            log = html.div(class_='log')
             for line in str(report.longrepr).splitlines():
                 if not PY3:
                     line = line.decode('utf-8')
@@ -136,11 +137,13 @@ class HTMLReport(object):
                     else:
                         log.append(raw(escape(line)))
                 log.append(html.br())
-            for header, content in report.sections:
-                log.append(' {0} '.format(header).center(80, '-'))
-                log.append(html.br())
-                log.append(content)
-        else:
+
+        for header, content in report.sections:
+            log.append(' {0} '.format(header).center(80, '-'))
+            log.append(html.br())
+            log.append(content)
+
+        if len(log) == 0:
             log = html.div(class_='empty log')
             log.append('No log output captured.')
         additional_html.append(log)

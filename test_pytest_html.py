@@ -152,14 +152,17 @@ class TestHTML:
             assert content in html
 
     def test_stdout(self, testdir):
-        content = str(random.random())
+        content = (str(random.random()), str(random.random()))
         testdir.makepyfile("""
-            def test_fail():
+            def test_pass():
                 print({0})
-                assert False""".format(content))
+            def test_fail():
+                print({1})
+                assert False""".format(*content))
         result, html = run(testdir)
         assert result.ret
-        assert content in html
+        for c in content:
+            assert c in html
 
     def test_extra_html(self, testdir):
         content = str(random.random())

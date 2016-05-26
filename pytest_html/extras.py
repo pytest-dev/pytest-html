@@ -9,25 +9,25 @@ FORMAT_TEXT = 'text'
 FORMAT_URL = 'url'
 
 
-def extra(content, format, name=None):
-    return {'name': name, 'format': format, 'content': content}
+def extra(content, format_, column, name=None):
+    return {'name': name, 'format': format_, 'content': content, 'column': column}
 
 
-def html(content):
-    return extra(content, FORMAT_HTML)
+def html(content, column='Links', name=None):
+    return extra(content, FORMAT_HTML, column, name)
 
 
-def image(content, name='Image'):
-    return extra(content, FORMAT_IMAGE, name)
+def image(content, column='Links', name='Image'):
+    return extra(content, FORMAT_IMAGE, column, name)
 
 
-def json(content, name='JSON'):
-    return extra(content, FORMAT_JSON, name)
+def json(content, column='Links', name='JSON'):
+    return extra(content, FORMAT_JSON, column, name)
 
 
-def text(content, name='Text'):
-    return extra(content, FORMAT_TEXT, name)
+def text(content, column='Links', name='Text'):
+    return extra(content, FORMAT_TEXT, column, name)
 
 
-def url(content, name='URL'):
-    return extra(content, FORMAT_URL, name)
+def url(content, column='Links', name='URL'):
+    return extra(content, FORMAT_URL, column, name)

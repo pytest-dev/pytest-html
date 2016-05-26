@@ -36,6 +36,22 @@ def environment(request):
         ('Platform', platform.platform())])
 
 
+@pytest.fixture(scope='session', autouse=True)
+def tableconf(request):
+    """ Provide table header information for HTML report"""
+    request.config._tableconf.append(
+        'Result', headerclass='sortable initial-sort result',
+        rowclass='col-result')
+    request.config._tableconf.append(
+        'Test', headerclass='sortable', rowclass='col-name')
+    request.config._tableconf.append(
+        'Duration', headerclass='sortable numeric',
+        rowclass='col-duration')
+    request.config._tableconf.append(
+        'Links', headerclass='sortable initial-sort result',
+        rowclass='col-links', _id='results-table-head')
+
+
 def pytest_addoption(parser):
     group = parser.getgroup('terminal reporting')
     group.addoption('--html', action='store', dest='htmlpath',
@@ -45,11 +61,14 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     config._environment = []
+    config._tableconf = HTMLTableHeader()
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
         config._html = HTMLReport(htmlpath)
         config.pluginmanager.register(config._html)
+        config._html.tableconf = config._tableconf
+        config._tableconf = config._html.tableconf
     if hasattr(config, 'slaveoutput'):
         config.slaveoutput['environment'] = config._environment
 
@@ -77,6 +96,58 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
     return 'data:{0};charset={1};base64,{2}'.format(mime_type, charset, data)
 
 
+class HTMLTableColumn(object):
+
+    def __init__(self, heading, headerclass="", rowclass="", _id=""):
+        self.heading = heading
+        self.headerclass = headerclass
+        self.rowclass = rowclass
+        self.id = _id
+
+
+class HTMLTableHeader(object):
+
+    def __init__(self):
+        self.headers = []
+
+    def append(self, heading, headerclass="", rowclass="", _id=""):
+        for header in self.headers:
+            if header.heading == heading:
+                return
+        self.headers.append(HTMLTableColumn(heading, headerclass,
+                                            rowclass, _id))
+
+    def insert_at(self, position, heading, _class="", _id=""):
+        if position < 0 or position > len(self.headers):
+            raise IndexError('index position out of range')
+        if len(self.headers) == position:
+            self.append(heading, _class, _id)
+        else:
+            self.headers = self.headers[:position] + \
+                [HTMLTableColumn(heading, _class, _id)] + \
+                self.headers[position:]
+
+    def exists(self, heading):
+        for (index, col) in enumerate(self.headers):
+            if col.heading == heading:
+                return index
+        return None
+
+    def remove(self, heading):
+        index = self.exists(heading)
+        if index is not None:
+            self.headers = self.headers[:index] + self.headers[index+1:]
+
+    def html(self):
+        results_headings = []
+        for column in self.headers:
+            results_headings.append(html.th(column.heading,
+                                            class_=column.headerclass,
+                                            col=column.heading.lower(),
+                                            id=column.id))
+        return results_headings
+
+
 class HTMLReport(object):
 
     def __init__(self, logfile):
@@ -86,6 +157,7 @@ class HTMLReport(object):
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
+        self.tableconf = None
 
     def _appendrow(self, result, report):
         time = getattr(report, 'duration', 0.0)
@@ -95,6 +167,7 @@ class HTMLReport(object):
 
         for extra in getattr(report, 'extra', []):
             href = None
+
             if extra.get('format') == extras.FORMAT_IMAGE:
                 href = '#'
                 image = 'data:image/png;base64,{0}'.format(
@@ -152,13 +225,55 @@ class HTMLReport(object):
         if report.when != 'call':
             test_id = '::'.join([report.nodeid, report.when])
 
-        self.test_logs.append(html.tr([
-            html.td(result, class_='col-result'),
-            html.td(test_id, class_='col-name'),
-            html.td('{0:.2f}'.format(time), class_='col-duration'),
-            html.td(links_html, class_='col-links'),
-            html.td(additional_html, class_='extra')],
-            class_=result.lower() + ' results-table-row'))
+        table_row = []
+        for header in self.tableconf.headers:
+            if header.heading == 'Result':
+                table_row.append(html.td(result, class_=header.rowclass))
+            elif header.heading == 'Test':
+                table_row.append(html.td(test_id, class_=header.rowclass))
+            elif header.heading == 'Duration':
+                table_row.append(
+                    html.td('{0:.2f}'.format(time), class_=header.rowclass))
+            elif header.heading == 'Links':
+                table_row.append(html.td(links_html, class_=header.rowclass))
+            else:
+                for extra in getattr(report, 'extra_col', []):
+                    if header.heading == extra.get('column'):
+                        href = None
+
+                        if extra.get('format') == extras.FORMAT_IMAGE:
+                            href = '#'
+                            image = 'data:image/png;base64,{0}'.format(
+                                extra.get('content'))
+                            table_row.append(html.td(
+                                html.a(html.img(src=image), href="#"),
+                                class_='image'))
+                        elif extra.get('format') == extras.FORMAT_HTML:
+                            table_row.append(
+                                html.td(raw(extra.get('content'))))
+                        elif extra.get('format') == extras.FORMAT_JSON:
+                            href = data_uri(json.dumps(extra.get('content')),
+                                            mime_type='application/json')
+                        elif extra.get('format') == extras.FORMAT_TEXT:
+                            href = data_uri(extra.get('content'))
+                        elif extra.get('format') == extras.FORMAT_URL:
+                            href = extra.get('content')
+
+                        if href is not None:
+                            link = html.a(
+                                extra.get('name'),
+                                class_=extra.get('format'),
+                                href=href,
+                                target='_blank')
+                            table_row.append(html.td(link))
+
+                        break
+
+        table_row.append(html.td(additional_html, class_='extra'))
+
+        self.test_logs.append(html.tr(table_row,
+                                      class_=result.lower() +
+                                      ' results-table-row'))
 
     def append_pass(self, report):
         self.passed += 1
@@ -237,15 +352,8 @@ class HTMLReport(object):
                 self.xpassed), class_='failed'), '.')]
 
         results = [html.h2('Results'), html.table([html.thead(
-            html.tr([
-                html.th('Result',
-                        class_='sortable initial-sort result',
-                        col='result'),
-                html.th('Test', class_='sortable', col='name'),
-                html.th('Duration',
-                        class_='sortable numeric',
-                        col='duration'),
-                html.th('Links')]), id='results-table-head'),
+            html.tr(session.config._tableconf.html()),
+            id='results-table-head'),
             html.tbody(*self.test_logs, id='results-table-body')],
             id='results-table')]
 

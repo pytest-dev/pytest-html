@@ -39,6 +39,42 @@ def assert_summary(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
     assert int(re.search('(\d)+ unexpected passes', html).group(1)) == xpassed
 
 
+def assert_tableformat(html, num_column=4, 
+                       headers=['Result', 'Test', 'Duration', 'Links']):
+    html_ = re.sub('\n', '', html)
+    m = re.search('<table id="results-table">(.*?)</table>', html_)
+    assert m is not None
+    
+    # Find the number of columns
+    cols = re.findall('(\w+)<\/th>', m.group(1))
+    assert len(cols) == num_column
+    
+    # Check the headings
+    for (column, heading) in zip(cols, headers):
+        assert column == heading
+    
+    # Finally, check the number of table columns is the same as the header
+    rows = re.findall('<tr.*?>.*?<\/tr>', m.group(1))
+    assert len(rows) > 1 # More than a row of headers
+    second_row = rows[1]
+    
+    cols = re.findall('<td.*?>.*?<\/td>', second_row)
+    assert len(cols) == num_column + 1
+    
+def assert_resultscell(html, value, col=0, row=0):
+    html_ = re.sub('\n', '', html)
+    m = re.search('<table id="results-table">(.*?)</table>', html_)
+    assert m is not None
+    
+    rows = re.findall('<tr.*?>.*?<\/tr>', m.group(1))
+    assert len(rows) >= row+1
+    
+    cells = re.findall('<t[d|h].*?>.*?<\/t[d|h]>', rows[row])
+    assert len(cells) >= col + 1
+    test = cells[col]
+    assert value in cells[col]
+
+
 class TestHTML:
 
     def test_durations(self, testdir):
@@ -268,6 +304,141 @@ class TestHTML:
             href)
         assert link in html
 
+    def test_tableconf_remove_testpassed(self, testdir):
+        headers = ['Result', 'Test', 'Duration', 'Links']
+        to_remove = random.choice(headers)
+        headers.remove(to_remove)
+
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(scope='session', autouse=True)
+            def tableconfigure(request):
+                request.config._tableconf.remove('{}')
+        """.format(to_remove))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_tableformat(html, num_column=3, headers=headers)
+
+    def test_tableconf_remove_testfailed(self, testdir):
+        headers = ['Result', 'Test', 'Duration', 'Links']
+        to_remove = random.choice(headers)
+        headers.remove(to_remove)
+
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(scope='session', autouse=True)
+            def tableconfigure(request):
+                request.config._tableconf.remove('{}')
+        """.format(to_remove))
+        testdir.makepyfile('def test_fail(): assert False')
+        result, html = run(testdir)
+        assert result.ret
+        assert_tableformat(html, num_column=3, headers=headers)
+        
+    def test_tableconf_extra_html(self, testdir):
+        headers = ['Result', 'Test', 'Duration', 'Links', 'NewHTMLColumn']
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(scope='session', autouse=True)
+            def tableconfigure(request):
+                request.config._tableconf.append('{0}')
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                extra_col = getattr(report, 'extra_col', [])
+                if report.when == 'call':
+                    from pytest_html import extras
+                    extra_col.append(
+                        extras.html('ExtraInfo', name='{0}'))
+                    report.extra_col = extra_col
+        """.format(headers[-1]))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_tableformat(html, num_column=5, headers=headers)
+        assert_resultscell(html, 'ExtraInfo', col=4, row=1)
+
+    def test_tableconf_insertat(self, testdir):
+        headers = ['Result', 'NewHTMLColumn', 'Test', 'Duration', 'Links']
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(scope='session', autouse=True)
+            def tableconfigure(request):
+                request.config._tableconf.insert_at(1, '{0}')
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                extra_col = getattr(report, 'extra_col', [])
+                if report.when == 'call':
+                    from pytest_html import extras
+                    extra_col.append(
+                        extras.html('ExtraInfo', name='{0}'))
+                    report.extra_col = extra_col
+        """.format(headers[1]))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_tableformat(html, num_column=5, headers=headers)
+        assert_resultscell(html, 'ExtraInfo', col=1, row=1)
+    
+    def test_tableconf_insertatfails(self, testdir):
+        headers = ['Result', 'NewHTMLColumn', 'Test', 'Duration', 'Links']
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(scope='session', autouse=True)
+            def tableconfigure(request):
+                request.config._tableconf.insert_at(6, '{0}')
+        """.format(headers[1]))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret
+        assert 'IndexError' in html
+    
+    def test_tableconf_extra_text(self, testdir):
+        content = 'NewHTMLColumn'
+        headers = ['Result', 'Test', 'Duration', 'Links', content]
+        testdir.makeconftest("""
+            import pytest
+            @pytest.fixture(scope='session', autouse=True)
+            def tableconfigure(request):
+                request.config._tableconf.append('{0}')
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                extra_col = getattr(report, 'extra_col', [])
+                if report.when == 'call':
+                    from pytest_html import extras
+                    extra_col.append(
+                        extras.text('{0}', column='{0}'))
+                    report.extra_col = extra_col
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_tableformat(html, num_column=5, headers=headers)
+        
+        if PY3:
+            data = b64encode(content.encode('utf-8')).decode('ascii')
+        else:
+            data = b64encode(content)
+        href = 'data:text/plain;charset=utf-8;base64,{0}'.format(data)
+        link = '<a class="text" href="{0}" target="_blank">Text</a>'.format(
+            href)
+        assert_resultscell(html, link, col=4, row=1)
+    
+    def test_tableconf_extra_url(self, testdir):
+        pass
+    
+    def test_tableconf_extra_image(self, testdir):
+        pass
+    
+    def test_tableconf_extra_json(self, testdir):
+        pass
+
     def test_no_environment(self, testdir):
         testdir.makeconftest("""
             import pytest
@@ -337,7 +508,7 @@ class TestHTML:
             def test_exit():
                 os._exit(0)
         """)
-        result, html = run(testdir, 'report.html', '-n', '1')
+        result, _ = run(testdir, 'report.html', '-n', '1')
         assert 'INTERNALERROR>' not in result.stdout.str()
 
     def test_utf8_surrogate(self, testdir):

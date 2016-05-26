@@ -87,6 +87,51 @@ conftest.py file:
               extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
           report.extra = extra
 
+You can also modify the columns displayed by the results table. For instance,
+it is possible to remove a column from being displayed using a session-scope 
+fixture, which can be implemented in a plugin or conftest.py file:
+
+.. code-block:: python
+
+  import pytest
+  @pytest.fixture(scope='session', autorun=True)
+  def tablecustomise(request):
+    conf = request.config._tableconf
+    conf.remove('Links')  # Exclude links column
+    request.config._tableconf = conf
+
+You can add columns at a specific point or at the right of the time using
+either :code:`insert_at` or :code:`append` functions. These should be implemented
+in the same kind of fixture:
+
+..code-block:: python
+  import pytest
+  @pytest.fixture(scope='session', autorun=True)
+  def tablecustomise(request):
+    conf = request.config._tableconf
+    conf.insert_at(1, 'Description')  # Add docstring column
+    conf.append('Image Representation') # Add image column
+    request.config._tableconf = conf
+
+Then use a :code:`pytest_runtest_makereport` hook to add extras to the extra_col list:
+..code-block:: python
+  import pytest
+  @pytest.mark.hookwrapper
+  def pytest_runtest_makereport(item, call):
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    outcome = yield
+    report = outcome.get_result()
+    extra_col = getattr(report, 'extra_col', [])
+    if report.when == 'call':
+      # Add docstring as description
+      extra_col.append(
+        pytest_html.extras.html(item.function.__doc__, name='Description'))
+      # Add ball.png as an image
+      extra_col.append(
+        pytest_html.extras.image('ball.png', name='Image Representation'))
+      report.extra_col = extra_col
+
+
 Screenshots
 -----------
 

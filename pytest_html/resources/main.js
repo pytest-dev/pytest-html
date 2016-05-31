@@ -24,6 +24,9 @@ function find_all(selector, elem) {
 }
 
 function sort_column(elem) {
+    if (elem == null)
+        return;
+
     toggle_sort_states(elem);
     var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
     var key;
@@ -41,6 +44,8 @@ addEventListener("DOMContentLoaded", function() {
     reset_sort_headers();
 
     split_extra_onto_two_rows();
+
+    window.sorted_index = find_all('.results-table-row').map(function(item, i) { return  i; });
     sort_column(find('.initial-sort'));
 
     find_all('.col-links a.image').forEach(function(elem) {
@@ -80,14 +85,18 @@ addEventListener("DOMContentLoaded", function() {
 
 function sort_table(clicked, key_func) {
     one_row_for_data();
-    var rows = find_all('.results-table-row');
-    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = find_all('.results-table-row');
+    var unsort_index = sort(window.sorted_index, function (a){return a;}, false);
+    var rows = unsort_index.map(function(elem) { return sorted_rows[elem]; });
 
-    var sorted_rows = sort(rows, key_func, reversed);
+    if (clicked.classList.contains('active'))
+       window.sorted_index = sort(rows, key_func, !clicked.classList.contains('asc'));
+    else
+       window.sorted_index = find_all('.results-table-row').map(function(item, i) { return  i; });
 
     var parent = document.getElementById('results-table-body');
-    sorted_rows.forEach(function(elem) {
-        parent.appendChild(elem);
+    window.sorted_index.forEach(function(elem) {
+        parent.appendChild(rows[elem]);
     });
 
     split_extra_onto_two_rows();
@@ -106,8 +115,7 @@ function sort(items, key_func, reversed) {
     });
 
     return sort_array.map(function(item) {
-        var index = item[1];
-        return items[index];
+        return item[1];
     });
 }
 
@@ -146,10 +154,23 @@ function reset_sort_headers() {
 }
 
 function toggle_sort_states(elem) {
+
+    var noordernext = false;
+
     //if active, toggle between asc and desc
     if (elem.classList.contains('active')) {
-        elem.classList.toggle('asc');
-        elem.classList.toggle('desc');
+        noordernext = elem.classList.contains('desc');
+        if (!noordernext)
+        {
+          elem.classList.toggle('asc');
+          elem.classList.toggle('desc');
+        }
+        else
+        {
+          elem.classList.remove('active');
+          elem.classList.add('inactive');
+          return;
+        }
     }
 
     //if inactive, reset all other functions and add ascending active

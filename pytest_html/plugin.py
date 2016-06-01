@@ -149,13 +149,16 @@ class HTMLReport(object):
         if report.when != 'call':
             test_id = '::'.join([report.nodeid, report.when])
 
+        logs_attribs = {"data-type-associated" : result, 
+                        "data-test-associated" : test_id};
+
         self.test_logs.append(html.tr([
             html.td(result, class_='col-result'),
             html.td(test_id, class_='col-name'),
             html.td('{0:.2f}'.format(time), class_='col-duration'),
             html.td(links_html, class_='col-links'),
-            html.td(additional_html, class_='extra', id=test_id)],
-            class_=result.lower() + ' results-table-row', id=test_id))
+            html.td(additional_html, class_='extra', **logs_attribs)],
+            class_=result.lower() + ' results-table-row', **logs_attribs))
 
     def append_pass(self, report):
         self.passed += 1
@@ -215,51 +218,51 @@ class HTMLReport(object):
             html.title('Test Report'),
             html.style(raw(style_css)))
 
-        filter_checkbox = {}
-        test_result_type_amount = {'Passed': self.passed,
-                                   'Skipped': self.skipped,
-                                   'Failed': self.failed,
-                                   'Error': self.errors,
-                                   'XFailed': self.xfailed,
-                                   'XPassed': self.xpassed}
 
-        for test_type in test_result_type_amount:
-            if(test_result_type_amount[test_type] > 0):
-                oc_command = 'filter_table(' + test_type + ')'
-                filter_checkbox[test_type] = html.input(type='checkbox',
-                                                        checked='true',
-                                                        onChange=oc_command,
-                                                        name='filter_checkbox',
-                                                        id=test_type,
-                                                        value=test_type)
-            else:
-                filter_checkbox[test_type] = html.input(type='checkbox',
-                                                        disabled='true')
+        class ResultByType:
+
+            def __init__(self, label="Passed", class_html="passed",
+                         data_type_associated="Passed", amount=0):
+                self.label = label
+                self.class_html = class_html
+                self.amount = amount
+                self.data_type_associated = {"data-type-associated": 
+                                               data_type_associated}
+                self.generate_checkbox()
+                self.generate_summary_item()
+
+            def generate_checkbox(self):
+                if(self.amount > 0):
+                    self.checkbox = html.input(type='checkbox',
+                                               checked='true',
+                                               onChange='filter_table(this)',
+                                               name='filter_checkbox',
+                                               **self.data_type_associated)
+                else:
+                    self.checkbox = html.input(type='checkbox',
+                                                disabled='true')
+            def generate_summary_item(self):
+                self.summary_item = html.span('{0} {1}'.format(
+                    self.amount, self.label), class_= self.class_html)
+
+
+
+        results_by_type = [ResultByType('passed', 'passed', 'Passed', self.passed),
+                           ResultByType('skipped', 'skipped', 'Skipped', self.skipped),
+                           ResultByType('failed', 'failed', 'Failed', self.failed),
+                           ResultByType ('errors', 'error', 'Error', self.errors),
+                           ResultByType('expected failures', 'skipped', 'XFailed', self.xfailed),
+                           ResultByType('unexpected passes', 'failed', 'XPassed', self.xpassed)]
 
         summary = [html.h2('Summary'), html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(
-                numtests, suite_time_delta),
-            html.p('(Un)check the boxes to filter the results.'),
-            html.br(),
-            filter_checkbox['Passed'],
-            html.span('{0} passed'.format(
-                self.passed), class_='passed'), ', ',
-            filter_checkbox['Skipped'],
-            html.span('{0} skipped'.format(
-                self.skipped), class_='skipped'), ', ',
-            filter_checkbox['Failed'],
-            html.span('{0} failed'.format(
-                self.failed), class_='failed'), ', ',
-            filter_checkbox['Error'],
-            html.span('{0} errors'.format(
-                self.errors), class_='error'), '.',
-            html.br(),
-            filter_checkbox['XFailed'],
-            html.span('{0} expected failures'.format(
-                self.xfailed), class_='skipped'), ', ',
-            filter_checkbox['XPassed'],
-            html.span('{0} unexpected passes'.format(
-                self.xpassed), class_='failed'), '.')]
+                numtests, suite_time_delta)),
+            html.p('(Un)check the boxes to filter the results.')]
+
+        for result_by_type in results_by_type:
+            summary.append(result_by_type.checkbox)
+            summary.append(result_by_type.summary_item)
+            summary.append(' ')
 
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([

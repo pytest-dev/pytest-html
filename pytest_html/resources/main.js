@@ -192,22 +192,28 @@ function one_row_for_data() {
 }
 
 function filter_table(elem) {
-    var checkbox = document.getElementById(elem.value);
+    console.log(elem.value);
+    var checkbox = elem;
+    var att_name = "data-type-associated";
+
     var results_table = document.getElementById("results-table");
     var rows = results_table.rows; 
+
     //The logs and extra HTML don't appear on the rows
     var logs = document.getElementsByClassName("extra");
 
-    var td_elem_str = "class=\"col-result\">" + elem.value;
     
     for(var i = 0; i < rows.length; i++){
-        if(rows[i].innerHTML.indexOf(td_elem_str) > -1) {
+        if(rows[i].getAttribute(att_name) ==
+            elem.getAttribute(att_name)) {
             rows[i].hidden = !checkbox.checked;
-            for(var j = 0; j < logs.length; j++) {
-                if(logs[j].id == rows[i].id) {
-                    logs[j].hidden = !checkbox.checked;
-                }
-            }
         }
+    }
+
+    for(var i = 0; i < logs.length; i++) {
+        if(logs[i].getAttribute(att_name) ==
+           elem.getAttribute(att_name)) {
+                logs[i].hidden = !checkbox.checked;
+            }
     }
 }

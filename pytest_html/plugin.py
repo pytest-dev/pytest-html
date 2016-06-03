@@ -141,7 +141,7 @@ class HTMLReport(object):
                 log.append(html.br())
                 log.append(content)
         else:
-            log = html.div(class_='empty log')
+            log = html.div(class_='empty log', colspan="5")
             log.append('No log output captured.')
         additional_html.append(log)
 
@@ -149,16 +149,18 @@ class HTMLReport(object):
         if report.when != 'call':
             test_id = '::'.join([report.nodeid, report.when])
 
-        logs_attribs = {"data-type-associated" : result, 
-                        "data-test-associated" : test_id};
-
-        self.test_logs.append(html.tr([
+        rows_table = html.tr([
             html.td(result, class_='col-result'),
             html.td(test_id, class_='col-name'),
             html.td('{0:.2f}'.format(time), class_='col-duration'),
-            html.td(links_html, class_='col-links'),
-            html.td(additional_html, class_='extra', **logs_attribs)],
-            class_=result.lower() + ' results-table-row', **logs_attribs))
+            html.td(links_html, class_='col-links')])
+
+        rows_extra = html.tr(html.td(additional_html,
+                             class_='extra', colspan="5"))
+
+        self.test_logs.append(html.tbody(rows_table, rows_extra,
+                                         class_=result.lower() +
+                                         ' results-table-row'))
 
     def append_pass(self, report):
         self.passed += 1
@@ -218,50 +220,54 @@ class HTMLReport(object):
             html.title('Test Report'),
             html.style(raw(style_css)))
 
+        class Outcome:
 
-        class ResultByType:
+            def __init__(self, outcome, total=0, label=None,
+                         test_result=None, class_html=None):
+                self.outcome = outcome
+                self.label = label or outcome
+                self.class_html = class_html or outcome
+                self.total = total
+                self.test_result = test_result or outcome
 
-            def __init__(self, label="Passed", class_html="passed",
-                         data_type_associated="Passed", amount=0):
-                self.label = label
-                self.class_html = class_html
-                self.amount = amount
-                self.data_type_associated = {"data-type-associated": 
-                                               data_type_associated}
                 self.generate_checkbox()
                 self.generate_summary_item()
 
             def generate_checkbox(self):
-                if(self.amount > 0):
+                data_test_result = {"data-test-result":
+                                    self.test_result.lower()}
+                if(self.total > 0):
                     self.checkbox = html.input(type='checkbox',
                                                checked='true',
                                                onChange='filter_table(this)',
                                                name='filter_checkbox',
-                                               **self.data_type_associated)
+                                               **data_test_result)
                 else:
                     self.checkbox = html.input(type='checkbox',
-                                                disabled='true')
+                                               disabled='true')
+
             def generate_summary_item(self):
-                self.summary_item = html.span('{0} {1}'.format(
-                    self.amount, self.label), class_= self.class_html)
+                self.summary_item = html.span('{0} {1}'.
+                                              format(self.total, self.label),
+                                              class_=self.class_html)
 
-
-
-        results_by_type = [ResultByType('passed', 'passed', 'Passed', self.passed),
-                           ResultByType('skipped', 'skipped', 'Skipped', self.skipped),
-                           ResultByType('failed', 'failed', 'Failed', self.failed),
-                           ResultByType ('errors', 'error', 'Error', self.errors),
-                           ResultByType('expected failures', 'skipped', 'XFailed', self.xfailed),
-                           ResultByType('unexpected passes', 'failed', 'XPassed', self.xpassed)]
+        outcomes = [Outcome('passed', self.passed),
+                    Outcome('skipped', self.skipped),
+                    Outcome('failed', self.failed),
+                    Outcome('error', self.errors, 'errors'),
+                    Outcome('xfailed', self.xfailed,
+                            'expected failures', 'xfailed', 'skipped'),
+                    Outcome('xpassed', self.xpassed,
+                            'unexpected passes', 'xpassed', 'failed')]
 
         summary = [html.h2('Summary'), html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(
                 numtests, suite_time_delta)),
             html.p('(Un)check the boxes to filter the results.')]
 
-        for result_by_type in results_by_type:
-            summary.append(result_by_type.checkbox)
-            summary.append(result_by_type.summary_item)
+        for outcome in outcomes:
+            summary.append(outcome.checkbox)
+            summary.append(outcome.summary_item)
             summary.append(' ')
 
         results = [html.h2('Results'), html.table([html.thead(
@@ -274,8 +280,7 @@ class HTMLReport(object):
                         class_='sortable numeric',
                         col='duration'),
                 html.th('Links')]), id='results-table-head'),
-            html.tbody(*self.test_logs, id='results-table-body')],
-            id='results-table')]
+                self.test_logs],  id='results-table')]
 
         main_js = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'main.js'))

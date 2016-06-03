@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+
 function toArray(iter) {
     if (iter === null) {
         return null;
@@ -40,7 +41,6 @@ function sort_column(elem) {
 addEventListener("DOMContentLoaded", function() {
     reset_sort_headers();
 
-    split_extra_onto_two_rows();
     sort_column(find('.initial-sort'));
 
     find_all('.col-links a.image').forEach(function(elem) {
@@ -79,18 +79,15 @@ addEventListener("DOMContentLoaded", function() {
 });
 
 function sort_table(clicked, key_func) {
-    one_row_for_data();
     var rows = find_all('.results-table-row');
     var reversed = !clicked.classList.contains('asc');
 
     var sorted_rows = sort(rows, key_func, reversed);
 
-    var parent = document.getElementById('results-table-body');
+    var parent = document.getElementById('results-table');
     sorted_rows.forEach(function(elem) {
         parent.appendChild(elem);
     });
-
-    split_extra_onto_two_rows();
 }
 
 function sort(items, key_func, reversed) {
@@ -160,60 +157,13 @@ function toggle_sort_states(elem) {
     }
 }
 
-function split_extra_onto_two_rows() {
-    find_all('tr.results-table-row').forEach(function(elem) {
-        var new_row = document.createElement("tr")
-        new_row.className = "extra";
-        elem.parentNode.insertBefore(new_row, elem.nextSibling);
-        find_all(".extra", elem).forEach(function (td_elem) {
-            if (find("*:not(.empty)", td_elem)) {
-                new_row.appendChild(td_elem);
-                td_elem.colSpan=5;
-            } else {
-                td_elem.parentNode.removeChild(td_elem);
-            }
-        });
-    });
-}
-
-function one_row_for_data() {
-    find_all('tr.results-table-row').forEach(function(elem) {
-        if (elem.nextSibling.classList.contains('extra')) {
-            toArray(elem.nextSibling.childNodes).forEach(
-                function (td_elem) {
-                    elem.appendChild(td_elem);
-                })
-        } else {
-            var new_td = document.createElement("td");
-            new_td.className = "extra";
-            elem.appendChild(new_td);
-        }
-    });
-}
-
 function filter_table(elem) {
-    console.log(elem.value);
-    var checkbox = elem;
-    var att_name = "data-type-associated";
-
-    var results_table = document.getElementById("results-table");
-    var rows = results_table.rows; 
-
-    //The logs and extra HTML don't appear on the rows
-    var logs = document.getElementsByClassName("extra");
-
-    
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var rows = document.getElementsByClassName(class_outcome);
+   
     for(var i = 0; i < rows.length; i++){
-        if(rows[i].getAttribute(att_name) ==
-            elem.getAttribute(att_name)) {
-            rows[i].hidden = !checkbox.checked;
-        }
-    }
-
-    for(var i = 0; i < logs.length; i++) {
-        if(logs[i].getAttribute(att_name) ==
-           elem.getAttribute(att_name)) {
-                logs[i].hidden = !checkbox.checked;
-            }
+        rows[i].hidden = !elem.checked;
     }
 }

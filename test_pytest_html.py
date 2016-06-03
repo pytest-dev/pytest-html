@@ -25,16 +25,21 @@ def run(testdir, path='report.html', *args):
     return result, html
 
 
-# it is only necessary to check one condition, since the
-# algorithm which generates all the checkboxes is the same
-def assert_summary_checkboxes(html, passed=1):
-    pass
-    """cb_active = "<input checked=\"true\" id=\"Passed\""
-    cb_unactive = "<input disabled=\"true\""
-    if(passed != 0):
+def assert_summary_filter(html, test_outcome='Passed', test_outcome_number=1):
+    cb_active = ("<input checked=\"true\""
+                 " data-test-result=\"{0}\""
+                 .format(test_outcome))
+    cb_unactive = ("<input disabled=\"true\"")
+    table_test_result_outcome = ("tbody class=\"{0} "
+                                 .format(test_outcome))
+    if(test_outcome_number != 0):
         assert str(re.search(cb_active, html).group()) == cb_active
+        assert len(
+                    re.findall(
+                               table_test_result_outcome,
+                               html)) == test_outcome_number
     else:
-        assert str(re.search(cb_unactive, html).group()) == cb_unactive"""
+        assert str(re.search(cb_unactive, html).group()) == cb_unactive
 
 
 def assert_summary(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
@@ -49,6 +54,14 @@ def assert_summary(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
     assert int(re.search('(\d)+ errors', html).group(1)) == errors
     assert int(re.search('(\d)+ expected failures', html).group(1)) == xfailed
     assert int(re.search('(\d)+ unexpected passes', html).group(1)) == xpassed
+
+    assert_summary_filter(html, 'passed', passed)
+    assert_summary_filter(html, 'skipped', skipped)
+    assert_summary_filter(html, 'failed', failed)
+    assert_summary_filter(html, 'error', errors)
+    assert_summary_filter(html, 'xfailed', xfailed)
+    assert_summary_filter(html, 'xpassed', xpassed)
+
 
 class TestHTML:
 

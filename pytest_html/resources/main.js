@@ -81,7 +81,6 @@ addEventListener("DOMContentLoaded", function() {
 function sort_table(clicked, key_func) {
     var rows = find_all('.results-table-row');
     var reversed = !clicked.classList.contains('asc');
-
     var sorted_rows = sort(rows, key_func, reversed);
 
     var parent = document.getElementById('results-table');
@@ -110,13 +109,13 @@ function sort(items, key_func, reversed) {
 
 function key_alpha(col_index) {
     return function(elem) {
-        return elem.childNodes[col_index].firstChild.data.toLowerCase();
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
     };
 }
 
 function key_num(col_index) {
     return function(elem) {
-        return parseFloat(elem.childNodes[col_index].firstChild.data);
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
     };
 }
 
@@ -124,7 +123,7 @@ function key_result(col_index) {
     return function(elem) {
         var strings = ['Error', 'Failed', 'XFailed', 'XPassed', 'Skipped',
                        'Passed'];
-        return strings.indexOf(elem.childNodes[col_index].firstChild.data);
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
     };
 }
 

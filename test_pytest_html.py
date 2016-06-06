@@ -27,20 +27,20 @@ def run(testdir, path='report.html', *args):
 
 def assert_results_by_outcome(html, test_outcome, test_outcome_number,
                               label=None):
-    # Asserts if the test number of this outcome in the summary matches
+    # Asserts if the test number of this outcome in the summary is correct
     regex_summary = '(\d)+ {0}'.format(label or test_outcome)
     int(re.search(regex_summary, html).group(1)) == test_outcome_number
 
-    # Asserts if the generated checkboxes of this outcome matches
+    # Asserts if the generated checkbox of this outcome is correct
     regex_checkbox = ('<input checked="true" data-test-result="{0}"'
                       .format(test_outcome))
     if test_outcome_number == 0:
         regex_checkbox += ' disabled="true"'
-    assert str(re.search(regex_checkbox, html).group()) == regex_checkbox
+    assert str(re.search(regex_checkbox, html).group()) != None
 
-    # Asserts if the generated checkboxes of this outcome matches
+    # Asserts if the table rows of this outcome are correct
     regex_table = ('tbody class=\"{0} '.format(test_outcome))
-    assert len(re.findall(regex_table, html)) or 0 == test_outcome_number
+    assert len(re.findall(regex_table, html)) == test_outcome_number
 
 
 def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
@@ -53,9 +53,6 @@ def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
     tests_duration = re.search('([\d,.])+ seconds', html)
     if duration is not None:
         assert float(tests_duration.group(1)) >= float(duration)
-
-    # Asserts number of rows of the table
-    assert len(re.findall('tbody', html)) or 0 == tests
 
     # Asserts by outcome
     assert_results_by_outcome(html, 'passed', passed)

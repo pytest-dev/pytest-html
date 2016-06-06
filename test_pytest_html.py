@@ -25,9 +25,10 @@ def run(testdir, path='report.html', *args):
     return result, html
 
 
-def assert_results_by_outcome(html, test_outcome, test_outcome_number, label):
+def assert_results_by_outcome(html, test_outcome, test_outcome_number,
+                              label=None):
     # Asserts if the test number of this outcome in the summary matches
-    regex_summary = '(\d)+ {0}'.format(label)
+    regex_summary = '(\d)+ {0}'.format(label or test_outcome)
     int(re.search(regex_summary, html).group(1)) == test_outcome_number
 
     # Asserts if the generated checkboxes of this outcome matches
@@ -57,9 +58,9 @@ def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
     assert len(re.findall('tbody', html)) or 0 == tests
 
     # Asserts by outcome
-    assert_results_by_outcome(html, 'passed', passed, 'passed')
-    assert_results_by_outcome(html, 'skipped', skipped, 'skipped')
-    assert_results_by_outcome(html, 'failed', failed, 'failed')
+    assert_results_by_outcome(html, 'passed', passed)
+    assert_results_by_outcome(html, 'skipped', skipped)
+    assert_results_by_outcome(html, 'failed', failed)
     assert_results_by_outcome(html, 'error', errors, 'errors')
     assert_results_by_outcome(html, 'xfailed', xfailed, 'expected failures')
     assert_results_by_outcome(html, 'xpassed', xpassed, 'unexpected passes')

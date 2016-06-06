@@ -141,7 +141,7 @@ class HTMLReport(object):
                 log.append(html.br())
                 log.append(content)
         else:
-            log = html.div(class_='empty log', colspan="5")
+            log = html.div(class_='empty log')
             log.append('No log output captured.')
         additional_html.append(log)
 
@@ -156,7 +156,7 @@ class HTMLReport(object):
             html.td(links_html, class_='col-links')])
 
         rows_extra = html.tr(html.td(additional_html,
-                             class_='extra', colspan="5"))
+                             class_='extra', colspan='5'))
 
         self.test_logs.append(html.tbody(rows_table, rows_extra,
                                          class_=result.lower() +
@@ -234,17 +234,16 @@ class HTMLReport(object):
                 self.generate_summary_item()
 
             def generate_checkbox(self):
-                data_test_result = {"data-test-result":
-                                    self.test_result.lower()}
-                if(self.total > 0):
-                    self.checkbox = html.input(type='checkbox',
-                                               checked='true',
-                                               onChange='filter_table(this)',
-                                               name='filter_checkbox',
-                                               **data_test_result)
-                else:
-                    self.checkbox = html.input(type='checkbox',
-                                               disabled='true')
+                checkbox_kwargs = {'data-test-result':
+                                   self.test_result.lower()}
+                if self.total == 0:
+                    checkbox_kwargs['disabled'] = 'true'
+
+                self.checkbox = html.input(type='checkbox',
+                                           checked='true',
+                                           onChange='filter_table(this)',
+                                           name='filter_checkbox',
+                                           **checkbox_kwargs)
 
             def generate_summary_item(self):
                 self.summary_item = html.span('{0} {1}'.
@@ -254,11 +253,13 @@ class HTMLReport(object):
         outcomes = [Outcome('passed', self.passed),
                     Outcome('skipped', self.skipped),
                     Outcome('failed', self.failed),
-                    Outcome('error', self.errors, 'errors'),
+                    Outcome('error', self.errors, label='errors'),
                     Outcome('xfailed', self.xfailed,
-                            'expected failures', 'xfailed', 'skipped'),
+                            label='expected failures',
+                            class_html='skipped'),
                     Outcome('xpassed', self.xpassed,
-                            'unexpected passes', 'xpassed', 'failed')]
+                            label='unexpected passes',
+                            class_html='failed')]
 
         summary = [html.h2('Summary'), html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(

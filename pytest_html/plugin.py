@@ -280,7 +280,12 @@ class HTMLReport(object):
                 html.th('Duration',
                         class_='sortable numeric',
                         col='duration'),
-                html.th('Links')]), id='results-table-head'),
+                html.th('Links')]),
+            html.tr([
+                html.th('No results found. Try to check the filters',
+                    colspan='5')],
+                    id='not-found-message', hidden='true'),
+            id='results-table-head'),
                 self.test_logs],  id='results-table')]
 
         main_js = pkg_resources.resource_string(

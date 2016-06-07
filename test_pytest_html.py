@@ -36,7 +36,7 @@ def assert_results_by_outcome(html, test_outcome, test_outcome_number,
                       .format(test_outcome))
     if test_outcome_number == 0:
         regex_checkbox += ' disabled="true"'
-    assert str(re.search(regex_checkbox, html).group()) != None
+    assert str(re.search(regex_checkbox, html).group()) is not None
 
     # Asserts if the table rows of this outcome are correct
     regex_table = ('tbody class=\"{0} '.format(test_outcome))

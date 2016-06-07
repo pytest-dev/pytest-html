@@ -156,6 +156,19 @@ function toggle_sort_states(elem) {
     }
 }
 
+function is_all_rows_hidden() {
+    var rows = find_all('.results-table-row');
+    if(rows.length == 0)
+        return true;
+
+    for (var i = 0; i < rows.length; i++) {
+        if (rows[i].hidden == false)
+            return false;
+    }
+
+    return true;
+}
+
 function filter_table(elem) {
     var outcome_att = "data-test-result";
     var outcome = elem.getAttribute(outcome_att);
@@ -165,4 +178,9 @@ function filter_table(elem) {
     for(var i = 0; i < rows.length; i++){
         rows[i].hidden = !elem.checked;
     }
+
+    var not_found_message = document.getElementById("not-found-message");
+    var all_rows_hidden = is_all_rows_hidden();
+
+    not_found_message.hidden = !all_rows_hidden;
 }

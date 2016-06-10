@@ -50,8 +50,8 @@ def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
     assert int(total_tests.group(1)) == tests
 
     # Asserts tests running duration
-    tests_duration = re.search('([\d,.])+ seconds', html)
     if duration is not None:
+        tests_duration = re.search('([\d,.])+ seconds', html)
         assert float(tests_duration.group(1)) >= float(duration)
 
     # Asserts by outcome

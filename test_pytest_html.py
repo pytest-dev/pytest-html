@@ -29,7 +29,7 @@ def assert_results_by_outcome(html, test_outcome, test_outcome_number,
                               label=None):
     # Asserts if the test number of this outcome in the summary is correct
     regex_summary = '(\d)+ {0}'.format(label or test_outcome)
-    int(re.search(regex_summary, html).group(1)) == test_outcome_number
+    assert int(re.search(regex_summary, html).group(1)) == test_outcome_number
 
     # Asserts if the generated checkbox of this outcome is correct
     regex_checkbox = ('<input checked="true" data-test-result="{0}"'

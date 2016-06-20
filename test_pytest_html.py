@@ -25,22 +25,45 @@ def run(testdir, path='report.html', *args):
     return result, html
 
 
-def assert_summary(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
+def assert_results_by_outcome(html, test_outcome, test_outcome_number,
+                              label=None):
+    # Asserts if the test number of this outcome in the summary is correct
+    regex_summary = '(\d)+ {0}'.format(label or test_outcome)
+    assert int(re.search(regex_summary, html).group(1)) == test_outcome_number
+
+    # Asserts if the generated checkbox of this outcome is correct
+    regex_checkbox = ('<input checked="true" data-test-result="{0}"'
+                      .format(test_outcome))
+    if test_outcome_number == 0:
+        regex_checkbox += ' disabled="true"'
+    assert re.search(regex_checkbox, html) is not None
+
+    # Asserts if the table rows of this outcome are correct
+    regex_table = ('tbody class=\"{0} '.format(test_outcome))
+    assert len(re.findall(regex_table, html)) == test_outcome_number
+
+
+def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
                    errors=0, xfailed=0, xpassed=0):
-    m = re.search('(\d)+ tests ran in ([\d,.])+ seconds', html)
-    assert int(m.group(1)) == tests
+    # Asserts total amount of tests
+    total_tests = re.search('(\d)+ tests ran', html)
+    assert int(total_tests.group(1)) == tests
+
+    # Asserts tests running duration
     if duration is not None:
-        assert float(m.group(2)) >= float(duration)
-    assert int(re.search('(\d)+ passed', html).group(1)) == passed
-    assert int(re.search('(\d)+ skipped', html).group(1)) == skipped
-    assert int(re.search('(\d)+ failed', html).group(1)) == failed
-    assert int(re.search('(\d)+ errors', html).group(1)) == errors
-    assert int(re.search('(\d)+ expected failures', html).group(1)) == xfailed
-    assert int(re.search('(\d)+ unexpected passes', html).group(1)) == xpassed
+        tests_duration = re.search('([\d,.])+ seconds', html)
+        assert float(tests_duration.group(1)) >= float(duration)
+
+    # Asserts by outcome
+    assert_results_by_outcome(html, 'passed', passed)
+    assert_results_by_outcome(html, 'skipped', skipped)
+    assert_results_by_outcome(html, 'failed', failed)
+    assert_results_by_outcome(html, 'error', errors, 'errors')
+    assert_results_by_outcome(html, 'xfailed', xfailed, 'expected failures')
+    assert_results_by_outcome(html, 'xpassed', xpassed, 'unexpected passes')
 
 
 class TestHTML:
-
     def test_durations(self, testdir):
         sleep = float(0.2)
         testdir.makepyfile("""
@@ -50,7 +73,7 @@ class TestHTML:
         """.format(sleep))
         result, html = run(testdir)
         assert result.ret == 0
-        assert_summary(html, duration=sleep)
+        assert_results(html, duration=sleep)
         p = re.compile('<td class="col-duration">([\d,.]+)</td>')
         m = p.search(html)
         assert float(m.group(1)) >= sleep
@@ -59,7 +82,7 @@ class TestHTML:
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
-        assert_summary(html)
+        assert_results(html)
 
     def test_skip(self, testdir):
         reason = str(random.random())
@@ -70,14 +93,14 @@ class TestHTML:
         """.format(reason))
         result, html = run(testdir)
         assert result.ret == 0
-        assert_summary(html, tests=0, passed=0, skipped=1)
+        assert_results(html, tests=0, passed=0, skipped=1)
         assert 'Skipped: {0}'.format(reason) in html
 
     def test_fail(self, testdir):
         testdir.makepyfile('def test_fail(): assert False')
         result, html = run(testdir)
         assert result.ret
-        assert_summary(html, passed=0, failed=1)
+        assert_results(html, passed=0, failed=1)
         assert 'AssertionError' in html
 
     def test_conditional_xfails(self, testdir):
@@ -94,7 +117,7 @@ class TestHTML:
         """)
         result, html = run(testdir)
         assert result.ret
-        assert_summary(html, tests=4, passed=1, failed=1, xfailed=1, xpassed=1)
+        assert_results(html, tests=4, passed=1, failed=1, xfailed=1, xpassed=1)
 
     def test_setup_error(self, testdir):
         testdir.makepyfile("""
@@ -105,7 +128,7 @@ class TestHTML:
         """)
         result, html = run(testdir)
         assert result.ret
-        assert_summary(html, tests=0, passed=0, errors=1)
+        assert_results(html, tests=0, passed=0, errors=1)
         assert '::setup' in html
         assert 'ValueError' in html
 
@@ -118,7 +141,7 @@ class TestHTML:
         """.format(reason))
         result, html = run(testdir)
         assert result.ret == 0
-        assert_summary(html, passed=0, xfailed=1)
+        assert_results(html, passed=0, xfailed=1)
         assert 'XFailed: {0}'.format(reason) in html
 
     def test_xpass(self, testdir):
@@ -130,14 +153,14 @@ class TestHTML:
         """)
         result, html = run(testdir)
         assert result.ret == 0
-        assert_summary(html, passed=0, xpassed=1)
+        assert_results(html, passed=0, xpassed=1)
 
     def test_create_report_path(self, testdir):
         testdir.makepyfile('def test_pass(): pass')
         path = os.path.join('directory', 'report.html')
         result, html = run(testdir, path)
         assert result.ret == 0
-        assert_summary(html)
+        assert_results(html)
 
     def test_resources(self, testdir):
         testdir.makepyfile('def test_pass(): pass')
@@ -350,4 +373,4 @@ class TestHTML:
         """)
         result, html = run(testdir)
         assert result.ret == 0
-        assert_summary(html, passed=1)
+        assert_results(html, passed=1)

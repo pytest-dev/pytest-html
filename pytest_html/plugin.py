@@ -152,13 +152,18 @@ class HTMLReport(object):
         if report.when != 'call':
             test_id = '::'.join([report.nodeid, report.when])
 
-        self.test_logs.append(html.tr([
+        rows_table = html.tr([
             html.td(result, class_='col-result'),
             html.td(test_id, class_='col-name'),
             html.td('{0:.2f}'.format(time), class_='col-duration'),
-            html.td(links_html, class_='col-links'),
-            html.td(additional_html, class_='extra')],
-            class_=result.lower() + ' results-table-row'))
+            html.td(links_html, class_='col-links')])
+
+        rows_extra = html.tr(html.td(additional_html,
+                             class_='extra', colspan='5'))
+
+        self.test_logs.append(html.tbody(rows_table, rows_extra,
+                                         class_=result.lower() +
+                                         ' results-table-row'))
 
     def append_pass(self, report):
         self.passed += 1
@@ -218,23 +223,56 @@ class HTMLReport(object):
             html.title('Test Report'),
             html.style(raw(style_css)))
 
+        class Outcome:
+
+            def __init__(self, outcome, total=0, label=None,
+                         test_result=None, class_html=None):
+                self.outcome = outcome
+                self.label = label or outcome
+                self.class_html = class_html or outcome
+                self.total = total
+                self.test_result = test_result or outcome
+
+                self.generate_checkbox()
+                self.generate_summary_item()
+
+            def generate_checkbox(self):
+                checkbox_kwargs = {'data-test-result':
+                                   self.test_result.lower()}
+                if self.total == 0:
+                    checkbox_kwargs['disabled'] = 'true'
+
+                self.checkbox = html.input(type='checkbox',
+                                           checked='true',
+                                           onChange='filter_table(this)',
+                                           name='filter_checkbox',
+                                           **checkbox_kwargs)
+
+            def generate_summary_item(self):
+                self.summary_item = html.span('{0} {1}'.
+                                              format(self.total, self.label),
+                                              class_=self.class_html)
+
+        outcomes = [Outcome('passed', self.passed),
+                    Outcome('skipped', self.skipped),
+                    Outcome('failed', self.failed),
+                    Outcome('error', self.errors, label='errors'),
+                    Outcome('xfailed', self.xfailed,
+                            label='expected failures',
+                            class_html='skipped'),
+                    Outcome('xpassed', self.xpassed,
+                            label='unexpected passes',
+                            class_html='failed')]
+
         summary = [html.h2('Summary'), html.p(
-            '{0} tests ran in {1:.2f} seconds.'.format(
-                numtests, suite_time_delta),
-            html.br(),
-            html.span('{0} passed'.format(
-                self.passed), class_='passed'), ', ',
-            html.span('{0} skipped'.format(
-                self.skipped), class_='skipped'), ', ',
-            html.span('{0} failed'.format(
-                self.failed), class_='failed'), ', ',
-            html.span('{0} errors'.format(
-                self.errors), class_='error'), '.',
-            html.br(),
-            html.span('{0} expected failures'.format(
-                self.xfailed), class_='skipped'), ', ',
-            html.span('{0} unexpected passes'.format(
-                self.xpassed), class_='failed'), '.')]
+            '{0} tests ran in {1:.2f} seconds. '.format(
+                numtests, suite_time_delta)),
+            html.p('(Un)check the boxes to filter the results.')]
+
+        for outcome in outcomes:
+            summary.append(outcome.checkbox)
+            summary.append(outcome.summary_item)
+            summary.append(' ')
 
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([
@@ -245,9 +283,13 @@ class HTMLReport(object):
                 html.th('Duration',
                         class_='sortable numeric',
                         col='duration'),
-                html.th('Links')]), id='results-table-head'),
-            html.tbody(*self.test_logs, id='results-table-body')],
-            id='results-table')]
+                html.th('Links')]),
+            html.tr([
+                html.th('No results found. Try to check the filters',
+                    colspan='5')],
+                    id='not-found-message', hidden='true'),
+            id='results-table-head'),
+                self.test_logs],  id='results-table')]
 
         main_js = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'main.js'))

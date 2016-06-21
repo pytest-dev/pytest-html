@@ -86,42 +86,41 @@ class HTMLReport(object):
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
+        self.rerun = 0
 
-    def _appendrow(self, result, report):
-        time = getattr(report, 'duration', 0.0)
-
-        additional_html = []
-        links_html = []
-
-        for extra in getattr(report, 'extra', []):
-            href = None
-            if extra.get('format') == extras.FORMAT_IMAGE:
-                href = '#'
-                image = 'data:image/png;base64,{0}'.format(
+    def append_extra_html(self, extra, additional_html, links_html):
+        href = None
+        if extra.get('format') == extras.FORMAT_IMAGE:
+            href = '#'
+            image = 'data:image/png;base64,{0}'.format(
                     extra.get('content'))
-                additional_html.append(html.div(
-                    html.a(html.img(src=image), href="#"),
-                    class_='image'))
-            elif extra.get('format') == extras.FORMAT_HTML:
-                additional_html.append(html.div(raw(extra.get('content'))))
-            elif extra.get('format') == extras.FORMAT_JSON:
-                href = data_uri(json.dumps(extra.get('content')),
-                                mime_type='application/json')
-            elif extra.get('format') == extras.FORMAT_TEXT:
-                href = data_uri(extra.get('content'))
-            elif extra.get('format') == extras.FORMAT_URL:
-                href = extra.get('content')
+            additional_html.append(html.div(
+                html.a(html.img(src=image), href="#"),
+                class_='image'))
 
-            if href is not None:
-                links_html.append(html.a(
-                    extra.get('name'),
-                    class_=extra.get('format'),
-                    href=href,
-                    target='_blank'))
-                links_html.append(' ')
+        elif extra.get('format') == extras.FORMAT_HTML:
+            additional_html.append(html.div(raw(extra.get('content'))))
 
+        elif extra.get('format') == extras.FORMAT_JSON:
+            href = data_uri(json.dumps(extra.get('content')),
+                            mime_type='application/json')
+
+        elif extra.get('format') == extras.FORMAT_TEXT:
+            href = data_uri(extra.get('content'))
+
+        elif extra.get('format') == extras.FORMAT_URL:
+            href = extra.get('content')
+
+        if href is not None:
+            links_html.append(html.a(
+                extra.get('name'),
+                class_=extra.get('format'),
+                href=href,
+                target='_blank'))
+            links_html.append(' ')
+
+    def append_log_html(self, report, additional_html):
         log = html.div(class_='log')
-
         if report.longrepr:
             for line in str(report.longrepr).splitlines():
                 if not PY3:
@@ -144,16 +143,26 @@ class HTMLReport(object):
             log.append(content)
 
         if len(log) == 0:
-            log = html.div(class_='empty log')
             log.append('No log output captured.')
         additional_html.append(log)
+
+    def _appendrow(self, result_name, report):
+        time = getattr(report, 'duration', 0.0)
+
+        additional_html = []
+        links_html = []
+
+        for extra in getattr(report, 'extra', []):
+            self.append_extra_html(extra, additional_html, links_html)
+
+        self.append_log_html(report, additional_html)
 
         test_id = report.nodeid
         if report.when != 'call':
             test_id = '::'.join([report.nodeid, report.when])
 
         rows_table = html.tr([
-            html.td(result, class_='col-result'),
+            html.td(result_name, class_='col-result'),
             html.td(test_id, class_='col-name'),
             html.td('{0:.2f}'.format(time), class_='col-duration'),
             html.td(links_html, class_='col-links')])
@@ -162,44 +171,48 @@ class HTMLReport(object):
                              class_='extra', colspan='5'))
 
         self.test_logs.append(html.tbody(rows_table, rows_extra,
-                                         class_=result.lower() +
+                                         class_=result_name.lower() +
                                          ' results-table-row'))
 
-    def append_pass(self, report):
-        self.passed += 1
-        self._appendrow('Passed', report)
+    def append_passed(self, report):
+        if report.when == 'call':
+            self.passed += 1
+            self._appendrow('Passed', report)
 
-    def append_failure(self, report):
-        if hasattr(report, "wasxfail"):
-            self._appendrow('XPassed', report)
-            self.xpassed += 1
+    def append_failed(self, report):
+        if report.when == "call":
+            if hasattr(report, "wasxfail"):
+                self.xpassed += 1
+                self._appendrow('XPassed', report)
+            else:
+                self.failed += 1
+                self._appendrow('Failed', report)
         else:
-            self._appendrow('Failed', report)
-            self.failed += 1
-
-    def append_error(self, report):
-        self._appendrow('Error', report)
-        self.errors += 1
+            self.errors += 1
+            self._appendrow('Error', report)
 
     def append_skipped(self, report):
         if hasattr(report, "wasxfail"):
-            self._appendrow('XFailed', report)
             self.xfailed += 1
+            self._appendrow('XFailed', report)
         else:
-            self._appendrow('Skipped', report)
             self.skipped += 1
+            self._appendrow('Skipped', report)
+
+    def append_other(self, report):
+        # For now, the only "other" the plugin give support is rerun
+        self.rerun += 1
+        self._appendrow('Rerun', report)
 
     def pytest_runtest_logreport(self, report):
         if report.passed:
-            if report.when == 'call':
-                self.append_pass(report)
+            self.append_passed(report)
         elif report.failed:
-            if report.when != "call":
-                self.append_error(report)
-            else:
-                self.append_failure(report)
+            self.append_failed(report)
         elif report.skipped:
             self.append_skipped(report)
+        else:
+            self.append_other(report)
 
     def pytest_sessionstart(self, session):
         self.suite_start_time = time.time()
@@ -258,11 +271,10 @@ class HTMLReport(object):
                     Outcome('failed', self.failed),
                     Outcome('error', self.errors, label='errors'),
                     Outcome('xfailed', self.xfailed,
-                            label='expected failures',
-                            class_html='skipped'),
+                            label='expected failures'),
                     Outcome('xpassed', self.xpassed,
-                            label='unexpected passes',
-                            class_html='failed')]
+                            label='unexpected passes'),
+                    Outcome('rerun', self.rerun)]
 
         summary = [html.h2('Summary'), html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(

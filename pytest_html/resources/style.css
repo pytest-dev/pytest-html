@@ -40,7 +40,7 @@ table {
 span.passed, .passed .col-result {
 	color: green;
 }
-span.skipped, span.xfailed, .skipped .col-result, .xfailed .col-result {
+span.skipped, span.xfailed, span.rerun, .skipped .col-result, .xfailed .col-result, .rerun .col-result {
 	color: orange;
 }
 span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, .xpassed .col-result  {

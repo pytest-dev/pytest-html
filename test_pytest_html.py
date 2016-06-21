@@ -44,7 +44,7 @@ def assert_results_by_outcome(html, test_outcome, test_outcome_number,
 
 
 def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
-                   errors=0, xfailed=0, xpassed=0):
+                   errors=0, xfailed=0, xpassed=0, rerun=0):
     # Asserts total amount of tests
     total_tests = re.search('(\d)+ tests ran', html)
     assert int(total_tests.group(1)) == tests
@@ -61,6 +61,7 @@ def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
     assert_results_by_outcome(html, 'error', errors, 'errors')
     assert_results_by_outcome(html, 'xfailed', xfailed, 'expected failures')
     assert_results_by_outcome(html, 'xpassed', xpassed, 'unexpected passes')
+    assert_results_by_outcome(html, 'rerun', rerun)
 
 
 class TestHTML:
@@ -102,6 +103,17 @@ class TestHTML:
         assert result.ret
         assert_results(html, passed=0, failed=1)
         assert 'AssertionError' in html
+
+    def test_rerun(self, testdir):
+        testdir.makepyfile("""
+            import pytest
+            @pytest.mark.flaky(reruns=5)
+            def test_example():
+                assert False
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        assert_results(html, passed=0, failed=1, rerun=5)
 
     def test_conditional_xfails(self, testdir):
         testdir.makepyfile("""

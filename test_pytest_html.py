@@ -354,7 +354,7 @@ class TestHTML:
         reason='Fails on earlier versions of Python and pytest',
         run=False)
     def test_xdist_crashing_slave(self, testdir):
-        """https://github.com/davehunt/pytest-html/issues/21"""
+        """https://github.com/pytest-dev/pytest-html/issues/21"""
         testdir.makepyfile("""
             import os
             def test_exit():

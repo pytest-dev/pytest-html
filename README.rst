@@ -5,19 +5,19 @@ pytest-html is a plugin for `py.test <http://pytest.org>`_ that generates a
 HTML report for the test results.
 
 .. image:: https://img.shields.io/badge/license-MPL%202.0-blue.svg
-   :target: https://github.com/davehunt/pytest-html/blob/master/LICENSE
+   :target: https://github.com/pytest-dev/pytest-html/blob/master/LICENSE
    :alt: License
 .. image:: https://img.shields.io/pypi/v/pytest-html.svg
    :target: https://pypi.python.org/pypi/pytest-html/
    :alt: PyPI
-.. image:: https://img.shields.io/travis/davehunt/pytest-html.svg
-   :target: https://travis-ci.org/davehunt/pytest-html/
+.. image:: https://img.shields.io/travis/pytest-dev/pytest-html.svg
+   :target: https://travis-ci.org/pytest-dev/pytest-html/
    :alt: Travis
-.. image:: https://img.shields.io/github/issues-raw/davehunt/pytest-html.svg
-   :target: https://github.com/davehunt/pytest-html/issues
+.. image:: https://img.shields.io/github/issues-raw/pytest-dev/pytest-html.svg
+   :target: https://github.com/pytest-dev/pytest-html/issues
    :alt: Issues
-.. image:: https://img.shields.io/requires/github/davehunt/pytest-html.svg
-   :target: https://requires.io/github/davehunt/pytest-html/requirements/?branch=master
+.. image:: https://img.shields.io/requires/github/pytest-dev/pytest-html.svg
+   :target: https://requires.io/github/pytest-dev/pytest-html/requirements/?branch=master
    :alt: Requirements
 
 Outreachy
@@ -27,7 +27,7 @@ Mozilla is participating in the `Outreachy <http://www.outreachy.org>`_ program
 helping people from groups underrepresented in free and open source software
 to get involved. For the round running `May 23 to August 23, 2016 <https://wiki.gnome.org/Outreachy/2016/MayAugust>`_,
 there is `a project <https://wiki.mozilla.org/Outreachy#Enhancements_to_Python_testing_tool_plugin_for_generation_of_HTML_reports>`_
-to work on `several enhancements <https://github.com/davehunt/pytest-html/labels/outreachy>`_ to pytest-html.
+to work on `several enhancements <https://github.com/pytest-dev/pytest-html/labels/outreachy>`_ to pytest-html.
 
 Requirements
 ------------
@@ -97,6 +97,6 @@ Screenshots
 Resources
 ---------
 
-- `Release Notes <http://github.com/davehunt/pytest-html/blob/master/CHANGES.rst>`_
-- `Issue Tracker <http://github.com/davehunt/pytest-html/issues>`_
-- `Code <http://github.com/davehunt/pytest-html/>`_
+- `Release Notes <http://github.com/pytest-dev/pytest-html/blob/master/CHANGES.rst>`_
+- `Issue Tracker <http://github.com/pytest-dev/pytest-html/issues>`_
+- `Code <http://github.com/pytest-dev/pytest-html/>`_

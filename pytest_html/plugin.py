@@ -143,6 +143,7 @@ class HTMLReport(object):
             log.append(content)
 
         if len(log) == 0:
+            log = html.div(class_='empty log')
             log.append('No log output captured.')
         additional_html.append(log)
 

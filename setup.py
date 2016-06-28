@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pytest-html',
-      version='1.8.1',
+      version='1.9.1',
       description='pytest plugin for generating HTML reports',
       long_description=open('README.rst').read(),
       author='Dave Hunt',

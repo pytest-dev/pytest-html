@@ -1,6 +1,11 @@
 Release Notes
 -------------
 
+**1.9.0 (2016-06-28)**
+
+* Added support to rerun plugins
+* Added a feature to filter tests by its outcome
+
 **1.8.1 (2016-05-24)**
 
 * Include captured output for passing tests

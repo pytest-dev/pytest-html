@@ -6,3 +6,21 @@ build
 dist
 *.egg-info
 *.pyc
+
+# IDE Specific files
+### Pycharm IDE - Jetbrains
+.idea/*
+
+### PyDev IDE - Eclipse
+.metadata
+tmp/
+*.tmp
+*.bak
+local.properties
+.settings/
+.loadpath
+*.project
+*.pydevproject
+
+### YouCompleteMe - VIM plugin
+.ycm_extra_conf.py

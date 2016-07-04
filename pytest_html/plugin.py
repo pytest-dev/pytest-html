@@ -205,23 +205,7 @@ class HTMLReport(object):
         self.rerun += 1
         self._appendrow('Rerun', report)
 
-    def pytest_runtest_logreport(self, report):
-        if report.passed:
-            self.append_passed(report)
-        elif report.failed:
-            self.append_failed(report)
-        elif report.skipped:
-            self.append_skipped(report)
-        else:
-            self.append_other(report)
-
-    def pytest_sessionstart(self, session):
-        self.suite_start_time = time.time()
-
-    def pytest_sessionfinish(self, session):
-        if not os.path.exists(os.path.dirname(self.logfile)):
-            os.makedirs(os.path.dirname(self.logfile))
-        logfile = open(self.logfile, 'w', encoding='utf-8')
+    def _generate_report(self, session):
         suite_stop_time = time.time()
         suite_time_delta = suite_stop_time - self.suite_start_time
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
@@ -328,15 +312,38 @@ class HTMLReport(object):
 
         doc = html.html(head, body)
 
-        logfile.write('<!DOCTYPE html>')
-        unicode_doc = doc.unicode(indent=2)
+        unicode_doc = u'<!DOCTYPE html>\n{0}'.format(doc.unicode(indent=2))
         if PY3:
             # Fix encoding issues, e.g. with surrogates
             unicode_doc = unicode_doc.encode('utf-8',
                                              errors='xmlcharrefreplace')
             unicode_doc = unicode_doc.decode('utf-8')
-        logfile.write(unicode_doc)
+        return unicode_doc
+
+    def _save_report(self, report_content):
+        if not os.path.exists(os.path.dirname(self.logfile)):
+            os.makedirs(os.path.dirname(self.logfile))
+        logfile = open(self.logfile, 'w', encoding='utf-8')
+
+        logfile.write(report_content)
         logfile.close()
+
+    def pytest_runtest_logreport(self, report):
+        if report.passed:
+            self.append_passed(report)
+        elif report.failed:
+            self.append_failed(report)
+        elif report.skipped:
+            self.append_skipped(report)
+        else:
+            self.append_other(report)
+
+    def pytest_sessionstart(self, session):
+        self.suite_start_time = time.time()
+
+    def pytest_sessionfinish(self, session):
+        report_content = self._generate_report(session)
+        self._save_report(report_content)
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: {0}'.format(

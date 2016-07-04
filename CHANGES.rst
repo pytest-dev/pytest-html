@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**1.9.0 (2016-07-04)**
+
+* Split pytest_sessionfinish into generate and save methods
+* Show tests rerun by pytest-rerunfailures plugin
+* Added a feature to filter tests by outcome
+
 **1.8.1 (2016-05-24)**
 
 * Include captured output for passing tests

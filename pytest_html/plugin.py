@@ -312,7 +312,7 @@ class HTMLReport(object):
 
         doc = html.html(head, body)
 
-        unicode_doc = doc.unicode(indent=2)
+        unicode_doc = u'<!DOCTYPE html>\n{0}'.format(doc.unicode(indent=2))
         if PY3:
             # Fix encoding issues, e.g. with surrogates
             unicode_doc = unicode_doc.encode('utf-8',
@@ -325,7 +325,6 @@ class HTMLReport(object):
             os.makedirs(os.path.dirname(self.logfile))
         logfile = open(self.logfile, 'w', encoding='utf-8')
 
-        logfile.write('<!DOCTYPE html>')
         logfile.write(report_content)
         logfile.close()
 

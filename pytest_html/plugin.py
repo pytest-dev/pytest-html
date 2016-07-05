@@ -95,7 +95,7 @@ class HTMLReport(object):
         def __init__(self, outcome, report):
             self.test_id = report.nodeid
             if report.when != 'call':
-                test_id = '::'.join([report.nodeid, report.when])
+                self.test_id = '::'.join([report.nodeid, report.when])
             self.time = getattr(report, 'duration', 0.0)
             self.outcome = outcome
             self.additional_html = []
@@ -104,7 +104,8 @@ class HTMLReport(object):
             self.append_log_html(report, self.additional_html)
 
             for extra in getattr(report, 'extra', []):
-                self.append_extra_html(extra, self.additional_html, self.links_html)
+                self.append_extra_html(extra,
+                                       self.additional_html, self.links_html)
 
             self.row_table = html.tr([
                 html.td(self.outcome, class_='col-result'),
@@ -113,7 +114,7 @@ class HTMLReport(object):
                 html.td(self.links_html, class_='col-links')])
 
             self.row_extra = html.tr(html.td(self.additional_html,
-                                 class_='extra', colspan='5'))
+                                     class_='extra', colspan='5'))
 
         def __cmp__(self, other):
             if self.outcome > other.outcome:
@@ -187,14 +188,13 @@ class HTMLReport(object):
                 log.append('No log output captured.')
             additional_html.append(log)
 
-
     def _appendrow(self, outcome, report):
         test = self.TestReport(outcome, report)
         index = bisect.bisect_right(self.tests, test)
         self.tests.insert(index, test)
         self.test_logs.insert(index, html.tbody(test.row_table, test.row_extra,
-                                     class_=test.outcome.lower() +
-                                     ' results-table-row'))
+                              class_=test.outcome.lower() +
+                              ' results-table-row'))
 
     def append_passed(self, report):
         if report.when == 'call':
@@ -345,8 +345,8 @@ class HTMLReport(object):
         if not os.path.exists(os.path.dirname(self.logfile)):
             os.makedirs(os.path.dirname(self.logfile))
         logfile = open(self.logfile, 'w', encoding='utf-8')
-
         logfile.write(report_content)
+        logfile.close()
 
     def pytest_runtest_logreport(self, report):
         if report.passed:

@@ -116,18 +116,18 @@ class HTMLReport(object):
             self.row_extra = html.tr(html.td(self.additional_html,
                                      class_='extra', colspan='5'))
 
-        def __cmp__(self, other):
-            if self.outcome > other.outcome:
-                return 1
-            elif self.outcome < other.outcome:
-                return -1
+        def __lt__(self, other):
+            order = {'Error': 0, 'Failed': 1, 'Rerun': 2, 'XFailed': 3,
+                     'XPassed': 4, 'Skipped': 5, 'Passed': 6}
+            if order[self.outcome] > order[other.outcome]:
+                return False
+            elif order[self.outcome] > order[other.outcome]:
+                return True
             else:
                 if self.test_id > other.test_id:
-                    return 1
-                elif self.test_id < other.test_id:
-                    return -1
-                else:
-                    return 0
+                    return False
+                elif self.test_id <= other.test_id:
+                    return True
 
         def append_extra_html(self, extra, additional_html, links_html):
             href = None
@@ -295,7 +295,7 @@ class HTMLReport(object):
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([
                 html.th('Result',
-                        class_='sortable initial-sort result',
+                        class_='sortable result initial-sort',
                         col='result'),
                 html.th('Test', class_='sortable', col='name'),
                 html.th('Duration',

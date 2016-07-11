@@ -121,7 +121,7 @@ class HTMLReport(object):
                      'XPassed': 4, 'Skipped': 5, 'Passed': 6}
             if order[self.outcome] > order[other.outcome]:
                 return False
-            elif order[self.outcome] > order[other.outcome]:
+            elif order[self.outcome] < order[other.outcome]:
                 return True
             else:
                 if self.test_id > other.test_id:

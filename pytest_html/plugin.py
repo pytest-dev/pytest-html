@@ -322,10 +322,13 @@ class HTMLReport(object):
         return unicode_doc
 
     def _save_report(self, report_content):
-        if not os.path.exists(os.path.dirname(self.logfile)):
-            os.makedirs(os.path.dirname(self.logfile))
+        dir_name = os.path.dirname(self.logfile)
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
         logfile = open(self.logfile, 'w', encoding='utf-8')
-        style_file = open('style.css', 'w', encoding='utf-8')
+        style_path = dir_name + '/style.css'
+
+        style_file = open(style_path, 'w', encoding='utf-8')
 
         logfile.write(report_content)
         style_file.write(self.style_css)

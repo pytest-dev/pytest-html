@@ -323,7 +323,6 @@ class HTMLReport(object):
 
     def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)
-        
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
         logfile = open(self.logfile, 'w', encoding='utf-8')

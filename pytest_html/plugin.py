@@ -211,15 +211,16 @@ class HTMLReport(object):
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
-        style_css = pkg_resources.resource_string(
+        self.style_css = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'style.css'))
         if PY3:
-            style_css = style_css.decode('utf-8')
+            self.style_css = self.style_css.decode('utf-8')
 
         head = html.head(
             html.meta(charset='utf-8'),
             html.title('Test Report'),
-            html.style(raw(style_css)))
+            html.link(href='style.css', rel='stylesheet', type='text/css'),
+            html.style(raw(self.style_css)))
 
         class Outcome:
 
@@ -324,9 +325,13 @@ class HTMLReport(object):
         if not os.path.exists(os.path.dirname(self.logfile)):
             os.makedirs(os.path.dirname(self.logfile))
         logfile = open(self.logfile, 'w', encoding='utf-8')
+        style_file = open('style.css', 'w', encoding='utf-8')
 
         logfile.write(report_content)
+        style_file.write(self.style_css)
+
         logfile.close()
+        style_file.close()
 
     def pytest_runtest_logreport(self, report):
         if report.passed:

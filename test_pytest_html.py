@@ -44,7 +44,17 @@ def assert_results_by_outcome(html, test_outcome, test_outcome_number,
 
 
 def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
-                   errors=0, xfailed=0, xpassed=0, rerun=0):
+                   errors=0, xfailed=0, xpassed=0, rerun=0,
+                   self_contained_html=False):
+
+    # Assert CSS link or inline parameter
+    if self_contained_html:
+        regex_css_inline = '<style>'
+        assert re.search(regex_css_inline, html) is not None
+    else:
+        regex_css_link = '<link href='
+        assert re.search(regex_css_link, html) is not None
+
     # Asserts total amount of tests
     total_tests = re.search('(\d)+ tests ran', html)
     assert int(total_tests.group(1)) == tests
@@ -65,6 +75,12 @@ def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
 
 
 class TestHTML:
+    def test_css_inline(self, testdir):
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir, 'report.html', '--self-contained-html', 'True')
+        assert result.ret == 0s
+        assert_results(html, self_contained_html=True)
+
     def test_durations(self, testdir):
         sleep = float(0.2)
         testdir.makepyfile("""

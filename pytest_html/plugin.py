@@ -219,11 +219,14 @@ class HTMLReport(object):
         if PY3:
             self.style_css = self.style_css.decode('utf-8')
 
+        html_css= html.link(href='style.css', rel='stylesheet', type='text/css')
+        if session.config.getoption('self_contained_html'):
+            html_css = html.style(raw(self.style_css))
+
         head = html.head(
             html.meta(charset='utf-8'),
             html.title('Test Report'),
-            html.link(href='style.css', rel='stylesheet', type='text/css'),
-            html.style(raw(self.style_css)))
+            html_css)
 
         class Outcome:
 
@@ -324,20 +327,19 @@ class HTMLReport(object):
             unicode_doc = unicode_doc.decode('utf-8')
         return unicode_doc
 
-    def _save_report(self, report_content):
+    def _save_report(self, report_content, self_contained_html):
         dir_name = os.path.dirname(self.logfile)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
         logfile = open(self.logfile, 'w', encoding='utf-8')
-
-        style_path = dir_name + '/style.css'
-        style_file = open(style_path, 'w', encoding='utf-8')
-
         logfile.write(report_content)
-        style_file.write(self.style_css)
-
         logfile.close()
-        style_file.close()
+
+        if not self_contained_html:
+            style_path = dir_name + '/style.css'
+            style_file = open(style_path, 'w', encoding='utf-8')
+            style_file.write(self.style_css)
+            style_file.close()
 
     def pytest_runtest_logreport(self, report):
         if report.passed:
@@ -354,7 +356,8 @@ class HTMLReport(object):
 
     def pytest_sessionfinish(self, session):
         report_content = self._generate_report(session)
-        self._save_report(report_content)
+        self_contained_html = session.config.getoption('self_contained_html')
+        self._save_report(report_content, self_contained_html)
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: {0}'.format(

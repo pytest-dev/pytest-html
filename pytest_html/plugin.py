@@ -41,6 +41,9 @@ def pytest_addoption(parser):
     group.addoption('--html', action='store', dest='htmlpath',
                     metavar='path', default=None,
                     help='create html report file at given path.')
+    group.addoption('--self-contained-html', action="store", dest='self_contained_html', default=False,
+        help='If it is true, asserts that the HTML will not ' +
+             'depend of external files, risk of breaking CSP. DEFAULT: False')
 
 
 def pytest_configure(config):

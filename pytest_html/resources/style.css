@@ -106,6 +106,19 @@ div.image {
 div.image img {
 	width: 320px
 }
+.collapsed {
+	display: none;
+}
+.expander::after {
+	content: " (show)";
+	color: #BBB;
+	font-style: italic;
+}
+.collapser::after {
+	content: " (hide)";
+	color: #BBB;
+	font-style: italic;
+}
 
 /*------------------
  * 3. Sorting items

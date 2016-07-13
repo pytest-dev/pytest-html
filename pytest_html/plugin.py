@@ -41,9 +41,11 @@ def pytest_addoption(parser):
     group.addoption('--html', action='store', dest='htmlpath',
                     metavar='path', default=None,
                     help='create html report file at given path.')
-    group.addoption('--self-contained-html', action="store", dest='self_contained_html', default=False,
-        help='If it is true, asserts that the HTML will not ' +
-             'depend of external files, risk of breaking CSP. DEFAULT: False')
+    group.addoption('--self-contained-html', action="store",
+                    dest='self_contained_html', default=False,
+                    help='If it is true, asserts that the HTML will not ' +
+                    'depend of external files, risk of breaking CSP. ' +
+                    'DEFAULT: False')
 
 
 def pytest_configure(config):
@@ -219,7 +221,8 @@ class HTMLReport(object):
         if PY3:
             self.style_css = self.style_css.decode('utf-8')
 
-        html_css= html.link(href='style.css', rel='stylesheet', type='text/css')
+        html_css = html.link(href='style.css', rel='stylesheet',
+                             type='text/css')
         if session.config.getoption('self_contained_html'):
             html_css = html.style(raw(self.style_css))
 

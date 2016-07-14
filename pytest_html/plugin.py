@@ -84,13 +84,13 @@ class HTMLReport(object):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
-        self.tests = []
+        self.results = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
         self.rerun = 0
 
-    class TestReport:
+    class TestResult:
 
         def __init__(self, outcome, report):
             self.test_id = report.nodeid
@@ -117,17 +117,12 @@ class HTMLReport(object):
                                      class_='extra', colspan='5'))
 
         def __lt__(self, other):
-            order = {'Error': 0, 'Failed': 1, 'Rerun': 2, 'XFailed': 3,
-                     'XPassed': 4, 'Skipped': 5, 'Passed': 6}
-            if order[self.outcome] > order[other.outcome]:
+            order = ('Error', 'Failed', 'Rerun', 'XFailed',
+                     'XPassed', 'Skipped', 'Passed'}
+            if order.index(self.outcome) => order.index(other.outcome):
                 return False
-            elif order[self.outcome] < order[other.outcome]:
+            elif order.index(self.outcome) < order.index(other.outcome):
                 return True
-            else:
-                if self.test_id > other.test_id:
-                    return False
-                elif self.test_id <= other.test_id:
-                    return True
 
         def append_extra_html(self, extra, additional_html, links_html):
             href = None
@@ -189,11 +184,11 @@ class HTMLReport(object):
             additional_html.append(log)
 
     def _appendrow(self, outcome, report):
-        test = self.TestReport(outcome, report)
-        index = bisect.bisect_right(self.tests, test)
-        self.tests.insert(index, test)
-        self.test_logs.insert(index, html.tbody(test.row_table, test.row_extra,
-                              class_=test.outcome.lower() +
+        result = self.TestResult(outcome, report)
+        index = bisect.bisect_right(self.results, result)
+        self.results.insert(index, result)
+        self.test_logs.insert(index, html.tbody(result.row_table,
+                              result.row_extra, class_=test.outcome.lower() +
                               ' results-table-row'))
 
     def append_passed(self, report):

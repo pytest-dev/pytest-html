@@ -41,11 +41,12 @@ def pytest_addoption(parser):
     group.addoption('--html', action='store', dest='htmlpath',
                     metavar='path', default=None,
                     help='create html report file at given path.')
-    group.addoption('--self-contained-html', action="store",
-                    dest='self_contained_html', default=False,
-                    help='If it is true, asserts that the HTML will not ' +
-                    'depend of external files, risk of breaking CSP. ' +
-                    'DEFAULT: False')
+    group.addoption('--self-contained-html', action='store_true',
+                    help='create a self-contained html file containing all ' +
+                    'necessary styles, scripts, and images - this means ' +
+                    'that the report may not render or function where CSP ' +
+                    'restrictions are in place (see' +
+                    'https://developer.mozilla.org/docs/Web/Security/CSP)')
 
 
 def pytest_configure(config):
@@ -334,14 +335,14 @@ class HTMLReport(object):
         dir_name = os.path.dirname(self.logfile)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
-        logfile = open(self.logfile, 'w', encoding='utf-8')
-        logfile.write(report_content)
+        with open(self.logfile, 'w', encoding='utf-8') as logfile:
+            logfile.write(report_content)
         logfile.close()
 
         if not self_contained_html:
-            style_path = dir_name + '/style.css'
-            style_file = open(style_path, 'w', encoding='utf-8')
-            style_file.write(self.style_css)
+            style_path = os.path.join(dir_name, 'style.css')
+            with open(style_path, 'w', encoding='utf-8') as style_file:
+                style_file.write(self.style_css)
             style_file.close()
 
     def pytest_runtest_logreport(self, report):

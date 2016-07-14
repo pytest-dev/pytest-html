@@ -176,30 +176,29 @@ class TestHTML:
 
     def test_resources_inline_css(self, testdir):
         testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir, 'report.html',
-                           '--self-contained-html', 'True')
+        result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
-        for resource in ['style.css', 'main.js']:
-            content = pkg_resources.resource_string(
-                'pytest_html', os.path.join('resources', resource))
-            if PY3:
-                content = content.decode('utf-8')
-            assert content
-            assert content in html
+
+        content = pkg_resources.resource_string(
+            'pytest_html', os.path.join('resources', 'style.css'))
+        if PY3:
+            content = content.decode('utf-8')
+        assert content
+        assert content in html
 
     def test_resources(self, testdir):
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
-        for resource in ['main.js']:
-            content = pkg_resources.resource_string(
-                'pytest_html', os.path.join('resources', resource))
-            if PY3:
-                content = content.decode('utf-8')
-            assert content
-            assert content in html
 
-        regex_css_link = '<link href='
+        content = pkg_resources.resource_string(
+            'pytest_html', os.path.join('resources', 'main.js'))
+        if PY3:
+            content = content.decode('utf-8')
+        assert content
+        assert content in html
+
+        regex_css_link = '<link href="style.css" rel="stylesheet"'
         assert re.search(regex_css_link, html) is not None
 
     def test_stdout(self, testdir):

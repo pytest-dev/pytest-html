@@ -118,8 +118,8 @@ class HTMLReport(object):
 
         def __lt__(self, other):
             order = ('Error', 'Failed', 'Rerun', 'XFailed',
-                     'XPassed', 'Skipped', 'Passed'}
-            if order.index(self.outcome) => order.index(other.outcome):
+                     'XPassed', 'Skipped', 'Passed')
+            if order.index(self.outcome) >= order.index(other.outcome):
                 return False
             elif order.index(self.outcome) < order.index(other.outcome):
                 return True
@@ -188,7 +188,7 @@ class HTMLReport(object):
         index = bisect.bisect_right(self.results, result)
         self.results.insert(index, result)
         self.test_logs.insert(index, html.tbody(result.row_table,
-                              result.row_extra, class_=test.outcome.lower() +
+                              result.row_extra, class_=result.outcome.lower() +
                               ' results-table-row'))
 
     def append_passed(self, report):

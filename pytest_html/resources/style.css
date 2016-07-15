@@ -110,14 +110,16 @@ div.image img {
 	display: none;
 }
 .expander::after {
-	content: " (show)";
+	content: " (show details)";
 	color: #BBB;
 	font-style: italic;
+	cursor: pointer;
 }
 .collapser::after {
-	content: " (hide)";
+	content: " (hide details)";
 	color: #BBB;
 	font-style: italic;
+	cursor: pointer;
 }
 
 /*------------------

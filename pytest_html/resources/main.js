@@ -63,6 +63,14 @@ function hide_extras(colresult_elem) {
 }
 
 function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all detauls</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+    
+    // Add show/hide link to each result
     find_all('.col-result').forEach(function(elem) {
         var extras = elem.parentNode.nextElementSibling;
         var expandcollapse = document.createElement("span");

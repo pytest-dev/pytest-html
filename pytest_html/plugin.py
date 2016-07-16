@@ -119,10 +119,7 @@ class HTMLReport(object):
         def __lt__(self, other):
             order = ('Error', 'Failed', 'Rerun', 'XFailed',
                      'XPassed', 'Skipped', 'Passed')
-            if order.index(self.outcome) >= order.index(other.outcome):
-                return False
-            elif order.index(self.outcome) < order.index(other.outcome):
-                return True
+            return order.index(self.outcome) < order.index(other.outcome)
 
         def append_extra_html(self, extra, additional_html, links_html):
             href = None

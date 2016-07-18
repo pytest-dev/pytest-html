@@ -87,6 +87,10 @@ conftest.py file:
               extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
           report.extra = extra
 
+Single files
+------------
+In order to protect the `Content Security Policy (CSP)<https://developer.mozilla.org/docs/Web/Security/CSP>`, the CSS file is created apart by default. But if it is necessary to you create a single file to the whole report, you may use the option `--self-contained-html` when running the project, so the CSS will be inline.
+
 Screenshots
 -----------
 

@@ -45,7 +45,7 @@ def pytest_addoption(parser):
                     help='create a self-contained html file containing all ' +
                     'necessary styles, scripts, and images - this means ' +
                     'that the report may not render or function where CSP ' +
-                    'restrictions are in place (see' +
+                    'restrictions are in place (see ' +
                     'https://developer.mozilla.org/docs/Web/Security/CSP)')
 
 

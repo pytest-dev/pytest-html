@@ -42,9 +42,9 @@ def pytest_addoption(parser):
                     metavar='path', default=None,
                     help='create html report file at given path.')
     group.addoption('--self-contained-html', action='store_true',
-                    help='create a self-contained html file containing all ' +
-                    'necessary styles, scripts, and images - this means ' +
-                    'that the report may not render or function where CSP ' +
+                    help='create a self-contained html file containing all '
+                    'necessary styles, scripts, and images - this means '
+                    'that the report may not render or function where CSP '
                     'restrictions are in place (see ' +
                     'https://developer.mozilla.org/docs/Web/Security/CSP)')
 

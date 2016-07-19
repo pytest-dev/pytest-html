@@ -96,7 +96,7 @@ addEventListener("DOMContentLoaded", function() {
     
     add_collapse();
 
-    sort_column(find('.initial-sort'));
+    toggle_sort_states(find('.initial-sort'));
 
     find_all('.col-links a.image').forEach(function(elem) {
         elem.addEventListener("click",
@@ -183,8 +183,8 @@ function key_num(col_index) {
 
 function key_result(col_index) {
     return function(elem) {
-        var strings = ['Error', 'Failed', 'XFailed', 'XPassed', 'Skipped',
-                       'Passed'];
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
         return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
     };
 }
@@ -227,13 +227,13 @@ function filter_table(elem) {
     var outcome = elem.getAttribute(outcome_att);
     class_outcome = outcome + " results-table-row";
     var outcome_rows = document.getElementsByClassName(class_outcome);
-   
+
     for(var i = 0; i < outcome_rows.length; i++){
         outcome_rows[i].hidden = !elem.checked;
     }
 
     var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
-    var all_rows_hidden = rows.length == 0 ? true : false;    
+    var all_rows_hidden = rows.length == 0 ? true : false;
     var not_found_message = document.getElementById("not-found-message");
     not_found_message.hidden = !all_rows_hidden;
 }

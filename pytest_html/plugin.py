@@ -335,15 +335,15 @@ class HTMLReport(object):
         dir_name = os.path.dirname(self.logfile)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
-        with open(self.logfile, 'w', encoding='utf-8') as logfile:
-            logfile.write(report_content)
-        logfile.close()
+        with open(self.logfile, 'w', encoding='utf-8') as f:
+            f.write(report_content)
+        f.close()
 
         if not self_contained_html:
             style_path = os.path.join(dir_name, 'style.css')
-            with open(style_path, 'w', encoding='utf-8') as style_file:
-                style_file.write(self.style_css)
-            style_file.close()
+            with open(style_path, 'w', encoding='utf-8') as f:
+                f.write(self.style_css)
+            f.close()
 
     def pytest_runtest_logreport(self, report):
         if report.passed:

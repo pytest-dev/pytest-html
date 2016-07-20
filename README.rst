@@ -52,8 +52,7 @@ Then run your tests with:
 
   $ py.test --html=report.html
 
-
-Creating a a self-contained report
+Creating a self-contained report
 ----------------------------------
 
 In order to respect the `Content Security Policy (CSP)
@@ -65,7 +64,6 @@ convenient when sharing your results. This can be done in the following way:
 .. code-block:: bash
 
    $ py.test --html=report.html --self-contained-html
-
 
 Enhancing reports
 -----------------
@@ -101,7 +99,6 @@ conftest.py file:
               # only add additional html on failure
               extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
           report.extra = extra
-
 
 Screenshots
 -----------

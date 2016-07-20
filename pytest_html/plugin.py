@@ -159,7 +159,8 @@ class HTMLReport(object):
                     class_='image'))
 
             elif extra.get('format') == extras.FORMAT_HTML:
-                self.additional_html.append(html.div(raw(extra.get('content')))
+                self.additional_html.append(html.div(
+                                            raw(extra.get('content'))))
 
             elif extra.get('format') == extras.FORMAT_JSON:
                 href = data_uri(json.dumps(extra.get('content')),

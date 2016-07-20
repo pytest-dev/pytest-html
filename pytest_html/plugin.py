@@ -42,6 +42,12 @@ def pytest_addoption(parser):
     group.addoption('--html', action='store', dest='htmlpath',
                     metavar='path', default=None,
                     help='create html report file at given path.')
+    group.addoption('--self-contained-html', action='store_true',
+                    help='create a self-contained html file containing all '
+                    'necessary styles, scripts, and images - this means '
+                    'that the report may not render or function where CSP '
+                    'restrictions are in place (see '
+                    'https://developer.mozilla.org/docs/Web/Security/CSP)')
 
 
 def pytest_configure(config):
@@ -224,15 +230,20 @@ class HTMLReport(object):
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
-        style_css = pkg_resources.resource_string(
+        self.style_css = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'style.css'))
         if PY3:
-            style_css = style_css.decode('utf-8')
+            self.style_css = self.style_css.decode('utf-8')
+
+        html_css = html.link(href='style.css', rel='stylesheet',
+                             type='text/css')
+        if session.config.getoption('self_contained_html'):
+            html_css = html.style(raw(self.style_css))
 
         head = html.head(
             html.meta(charset='utf-8'),
             html.title('Test Report'),
-            html.style(raw(style_css)))
+            html_css)
 
         class Outcome:
 
@@ -333,12 +344,16 @@ class HTMLReport(object):
             unicode_doc = unicode_doc.decode('utf-8')
         return unicode_doc
 
-    def _save_report(self, report_content):
-        if not os.path.exists(os.path.dirname(self.logfile)):
-            os.makedirs(os.path.dirname(self.logfile))
-        logfile = open(self.logfile, 'w', encoding='utf-8')
-        logfile.write(report_content)
-        logfile.close()
+    def _save_report(self, report_content, self_contained_html):
+        dir_name = os.path.dirname(self.logfile)
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
+        with open(self.logfile, 'w', encoding='utf-8') as f:
+            f.write(report_content)
+        if not self_contained_html:
+            style_path = os.path.join(dir_name, 'style.css')
+            with open(style_path, 'w', encoding='utf-8') as f:
+                f.write(self.style_css)
 
     def pytest_runtest_logreport(self, report):
         if report.passed:
@@ -355,7 +370,8 @@ class HTMLReport(object):
 
     def pytest_sessionfinish(self, session):
         report_content = self._generate_report(session)
-        self._save_report(report_content)
+        self_contained_html = session.config.getoption('self_contained_html')
+        self._save_report(report_content, self_contained_html)
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: {0}'.format(

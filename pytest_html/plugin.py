@@ -13,6 +13,7 @@ import platform
 import sys
 import time
 import bisect
+import hashlib
 
 import pytest
 from py.xml import html, raw
@@ -55,7 +56,8 @@ def pytest_configure(config):
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
-        config._html = HTMLReport(htmlpath)
+        contained_html = config.getoption('self_contained_html')
+        config._html = HTMLReport(htmlpath, contained_html=contained_html)
         config.pluginmanager.register(config._html)
     if hasattr(config, 'slaveoutput'):
         config.slaveoutput['environment'] = config._environment
@@ -86,7 +88,7 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
 
 class HTMLReport(object):
 
-    def __init__(self, logfile):
+    def __init__(self, logfile, **kwargs):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
@@ -95,10 +97,11 @@ class HTMLReport(object):
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
         self.rerun = 0
+        self.contained_html = kwargs['contained_html']
 
     class TestResult:
 
-        def __init__(self, outcome, report):
+        def __init__(self, outcome, report, contained_html, logfile):
             self.test_id = report.nodeid
             if report.when != 'call':
                 self.test_id = '::'.join([report.nodeid, report.when])
@@ -106,12 +109,13 @@ class HTMLReport(object):
             self.outcome = outcome
             self.additional_html = []
             self.links_html = []
-
-            self.append_log_html(report, self.additional_html)
+            self.contained_html = contained_html
+            self.logfile = logfile
 
             for extra in getattr(report, 'extra', []):
-                self.append_extra_html(extra,
-                                       self.additional_html, self.links_html)
+                self.append_extra_html(extra)
+
+            self.append_log_html(report, self.additional_html)
 
             self.row_table = html.tr([
                 html.td(self.outcome, class_='col-result'),
@@ -127,18 +131,35 @@ class HTMLReport(object):
                      'XPassed', 'Skipped', 'Passed')
             return order.index(self.outcome) < order.index(other.outcome)
 
-        def append_extra_html(self, extra, additional_html, links_html):
+        def append_extra_html(self, extra):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
-                href = '#'
-                image = 'data:image/png;base64,{0}'.format(
-                        extra.get('content'))
-                additional_html.append(html.div(
-                    html.a(html.img(src=image), href="#"),
+                image_src = None
+                if self.contained_html:
+                    image_src = 'data:image/png;base64,{0}'.format(
+                            extra.get('content'))
+                    href = '#'
+                else:
+                    hash_key = self.test_id + self.outcome
+                    hash_generator = hashlib.md5()
+                    hash_generator.update(hash_key)
+                    image_file_name = '{0}.jpg'.format(hash_generator.digest)
+
+                    super_dir_name = os.path.dirname(self.logfile)
+                    dir_name = os.path.join(super_dir_name, 'assets')
+                    image_path = os.path.join(dir_name, image_file_name)
+                    href = os.path.join('assets', image_file_name)
+                    image_src = href
+
+                    with open(image_path, 'w') as fh:
+                        fh.write(extra.get('content').decode('base64'))
+
+                self.additional_html.append(html.div(
+                    html.a(html.img(src=image_src), href=href),
                     class_='image'))
 
             elif extra.get('format') == extras.FORMAT_HTML:
-                additional_html.append(html.div(raw(extra.get('content'))))
+                self.additional_html.append(html.div(raw(extra.get('content')))
 
             elif extra.get('format') == extras.FORMAT_JSON:
                 href = data_uri(json.dumps(extra.get('content')),
@@ -151,12 +172,12 @@ class HTMLReport(object):
                 href = extra.get('content')
 
             if href is not None:
-                links_html.append(html.a(
+                self.links_html.append(html.a(
                     extra.get('name'),
                     class_=extra.get('format'),
                     href=href,
                     target='_blank'))
-                links_html.append(' ')
+                self.links_html.append(' ')
 
         def append_log_html(self, report, additional_html):
             log = html.div(class_='log')
@@ -187,7 +208,8 @@ class HTMLReport(object):
             additional_html.append(log)
 
     def _appendrow(self, outcome, report):
-        result = self.TestResult(outcome, report)
+        result = self.TestResult(outcome, report, self.contained_html,
+                                 self.logfile)
         index = bisect.bisect_right(self.results, result)
         self.results.insert(index, result)
         self.test_logs.insert(index, html.tbody(result.row_table,

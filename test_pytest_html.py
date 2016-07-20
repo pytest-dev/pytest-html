@@ -275,6 +275,7 @@ class TestHTML:
         assert link in html
 
     def test_extra_image(self, testdir):
+        # TO DO: Add a test to image of created apart
         content = str(random.random())
         testdir.makeconftest("""
             import pytest
@@ -287,7 +288,7 @@ class TestHTML:
                     report.extra = [extras.image('{0}')]
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir)
+        result, html = run(testdir,  'report.html', '--self-contained-html')
         assert result.ret == 0
         assert '<a class="image" href="#" target="_blank">Image</a>' in html
         src = 'data:image/png;base64,{0}'.format(content)

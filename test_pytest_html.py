@@ -198,7 +198,7 @@ class TestHTML:
         assert content
         assert content in html
 
-        regex_css_link = '<link href="style.css" rel="stylesheet"'
+        regex_css_link = '<link href="assets/style.css" rel="stylesheet"'
         assert re.search(regex_css_link, html) is not None
 
     def test_stdout(self, testdir):

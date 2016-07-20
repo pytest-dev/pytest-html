@@ -235,7 +235,8 @@ class HTMLReport(object):
         if PY3:
             self.style_css = self.style_css.decode('utf-8')
 
-        html_css = html.link(href='style.css', rel='stylesheet',
+        css_href = os.path.join('assets', 'style.css')
+        html_css = html.link(href=css_href, rel='stylesheet',
                              type='text/css')
         if session.config.getoption('self_contained_html'):
             html_css = html.style(raw(self.style_css))
@@ -346,12 +347,15 @@ class HTMLReport(object):
 
     def _save_report(self, report_content, self_contained_html):
         dir_name = os.path.dirname(self.logfile)
+        assets_dir = os.path.join(dir_name, 'assets')
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
+        if not os.path.exists(assets_dir):
+            os.makedirs(assets_dir)
         with open(self.logfile, 'w', encoding='utf-8') as f:
             f.write(report_content)
         if not self_contained_html:
-            style_path = os.path.join(dir_name, 'style.css')
+            style_path = os.path.join(assets_dir, 'style.css')
             with open(style_path, 'w', encoding='utf-8') as f:
                 f.write(self.style_css)
 

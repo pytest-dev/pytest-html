@@ -1,10 +1,11 @@
 Release Notes
 -------------
 
-**1.9.0 (2016-06-28)**
+**1.9.0 (2016-07-04)**
 
-* Added support to rerun plugins
-* Added a feature to filter tests by its outcome
+* Split pytest_sessionfinish into generate and save methods
+* Show tests rerun by pytest-rerunfailures plugin
+* Added a feature to filter tests by outcome
 
 **1.8.1 (2016-05-24)**
 

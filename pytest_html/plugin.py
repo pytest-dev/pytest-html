@@ -12,6 +12,7 @@ import pkg_resources
 import platform
 import sys
 import time
+import bisect
 
 import pytest
 from py.xml import html, raw
@@ -83,97 +84,109 @@ class HTMLReport(object):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
+        self.results = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
         self.rerun = 0
 
-    def append_extra_html(self, extra, additional_html, links_html):
-        href = None
-        if extra.get('format') == extras.FORMAT_IMAGE:
-            href = '#'
-            image = 'data:image/png;base64,{0}'.format(
-                    extra.get('content'))
-            additional_html.append(html.div(
-                html.a(html.img(src=image), href="#"),
-                class_='image'))
+    class TestResult:
 
-        elif extra.get('format') == extras.FORMAT_HTML:
-            additional_html.append(html.div(raw(extra.get('content'))))
+        def __init__(self, outcome, report):
+            self.test_id = report.nodeid
+            if report.when != 'call':
+                self.test_id = '::'.join([report.nodeid, report.when])
+            self.time = getattr(report, 'duration', 0.0)
+            self.outcome = outcome
+            self.additional_html = []
+            self.links_html = []
 
-        elif extra.get('format') == extras.FORMAT_JSON:
-            href = data_uri(json.dumps(extra.get('content')),
-                            mime_type='application/json')
+            self.append_log_html(report, self.additional_html)
 
-        elif extra.get('format') == extras.FORMAT_TEXT:
-            href = data_uri(extra.get('content'))
+            for extra in getattr(report, 'extra', []):
+                self.append_extra_html(extra,
+                                       self.additional_html, self.links_html)
 
-        elif extra.get('format') == extras.FORMAT_URL:
-            href = extra.get('content')
+            self.row_table = html.tr([
+                html.td(self.outcome, class_='col-result'),
+                html.td(self.test_id, class_='col-name'),
+                html.td('{0:.2f}'.format(self.time), class_='col-duration'),
+                html.td(self.links_html, class_='col-links')])
 
-        if href is not None:
-            links_html.append(html.a(
-                extra.get('name'),
-                class_=extra.get('format'),
-                href=href,
-                target='_blank'))
-            links_html.append(' ')
+            self.row_extra = html.tr(html.td(self.additional_html,
+                                     class_='extra', colspan='5'))
 
-    def append_log_html(self, report, additional_html):
-        log = html.div(class_='log')
-        if report.longrepr:
-            for line in str(report.longrepr).splitlines():
-                if not PY3:
-                    line = line.decode('utf-8')
-                separator = line.startswith('_ ' * 10)
-                if separator:
-                    log.append(line[:80])
-                else:
-                    exception = line.startswith("E   ")
-                    if exception:
-                        log.append(html.span(raw(escape(line)),
-                                             class_='error'))
+        def __lt__(self, other):
+            order = ('Error', 'Failed', 'Rerun', 'XFailed',
+                     'XPassed', 'Skipped', 'Passed')
+            return order.index(self.outcome) < order.index(other.outcome)
+
+        def append_extra_html(self, extra, additional_html, links_html):
+            href = None
+            if extra.get('format') == extras.FORMAT_IMAGE:
+                href = '#'
+                image = 'data:image/png;base64,{0}'.format(
+                        extra.get('content'))
+                additional_html.append(html.div(
+                    html.a(html.img(src=image), href="#"),
+                    class_='image'))
+
+            elif extra.get('format') == extras.FORMAT_HTML:
+                additional_html.append(html.div(raw(extra.get('content'))))
+
+            elif extra.get('format') == extras.FORMAT_JSON:
+                href = data_uri(json.dumps(extra.get('content')),
+                                mime_type='application/json')
+
+            elif extra.get('format') == extras.FORMAT_TEXT:
+                href = data_uri(extra.get('content'))
+
+            elif extra.get('format') == extras.FORMAT_URL:
+                href = extra.get('content')
+
+            if href is not None:
+                links_html.append(html.a(
+                    extra.get('name'),
+                    class_=extra.get('format'),
+                    href=href,
+                    target='_blank'))
+                links_html.append(' ')
+
+        def append_log_html(self, report, additional_html):
+            log = html.div(class_='log')
+            if report.longrepr:
+                for line in str(report.longrepr).splitlines():
+                    if not PY3:
+                        line = line.decode('utf-8')
+                    separator = line.startswith('_ ' * 10)
+                    if separator:
+                        log.append(line[:80])
                     else:
-                        log.append(raw(escape(line)))
+                        exception = line.startswith("E   ")
+                        if exception:
+                            log.append(html.span(raw(escape(line)),
+                                                 class_='error'))
+                        else:
+                            log.append(raw(escape(line)))
+                    log.append(html.br())
+
+            for header, content in report.sections:
+                log.append(' {0} '.format(header).center(80, '-'))
                 log.append(html.br())
+                log.append(content)
 
-        for header, content in report.sections:
-            log.append(' {0} '.format(header).center(80, '-'))
-            log.append(html.br())
-            log.append(content)
+            if len(log) == 0:
+                log = html.div(class_='empty log')
+                log.append('No log output captured.')
+            additional_html.append(log)
 
-        if len(log) == 0:
-            log = html.div(class_='empty log')
-            log.append('No log output captured.')
-        additional_html.append(log)
-
-    def _appendrow(self, result_name, report):
-        time = getattr(report, 'duration', 0.0)
-
-        additional_html = []
-        links_html = []
-
-        for extra in getattr(report, 'extra', []):
-            self.append_extra_html(extra, additional_html, links_html)
-
-        self.append_log_html(report, additional_html)
-
-        test_id = report.nodeid
-        if report.when != 'call':
-            test_id = '::'.join([report.nodeid, report.when])
-
-        rows_table = html.tr([
-            html.td(result_name, class_='col-result'),
-            html.td(test_id, class_='col-name'),
-            html.td('{0:.2f}'.format(time), class_='col-duration'),
-            html.td(links_html, class_='col-links')])
-
-        rows_extra = html.tr(html.td(additional_html,
-                             class_='extra', colspan='5'))
-
-        self.test_logs.append(html.tbody(rows_table, rows_extra,
-                                         class_=result_name.lower() +
-                                         ' results-table-row'))
+    def _appendrow(self, outcome, report):
+        result = self.TestResult(outcome, report)
+        index = bisect.bisect_right(self.results, result)
+        self.results.insert(index, result)
+        self.test_logs.insert(index, html.tbody(result.row_table,
+                              result.row_extra, class_=result.outcome.lower() +
+                              ' results-table-row'))
 
     def append_passed(self, report):
         if report.when == 'call':
@@ -205,23 +218,7 @@ class HTMLReport(object):
         self.rerun += 1
         self._appendrow('Rerun', report)
 
-    def pytest_runtest_logreport(self, report):
-        if report.passed:
-            self.append_passed(report)
-        elif report.failed:
-            self.append_failed(report)
-        elif report.skipped:
-            self.append_skipped(report)
-        else:
-            self.append_other(report)
-
-    def pytest_sessionstart(self, session):
-        self.suite_start_time = time.time()
-
-    def pytest_sessionfinish(self, session):
-        if not os.path.exists(os.path.dirname(self.logfile)):
-            os.makedirs(os.path.dirname(self.logfile))
-        logfile = open(self.logfile, 'w', encoding='utf-8')
+    def _generate_report(self, session):
         suite_stop_time = time.time()
         suite_time_delta = suite_stop_time - self.suite_start_time
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
@@ -290,7 +287,7 @@ class HTMLReport(object):
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([
                 html.th('Result',
-                        class_='sortable initial-sort result',
+                        class_='sortable result initial-sort',
                         col='result'),
                 html.th('Test', class_='sortable', col='name'),
                 html.th('Duration',
@@ -328,15 +325,37 @@ class HTMLReport(object):
 
         doc = html.html(head, body)
 
-        logfile.write('<!DOCTYPE html>')
-        unicode_doc = doc.unicode(indent=2)
+        unicode_doc = u'<!DOCTYPE html>\n{0}'.format(doc.unicode(indent=2))
         if PY3:
             # Fix encoding issues, e.g. with surrogates
             unicode_doc = unicode_doc.encode('utf-8',
                                              errors='xmlcharrefreplace')
             unicode_doc = unicode_doc.decode('utf-8')
-        logfile.write(unicode_doc)
+        return unicode_doc
+
+    def _save_report(self, report_content):
+        if not os.path.exists(os.path.dirname(self.logfile)):
+            os.makedirs(os.path.dirname(self.logfile))
+        logfile = open(self.logfile, 'w', encoding='utf-8')
+        logfile.write(report_content)
         logfile.close()
+
+    def pytest_runtest_logreport(self, report):
+        if report.passed:
+            self.append_passed(report)
+        elif report.failed:
+            self.append_failed(report)
+        elif report.skipped:
+            self.append_skipped(report)
+        else:
+            self.append_other(report)
+
+    def pytest_sessionstart(self, session):
+        self.suite_start_time = time.time()
+
+    def pytest_sessionfinish(self, session):
+        report_content = self._generate_report(session)
+        self._save_report(report_content)
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: {0}'.format(

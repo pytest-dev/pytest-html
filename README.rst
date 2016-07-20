@@ -50,7 +50,7 @@ Then run your tests with:
 
 .. code-block:: bash
 
-   $ py.test --html=report.html
+  $ py.test --html=report.html
 
 
 Creating a a self-contained report

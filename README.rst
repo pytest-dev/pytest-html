@@ -52,6 +52,19 @@ Then run your tests with:
 
   $ py.test --html=report.html
 
+  Creating a single file to the project
+  -------------------------------------
+
+  In order to respect the `Content Security Policy (CSP)
+   <https://developer.mozilla.org/docs/Web/Security/CSP>`_,
+  several assets such as CSS and images' are stored separately by default.
+  You can alternatively create a self-contained report, which can be more
+  convenient when sharing your results. This can be done in the following way:
+
+  .. code-block:: bash
+
+      $ py.test --html=report.html --self-contained-html
+
 Enhancing reports
 -----------------
 
@@ -86,17 +99,6 @@ conftest.py file:
               # only add additional html on failure
               extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
           report.extra = extra
-
-Creating a single file to the project
--------------------------------------
-
-In order to respect the `Content Security Policy (CSP) <https://developer.mozilla.org/docs/Web/Security/CSP>`_, the CSS file is created apart by default. But if it is necessary to you create a single file to the whole report, you may run the file by the following way:
-
-.. code-block:: bash
-
-    $ py.test --html=report.html --self-contained-html
-
-So, the CSS will be inline and the whole report will be created on a single file.
 
 
 Screenshots

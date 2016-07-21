@@ -5,6 +5,7 @@
 from __future__ import absolute_import
 
 from base64 import b64encode
+from base64 import b64decode
 import datetime
 import json
 import os
@@ -57,7 +58,7 @@ def pytest_configure(config):
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
         config._html = HTMLReport(htmlpath,
-                                  config.getoption('self_contained'))
+                                  config.getoption('self_contained_html'))
         config.pluginmanager.register(config._html)
     if hasattr(config, 'slaveoutput'):
         config.slaveoutput['environment'] = config._environment
@@ -97,11 +98,11 @@ class HTMLReport(object):
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
         self.rerun = 0
-        self.contained_html = self_contained
+        self.self_contained = self_contained
 
     class TestResult:
 
-        def __init__(self, outcome, report, contained_html,
+        def __init__(self, outcome, report, self_contained,
                      logfile, test_index):
             self.test_id = report.nodeid
             if report.when != 'call':
@@ -110,13 +111,12 @@ class HTMLReport(object):
             self.outcome = outcome
             self.additional_html = []
             self.links_html = []
-            self.contained_html = contained_html
+            self.self_contained = self_contained
             self.logfile = logfile
 
-            extra_index = 1
-            for extra in getattr(report, 'extra', []):
+            for extra_index, extra in enumerate(getattr(report, 'extra', []),
+                                                start=1):
                 self.append_extra_html(extra, extra_index, test_index)
-                extra_index += 1
 
             self.append_log_html(report, self.additional_html)
 
@@ -137,16 +137,18 @@ class HTMLReport(object):
         def append_extra_html(self, extra, extra_index, test_index):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
-                if self.contained_html:
+                if self.self_contained:
                     image_src = 'data:image/png;base64,{0}'.format(
                             extra.get('content'))
                     href = '#'
                 else:
-                    hash_key = self.test_id + extra_index + test_index
+                    hash_key = "{0}{1}{2}".format(
+                               self.test_id, str(extra_index),
+                               str(test_index)).encode('utf-8')
                     hash_generator = hashlib.md5()
                     hash_generator.update(hash_key)
-                    image_file_name = '{0}.png'.format(hash_generator.digest)
-
+                    image_file_name = '{0}.png'.format(hash_generator
+                                                       .hexdigest())
                     dir_name = os.path.join(os.path.dirname(self.logfile),
                                             'assets')
                     if not os.path.exists(dir_name):
@@ -157,8 +159,8 @@ class HTMLReport(object):
                                            os.path.dirname(self.logfile))
                     image_src = href
 
-                    with open(image_path, 'w') as fh:
-                        fh.write(extra.get('content').decode('base64'))
+                    with open(image_path, 'w') as f:
+                        f.write(str(b64decode(extra.get('content'))))
 
                 self.additional_html.append(html.div(
                     html.a(html.img(src=image_src), href=href),
@@ -215,7 +217,7 @@ class HTMLReport(object):
             additional_html.append(log)
 
     def _appendrow(self, outcome, report, test_index):
-        result = self.TestResult(outcome, report, self.contained_html,
+        result = self.TestResult(outcome, report, self.self_contained,
                                  self.logfile, test_index)
         index = bisect.bisect_right(self.results, result)
         self.results.insert(index, result)
@@ -267,7 +269,7 @@ class HTMLReport(object):
         css_href = os.path.join('assets', 'style.css')
         html_css = html.link(href=css_href, rel='stylesheet',
                              type='text/css')
-        if session.config.getoption('self_contained'):
+        if self.self_contained:
             html_css = html.style(raw(self.style_css))
 
         head = html.head(
@@ -374,7 +376,7 @@ class HTMLReport(object):
             unicode_doc = unicode_doc.decode('utf-8')
         return unicode_doc
 
-    def _save_report(self, report_content, self_contained):
+    def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)
         assets_dir = os.path.join(dir_name, 'assets')
         if not os.path.exists(dir_name):
@@ -383,7 +385,7 @@ class HTMLReport(object):
             os.makedirs(assets_dir)
         with open(self.logfile, 'w', encoding='utf-8') as f:
             f.write(report_content)
-        if not self_contained:
+        if not self.self_contained:
             style_path = os.path.join(assets_dir, 'style.css')
             with open(style_path, 'w', encoding='utf-8') as f:
                 f.write(self.style_css)
@@ -403,8 +405,7 @@ class HTMLReport(object):
 
     def pytest_sessionfinish(self, session):
         report_content = self._generate_report(session)
-        self_contained = session.config.getoption('self_contained')
-        self._save_report(report_content, self_contained)
+        self._save_report(report_content)
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: {0}'.format(

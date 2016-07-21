@@ -198,9 +198,7 @@ class TestHTML:
             content = content.decode('utf-8')
         assert content
         assert content in html
-
-        href = os.path.join('assets', 'style.css')
-        regex_css_link = '<link href="{0}" rel="stylesheet"'.format(href)
+        regex_css_link = '<link href="assets/style.css" rel="stylesheet"'
         assert re.search(regex_css_link, html) is not None
 
     def test_stdout(self, testdir):
@@ -296,7 +294,8 @@ class TestHTML:
         assert '<a href="#"><img src="{0}"/></a>'.format(src) in html
 
     def test_extra_image_separeted(self, testdir):
-        content = str(random.random())
+        content = b64encode(str(random.random())
+                            .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
             import pytest
             @pytest.mark.hookwrapper
@@ -309,14 +308,16 @@ class TestHTML:
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        hash_key = 'test_extra_image_separeted0::test.py11'
+        hash_key = ('test_extra_image_separeted.py::'
+                    'test_pass11').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
         assert result.ret == 0
+        src = os.path.join('assets',
+                           '{0}.png'.format(hash_generator.hexdigest()))
         a_img = ('<a class="image" href="{0}" '
-                'target="_blank">Image</a>'.format(src))
-        assert a_img  in html
-        src = os.path.join('assets', hash_generator.digest)
+                 'target="_blank">Image</a>'.format(src))
+        assert a_img in html
         assert '<a href="{0}"><img src="{1}"/></a>'.format(src, src) in html
 
     def test_extra_json(self, testdir):

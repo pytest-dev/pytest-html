@@ -10,6 +10,7 @@ import sys
 import pkg_resources
 import random
 import re
+import hashlib
 
 import pytest
 
@@ -198,7 +199,8 @@ class TestHTML:
         assert content
         assert content in html
 
-        regex_css_link = '<link href="assets/style.css" rel="stylesheet"'
+        href = os.path.join('assets', 'style.css')
+        regex_css_link = '<link href="{0}" rel="stylesheet"'.format(href)
         assert re.search(regex_css_link, html) is not None
 
     def test_stdout(self, testdir):
@@ -275,7 +277,6 @@ class TestHTML:
         assert link in html
 
     def test_extra_image(self, testdir):
-        # TO DO: Add a test to image of created apart
         content = str(random.random())
         testdir.makeconftest("""
             import pytest
@@ -288,11 +289,35 @@ class TestHTML:
                     report.extra = [extras.image('{0}')]
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir,  'report.html', '--self-contained-html')
+        result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
         assert '<a class="image" href="#" target="_blank">Image</a>' in html
         src = 'data:image/png;base64,{0}'.format(content)
         assert '<a href="#"><img src="{0}"/></a>'.format(src) in html
+
+    def test_extra_image_separeted(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.image('{0}')]
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        hash_key = 'test_extra_image_separeted0::test.py11'
+        hash_generator = hashlib.md5()
+        hash_generator.update(hash_key)
+        assert result.ret == 0
+        a_img = ('<a class="image" href="{0}" '
+                'target="_blank">Image</a>'.format(src))
+        assert a_img  in html
+        src = os.path.join('assets', hash_generator.digest)
+        assert '<a href="{0}"><img src="{1}"/></a>'.format(src, src) in html
 
     def test_extra_json(self, testdir):
         content = {str(random.random()): str(random.random())}

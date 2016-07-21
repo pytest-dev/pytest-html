@@ -309,7 +309,7 @@ class TestHTML:
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         hash_key = ('test_extra_image_separeted.py::'
-                    'test_pass11').encode('utf-8')
+                    'test_pass1-1').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
         assert result.ret == 0
@@ -319,6 +319,39 @@ class TestHTML:
                  'target="_blank">Image</a>'.format(src))
         assert a_img in html
         assert '<a href="{0}"><img src="{1}"/></a>'.format(src, src) in html
+
+    def test_extra_image_separeted_rerun(self, testdir):
+        content = b64encode(str(random.random())
+                            .encode('utf-8')).decode('ascii')
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.image('{0}')]
+        """.format(content))
+        testdir.makepyfile("""
+            import pytest
+            @pytest.mark.flaky(reruns=2)
+            def test_fail():
+                assert False""")
+        result, html = run(testdir)
+
+        for i in [0, 1]:
+            hash_key = ('test_extra_image_separeted_rerun.py::'
+                        'test_fail1{0}'.format(i)).encode('utf-8')
+            hash_generator = hashlib.md5()
+            hash_generator.update(hash_key)
+            src = 'assets/{0}.png'.format(hash_generator.hexdigest())
+            a_img = ('<a class="image" href="{0}" '
+                     'target="_blank">Image</a>'.format(src))
+            assert result.ret
+            assert a_img in html
+            assert ('<a href="{0}">'
+                    '<img src="{1}"/></a>').format(src, src) in html
 
     def test_extra_json(self, testdir):
         content = {str(random.random()): str(random.random())}

@@ -216,7 +216,7 @@ class HTMLReport(object):
                 log.append('No log output captured.')
             additional_html.append(log)
 
-    def _appendrow(self, outcome, report, test_index):
+    def _appendrow(self, outcome, report, test_index=-1):
         result = self.TestResult(outcome, report, self.self_contained,
                                  self.logfile, test_index)
         index = bisect.bisect_right(self.results, result)
@@ -228,32 +228,32 @@ class HTMLReport(object):
     def append_passed(self, report):
         if report.when == 'call':
             self.passed += 1
-            self._appendrow('Passed', report, self.passed)
+            self._appendrow('Passed', report)
 
     def append_failed(self, report):
         if report.when == "call":
             if hasattr(report, "wasxfail"):
                 self.xpassed += 1
-                self._appendrow('XPassed', report, self.xpassed)
+                self._appendrow('XPassed', report)
             else:
                 self.failed += 1
-                self._appendrow('Failed', report, self.failed)
+                self._appendrow('Failed', report)
         else:
             self.errors += 1
-            self._appendrow('Error', report, self.errors)
+            self._appendrow('Error', report)
 
     def append_skipped(self, report):
         if hasattr(report, "wasxfail"):
             self.xfailed += 1
-            self._appendrow('XFailed', report, self.xfailed)
+            self._appendrow('XFailed', report)
         else:
             self.skipped += 1
-            self._appendrow('Skipped', report, self.skipped)
+            self._appendrow('Skipped', report)
 
     def append_other(self, report):
         # For now, the only "other" the plugin give support is rerun
         self.rerun += 1
-        self._appendrow('Rerun', report, self.rerun)
+        self._appendrow('Rerun', report, report.rerun)
 
     def _generate_report(self, session):
         suite_stop_time = time.time()

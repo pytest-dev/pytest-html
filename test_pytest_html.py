@@ -318,7 +318,7 @@ class TestHTML:
         a_img = ('<a class="image" href="{0}" '
                  'target="_blank">Image</a>'.format(src))
         assert a_img in html
-        assert '<a href="{0}"><img src="{1}"/></a>'.format(src, src) in html
+        assert '<a href="{0}"><img src="{0}"/></a>'.format(src) in html
         assert os.path.exists(src)
 
     def test_extra_image_seperated_rerun(self, testdir):
@@ -351,8 +351,7 @@ class TestHTML:
                      'target="_blank">Image</a>'.format(src))
             assert result.ret
             assert a_img in html
-            assert ('<a href="{0}">'
-                    '<img src="{1}"/></a>').format(src, src) in html
+            assert ('<a href="{0}"><img src="{0}"/></a>').format(src) in html
             assert os.path.exists(src)
 
     def test_extra_json(self, testdir):

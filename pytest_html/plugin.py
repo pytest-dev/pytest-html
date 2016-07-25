@@ -112,12 +112,9 @@ class HTMLReport(object):
             self.self_contained = self_contained
             self.logfile = logfile
 
-            test_index = -1
-            if outcome == 'Rerun':
-                test_index = report.rerun
+            test_index = hasattr(report, 'rerun') and report.rerun + 1 or 0
 
-            for extra_index, extra in enumerate(getattr(report, 'extra', []),
-                                                start=0):
+            for extra_index, extra in enumerate(getattr(report, 'extra', [])):
                 self.append_extra_html(extra, extra_index, test_index)
 
             self.append_log_html(report, self.additional_html)
@@ -155,16 +152,13 @@ class HTMLReport(object):
                     if not os.path.exists(os.path.dirname(image_path)):
                         os.makedirs(os.path.dirname(image_path))
 
-                    href = os.path.relpath(image_path,
-                                           os.path.dirname(self.logfile))
+                    href = '{0}/{1}'.format('assets', image_file_name)
                     image_src = href
 
                     with open(image_path, 'w') as f:
                         content = extra.get('content')
                         if PY3:
-                            content = bytearray()
-                            content.extend(extra.get('content')
-                                           .encode('utf-8'))
+                            content = bytearray(extra.get('content'), 'utf-8')
                         f.write(str(b64decode(content)))
 
                 self.additional_html.append(html.div(
@@ -271,7 +265,7 @@ class HTMLReport(object):
         if PY3:
             self.style_css = self.style_css.decode('utf-8')
 
-        css_href = os.path.join('assets', 'style.css')
+        css_href = '{0}/{1}'.format('assets', 'style.css')
         html_css = html.link(href=css_href, rel='stylesheet',
                              type='text/css')
         if self.self_contained:
@@ -385,12 +379,10 @@ class HTMLReport(object):
         dir_name = os.path.dirname(self.logfile)
         assets_dir = os.path.join(dir_name, 'assets')
 
-        if self.self_contained:
-            if not os.path.exists(dir_name):
-                os.makedirs(dir_name)
-        else:
-            if not os.path.exists(assets_dir):
-                os.makedirs(assets_dir)
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
+        if not self.self_contained and not os.path.exists(assets_dir):
+            os.makedirs(assets_dir)
 
         with open(self.logfile, 'w', encoding='utf-8') as f:
             f.write(report_content)

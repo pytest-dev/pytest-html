@@ -293,7 +293,7 @@ class TestHTML:
         src = 'data:image/png;base64,{0}'.format(content)
         assert '<a href="#"><img src="{0}"/></a>'.format(src) in html
 
-    def test_extra_image_separeted(self, testdir):
+    def test_extra_image_seperated(self, testdir):
         content = b64encode(str(random.random())
                             .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
@@ -308,20 +308,20 @@ class TestHTML:
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        hash_key = ('test_extra_image_separeted.py::'
-                    'test_pass0-1').encode('utf-8')
+        hash_key = ('test_extra_image_seperated.py::'
+                    'test_pass01').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
         assert result.ret == 0
-        src = os.path.join('assets',
-                           '{0}.png'.format(hash_generator.hexdigest()))
+        src = '{0}/{1}'.format('assets', '{0}.png'.
+                               format(hash_generator.hexdigest()))
         a_img = ('<a class="image" href="{0}" '
                  'target="_blank">Image</a>'.format(src))
         assert a_img in html
         assert '<a href="{0}"><img src="{1}"/></a>'.format(src, src) in html
         assert os.path.exists(src)
 
-    def test_extra_image_separeted_rerun(self, testdir):
+    def test_extra_image_seperated_rerun(self, testdir):
         content = b64encode(str(random.random())
                             .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
@@ -341,8 +341,8 @@ class TestHTML:
                 assert False""")
         result, html = run(testdir)
 
-        for i in [0, 1]:
-            hash_key = ('test_extra_image_separeted_rerun.py::'
+        for i in range(1, 3):
+            hash_key = ('test_extra_image_seperated_rerun.py::'
                         'test_fail0{0}'.format(i)).encode('utf-8')
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key)

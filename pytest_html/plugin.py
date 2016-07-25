@@ -4,8 +4,7 @@
 
 from __future__ import absolute_import
 
-from base64 import b64encode
-from base64 import b64decode
+from base64 import b64encode, b64decode
 import datetime
 import json
 import os
@@ -102,8 +101,7 @@ class HTMLReport(object):
 
     class TestResult:
 
-        def __init__(self, outcome, report, self_contained,
-                     logfile, test_index):
+        def __init__(self, outcome, report, self_contained, logfile):
             self.test_id = report.nodeid
             if report.when != 'call':
                 self.test_id = '::'.join([report.nodeid, report.when])
@@ -114,8 +112,12 @@ class HTMLReport(object):
             self.self_contained = self_contained
             self.logfile = logfile
 
+            test_index = -1
+            if outcome == 'Rerun':
+                test_index = report.rerun
+
             for extra_index, extra in enumerate(getattr(report, 'extra', []),
-                                                start=1):
+                                                start=0):
                 self.append_extra_html(extra, extra_index, test_index)
 
             self.append_log_html(report, self.additional_html)
@@ -142,19 +144,17 @@ class HTMLReport(object):
                             extra.get('content'))
                     href = '#'
                 else:
-                    hash_key = "{0}{1}{2}".format(
-                               self.test_id, str(extra_index),
-                               str(test_index)).encode('utf-8')
+                    hash_key = ''.join([self.test_id, str(extra_index),
+                                       str(test_index)]).encode('utf-8')
                     hash_generator = hashlib.md5()
                     hash_generator.update(hash_key)
                     image_file_name = '{0}.png'.format(hash_generator
                                                        .hexdigest())
-                    dir_name = os.path.join(os.path.dirname(self.logfile),
-                                            'assets')
-                    if not os.path.exists(dir_name):
-                        os.makedirs(dir_name)
+                    image_path = os.path.join(os.path.dirname(self.logfile),
+                                              'assets', image_file_name)
+                    if not os.path.exists(os.path.dirname(image_path)):
+                        os.makedirs(os.path.dirname(image_path))
 
-                    image_path = os.path.join(dir_name, image_file_name)
                     href = os.path.relpath(image_path,
                                            os.path.dirname(self.logfile))
                     image_src = href
@@ -221,9 +221,9 @@ class HTMLReport(object):
                 log.append('No log output captured.')
             additional_html.append(log)
 
-    def _appendrow(self, outcome, report, test_index=-1):
+    def _appendrow(self, outcome, report):
         result = self.TestResult(outcome, report, self.self_contained,
-                                 self.logfile, test_index)
+                                 self.logfile)
         index = bisect.bisect_right(self.results, result)
         self.results.insert(index, result)
         self.test_logs.insert(index, html.tbody(result.row_table,
@@ -258,7 +258,7 @@ class HTMLReport(object):
     def append_other(self, report):
         # For now, the only "other" the plugin give support is rerun
         self.rerun += 1
-        self._appendrow('Rerun', report, report.rerun)
+        self._appendrow('Rerun', report)
 
     def _generate_report(self, session):
         suite_stop_time = time.time()
@@ -384,10 +384,14 @@ class HTMLReport(object):
     def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)
         assets_dir = os.path.join(dir_name, 'assets')
-        if not os.path.exists(dir_name):
-            os.makedirs(dir_name)
-        if not os.path.exists(assets_dir):
-            os.makedirs(assets_dir)
+
+        if self.self_contained:
+            if not os.path.exists(dir_name):
+                os.makedirs(dir_name)
+        else:
+            if not os.path.exists(assets_dir):
+                os.makedirs(assets_dir)
+
         with open(self.logfile, 'w', encoding='utf-8') as f:
             f.write(report_content)
         if not self.self_contained:

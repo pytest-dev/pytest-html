@@ -309,7 +309,7 @@ class TestHTML:
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         hash_key = ('test_extra_image_separeted.py::'
-                    'test_pass1-1').encode('utf-8')
+                    'test_pass0-1').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
         assert result.ret == 0
@@ -319,6 +319,7 @@ class TestHTML:
                  'target="_blank">Image</a>'.format(src))
         assert a_img in html
         assert '<a href="{0}"><img src="{1}"/></a>'.format(src, src) in html
+        assert os.path.exists(src)
 
     def test_extra_image_separeted_rerun(self, testdir):
         content = b64encode(str(random.random())
@@ -342,7 +343,7 @@ class TestHTML:
 
         for i in [0, 1]:
             hash_key = ('test_extra_image_separeted_rerun.py::'
-                        'test_fail1{0}'.format(i)).encode('utf-8')
+                        'test_fail0{0}'.format(i)).encode('utf-8')
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key)
             src = 'assets/{0}.png'.format(hash_generator.hexdigest())
@@ -352,6 +353,7 @@ class TestHTML:
             assert a_img in html
             assert ('<a href="{0}">'
                     '<img src="{1}"/></a>').format(src, src) in html
+            assert os.path.exists(src)
 
     def test_extra_json(self, testdir):
         content = {str(random.random()): str(random.random())}

@@ -160,7 +160,12 @@ class HTMLReport(object):
                     image_src = href
 
                     with open(image_path, 'w') as f:
-                        f.write(str(b64decode(extra.get('content'))))
+                        content = extra.get('content')
+                        if PY3:
+                            content = bytearray()
+                            content.extend(extra.get('content')
+                                           .encode('utf-8'))
+                        f.write(str(b64decode(content)))
 
                 self.additional_html.append(html.div(
                     html.a(html.img(src=image_src), href=href),

@@ -341,7 +341,7 @@ class TestHTML:
                 assert False""")
         result, html = run(testdir)
 
-        for i in range(1, 3):
+        for i in range(1, 4):
             hash_key = ('test_extra_image_seperated_rerun.py::'
                         'test_fail0{0}'.format(i)).encode('utf-8')
             hash_generator = hashlib.md5()

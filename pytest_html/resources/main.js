@@ -62,6 +62,15 @@ function hide_extras(colresult_elem) {
     expandcollapse.classList.add("expander");
 }
 
+function add_filter_boxes() {
+    var checkboxes = document.getElementsByName('filter_checkbox');
+    for (var i = 0; i < checkboxes.length; i++)
+      checkboxes[i].hidden = false;
+
+    var checkbox_text = document.getElementById('filter_checkbox_text');
+    checkbox_text.hidden = false;
+}
+
 function add_collapse() {
     // Add links for show/hide all
     var resulttable = find('table#results-table');
@@ -69,7 +78,7 @@ function add_collapse() {
     showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
                             '<a href="javascript:hide_all_extras()">Hide all detauls</a>';
     resulttable.parentElement.insertBefore(showhideall, resulttable);
-    
+
     // Add show/hide link to each result
     find_all('.col-result').forEach(function(elem) {
         var extras = elem.parentNode.nextElementSibling;
@@ -93,8 +102,10 @@ function add_collapse() {
 }
 addEventListener("DOMContentLoaded", function() {
     reset_sort_headers();
-    
+
     add_collapse();
+
+    add_filter_boxes();
 
     toggle_sort_states(find('.initial-sort'));
 

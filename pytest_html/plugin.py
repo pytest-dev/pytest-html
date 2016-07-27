@@ -260,7 +260,8 @@ class HTMLReport(object):
 
             def generate_checkbox(self):
                 checkbox_kwargs = {'data-test-result':
-                                   self.test_result.lower()}
+                                   self.test_result.lower(),
+                                   'hidden': 'true'}
                 if self.total == 0:
                     checkbox_kwargs['disabled'] = 'true'
 
@@ -271,9 +272,10 @@ class HTMLReport(object):
                                            **checkbox_kwargs)
 
             def generate_summary_item(self):
-                self.summary_item = html.span('{0} {1}'.
+                self.summary_item = [html.span('{0} {1}'.
                                               format(self.total, self.label),
-                                              class_=self.class_html)
+                                              class_=self.class_html),
+                                     html.span('; ')]
 
         outcomes = [Outcome('passed', self.passed),
                     Outcome('skipped', self.skipped),
@@ -288,7 +290,9 @@ class HTMLReport(object):
         summary = [html.h2('Summary'), html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(
                 numtests, suite_time_delta)),
-            html.p('(Un)check the boxes to filter the results.')]
+            html.p('(Un)check the boxes to filter the results.',
+                   id='filter_checkbox_text',
+                   hidden='true')]
 
         for outcome in outcomes:
             summary.append(outcome.checkbox)

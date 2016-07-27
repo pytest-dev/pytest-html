@@ -32,8 +32,8 @@ def assert_results_by_outcome(html, test_outcome, test_outcome_number,
     assert int(re.search(regex_summary, html).group(1)) == test_outcome_number
 
     # Asserts if the generated checkbox of this outcome is correct
-    regex_checkbox = ('<input checked="true" data-test-result="{0}"'
-                      .format(test_outcome))
+    regex_checkbox = ('<input checked="true" class="filter" '
+                      'data-test-result="{0}"'.format(test_outcome))
     if test_outcome_number == 0:
         regex_checkbox += ' disabled="true"'
     assert re.search(regex_checkbox, html) is not None

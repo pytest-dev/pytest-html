@@ -273,8 +273,8 @@ class HTMLReport(object):
 
             def generate_summary_item(self):
                 self.summary_item = [html.span('{0} {1}'.
-                                              format(self.total, self.label),
-                                              class_=self.class_html),
+                                               format(self.total, self.label),
+                                               class_=self.class_html),
                                      html.span('; ')]
 
         outcomes = [Outcome('passed', self.passed),

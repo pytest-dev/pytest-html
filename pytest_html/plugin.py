@@ -260,8 +260,7 @@ class HTMLReport(object):
 
             def generate_checkbox(self):
                 checkbox_kwargs = {'data-test-result':
-                                   self.test_result.lower(),
-                                   'hidden': 'true'}
+                                   self.test_result.lower()}
                 if self.total == 0:
                     checkbox_kwargs['disabled'] = 'true'
 
@@ -269,13 +268,14 @@ class HTMLReport(object):
                                            checked='true',
                                            onChange='filter_table(this)',
                                            name='filter_checkbox',
+                                           class_='filter',
+                                           hidden='true',
                                            **checkbox_kwargs)
 
             def generate_summary_item(self):
                 self.summary_item = [html.span('{0} {1}'.
-                                               format(self.total, self.label),
-                                               class_=self.class_html),
-                                     html.span('; ')]
+                                              format(self.total, self.label),
+                                              class_=self.class_html)]
 
         outcomes = [Outcome('passed', self.passed),
                     Outcome('skipped', self.skipped),
@@ -291,13 +291,13 @@ class HTMLReport(object):
             '{0} tests ran in {1:.2f} seconds. '.format(
                 numtests, suite_time_delta)),
             html.p('(Un)check the boxes to filter the results.',
-                   id='filter_checkbox_text',
-                   hidden='true')]
+                   class_='filter',
+                   hidden=True)]
 
         for outcome in outcomes:
+            summary.append(' -')
             summary.append(outcome.checkbox)
             summary.append(outcome.summary_item)
-            summary.append(' ')
 
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([

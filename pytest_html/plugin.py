@@ -273,9 +273,9 @@ class HTMLReport(object):
                                            **checkbox_kwargs)
 
             def generate_summary_item(self):
-                self.summary_item = [html.span('{0} {1}'.
+                self.summary_item = html.span('{0} {1}'.
                                                format(self.total, self.label),
-                                               class_=self.class_html)]
+                                               class_=self.class_html)
 
         outcomes = [Outcome('passed', self.passed),
                     Outcome('skipped', self.skipped),
@@ -292,7 +292,7 @@ class HTMLReport(object):
                 numtests, suite_time_delta)),
             html.p('(Un)check the boxes to filter the results.',
                    class_='filter',
-                   hidden=True)]
+                   hidden='true')]
 
         for i, outcome in enumerate(outcomes, start=1):
             summary.append(outcome.checkbox)

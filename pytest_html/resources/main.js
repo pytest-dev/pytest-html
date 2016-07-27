@@ -63,9 +63,9 @@ function hide_extras(colresult_elem) {
 }
 
 function show_filters() {
-    var filters_itens = document.getElementsByClassName('filter');
-    for (var i = 0; i < filters_itens.length; i++)
-      filters_itens[i].hidden = false;
+    var filter_itens = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_itens.length; i++)
+        filter_itens[i].hidden = false;
 }
 
 function add_collapse() {

@@ -294,10 +294,11 @@ class HTMLReport(object):
                    class_='filter',
                    hidden=True)]
 
-        for outcome in outcomes:
-            summary.append(' -')
+        for i, outcome in enumerate(outcomes, start=1):
             summary.append(outcome.checkbox)
             summary.append(outcome.summary_item)
+            if i < len(outcomes):
+                summary.append(', ')
 
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([

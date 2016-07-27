@@ -10,6 +10,7 @@ import sys
 import pkg_resources
 import random
 import re
+import hashlib
 
 import pytest
 
@@ -197,8 +198,7 @@ class TestHTML:
             content = content.decode('utf-8')
         assert content
         assert content in html
-
-        regex_css_link = '<link href="style.css" rel="stylesheet"'
+        regex_css_link = '<link href="assets/style.css" rel="stylesheet"'
         assert re.search(regex_css_link, html) is not None
 
     def test_stdout(self, testdir):
@@ -287,11 +287,72 @@ class TestHTML:
                     report.extra = [extras.image('{0}')]
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir)
+        result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
         assert '<a class="image" href="#" target="_blank">Image</a>' in html
         src = 'data:image/png;base64,{0}'.format(content)
         assert '<a href="#"><img src="{0}"/></a>'.format(src) in html
+
+    def test_extra_image_seperated(self, testdir):
+        content = b64encode(str(random.random())
+                            .encode('utf-8')).decode('ascii')
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.image('{0}')]
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        hash_key = ('test_extra_image_seperated.py::'
+                    'test_pass01').encode('utf-8')
+        hash_generator = hashlib.md5()
+        hash_generator.update(hash_key)
+        assert result.ret == 0
+        src = '{0}/{1}'.format('assets', '{0}.png'.
+                               format(hash_generator.hexdigest()))
+        a_img = ('<a class="image" href="{0}" '
+                 'target="_blank">Image</a>'.format(src))
+        assert a_img in html
+        assert '<a href="{0}"><img src="{0}"/></a>'.format(src) in html
+        assert os.path.exists(src)
+
+    def test_extra_image_seperated_rerun(self, testdir):
+        content = b64encode(str(random.random())
+                            .encode('utf-8')).decode('ascii')
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.image('{0}')]
+        """.format(content))
+        testdir.makepyfile("""
+            import pytest
+            @pytest.mark.flaky(reruns=2)
+            def test_fail():
+                assert False""")
+        result, html = run(testdir)
+
+        for i in range(1, 4):
+            hash_key = ('test_extra_image_seperated_rerun.py::'
+                        'test_fail0{0}'.format(i)).encode('utf-8')
+            hash_generator = hashlib.md5()
+            hash_generator.update(hash_key)
+            src = 'assets/{0}.png'.format(hash_generator.hexdigest())
+            a_img = ('<a class="image" href="{0}" '
+                     'target="_blank">Image</a>'.format(src))
+            assert result.ret
+            assert a_img in html
+            assert ('<a href="{0}"><img src="{0}"/></a>').format(src) in html
+            assert os.path.exists(src)
 
     def test_extra_json(self, testdir):
         content = {str(random.random()): str(random.random())}

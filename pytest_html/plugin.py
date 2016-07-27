@@ -4,7 +4,7 @@
 
 from __future__ import absolute_import
 
-from base64 import b64encode
+from base64 import b64encode, b64decode
 import datetime
 import json
 import os
@@ -13,6 +13,7 @@ import platform
 import sys
 import time
 import bisect
+import hashlib
 
 import pytest
 from py.xml import html, raw
@@ -55,7 +56,8 @@ def pytest_configure(config):
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
-        config._html = HTMLReport(htmlpath)
+        config._html = HTMLReport(htmlpath,
+                                  config.getoption('self_contained_html'))
         config.pluginmanager.register(config._html)
     if hasattr(config, 'slaveoutput'):
         config.slaveoutput['environment'] = config._environment
@@ -86,7 +88,7 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
 
 class HTMLReport(object):
 
-    def __init__(self, logfile):
+    def __init__(self, logfile, self_contained):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
@@ -95,10 +97,11 @@ class HTMLReport(object):
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
         self.rerun = 0
+        self.self_contained = self_contained
 
     class TestResult:
 
-        def __init__(self, outcome, report):
+        def __init__(self, outcome, report, self_contained, logfile):
             self.test_id = report.nodeid
             if report.when != 'call':
                 self.test_id = '::'.join([report.nodeid, report.when])
@@ -106,12 +109,15 @@ class HTMLReport(object):
             self.outcome = outcome
             self.additional_html = []
             self.links_html = []
+            self.self_contained = self_contained
+            self.logfile = logfile
+
+            test_index = hasattr(report, 'rerun') and report.rerun + 1 or 0
+
+            for extra_index, extra in enumerate(getattr(report, 'extra', [])):
+                self.append_extra_html(extra, extra_index, test_index)
 
             self.append_log_html(report, self.additional_html)
-
-            for extra in getattr(report, 'extra', []):
-                self.append_extra_html(extra,
-                                       self.additional_html, self.links_html)
 
             self.row_table = html.tr([
                 html.td(self.outcome, class_='col-result'),
@@ -127,18 +133,41 @@ class HTMLReport(object):
                      'XPassed', 'Skipped', 'Passed')
             return order.index(self.outcome) < order.index(other.outcome)
 
-        def append_extra_html(self, extra, additional_html, links_html):
+        def append_extra_html(self, extra, extra_index, test_index):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
-                href = '#'
-                image = 'data:image/png;base64,{0}'.format(
-                        extra.get('content'))
-                additional_html.append(html.div(
-                    html.a(html.img(src=image), href="#"),
+                if self.self_contained:
+                    image_src = 'data:image/png;base64,{0}'.format(
+                            extra.get('content'))
+                    href = '#'
+                else:
+                    hash_key = ''.join([self.test_id, str(extra_index),
+                                       str(test_index)]).encode('utf-8')
+                    hash_generator = hashlib.md5()
+                    hash_generator.update(hash_key)
+                    image_file_name = '{0}.png'.format(hash_generator
+                                                       .hexdigest())
+                    image_path = os.path.join(os.path.dirname(self.logfile),
+                                              'assets', image_file_name)
+                    if not os.path.exists(os.path.dirname(image_path)):
+                        os.makedirs(os.path.dirname(image_path))
+
+                    href = '{0}/{1}'.format('assets', image_file_name)
+                    image_src = href
+
+                    with open(image_path, 'w') as f:
+                        content = extra.get('content')
+                        if PY3:
+                            content = bytearray(extra.get('content'), 'utf-8')
+                        f.write(str(b64decode(content)))
+
+                self.additional_html.append(html.div(
+                    html.a(html.img(src=image_src), href=href),
                     class_='image'))
 
             elif extra.get('format') == extras.FORMAT_HTML:
-                additional_html.append(html.div(raw(extra.get('content'))))
+                self.additional_html.append(html.div(
+                                            raw(extra.get('content'))))
 
             elif extra.get('format') == extras.FORMAT_JSON:
                 href = data_uri(json.dumps(extra.get('content')),
@@ -151,12 +180,12 @@ class HTMLReport(object):
                 href = extra.get('content')
 
             if href is not None:
-                links_html.append(html.a(
+                self.links_html.append(html.a(
                     extra.get('name'),
                     class_=extra.get('format'),
                     href=href,
                     target='_blank'))
-                links_html.append(' ')
+                self.links_html.append(' ')
 
         def append_log_html(self, report, additional_html):
             log = html.div(class_='log')
@@ -187,7 +216,8 @@ class HTMLReport(object):
             additional_html.append(log)
 
     def _appendrow(self, outcome, report):
-        result = self.TestResult(outcome, report)
+        result = self.TestResult(outcome, report, self.self_contained,
+                                 self.logfile)
         index = bisect.bisect_right(self.results, result)
         self.results.insert(index, result)
         self.test_logs.insert(index, html.tbody(result.row_table,
@@ -235,9 +265,10 @@ class HTMLReport(object):
         if PY3:
             self.style_css = self.style_css.decode('utf-8')
 
-        html_css = html.link(href='style.css', rel='stylesheet',
+        css_href = '{0}/{1}'.format('assets', 'style.css')
+        html_css = html.link(href=css_href, rel='stylesheet',
                              type='text/css')
-        if session.config.getoption('self_contained_html'):
+        if self.self_contained:
             html_css = html.style(raw(self.style_css))
 
         head = html.head(
@@ -344,14 +375,19 @@ class HTMLReport(object):
             unicode_doc = unicode_doc.decode('utf-8')
         return unicode_doc
 
-    def _save_report(self, report_content, self_contained_html):
+    def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)
+        assets_dir = os.path.join(dir_name, 'assets')
+
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
+        if not self.self_contained and not os.path.exists(assets_dir):
+            os.makedirs(assets_dir)
+
         with open(self.logfile, 'w', encoding='utf-8') as f:
             f.write(report_content)
-        if not self_contained_html:
-            style_path = os.path.join(dir_name, 'style.css')
+        if not self.self_contained:
+            style_path = os.path.join(assets_dir, 'style.css')
             with open(style_path, 'w', encoding='utf-8') as f:
                 f.write(self.style_css)
 
@@ -370,8 +406,7 @@ class HTMLReport(object):
 
     def pytest_sessionfinish(self, session):
         report_content = self._generate_report(session)
-        self_contained_html = session.config.getoption('self_contained_html')
-        self._save_report(report_content, self_contained_html)
+        self._save_report(report_content)
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: {0}'.format(

@@ -57,7 +57,9 @@ def pytest_configure(config):
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
         config._html = HTMLReport(htmlpath,
-                                  config.getoption('self_contained_html'))
+                                  config.getoption('self_contained_html'),
+                                  config.pluginmanager
+                                  .hasplugin('rerunfailures'))
         config.pluginmanager.register(config._html)
     if hasattr(config, 'slaveoutput'):
         config.slaveoutput['environment'] = config._environment
@@ -88,7 +90,7 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
 
 class HTMLReport(object):
 
-    def __init__(self, logfile, self_contained):
+    def __init__(self, logfile, self_contained, has_rerun):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
@@ -96,7 +98,7 @@ class HTMLReport(object):
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
-        self.rerun = 0
+        self.rerun = 0 if has_rerun else None
         self.self_contained = self_contained
 
     class TestResult:
@@ -313,8 +315,10 @@ class HTMLReport(object):
                     Outcome('xfailed', self.xfailed,
                             label='expected failures'),
                     Outcome('xpassed', self.xpassed,
-                            label='unexpected passes'),
-                    Outcome('rerun', self.rerun)]
+                            label='unexpected passes')]
+
+        if self.rerun is not None:
+            outcomes.append(Outcome('rerun', self.rerun))
 
         summary = [html.h2('Summary'), html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(

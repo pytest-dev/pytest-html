@@ -98,9 +98,7 @@ class HTMLReport(object):
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
-        self.has_rerun = has_rerun
-        if self.has_rerun:
-            self.rerun = 0
+        self.rerun = 0 if has_rerun else None
         self.self_contained = self_contained
 
     class TestResult:
@@ -319,7 +317,7 @@ class HTMLReport(object):
                     Outcome('xpassed', self.xpassed,
                             label='unexpected passes')]
 
-        if self.has_rerun:
+        if self.rerun is not None:
             outcomes.append(Outcome('rerun', self.rerun))
 
         summary = [html.h2('Summary'), html.p(

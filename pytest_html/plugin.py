@@ -301,6 +301,8 @@ class HTMLReport(object):
                                            checked='true',
                                            onChange='filter_table(this)',
                                            name='filter_checkbox',
+                                           class_='filter',
+                                           hidden='true',
                                            **checkbox_kwargs)
 
             def generate_summary_item(self):
@@ -323,12 +325,15 @@ class HTMLReport(object):
         summary = [html.h2('Summary'), html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(
                 numtests, suite_time_delta)),
-            html.p('(Un)check the boxes to filter the results.')]
+            html.p('(Un)check the boxes to filter the results.',
+                   class_='filter',
+                   hidden='true')]
 
-        for outcome in outcomes:
+        for i, outcome in enumerate(outcomes, start=1):
             summary.append(outcome.checkbox)
             summary.append(outcome.summary_item)
-            summary.append(' ')
+            if i < len(outcomes):
+                summary.append(', ')
 
         results = [html.h2('Results'), html.table([html.thead(
             html.tr([

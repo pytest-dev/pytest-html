@@ -135,6 +135,29 @@ class HTMLReport(object):
                      'XPassed', 'Skipped', 'Passed')
             return order.index(self.outcome) < order.index(other.outcome)
 
+        def save_external_src(self, extra, extra_index,
+                              test_index, file_extension):
+            hash_key = ''.join([self.test_id, str(extra_index),
+                               str(test_index)]).encode('utf-8')
+            hash_generator = hashlib.md5()
+            hash_generator.update(hash_key)
+            image_file_name = '{0}.{1}'.format(hash_generator.hexdigest(),
+                                               file_extension)
+            image_path = os.path.join(os.path.dirname(self.logfile),
+                                      'assets', image_file_name)
+            if not os.path.exists(os.path.dirname(image_path)):
+                os.makedirs(os.path.dirname(image_path))
+
+            relative_path = '{0}/{1}'.format('assets', image_file_name)
+
+            with open(image_path, 'w') as f:
+                content = extra.get('content')
+                if PY3:
+                    content = bytearray(extra.get('content'), 'utf-8')
+                f.write(str(b64decode(content)))
+            return relative_path
+
+
         def append_extra_html(self, extra, extra_index, test_index):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
@@ -143,26 +166,9 @@ class HTMLReport(object):
                             extra.get('content'))
                     href = '#'
                 else:
-                    hash_key = ''.join([self.test_id, str(extra_index),
-                                       str(test_index)]).encode('utf-8')
-                    hash_generator = hashlib.md5()
-                    hash_generator.update(hash_key)
-                    image_file_name = '{0}.png'.format(hash_generator
-                                                       .hexdigest())
-                    image_path = os.path.join(os.path.dirname(self.logfile),
-                                              'assets', image_file_name)
-                    if not os.path.exists(os.path.dirname(image_path)):
-                        os.makedirs(os.path.dirname(image_path))
-
-                    href = '{0}/{1}'.format('assets', image_file_name)
+                    href = self.save_external_src(extra, extra_index,
+                                                  test_index, 'png')
                     image_src = href
-
-                    with open(image_path, 'w') as f:
-                        content = extra.get('content')
-                        if PY3:
-                            content = bytearray(extra.get('content'), 'utf-8')
-                        f.write(str(b64decode(content)))
-
                 self.additional_html.append(html.div(
                     html.a(html.img(src=image_src), href=href),
                     class_='image'))

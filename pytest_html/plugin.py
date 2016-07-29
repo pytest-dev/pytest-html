@@ -135,7 +135,7 @@ class HTMLReport(object):
                      'XPassed', 'Skipped', 'Passed')
             return order.index(self.outcome) < order.index(other.outcome)
 
-        def save_external_src(self, extra, extra_index,
+        def save_external_src(self, content, extra_index,
                               test_index, file_extension):
             hash_key = ''.join([self.test_id, str(extra_index),
                                str(test_index)]).encode('utf-8')
@@ -151,10 +151,7 @@ class HTMLReport(object):
             relative_path = '{0}/{1}'.format('assets', image_file_name)
 
             with open(image_path, 'w') as f:
-                content = extra.get('content')
-                if PY3:
-                    content = bytearray(extra.get('content'), 'utf-8')
-                f.write(str(b64decode(content)))
+                f.write(content)
             return relative_path
 
 
@@ -166,7 +163,11 @@ class HTMLReport(object):
                             extra.get('content'))
                     href = '#'
                 else:
-                    href = self.save_external_src(extra, extra_index,
+                    content = extra.get('content')
+                    if PY3:
+                        content = bytearray(extra.get('content'), 'utf-8')
+                    content = str(b64decode(content))
+                    href = self.save_external_src(content, extra_index,
                                                   test_index, 'png')
                     image_src = href
                 self.additional_html.append(html.div(
@@ -178,11 +179,20 @@ class HTMLReport(object):
                                             raw(extra.get('content'))))
 
             elif extra.get('format') == extras.FORMAT_JSON:
-                href = data_uri(json.dumps(extra.get('content')),
-                                mime_type='application/json')
+                content = json.dumps(extra.get('content'))
+                if self.self_contained:
+                    href = data_uri(content, mime_type='application/json')
+                else:
+                    href = self.save_external_src(content, extra_index,
+                                                  test_index, 'json')
 
             elif extra.get('format') == extras.FORMAT_TEXT:
-                href = data_uri(extra.get('content'))
+                content = extra.get('content')
+                if self.self_contained:
+                    href = data_uri(content)
+                else:
+                    href = self.save_external_src(content, extra_index,
+                                                  test_index, 'txt')
 
             elif extra.get('format') == extras.FORMAT_URL:
                 href = extra.get('content')

@@ -116,12 +116,6 @@ class TestHTML:
         assert result.ret
         assert_results(html, passed=0, failed=1, rerun=5)
 
-    def test_no_rerun(self, testdir):
-        testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir, 'report.html', '-p', 'no:rerunfailures')
-        assert result.ret == 0
-        assert re.search('data-test-result="rerun"', html) is None
-
     def test_conditional_xfails(self, testdir):
         testdir.makepyfile("""
             import pytest
@@ -250,7 +244,7 @@ class TestHTML:
                     report.extra = [extras.text('{0}')]
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir)
+        result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
         if PY3:
             data = b64encode(content.encode('utf-8')).decode('ascii')
@@ -373,7 +367,7 @@ class TestHTML:
                     report.extra = [extras.json({0})]
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir)
+        result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
         content_str = json.dumps(content)
         if PY3:

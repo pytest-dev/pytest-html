@@ -255,6 +255,31 @@ class TestHTML:
             href)
         assert link in html
 
+    def test_extra_text_separeted(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.text('{0}')]
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+        hash_key = ('test_extra_text_separeted.py::'
+                    'test_pass01').encode('utf-8')
+        hash_generator = hashlib.md5()
+        hash_generator.update(hash_key)
+        href = '{0}/{1}'.format('assets', '{0}.txt'.
+                               format(hash_generator.hexdigest()))
+        link = '<a class="text" href="{0}" target="_blank">Text</a>'.format(
+            href)
+        assert link in html
+
     def test_extra_url(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
@@ -293,7 +318,7 @@ class TestHTML:
         src = 'data:image/png;base64,{0}'.format(content)
         assert '<a href="#"><img src="{0}"/></a>'.format(src) in html
 
-    def test_extra_image_seperated(self, testdir):
+    def test_extra_image_separeted(self, testdir):
         content = b64encode(str(random.random())
                             .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
@@ -308,7 +333,7 @@ class TestHTML:
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        hash_key = ('test_extra_image_seperated.py::'
+        hash_key = ('test_extra_image_separeted.py::'
                     'test_pass01').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
@@ -321,7 +346,7 @@ class TestHTML:
         assert '<a href="{0}"><img src="{0}"/></a>'.format(src) in html
         assert os.path.exists(src)
 
-    def test_extra_image_seperated_rerun(self, testdir):
+    def test_extra_image_separeted_rerun(self, testdir):
         content = b64encode(str(random.random())
                             .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
@@ -342,7 +367,7 @@ class TestHTML:
         result, html = run(testdir)
 
         for i in range(1, 4):
-            hash_key = ('test_extra_image_seperated_rerun.py::'
+            hash_key = ('test_extra_image_separeted_rerun.py::'
                         'test_fail0{0}'.format(i)).encode('utf-8')
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key)

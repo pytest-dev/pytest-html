@@ -135,25 +135,24 @@ class HTMLReport(object):
                      'XPassed', 'Skipped', 'Passed')
             return order.index(self.outcome) < order.index(other.outcome)
 
-        def save_external_src(self, content, extra_index,
-                              test_index, file_extension):
+        def create_asset(self, content, extra_index,
+                         test_index, file_extension):
             hash_key = ''.join([self.test_id, str(extra_index),
                                str(test_index)]).encode('utf-8')
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key)
-            image_file_name = '{0}.{1}'.format(hash_generator.hexdigest(),
+            asset_file_name = '{0}.{1}'.format(hash_generator.hexdigest(),
                                                file_extension)
-            image_path = os.path.join(os.path.dirname(self.logfile),
-                                      'assets', image_file_name)
-            if not os.path.exists(os.path.dirname(image_path)):
-                os.makedirs(os.path.dirname(image_path))
+            asset_path = os.path.join(os.path.dirname(self.logfile),
+                                      'assets', asset_file_name)
+            if not os.path.exists(os.path.dirname(asset_path)):
+                os.makedirs(os.path.dirname(asset_path))
 
-            relative_path = '{0}/{1}'.format('assets', image_file_name)
+            relative_path = '{0}/{1}'.format('assets', asset_file_name)
 
-            with open(image_path, 'w') as f:
+            with open(asset_path, 'w') as f:
                 f.write(content)
             return relative_path
-
 
         def append_extra_html(self, extra, extra_index, test_index):
             href = None
@@ -167,8 +166,8 @@ class HTMLReport(object):
                     if PY3:
                         content = bytearray(extra.get('content'), 'utf-8')
                     content = str(b64decode(content))
-                    href = self.save_external_src(content, extra_index,
-                                                  test_index, 'png')
+                    href = self.create_asset(content, extra_index,
+                                             test_index, 'png')
                     image_src = href
                 self.additional_html.append(html.div(
                     html.a(html.img(src=image_src), href=href),
@@ -183,16 +182,16 @@ class HTMLReport(object):
                 if self.self_contained:
                     href = data_uri(content, mime_type='application/json')
                 else:
-                    href = self.save_external_src(content, extra_index,
-                                                  test_index, 'json')
+                    href = self.create_asset(content, extra_index,
+                                             test_index, 'json')
 
             elif extra.get('format') == extras.FORMAT_TEXT:
                 content = extra.get('content')
                 if self.self_contained:
                     href = data_uri(content)
                 else:
-                    href = self.save_external_src(content, extra_index,
-                                                  test_index, 'txt')
+                    href = self.create_asset(content, extra_index,
+                                             test_index, 'txt')
 
             elif extra.get('format') == extras.FORMAT_URL:
                 href = extra.get('content')

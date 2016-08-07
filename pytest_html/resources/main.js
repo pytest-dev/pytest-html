@@ -97,7 +97,7 @@ function add_collapse() {
         });
     })
 }
-addEventListener("DOMContentLoaded", function() {
+document.onDOMContentLoaded = function() {
     reset_sort_headers();
 
     add_collapse();
@@ -139,7 +139,7 @@ addEventListener("DOMContentLoaded", function() {
                               }, false)
     });
 
-});
+};
 
 function sort_table(clicked, key_func) {
     var rows = find_all('.results-table-row');

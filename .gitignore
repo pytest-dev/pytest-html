@@ -24,3 +24,6 @@ local.properties
 
 ### YouCompleteMe - VIM plugin
 .ycm_extra_conf.py
+
+##Tests JS
+node_modules/

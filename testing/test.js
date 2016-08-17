@@ -34,7 +34,7 @@ function create_elem_table() {
 
   //Failed row
   var tbody_failed = document.createElement('tbody');
-  tbody.className = 'failed results-table-row';
+  tbody_failed.className = 'failed results-table-row';
   //columns
   var failed_row = tbody_failed.insertRow(0);
   var col_result_failed = failed_row.insertCell(0);

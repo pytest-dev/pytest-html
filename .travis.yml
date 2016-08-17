@@ -1,29 +1,5 @@
-language:
-  - python
-  - nodejs
-python:
-  - 2.6
-  - 2.7
-  - 3.3
-  - 3.4
-  - 3.5
-  - pypy
-  - pypy3
-  - nightly
+language: node_js
 node_js:
-  - 0.10
-env:
-  - TOXENV=pytest28
-  - TOXENV=pytest29
-matrix:
-  include:
-    - python: 2.7
-      env: TOXENV=flake8
-    - python: 3.5
-      env: TOXENV=flake8
-install:
-  - pip install tox-travis
+  - "0.10"
 before_script:
-  - npm install -g grunt-cli
-script:
-  - tox
+  - npm install grunt-cli -g

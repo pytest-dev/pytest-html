@@ -3,7 +3,7 @@
   "version": "1.10.0",
   "license": "MPL-2.0",
   "devDependencies": {
-    "grunt": "~0.4.5",
+    "grunt": "^0.4.5",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-qunit": "^1.2.0",
@@ -15,5 +15,14 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/pytest-dev/pytest-html.git"
+  },
+  "description": "pytest-html ===========",
+  "bugs": {
+    "url": "https://github.com/pytest-dev/pytest-html/issues"
+  },
+  "homepage": "https://github.com/pytest-dev/pytest-html#readme",
+  "main": "Gruntfile.js",
+  "dependencies": {
+    "grunt-contrib-qunit": "^1.2.0"
   }
 }

@@ -20,12 +20,12 @@ function create_elem_table() {
   result.innerHTML = '<div class="sort-icon">vvv</div> Result';
   //test column
   var test = head_row.insertCell(1);
-  test.className = 'sortable asc active';
+  test.className = 'sortable test asc inactive';
   test.setAttribute('col', 'name');
   test.innerHTML = '<div class="sort-icon">vvv</div> Test';
   //duration column
   var duration = head_row.insertCell(2);
-  duration.className = 'sortable numeric asc active';
+  duration.className = 'sortable numeric asc inactive';
   duration.setAttribute('col', 'duration');
   duration.innerHTML = '<div class="sort-icon">vvv</div> Duration';
   //Links
@@ -56,7 +56,12 @@ function create_elem_table() {
 
   table.appendChild(thead);
   table.appendChild(tbody_failed);
-  return table;
+
+  var html = document.createElement('html');
+  var body = document.createElement('body');
+  body.appendChild(table);
+  html.appendChild(body);
+  return html;
 }
 
 QUnit.test( 'toArray', function(assert) {
@@ -70,9 +75,31 @@ QUnit.test('find', function (assert) {
   assert.ok(find('thead', table).innerText ===
             'vvv Resultvvv Testvvv DurationLinks');
   assert.ok(find('.sort-icon', table).innerHTML === 'vvv');
+  assert.ok(find('#results-table-head', table) != null);
+  assert.ok(find('#results-table', table) != null);
+  assert.ok(find('.not-in-table', table) === null);
 });
 
 QUnit.test('find_all', function(assert) {
   var table = create_elem_table();
   assert.ok(find_all('.sort-icon', table).length === 3);
+  assert.ok(find_all('.not-in-table', table).length === 0);
+});
+
+QUnit.test('toggle_sort_states', function(assert){
+  var table = create_elem_table();
+  var row_numeric = find('.numeric', table);
+  assert.ok(row_numeric.className === 'sortable numeric asc inactive');
+  toggle_sort_states(row_numeric);
+  assert.ok(row_numeric.className === 'sortable numeric asc active');
+  toggle_sort_states(row_numeric);
+  assert.ok(row_numeric.className === 'sortable numeric active desc');
+});
+
+QUnit.test('sort_column_numeric', function(assert){
+  var table = create_elem_table();
+  setDocument(table);
+  row_numeric = find('.numeric', table);
+  sort_column(row_numeric);
+  assert.ok(0 == 0);
 });

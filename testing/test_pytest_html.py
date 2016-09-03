@@ -250,7 +250,7 @@ class TestHTML:
                     report.extra = [extras.text('{0}')]
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir)
+        result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
         if PY3:
             data = b64encode(content.encode('utf-8')).decode('ascii')
@@ -258,6 +258,31 @@ class TestHTML:
             data = b64encode(content)
         href = 'data:text/plain;charset=utf-8;base64,{0}'.format(data)
         link = '<a class="text" href="{0}" target="_blank">Text</a>'.format(
+            href)
+        assert link in html
+
+    def test_extra_json(self, testdir):
+        content = {str(random.random()): str(random.random())}
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.json({0})]
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir, 'report.html', '--self-contained-html')
+        assert result.ret == 0
+        content_str = json.dumps(content)
+        if PY3:
+            data = b64encode(content_str.encode('utf-8')).decode('ascii')
+        else:
+            data = b64encode(content_str)
+        href = 'data:application/json;charset=utf-8;base64,{0}'.format(data)
+        link = '<a class="json" href="{0}" target="_blank">JSON</a>'.format(
             href)
         assert link in html
 
@@ -299,7 +324,11 @@ class TestHTML:
         src = 'data:image/png;base64,{0}'.format(content)
         assert '<a href="#"><img src="{0}"/></a>'.format(src) in html
 
-    def test_extra_image_seperated(self, testdir):
+    @pytest.mark.parametrize('file_extension,file_type',
+                             [('png', 'image'),
+                              ('json', 'json'),
+                              ('txt', 'text')])
+    def test_extra_separated(self, testdir, file_extension, file_type):
         content = b64encode(str(random.random())
                             .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
@@ -310,24 +339,28 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.image('{0}')]
-        """.format(content))
+                    report.extra = [extras.{0}('{1}')]
+        """.format(file_type, content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        hash_key = ('test_extra_image_seperated.py::'
+        hash_key = ('test_extra_separated.py::'
                     'test_pass01').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
         assert result.ret == 0
-        src = '{0}/{1}'.format('assets', '{0}.png'.
-                               format(hash_generator.hexdigest()))
-        a_img = ('<a class="image" href="{0}" '
-                 'target="_blank">Image</a>'.format(src))
-        assert a_img in html
-        assert '<a href="{0}"><img src="{0}"/></a>'.format(src) in html
+        src = '{0}/{1}'.format('assets', '{0}.{1}'.
+                               format(hash_generator.hexdigest(),
+                                      file_extension))
+        link = ('<a class="{0}" href="{1}" '
+                'target="_blank">'.format(file_type, src))
+        assert link in html
         assert os.path.exists(src)
 
-    def test_extra_image_seperated_rerun(self, testdir):
+    @pytest.mark.parametrize('file_extension,file_type',
+                             [('png', 'image'),
+                              ('json', 'json'),
+                              ('txt', 'text')])
+    def test_extra_separated_rerun(self, testdir, file_extension, file_type):
         content = b64encode(str(random.random())
                             .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
@@ -338,8 +371,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.image('{0}')]
-        """.format(content))
+                    report.extra = [extras.{0}('{1}')]
+        """.format(file_type, content))
         testdir.makepyfile("""
             import pytest
             @pytest.mark.flaky(reruns=2)
@@ -348,42 +381,17 @@ class TestHTML:
         result, html = run(testdir)
 
         for i in range(1, 4):
-            hash_key = ('test_extra_image_seperated_rerun.py::'
+            hash_key = ('test_extra_separated_rerun.py::'
                         'test_fail0{0}'.format(i)).encode('utf-8')
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key)
-            src = 'assets/{0}.png'.format(hash_generator.hexdigest())
-            a_img = ('<a class="image" href="{0}" '
-                     'target="_blank">Image</a>'.format(src))
+            src = 'assets/{0}.{1}'.format(hash_generator.hexdigest(),
+                                          file_extension)
+            link = ('<a class="{0}" href="{1}" '
+                    'target="_blank">'.format(file_type, src))
             assert result.ret
-            assert a_img in html
-            assert ('<a href="{0}"><img src="{0}"/></a>').format(src) in html
+            assert link in html
             assert os.path.exists(src)
-
-    def test_extra_json(self, testdir):
-        content = {str(random.random()): str(random.random())}
-        testdir.makeconftest("""
-            import pytest
-            @pytest.mark.hookwrapper
-            def pytest_runtest_makereport(item, call):
-                outcome = yield
-                report = outcome.get_result()
-                if report.when == 'call':
-                    from pytest_html import extras
-                    report.extra = [extras.json({0})]
-        """.format(content))
-        testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir)
-        assert result.ret == 0
-        content_str = json.dumps(content)
-        if PY3:
-            data = b64encode(content_str.encode('utf-8')).decode('ascii')
-        else:
-            data = b64encode(content_str)
-        href = 'data:application/json;charset=utf-8;base64,{0}'.format(data)
-        link = '<a class="json" href="{0}" target="_blank">JSON</a>'.format(
-            href)
-        assert link in html
 
     def test_no_environment(self, testdir):
         testdir.makeconftest("""

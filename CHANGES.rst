@@ -1,6 +1,16 @@
 Release Notes
 -------------
 
+**1.10.0 (2016-08-09)**
+
+* Hide filter checkboxes when JavaScript is disabled
+* Removed rerun outcome unless the plugin is active
+* Introduce ``--self-contained-html`` option to store CSS and assets inline
+* Save images, text, and JSON extras as files in an assets directory
+* Use an external CSS file
+* Set initial sort order in the HTML
+* Allow visibility of extra details to be toggled
+
 **1.9.0 (2016-07-04)**
 
 * Split pytest_sessionfinish into generate and save methods

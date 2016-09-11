@@ -475,3 +475,19 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert_results(html, passed=1)
+
+    def test_ansi_color(self, testdir):
+        pass_content = ["<span class=\"ansi31\">RCOLOR",
+                        "<span class=\"ansi32\">GCOLOR",
+                        "<span class=\"ansi33\">YCOLOR"]
+        testdir.makepyfile(r"""
+            def test_ansi():
+                colors = ['\033[31mRCOLOR\033[0m', '\033[32mGCOLOR\033[0m',
+                          '\033[33mYCOLOR\033[0m']
+                for color in colors:
+                    print(color)
+        """)
+        result, html = run(testdir, 'report.html', '--self-contained-html')
+        assert result.ret == 0
+        for content in pass_content:
+            assert content in html

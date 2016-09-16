@@ -2,13 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//created to increase testability
-var  DOCUMENT = document;
-
-function setDocument(elem) {
-  DOCUMENT = elem;
-}
-
 function toArray(iter) {
     if (iter === null) {
         return null;
@@ -18,82 +11,16 @@ function toArray(iter) {
 
 function find(selector, elem) {
     if (!elem) {
-        elem = DOCUMENT;
+        elem = document;
     }
     return elem.querySelector(selector);
 }
 
 function find_all(selector, elem) {
     if (!elem) {
-        elem = DOCUMENT;
+        elem = document;
     }
     return toArray(elem.querySelectorAll(selector));
-}
-
-function reset_sort_headers() {
-    //there isn't Unit Tests for this function
-    find_all('.sort-icon').forEach(function(elem) {
-        elem.parentNode.removeChild(elem);
-    });
-    find_all('.sortable').forEach(function(elem) {
-        var icon = document.createElement("div");
-        icon.className = "sort-icon";
-        icon.textContent = "vvv";
-        elem.insertBefore(icon, elem.firstChild);
-        elem.classList.remove("desc", "active");
-        elem.classList.add("asc", "inactive");
-    });
-}
-
-function toggle_sort_states(elem) {
-    //if active, toggle between asc and desc
-    if (elem.classList.contains('active')) {
-        elem.classList.toggle('asc');
-        elem.classList.toggle('desc');
-    }
-
-    //if inactive, reset all other functions and add ascending active
-    if (elem.classList.contains('inactive')) {
-      elem.classList.remove('inactive');
-      elem.classList.add('active');
-      reset_sort_headers();
-    }
-}
-
-function sort(items, key_func, reversed) {
-    var sort_array = items.map(function(item, i) {
-        return [key_func(item), i];
-    });
-    var multiplier = reversed ? -1 : 1;
-
-    sort_array.sort(function(a, b) {
-        var key_a = a[0];
-        var key_b = b[0];
-        return multiplier * (key_a >= key_b ? 1 : -1);
-    });
-
-    return sort_array.map(function(item) {
-        var index = item[1];
-        return items[index];
-    });
-}
-
-function sort_table(clicked, key_func) {
-    var rows = find_all('.results-table-row');
-    var reversed = !clicked.classList.contains('asc');
-    var sorted_rows = sort(rows, key_func, reversed);
-    /* Whole table is removed here because browsers acts much slower
-     * when appending existing elements.
-     */
-    var thead = find("#results-table-head", DOCUMENT);
-    find('#results-table', DOCUMENT).remove();
-    var parent = document.createElement("table");
-    parent.id = "results-table";
-    parent.appendChild(thead);
-    sorted_rows.forEach(function(elem) {
-        parent.appendChild(elem);
-    });
-    find('body', DOCUMENT).appendChild(parent);
 }
 
 function sort_column(elem) {
@@ -135,7 +62,7 @@ function hide_extras(colresult_elem) {
 }
 
 function show_filters() {
-    var filter_items = DOCUMENT.getElementsByClassName('filter');
+    var filter_items = document.getElementsByClassName('filter');
     for (var i = 0; i < filter_items.length; i++)
         filter_items[i].hidden = false;
 }
@@ -143,7 +70,7 @@ function show_filters() {
 function add_collapse() {
     // Add links for show/hide all
     var resulttable = find('table#results-table');
-    var showhideall = DOCUMENT.createElement("p");
+    var showhideall = document.createElement("p");
     showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
                             '<a href="javascript:hide_all_extras()">Hide all details</a>';
     resulttable.parentElement.insertBefore(showhideall, resulttable);
@@ -151,7 +78,7 @@ function add_collapse() {
     // Add show/hide link to each result
     find_all('.col-result').forEach(function(elem) {
         var extras = elem.parentNode.nextElementSibling;
-        var expandcollapse = DOCUMENT.createElement("span");
+        var expandcollapse = document.createElement("span");
         if (elem.innerHTML === 'Passed') {
             extras.classList.add("collapsed");
             expandcollapse.classList.add("expander");
@@ -169,6 +96,7 @@ function add_collapse() {
         });
     })
 }
+
 document.onDOMContentLoaded = function() {
     reset_sort_headers();
 
@@ -213,6 +141,42 @@ document.onDOMContentLoaded = function() {
 
 };
 
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = find("#results-table-head", document);
+    find('#results-table', document).remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    find('body', document).appendChild(parent);
+}
+
 function key_alpha(col_index) {
     return function(elem) {
         return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
@@ -233,6 +197,36 @@ function key_result(col_index) {
     };
 }
 
+function reset_sort_headers() {
+    //there isn't Unit Tests for this function
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+      elem.classList.remove('inactive');
+      elem.classList.add('active');
+      reset_sort_headers();
+    }
+}
+
 function is_all_rows_hidden(value) {
   return value.hidden == false;
 }
@@ -241,7 +235,7 @@ function filter_table(elem) {
     var outcome_att = "data-test-result";
     var outcome = elem.getAttribute(outcome_att);
     class_outcome = outcome + " results-table-row";
-    var outcome_rows = DOCUMENT.getElementsByClassName(class_outcome);
+    var outcome_rows = document.getElementsByClassName(class_outcome);
 
     for(var i = 0; i < outcome_rows.length; i++){
         outcome_rows[i].hidden = !elem.checked;
@@ -249,6 +243,6 @@ function filter_table(elem) {
 
     var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
     var all_rows_hidden = rows.length == 0 ? true : false;
-    var not_found_message = DOCUMENT.getElementById("not-found-message");
+    var not_found_message = document.getElementById("not-found-message");
     not_found_message.hidden = !all_rows_hidden;
 }

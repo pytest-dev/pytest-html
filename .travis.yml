@@ -20,9 +20,5 @@ matrix:
       env: TOXENV=flake8
 install:
   - pip install tox-travis
-  - npm install -g grunt-cli
-  - npm install grunt
-  - npm install grunt-contrib-qunit
 script:
   - tox
-  - grunt test

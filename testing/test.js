@@ -95,11 +95,3 @@ QUnit.test('toggle_sort_states', function(assert){
   toggle_sort_states(row_numeric);
   assert.ok(row_numeric.className === 'sortable numeric active desc');
 });
-
-QUnit.test('sort_column_numeric', function(assert){
-  var table = create_elem_table();
-  setDocument(table);
-  row_numeric = find('.numeric', table);
-  sort_column(row_numeric);
-  assert.ok(0 == 0);
-});

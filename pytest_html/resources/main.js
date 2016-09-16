@@ -177,24 +177,6 @@ function sort(items, key_func, reversed) {
     });
 }
 
-function sort_table(clicked, key_func) {
-    var rows = find_all('.results-table-row');
-    var reversed = !clicked.classList.contains('asc');
-    var sorted_rows = sort(rows, key_func, reversed);
-    /* Whole table is removed here because browsers acts much slower
-     * when appending existing elements.
-     */
-    var thead = find("#results-table-head", document);
-    find('#results-table', document).remove();
-    var parent = document.createElement("table");
-    parent.id = "results-table";
-    parent.appendChild(thead);
-    sorted_rows.forEach(function(elem) {
-        parent.appendChild(elem);
-    });
-    find('body', document).appendChild(parent);
-}
-
 function key_alpha(col_index) {
     return function(elem) {
         return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();

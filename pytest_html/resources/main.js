@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+
 function toArray(iter) {
     if (iter === null) {
         return null;
@@ -97,7 +98,7 @@ function add_collapse() {
     })
 }
 
-document.onDOMContentLoaded = function() {
+function init () {
     reset_sort_headers();
 
     add_collapse();
@@ -198,7 +199,6 @@ function key_result(col_index) {
 }
 
 function reset_sort_headers() {
-    //there isn't Unit Tests for this function
     find_all('.sort-icon').forEach(function(elem) {
         elem.parentNode.removeChild(elem);
     });
@@ -221,9 +221,9 @@ function toggle_sort_states(elem) {
 
     //if inactive, reset all other functions and add ascending active
     if (elem.classList.contains('inactive')) {
-      elem.classList.remove('inactive');
-      elem.classList.add('active');
-      reset_sort_headers();
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
     }
 }
 

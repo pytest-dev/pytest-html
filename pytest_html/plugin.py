@@ -377,7 +377,7 @@ class HTMLReport(object):
             html.p('Report generated on {0} at {1}'.format(
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S'))),
-            onLoad = 'init()')
+            onLoad='init()')
 
         if session.config._environment:
             environment = set(session.config._environment)

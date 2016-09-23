@@ -136,7 +136,7 @@ class HTMLReport(object):
             return order.index(self.outcome) < order.index(other.outcome)
 
         def create_asset(self, content, extra_index,
-                         test_index, file_extension):
+                         test_index, file_extension, mode='w'):
             hash_key = ''.join([self.test_id, str(extra_index),
                                str(test_index)]).encode('utf-8')
             hash_generator = hashlib.md5()
@@ -150,7 +150,7 @@ class HTMLReport(object):
 
             relative_path = '{0}/{1}'.format('assets', asset_file_name)
 
-            with open(asset_path, 'w') as f:
+            with open(asset_path, mode) as f:
                 f.write(content)
             return relative_path
 
@@ -162,12 +162,9 @@ class HTMLReport(object):
                             extra.get('content'))
                     href = '#'
                 else:
-                    content = extra.get('content')
-                    if PY3:
-                        content = bytearray(extra.get('content'), 'utf-8')
-                    content = str(b64decode(content))
+                    content = b64decode(extra.get('content'))
                     href = self.create_asset(content, extra_index,
-                                             test_index, 'png')
+                                             test_index, 'png', 'wb')
                     image_src = href
                 self.additional_html.append(html.div(
                     html.a(html.img(src=image_src), href=href),

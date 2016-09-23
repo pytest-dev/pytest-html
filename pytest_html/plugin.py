@@ -240,12 +240,17 @@ class HTMLReport(object):
 
     def append_passed(self, report):
         if report.when == 'call':
-            self.passed += 1
-            self._appendrow('Passed', report)
+            if hasattr(report, "wasxfail"):
+                self.xpassed += 1
+                self._appendrow('XPassed', report)
+            else:
+                self.passed += 1
+                self._appendrow('Passed', report)
 
     def append_failed(self, report):
         if report.when == "call":
             if hasattr(report, "wasxfail"):
+                # pytest < 3.0 marked xpasses as failures
                 self.xpassed += 1
                 self._appendrow('XPassed', report)
             else:

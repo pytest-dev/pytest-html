@@ -1,23 +1,34 @@
 language: python
 python:
-  - 2.6
-  - 2.7
-  - 3.3
-  - 3.4
-  - 3.5
-  - pypy
-  - pypy3
-  - nightly
+- 2.6
+- 2.7
+- 3.3
+- 3.4
+- 3.5
+- pypy
+- pypy3
+- nightly
 env:
-  - TOXENV=pytest29
-  - TOXENV=pytest30
+- TOXENV=pytest29
+- TOXENV=pytest30
 matrix:
   include:
-    - python: 2.7
-      env: TOXENV=flake8
-    - python: 3.5
-      env: TOXENV=flake8
+  - python: 2.7
+    env: TOXENV=flake8
+  - python: 3.5
+    env: TOXENV=flake8
 install:
-  - pip install tox-travis
+- pip install tox-travis
 script:
-  - tox
+- tox
+deploy:
+  provider: pypi
+  user: davehunt
+  password:
+    secure: QTNaSfTEZnCEINpCfzdOiOPZ1s6co9Fz2cEt5zv/dSZAJCiKNZvvbMzsOsRMQl1MJvp+cSHiuOir46vEGxzh2+FIl+RRSlENqF2G7jGJpfJfukBxYAhSvt9ZLT4UyBbgYz5sv9A4zs+Yo72xAS9eP+zf5bDVaQh0EzudUbb0Mv4=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    repo: pytest-dev/pytest-html
+    python: 3.5
+    condition: "$TOXENV = pytest30"

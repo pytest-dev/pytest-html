@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pytest-html',
-      version='1.10.0',
+      use_scm_version=True,
       description='pytest plugin for generating HTML reports',
       long_description=open('README.rst').read(),
       author='Dave Hunt',
@@ -10,6 +10,7 @@ setup(name='pytest-html',
       packages=['pytest_html'],
       package_data={'pytest_html': ['resources/*']},
       entry_points={'pytest11': ['html = pytest_html.plugin']},
+      setup_requires=['setuptools_scm'],
       install_requires=['pytest>=2.3'],
       license='Mozilla Public License 2.0 (MPL 2.0)',
       keywords='py.test pytest html report',

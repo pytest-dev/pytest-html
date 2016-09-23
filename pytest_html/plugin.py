@@ -163,7 +163,11 @@ class HTMLReport(object):
                     self.additional_html.append(html.div(
                         html.img(src=src), class_='image'))
                 else:
-                    content = b64decode(extra.get('content'))
+                    content = extra.get('content')
+                    if PY3:
+                        content = b64decode(content.encode('utf-8'))
+                    else:
+                        content = b64decode(content)
                     href = src = self.create_asset(
                         content, extra_index, test_index, 'png', 'wb')
                     self.additional_html.append(html.div(

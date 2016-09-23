@@ -9,8 +9,8 @@ python:
   - pypy3
   - nightly
 env:
-  - TOXENV=pytest28
   - TOXENV=pytest29
+  - TOXENV=pytest30
 matrix:
   include:
     - python: 2.7

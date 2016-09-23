@@ -1,6 +1,11 @@
 Release Notes
 -------------
 
+**1.10.1 (2016-09-23)**
+
+* Fix corrupt image asset files
+* Remove image links from self-contained report
+
 **1.10.0 (2016-08-09)**
 
 * Hide filter checkboxes when JavaScript is disabled

@@ -10,24 +10,28 @@
 
  QUnit.test('sort_column', function(assert){
    function sort_column_test(parameter, first_element_then, first_element_now) {
-    assert.ok(find_all('.results-table-row')[0].className
-                        .includes(first_element_then));
+     assert.ok(find_all('.results-table-row')[0].className == first_element_then);
      var row_sort = find(parameter);
      sort_column(row_sort);
-     assert.ok(find_all('.results-table-row')[0].className
-                         .includes(first_element_now));
+     assert.ok(find_all('.results-table-row')[0].className == first_element_now);
    }
    //result
-   sort_column_test('[col=result]', 'rerun', 'passed');
-   sort_column_test('[col=result]', 'passed', 'rerun');
+   sort_column_test('[col=result]',
+                    'rerun results-table-row', 'passed results-table-row');
+   sort_column_test('[col=result]',
+                    'passed results-table-row', 'rerun results-table-row');
 
    //name
-   sort_column_test('[col=name]', 'rerun', 'passed');
-   sort_column_test('[col=name]', 'passed', 'rerun');
+   sort_column_test('[col=name]',
+                    'rerun results-table-row', 'passed results-table-row');
+   sort_column_test('[col=name]',
+                    'passed results-table-row', 'rerun results-table-row');
 
    //numeric
-   sort_column_test('[col=duration]', 'rerun', 'passed');
-   sort_column_test('[col=duration]', 'passed', 'rerun');
+   sort_column_test('[col=duration]',
+                    'rerun results-table-row', 'passed results-table-row');
+   sort_column_test('[col=duration]',
+                    'passed results-table-row', 'rerun results-table-row');
  });
 
 QUnit.test('find', function (assert) {

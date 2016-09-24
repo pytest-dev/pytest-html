@@ -136,7 +136,7 @@ class HTMLReport(object):
             return order.index(self.outcome) < order.index(other.outcome)
 
         def create_asset(self, content, extra_index,
-                         test_index, file_extension):
+                         test_index, file_extension, mode='w'):
             hash_key = ''.join([self.test_id, str(extra_index),
                                str(test_index)]).encode('utf-8')
             hash_generator = hashlib.md5()
@@ -150,7 +150,7 @@ class HTMLReport(object):
 
             relative_path = '{0}/{1}'.format('assets', asset_file_name)
 
-            with open(asset_path, 'w') as f:
+            with open(asset_path, mode) as f:
                 f.write(content)
             return relative_path
 
@@ -158,20 +158,21 @@ class HTMLReport(object):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
                 if self.self_contained:
-                    image_src = 'data:image/png;base64,{0}'.format(
+                    src = 'data:image/png;base64,{0}'.format(
                             extra.get('content'))
-                    href = '#'
+                    self.additional_html.append(html.div(
+                        html.img(src=src), class_='image'))
                 else:
                     content = extra.get('content')
                     if PY3:
-                        content = bytearray(extra.get('content'), 'utf-8')
-                    content = str(b64decode(content))
-                    href = self.create_asset(content, extra_index,
-                                             test_index, 'png')
-                    image_src = href
-                self.additional_html.append(html.div(
-                    html.a(html.img(src=image_src), href=href),
-                    class_='image'))
+                        content = b64decode(content.encode('utf-8'))
+                    else:
+                        content = b64decode(content)
+                    href = src = self.create_asset(
+                        content, extra_index, test_index, 'png', 'wb')
+                    self.additional_html.append(html.div(
+                        html.a(html.img(src=src), href=href),
+                        class_='image'))
 
             elif extra.get('format') == extras.FORMAT_HTML:
                 self.additional_html.append(html.div(
@@ -243,12 +244,17 @@ class HTMLReport(object):
 
     def append_passed(self, report):
         if report.when == 'call':
-            self.passed += 1
-            self._appendrow('Passed', report)
+            if hasattr(report, "wasxfail"):
+                self.xpassed += 1
+                self._appendrow('XPassed', report)
+            else:
+                self.passed += 1
+                self._appendrow('Passed', report)
 
     def append_failed(self, report):
         if report.when == "call":
             if hasattr(report, "wasxfail"):
+                # pytest < 3.0 marked xpasses as failures
                 self.xpassed += 1
                 self._appendrow('XPassed', report)
             else:

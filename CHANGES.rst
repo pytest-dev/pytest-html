@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**1.10.1 (2016-09-23)**
+
+* Fix corrupt image asset files
+* Remove image links from self-contained report
+* Fix issue with unexpected passes not being reported in pytest 3.0
+
 **1.10.0 (2016-08-09)**
 
 * Hide filter checkboxes when JavaScript is disabled

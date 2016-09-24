@@ -320,9 +320,8 @@ class TestHTML:
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
-        assert '<a class="image" href="#" target="_blank">Image</a>' in html
         src = 'data:image/png;base64,{0}'.format(content)
-        assert '<a href="#"><img src="{0}"/></a>'.format(src) in html
+        assert '<img src="{0}"/>'.format(src) in html
 
     @pytest.mark.parametrize('file_extension,file_type',
                              [('png', 'image'),

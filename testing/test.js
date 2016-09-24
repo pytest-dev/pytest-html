@@ -2,96 +2,41 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//Mocks
-function NodeList() {}
+ QUnit.module( "module", {
+   beforeEach: function( assert ) {
+      init();
+    }
+  });
 
-function create_elem_table() {
-  var table = document.createElement('table');
-  table.id = 'results-table'
+ QUnit.test('sort_column', function(assert){
+   function sort_column_test(parameter, first_element_then, first_element_now) {
+    assert.ok(find_all('.results-table-row')[0].className
+                        .includes(first_element_then));
+     var row_sort = find(parameter);
+     sort_column(row_sort);
+     assert.ok(find_all('.results-table-row')[0].className
+                         .includes(first_element_now));
+   }
+   //result
+   sort_column_test('[col=result]', 'rerun', 'passed');
+   sort_column_test('[col=result]', 'passed', 'rerun');
 
-  //head
-  var thead = table.createTHead();
-  thead.id = 'results-table-head'
-  var head_row = thead.insertRow(0);
-  //result column
-  var result = head_row.insertCell(0);
-  result.className = 'sortable initial-sort result asc active';
-  result.setAttribute('col', 'result');
-  result.innerHTML = '<div class="sort-icon">vvv</div> Result';
-  //test column
-  var test = head_row.insertCell(1);
-  test.className = 'sortable test asc inactive';
-  test.setAttribute('col', 'name');
-  test.innerHTML = '<div class="sort-icon">vvv</div> Test';
-  //duration column
-  var duration = head_row.insertCell(2);
-  duration.className = 'sortable numeric asc inactive';
-  duration.setAttribute('col', 'duration');
-  duration.innerHTML = '<div class="sort-icon">vvv</div> Duration';
-  //Links
-  var links = head_row.insertCell(3);
-  links.innerHTML = "Links";
+   //name
+   sort_column_test('[col=name]', 'rerun', 'passed');
+   sort_column_test('[col=name]', 'passed', 'rerun');
 
-  //Failed row
-  var tbody_failed = document.createElement('tbody');
-  tbody_failed.className = 'failed results-table-row';
-  //columns
-  var failed_row = tbody_failed.insertRow(0);
-  var col_result_failed = failed_row.insertCell(0);
-  col_result_failed.className = 'col-result';
-  col_result_failed.innerHTML = 'Failed';
-  var col_name_failed = failed_row.insertCell(1);
-  col_name_failed.className = 'col-name';
-  col_name_failed.innerHTML = 'test_documentation.py::test_fail';
-  var col_duration_failed = failed_row.insertCell(2);
-  col_duration_failed.className = 'col-duration';
-  col_duration_failed.innerHTML = '0.00';
-  var col_links_failed = failed_row.insertCell(3);
-  col_links_failed.className = 'col-links';
-  // extra and log
-  var row_extra_failed = tbody_failed.insertRow(0);
-  var col_extra_failed = row_extra_failed.insertCell(0);
-  col_extra_failed.className = 'extra';
-  col_extra_failed.innerHTML = '<div class="log"></div>';
-
-  table.appendChild(thead);
-  table.appendChild(tbody_failed);
-
-  var html = document.createElement('html');
-  var body = document.createElement('body');
-  body.appendChild(table);
-  html.appendChild(body);
-  return html;
-}
-
-QUnit.test( 'toArray', function(assert) {
-  var nodeList = new NodeList();
-  assert.ok(toArray(nodeList) instanceof Array);
-  assert.ok(toArray(null) === null);
-});
+   //numeric
+   sort_column_test('[col=duration]', 'rerun', 'passed');
+   sort_column_test('[col=duration]', 'passed', 'rerun');
+ });
 
 QUnit.test('find', function (assert) {
-  var table = create_elem_table();
-  assert.ok(find('thead', table).innerText ===
-            'vvv Resultvvv Testvvv DurationLinks');
-  assert.ok(find('.sort-icon', table).innerHTML === 'vvv');
-  assert.ok(find('#results-table-head', table) != null);
-  assert.ok(find('#results-table', table) != null);
-  assert.ok(find('.not-in-table', table) === null);
+  assert.ok(find('#results-table-head') != null);
+  assert.ok(find('table#results-table') != null);
+  assert.ok(find('.not-in-table') === null);
 });
 
 QUnit.test('find_all', function(assert) {
-  var table = create_elem_table();
-  assert.ok(find_all('.sort-icon', table).length === 3);
-  assert.ok(find_all('.not-in-table', table).length === 0);
-});
-
-QUnit.test('toggle_sort_states', function(assert){
-  var table = create_elem_table();
-  var row_numeric = find('.numeric', table);
-  assert.ok(row_numeric.className === 'sortable numeric asc inactive');
-  toggle_sort_states(row_numeric);
-  assert.ok(row_numeric.className === 'sortable numeric asc active');
-  toggle_sort_states(row_numeric);
-  assert.ok(row_numeric.className === 'sortable numeric active desc');
+  assert.ok(find_all('.sortable').length === 3);
+  assert.ok(find_all('.not-in-table').length === 0);
 });

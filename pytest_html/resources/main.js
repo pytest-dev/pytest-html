@@ -27,6 +27,7 @@ function find_all(selector, elem) {
 function sort_column(elem) {
     toggle_sort_states(elem);
     var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    //console.log(toArray(elem.parentNode.childNodes), elem);
     var key;
     if (elem.classList.contains('numeric')) {
         key = key_num;

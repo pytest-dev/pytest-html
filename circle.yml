@@ -9,3 +9,4 @@ dependencies:
 test:
   override:
     - grunt test
+    - bash <(curl -s https://codecov.io/bash)

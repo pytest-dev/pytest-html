@@ -9,9 +9,9 @@
   });
 
  QUnit.test('sort_column', function(assert){
-   function sort_column_test(parameter, first_element_then, first_element_now) {
+   function sort_column_test(col_re, first_element_then, first_element_now) {
      assert.ok(find_all('.results-table-row')[0].className == first_element_then);
-     var row_sort = find(parameter);
+     var row_sort = find(col_re);
      sort_column(row_sort);
      assert.ok(find_all('.results-table-row')[0].className == first_element_now);
    }
@@ -34,6 +34,13 @@
                     'passed results-table-row', 'rerun results-table-row');
  });
 
+/*QUnit.test('filter_table', function(assert){
+  function filter_table_test(outcome) {
+    assert
+  }
+});*/
+
+QUnit.module('private functions');
 QUnit.test('find', function (assert) {
   assert.ok(find('#results-table-head') != null);
   assert.ok(find('table#results-table') != null);

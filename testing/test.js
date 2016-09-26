@@ -10,10 +10,10 @@
 
  QUnit.test('sort_column', function(assert){
    function sort_column_test(col_re, first_element_then, first_element_now) {
-     assert.ok(find_all('.results-table-row')[0].className == first_element_then);
+     assert.equal(find_all('.results-table-row')[0].className, first_element_then);
      var row_sort = find(col_re);
      sort_column(row_sort);
-     assert.ok(find_all('.results-table-row')[0].className == first_element_now);
+     assert.equal(find_all('.results-table-row')[0].className, first_element_now);
    }
    //result
    sort_column_test('[col=result]',
@@ -34,20 +34,38 @@
                     'passed results-table-row', 'rerun results-table-row');
  });
 
-/*QUnit.test('filter_table', function(assert){
-  function filter_table_test(outcome) {
-    assert
-  }
-});*/
+QUnit.test('filter_table', function(assert){
+  function filter_table_test(outcome, checked) {
+    var filter_input = document.createElement('input');
+    filter_input.setAttribute("data-test-result", outcome);
+    filter_input.checked = checked;
+    filter_table(filter_input);
 
-QUnit.module('private functions');
+    var outcomes = find_all("." + outcome);
+    for(var i = 0; i < outcomes.length; i++) {
+      assert.equal(outcomes[i].hidden, !checked);
+    }
+  }
+  assert.equal(find("#not-found-message").hidden, true);
+
+  filter_table_test("rerun", false);
+  filter_table_test("passed", false);
+  assert.equal(find("#not-found-message").hidden, false);
+
+  filter_table_test("rerun", true);
+  assert.equal(find("#not-found-message").hidden, true);
+
+  filter_table_test("passed", true);
+
+});
+
 QUnit.test('find', function (assert) {
-  assert.ok(find('#results-table-head') != null);
-  assert.ok(find('table#results-table') != null);
-  assert.ok(find('.not-in-table') === null);
+  assert.notEqual(find('#results-table-head'), null);
+  assert.notEqual(find('table#results-table'), null);
+  assert.equal(find('.not-in-table'), null);
 });
 
 QUnit.test('find_all', function(assert) {
-  assert.ok(find_all('.sortable').length === 3);
-  assert.ok(find_all('.not-in-table').length === 0);
+  assert.equal(find_all('.sortable').length, 3);
+  assert.equal(find_all('.not-in-table').length, 0);
 });

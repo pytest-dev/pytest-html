@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- QUnit.module( "module", {
+ QUnit.module( 'module', {
    beforeEach: function( assert ) {
       init();
     }
@@ -37,26 +37,67 @@
 QUnit.test('filter_table', function(assert){
   function filter_table_test(outcome, checked) {
     var filter_input = document.createElement('input');
-    filter_input.setAttribute("data-test-result", outcome);
+    filter_input.setAttribute('data-test-result', outcome);
     filter_input.checked = checked;
     filter_table(filter_input);
 
-    var outcomes = find_all("." + outcome);
+    var outcomes = find_all('.' + outcome);
     for(var i = 0; i < outcomes.length; i++) {
       assert.equal(outcomes[i].hidden, !checked);
     }
   }
-  assert.equal(find("#not-found-message").hidden, true);
+  assert.equal(find('#not-found-message').hidden, true);
 
-  filter_table_test("rerun", false);
-  filter_table_test("passed", false);
-  assert.equal(find("#not-found-message").hidden, false);
+  filter_table_test('rerun', false);
+  filter_table_test('passed', false);
+  assert.equal(find('#not-found-message').hidden, false);
 
-  filter_table_test("rerun", true);
-  assert.equal(find("#not-found-message").hidden, true);
+  filter_table_test('rerun', true);
+  assert.equal(find('#not-found-message').hidden, true);
 
-  filter_table_test("passed", true);
+  filter_table_test('passed', true);
 
+});
+
+QUnit.test('show_hide_extras', function(assert) {
+  function show_extras_test(element){
+    assert.equal(element.parentNode.nextElementSibling.className, 'collapsed');
+    show_extras(element);
+    assert.notEqual(element.parentNode.nextElementSibling.className, 'collapsed');
+  }
+
+  function hide_extras_test(element){
+    assert.notEqual(element.parentNode.nextElementSibling.className, 'collapsed');
+    hide_extras(element);
+    assert.equal(element.parentNode.nextElementSibling.className, 'collapsed');
+  }
+  //Passed results have log collapsed by default
+  show_extras_test(find('.passed').firstElementChild.firstElementChild);
+  hide_extras_test(find('.passed').firstElementChild.firstElementChild);
+
+  hide_extras_test(find('.rerun').firstElementChild.firstElementChild);
+  show_extras_test(find('.rerun').firstElementChild.firstElementChild);
+});
+
+QUnit.test('show_hide_all_extras', function(assert) {
+  function show_all_extras_test(){
+    show_all_extras();
+    var extras = find_all('.extra');
+    for (var i = 0; i < extras.length; i++) {
+      assert.notEqual(extras[i].parentNode.className, 'collapsed');
+    }
+  }
+
+  function hide_all_extras_test(){
+    hide_all_extras();
+    var extras = find_all('.extra');
+    for (var i = 0; i < extras.length; i++) {
+      assert.equal(extras[i].parentNode.className, 'collapsed');
+    }
+  }
+
+  show_all_extras_test();
+  hide_all_extras_test();
 });
 
 QUnit.test('find', function (assert) {

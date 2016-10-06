@@ -20,15 +20,6 @@ HTML report for the test results.
    :target: https://requires.io/github/pytest-dev/pytest-html/requirements/?branch=master
    :alt: Requirements
 
-Outreachy
----------
-
-Mozilla is participating in the `Outreachy <http://www.outreachy.org>`_ program
-helping people from groups underrepresented in free and open source software
-to get involved. For the round running `May 23 to August 23, 2016 <https://wiki.gnome.org/Outreachy/2016/MayAugust>`_,
-there is `a project <https://wiki.mozilla.org/Outreachy#Enhancements_to_Python_testing_tool_plugin_for_generation_of_HTML_reports>`_
-to work on `several enhancements <https://github.com/pytest-dev/pytest-html/labels/outreachy>`_ to pytest-html.
-
 Requirements
 ------------
 

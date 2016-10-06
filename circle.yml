@@ -1,0 +1,11 @@
+## Customize dependencies
+dependencies:
+  override:
+    - npm install -g grunt-cli
+    - npm install grunt
+    - npm install grunt-contrib-qunit
+
+## Customize test commands
+test:
+  override:
+    - grunt test

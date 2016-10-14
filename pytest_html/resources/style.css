@@ -98,6 +98,7 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
 div.image {
 	border: 1px solid #e6e6e6;
 	float: right;
+	clear: right;
 	height: 240px;
 	margin-left: 5px;
 	overflow: hidden;

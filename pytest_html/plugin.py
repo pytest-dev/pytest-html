@@ -140,7 +140,8 @@ class HTMLReport(object):
             # need different hash keys for different images
             if image_index:
                 hash_key = ''.join([self.test_id, str(extra_index),
-                                   str(test_index), str(image_index)]).encode('utf-8')
+                                    str(test_index), str(image_index)]).encode(
+                        'utf-8')
             else:
                 hash_key = ''.join([self.test_id, str(extra_index),
                                    str(test_index)]).encode('utf-8')
@@ -173,11 +174,11 @@ class HTMLReport(object):
                     content = extra.get('content')
                     for image_index, b64_image in enumerate(content):
                         if PY3:
-                            decoded_image = b64decode(b64_image.encode('utf-8'))
+                            decoded = b64decode(b64_image.encode('utf-8'))
                         else:
-                            decoded_image = b64decode(b64_image)
+                            decoded = b64decode(b64_image)
                         single_image_href = src = self.create_asset(
-                            decoded_image, extra_index, test_index, 'png', 'wb',
+                            decoded, extra_index, test_index, 'png', 'wb',
                             image_index=image_index)
                         self.additional_html.append(html.div(
                             html.a(html.img(src=src), href=single_image_href),
@@ -211,11 +212,11 @@ class HTMLReport(object):
                 # for multiple images, extra.get('name') will return a list and
                 # href will be a list, else both of these would be strings
                 if isinstance(href, list):
-                    for single_image_href, name in zip(href, extra.get('name')):
+                    for single_href, name in zip(href, extra.get('name')):
                         self.links_html.append(html.a(
                             name,
                             class_=extra.get('format'),
-                            href=single_image_href,
+                            href=single_href,
                             target='_blank'))
                         self.links_html.append(' ')
                 else:

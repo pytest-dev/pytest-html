@@ -18,6 +18,8 @@ def html(content):
 
 
 def image(content, name='Image'):
+    if isinstance(content, str):
+        content = [content]
     return extra(content, FORMAT_IMAGE, name)
 
 

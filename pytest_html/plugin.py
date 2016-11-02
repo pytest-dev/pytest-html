@@ -15,6 +15,7 @@ import time
 import bisect
 import hashlib
 
+from ansi2html import Ansi2HTMLConverter, style
 import pytest
 from py.xml import html, raw
 
@@ -226,7 +227,9 @@ class HTMLReport(object):
             for header, content in report.sections:
                 log.append(' {0} '.format(header).center(80, '-'))
                 log.append(html.br())
-                log.append(content)
+                content = Ansi2HTMLConverter(inline=False).convert(content,
+                                                                   full=False)
+                log.append(raw(content))
 
             if len(log) == 0:
                 log = html.div(class_='empty log')
@@ -287,6 +290,13 @@ class HTMLReport(object):
             __name__, os.path.join('resources', 'style.css'))
         if PY3:
             self.style_css = self.style_css.decode('utf-8')
+
+        ansi_css = [
+            '\n/******************************',
+            ' * ANSI2HTML STYLES',
+            ' ******************************/\n']
+        ansi_css.extend([str(r) for r in style.get_styles()])
+        self.style_css += '\n'.join(ansi_css)
 
         css_href = '{0}/{1}'.format('assets', 'style.css')
         html_css = html.link(href=css_href, rel='stylesheet',

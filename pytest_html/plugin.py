@@ -255,8 +255,8 @@ class HTMLReport(object):
         if report.when == "call":
             if hasattr(report, "wasxfail"):
                 # pytest < 3.0 marked xpasses as failures
-                self.xpassed += 1
-                self._appendrow('XPassed', report)
+                self.xfailed += 1
+                self._appendrow('XFailed', report)
             else:
                 self.failed += 1
                 self._appendrow('Failed', report)

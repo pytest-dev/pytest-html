@@ -1,6 +1,10 @@
 Release Notes
 -------------
 
+**1.11.0 (2016-11-08)**
+
+* Add support for ANSI codes in logs
+
 **1.10.1 (2016-09-23)**
 
 * Fix corrupt image asset files

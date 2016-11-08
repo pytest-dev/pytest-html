@@ -1,7 +1,7 @@
 pytest-html
 ===========
 
-pytest-html is a plugin for `py.test <http://pytest.org>`_ that generates a
+pytest-html is a plugin for `pytest <http://pytest.org>`_ that generates a
 HTML report for the test results.
 
 .. image:: https://img.shields.io/badge/license-MPL%202.0-blue.svg
@@ -26,7 +26,7 @@ Requirements
 You will need the following prerequisites in order to use pytest-html:
 
 - Python 2.6, 2.7, 3.3, 3.4, 3.5, PyPy, or PyPy3
-- py.test 2.7 or newer
+- pytest 2.7 or newer
 
 Installation
 ------------
@@ -41,7 +41,7 @@ Then run your tests with:
 
 .. code-block:: bash
 
-  $ py.test --html=report.html
+  $ pytest --html=report.html
 
 Creating a self-contained report
 ----------------------------------
@@ -54,7 +54,7 @@ convenient when sharing your results. This can be done in the following way:
 
 .. code-block:: bash
 
-   $ py.test --html=report.html --self-contained-html
+   $ pytest --html=report.html --self-contained-html
 
 Enhancing reports
 -----------------

@@ -8,9 +8,13 @@ FORMAT_JSON = 'json'
 FORMAT_TEXT = 'text'
 FORMAT_URL = 'url'
 
+TYPE_JPG = ('image/jpeg', 'jpg')
+TYPE_PNG = ('image/png', 'png')
+TYPE_SVG = ('image/svg+xml', 'svg')
 
-def extra(content, format, name=None):
-    return {'name': name, 'format': format, 'content': content}
+
+def extra(content, format, name=None, type=None):
+    return {'name': name, 'format': format, 'content': content, 'type': type}
 
 
 def html(content):
@@ -18,7 +22,16 @@ def html(content):
 
 
 def image(content, name='Image'):
-    return extra(content, FORMAT_IMAGE, name)
+    return imagePNG(content=content, name=name)
+
+def imagePNG(content, name='Image'):
+    return extra(content, FORMAT_IMAGE, name, type=TYPE_PNG)
+
+def imageJPG(content, name='Image'):
+    return extra(content, FORMAT_IMAGE, name, type=TYPE_JPG)
+
+def imageSVG(content, name='Image'):
+    return extra(content, FORMAT_IMAGE, name, type=TYPE_SVG)
 
 
 def json(content, name='JSON'):

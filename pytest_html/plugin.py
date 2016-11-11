@@ -159,8 +159,9 @@ class HTMLReport(object):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
                 if self.self_contained:
-                    src = 'data:image/png;base64,{0}'.format(
-                            extra.get('content'))
+                    src = 'data:{0};base64,{1}'.format(
+                        extra.get('type')[0],
+                        extra.get('content'))
                     self.additional_html.append(html.div(
                         html.img(src=src), class_='image'))
                 else:
@@ -170,7 +171,7 @@ class HTMLReport(object):
                     else:
                         content = b64decode(content)
                     href = src = self.create_asset(
-                        content, extra_index, test_index, 'png', 'wb')
+                        content, extra_index, test_index, extra.get('type')[1], 'wb')
                     self.additional_html.append(html.div(
                         html.a(html.img(src=src), href=href),
                         class_='image'))

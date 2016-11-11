@@ -171,7 +171,8 @@ class HTMLReport(object):
                     else:
                         content = b64decode(content)
                     href = src = self.create_asset(
-                        content, extra_index, test_index, extra.get('type')[1], 'wb')
+                        content, extra_index, test_index,
+                        extra.get('type')[1], 'wb')
                     self.additional_html.append(html.div(
                         html.a(html.img(src=src), href=href),
                         class_='image'))

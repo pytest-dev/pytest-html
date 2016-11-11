@@ -24,11 +24,14 @@ def html(content):
 def image(content, name='Image'):
     return imagePNG(content=content, name=name)
 
+
 def imagePNG(content, name='Image'):
     return extra(content, FORMAT_IMAGE, name, type=TYPE_PNG)
 
+
 def imageJPG(content, name='Image'):
     return extra(content, FORMAT_IMAGE, name, type=TYPE_JPG)
+
 
 def imageSVG(content, name='Image'):
     return extra(content, FORMAT_IMAGE, name, type=TYPE_SVG)

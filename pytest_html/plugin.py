@@ -20,6 +20,7 @@ import pytest
 from py.xml import html, raw
 
 from . import extras
+from . import VERSION, PYPI_URL
 
 PY3 = sys.version_info[0] == 3
 
@@ -392,7 +393,9 @@ class HTMLReport(object):
             html.script(raw(main_js)),
             html.p('Report generated on {0} at {1}'.format(
                 generated.strftime('%d-%b-%Y'),
-                generated.strftime('%H:%M:%S'))),
+                generated.strftime('%H:%M:%S')),
+            html.a(' pytest-html', href=PYPI_URL),
+                ' v{}'.format(VERSION)),            
             onLoad='init()')
 
         if session.config._environment:

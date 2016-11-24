@@ -1,22 +1,64 @@
-language: python
-python:
-- 2.6
-- 2.7
-- 3.3
-- 3.4
-- 3.5
-- pypy
-- pypy3
-- nightly
-env:
-- TOXENV=pytest29
-- TOXENV=pytest30
 matrix:
   include:
-  - python: 2.7
+  - language: node_js
+    install:
+    - npm install grunt-cli grunt grunt-contrib-qunit
+    script:
+    - grunt test
+  - language: python
+    python: 2.6
+    env: TOXENV=pytest29
+  - language: python
+    python: 2.6
+    env: TOXENV=pytest30
+  - language: python
+    python: 2.7
     env: TOXENV=flake8
-  - python: 3.5
+  - language: python
+    python: 2.7
+    env: TOXENV=pytest29
+  - language: python
+    python: 2.7
+    env: TOXENV=pytest30
+  - language: python
+    python: 3.3
+    env: TOXENV=pytest29
+  - language: python
+    python: 3.3
+    env: TOXENV=pytest30
+  - language: python
+    python: 3.4
+    env: TOXENV=pytest29
+  - language: python
+    python: 3.4
+    env: TOXENV=pytest30
+  - language: python
+    python: 3.5
     env: TOXENV=flake8
+  - language: python
+    python: 3.5
+    env: TOXENV=pytest29
+  - language: python
+    python: 3.5
+    env: TOXENV=pytest30
+  - language: python
+    python: pypy
+    env: TOXENV=pytest29
+  - language: python
+    python: pypy
+    env: TOXENV=pytest30
+  - language: python
+    python: pypy3
+    env: TOXENV=pytest29
+  - language: python
+    python: pypy3
+    env: TOXENV=pytest30
+  - language: python
+    python: nightly
+    env: TOXENV=pytest29
+  - language: python
+    python: nightly
+    env: TOXENV=pytest30
 install:
 - pip install tox-travis
 script:

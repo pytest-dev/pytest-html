@@ -1,6 +1,11 @@
 Release Notes
 -------------
 
+**1.11.1 (2016-11-25)**
+
+* Fix title of checkbox disappearing when unchecked
+  * Thanks to `@vashirov <https://github.com/vashirov>`_ for the PR
+
 **1.11.0 (2016-11-08)**
 
 * Add support for ANSI codes in logs

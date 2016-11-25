@@ -184,10 +184,10 @@ class HTMLReport(object):
             elif extra.get('format') == extras.FORMAT_JSON:
                 content = json.dumps(extra.get('content'))
                 if self.self_contained:
-                    href = data_uri(content, mime_type='application/json')
+                    href = data_uri(content, mime_type=extra.get('mime_type'))
                 else:
                     href = self.create_asset(content, extra_index,
-                                             test_index, 'json')
+                                             test_index, extra.get('extension'))
 
             elif extra.get('format') == extras.FORMAT_TEXT:
                 content = extra.get('content')

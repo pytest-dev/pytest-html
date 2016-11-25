@@ -9,7 +9,7 @@ FORMAT_TEXT = 'text'
 FORMAT_URL = 'url'
 
 
-def extra(content, format, name=None, mime_type='image/png', extension='png'):
+def extra(content, format, name=None, mime_type=None, extension=None):
     return {'name': name, 'format': format, 'content': content,
             'mime_type': mime_type, 'extension': extension}
 
@@ -18,27 +18,24 @@ def html(content):
     return extra(content, FORMAT_HTML)
 
 
-def image(content, name='Image'):
-    return png(content=content, name=name)
+def image(content, name='Image', mime_type='image/png', extension='png'):
+    return extra(content, FORMAT_IMAGE, name, mime_type, extension)
 
 
 def png(content, name='Image'):
-    return extra(content, FORMAT_IMAGE, name,
-                 mime_type='image/png', extension='png')
+    return image(content, name, mime_type='image/png', extension='png')
 
 
 def jpg(content, name='Image'):
-    return extra(content, FORMAT_IMAGE, name,
-                 mime_type='image/jpeg', extension='jpg')
+    return image(content, name, mime_type='image/jpeg', extension='jpg')
 
 
 def svg(content, name='Image'):
-    return extra(content, FORMAT_IMAGE, name,
-                 mime_type='image/svg+xml', extension='svg')
+    return image(content, name, mime_type='image/svg+xml', extension='svg')
 
 
 def json(content, name='JSON'):
-    return extra(content, FORMAT_JSON, name)
+    return extra(content, FORMAT_JSON, name, 'application/json', 'json')
 
 
 def text(content, name='Text'):

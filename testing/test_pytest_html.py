@@ -305,7 +305,7 @@ class TestHTML:
             content)
         assert link in html
 
-    def test_extra_image(self, testdir):
+    def test_extra_png_image(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
             import pytest
@@ -321,6 +321,42 @@ class TestHTML:
         result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
         src = 'data:image/png;base64,{0}'.format(content)
+        assert '<img src="{0}"/>'.format(src) in html
+
+    def test_extra_jpg_image(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.jpg('{0}')]
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir, 'report.html', '--self-contained-html')
+        assert result.ret == 0
+        src = 'data:image/jpeg;base64,{0}'.format(content)
+        assert '<img src="{0}"/>'.format(src) in html
+
+    def test_extra_svg_image(self, testdir):
+        content = str(random.random())
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.svg('{0}')]
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir, 'report.html', '--self-contained-html')
+        assert result.ret == 0
+        src = 'data:image/svg+xml;base64,{0}'.format(content)
         assert '<img src="{0}"/>'.format(src) in html
 
     @pytest.mark.parametrize('file_extension,file_type',

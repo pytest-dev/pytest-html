@@ -4,11 +4,12 @@ Release Notes
 **1.11.1 (2016-11-25)**
 
 * Fix title of checkbox disappearing when unchecked
-  * Thanks to `@vashirov <https://github.com/vashirov>`_ for the PR
+  (`@vashirov <https://github.com/vashirov>`_)
 
 **1.11.0 (2016-11-08)**
 
 * Add support for ANSI codes in logs
+  (`@premkarat <https://github.com/premkarat>`_)
 
 **1.10.1 (2016-09-23)**
 
@@ -19,18 +20,28 @@ Release Notes
 **1.10.0 (2016-08-09)**
 
 * Hide filter checkboxes when JavaScript is disabled
+  (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 * Removed rerun outcome unless the plugin is active
+  (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 * Introduce ``--self-contained-html`` option to store CSS and assets inline
+  (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 * Save images, text, and JSON extras as files in an assets directory
+  (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 * Use an external CSS file
+  (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 * Set initial sort order in the HTML
+  (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 * Allow visibility of extra details to be toggled
+  (`@leitzler <https://github.com/leitzler>`_)
 
 **1.9.0 (2016-07-04)**
 
 * Split pytest_sessionfinish into generate and save methods
+  (`@karandesai-96 <https://github.com/karandesai-96>`_)
 * Show tests rerun by pytest-rerunfailures plugin
+  (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 * Added a feature to filter tests by outcome
+  (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 
 **1.8.1 (2016-05-24)**
 
@@ -46,6 +57,7 @@ Release Notes
 **1.7 (2015-10-19)**
 
 * Fixed INTERNALERROR when an xdist slave crashes
+  (`@The-Compiler <https://github.com/The-Compiler>`_)
 * Added report sections including stdout and stderr to log
 
 **1.6 (2015-09-08)**
@@ -64,6 +76,7 @@ Release Notes
 
 * Dropped support for pytest 2.6
 * Fixed unencodable strings for Python 3
+  (`@The-Compiler <https://github.com/The-Compiler>`_)
 
 **1.3.2 (2015-07-27)**
 
@@ -81,6 +94,7 @@ Release Notes
 **1.2 (2015-05-20)**
 
 * Changed default sort order to test result
+  (`@The-Compiler <https://github.com/The-Compiler>`_)
 
 **1.1 (2015-05-08)**
 

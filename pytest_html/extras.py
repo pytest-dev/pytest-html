@@ -1,8 +1,6 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import binascii
-import base64
 
 FORMAT_HTML = 'html'
 FORMAT_IMAGE = 'image'
@@ -25,15 +23,18 @@ def image(content, name='Image'):
 
 
 def png(content, name='Image'):
-    return extra(content, FORMAT_IMAGE, name, mime_type='image/png', extension='png')
+    return extra(content, FORMAT_IMAGE, name,
+                 mime_type='image/png', extension='png')
 
 
 def jpg(content, name='Image'):
-    return extra(content, FORMAT_IMAGE, name, mime_type='image/jpeg', extension='jpg')
+    return extra(content, FORMAT_IMAGE, name,
+                 mime_type='image/jpeg', extension='jpg')
 
 
 def svg(content, name='Image'):
-    return extra(content, FORMAT_IMAGE, name, mime_type='image/svg+xml', extension='svg')
+    return extra(content, FORMAT_IMAGE, name,
+                 mime_type='image/svg+xml', extension='svg')
 
 
 def json(content, name='JSON'):

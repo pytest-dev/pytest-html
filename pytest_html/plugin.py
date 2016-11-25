@@ -383,7 +383,7 @@ class HTMLReport(object):
                     colspan='5')],
                     id='not-found-message', hidden='true'),
             id='results-table-head'),
-                self.test_logs],  id='results-table')]
+                self.test_logs], id='results-table')]
 
         main_js = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'main.js'))

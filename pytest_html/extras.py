@@ -39,7 +39,7 @@ def json(content, name='JSON'):
 
 
 def text(content, name='Text'):
-    return extra(content, FORMAT_TEXT, name)
+    return extra(content, FORMAT_TEXT, name, 'text/plain', 'txt')
 
 
 def url(content, name='URL'):

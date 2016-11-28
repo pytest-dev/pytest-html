@@ -197,7 +197,8 @@ class HTMLReport(object):
                     href = data_uri(content)
                 else:
                     href = self.create_asset(content, extra_index,
-                                             test_index, 'txt')
+                                             test_index,
+                                             extra.get('extension'))
 
             elif extra.get('format') == extras.FORMAT_URL:
                 href = extra.get('content')

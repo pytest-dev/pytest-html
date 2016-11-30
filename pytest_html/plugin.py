@@ -137,10 +137,16 @@ class HTMLReport(object):
                      'XPassed', 'Skipped', 'Passed')
             return order.index(self.outcome) < order.index(other.outcome)
 
-        def create_asset(self, content, extra_index,
-                         test_index, file_extension, mode='w'):
-            hash_key = ''.join([self.test_id, str(extra_index),
-                               str(test_index)]).encode('utf-8')
+        def create_asset(self, content, extra_index, test_index,
+                         file_extension, mode='w', image_index=None):
+            # need different hash keys for different images
+            if image_index:
+                hash_key = ''.join([self.test_id, str(extra_index),
+                                    str(test_index), str(image_index)]).encode(
+                        'utf-8')
+            else:
+                hash_key = ''.join([self.test_id, str(extra_index),
+                                   str(test_index)]).encode('utf-8')
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key)
             asset_file_name = '{0}.{1}'.format(hash_generator.hexdigest(),
@@ -160,21 +166,26 @@ class HTMLReport(object):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
                 if self.self_contained:
-                    src = 'data:image/png;base64,{0}'.format(
-                            extra.get('content'))
-                    self.additional_html.append(html.div(
-                        html.img(src=src), class_='image'))
-                else:
                     content = extra.get('content')
-                    if PY3:
-                        content = b64decode(content.encode('utf-8'))
-                    else:
-                        content = b64decode(content)
-                    href = src = self.create_asset(
-                        content, extra_index, test_index, 'png', 'wb')
-                    self.additional_html.append(html.div(
-                        html.a(html.img(src=src), href=href),
-                        class_='image'))
+                    for b64_image in content:
+                        src = 'data:image/png;base64,{0}'.format(b64_image)
+                        self.additional_html.append(html.div(
+                            html.img(src=src), class_='image'))
+                else:
+                    href = list()
+                    content = extra.get('content')
+                    for image_index, b64_image in enumerate(content):
+                        if PY3:
+                            decoded = b64decode(b64_image.encode('utf-8'))
+                        else:
+                            decoded = b64decode(b64_image)
+                        single_image_href = src = self.create_asset(
+                            decoded, extra_index, test_index, 'png', 'wb',
+                            image_index=image_index)
+                        self.additional_html.append(html.div(
+                            html.a(html.img(src=src), href=single_image_href),
+                            class_='image'))
+                        href.append(single_image_href)
 
             elif extra.get('format') == extras.FORMAT_HTML:
                 self.additional_html.append(html.div(
@@ -200,12 +211,23 @@ class HTMLReport(object):
                 href = extra.get('content')
 
             if href is not None:
-                self.links_html.append(html.a(
-                    extra.get('name'),
-                    class_=extra.get('format'),
-                    href=href,
-                    target='_blank'))
-                self.links_html.append(' ')
+                # for multiple images, extra.get('name') will return a list and
+                # href will be a list, else both of these would be strings
+                if isinstance(href, list):
+                    for single_href, name in zip(href, extra.get('name')):
+                        self.links_html.append(html.a(
+                            name,
+                            class_=extra.get('format'),
+                            href=single_href,
+                            target='_blank'))
+                        self.links_html.append(' ')
+                else:
+                    self.links_html.append(html.a(
+                        extra.get('name'),
+                        class_=extra.get('format'),
+                        href=href,
+                        target='_blank'))
+                    self.links_html.append(' ')
 
         def append_log_html(self, report, additional_html):
             log = html.div(class_='log')

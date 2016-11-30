@@ -18,6 +18,13 @@ def html(content):
 
 
 def image(content, name='Image'):
+    if isinstance(content, str):
+        content = [content]
+
+    # default name unchanged by user
+    if name == 'Image':
+        # form name as ['Image1', 'Image2', 'Image3' ... ]
+        name = ['Image{0}'.format(i + 1) for i in range(len(content))]
     return extra(content, FORMAT_IMAGE, name)
 
 

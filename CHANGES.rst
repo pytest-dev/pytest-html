@@ -1,6 +1,13 @@
 Release Notes
 -------------
 
+**1.12.0 (2016-11-30)**
+
+* Add support for JPG and SVG images
+  (`@bhzunami <https://github.com/bhzunami>`_)
+* Add version number and PyPI link to report header
+  (`@denisra <https://github.com/denisra>`_)
+
 **1.11.1 (2016-11-25)**
 
 * Fix title of checkbox disappearing when unchecked

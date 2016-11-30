@@ -305,7 +305,12 @@ class TestHTML:
             content)
         assert link in html
 
-    def test_extra_image(self, testdir):
+    @pytest.mark.parametrize('mime_type, extension',
+                             [('image/png', 'png'),
+                              ('image/png', 'image'),
+                              ('image/jpeg', 'jpg'),
+                              ('image/svg+xml', 'svg')])
+    def test_extra_image(self, testdir, mime_type, extension):
         content = str(random.random())
         testdir.makeconftest("""
             import pytest
@@ -315,19 +320,23 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.image('{0}')]
-        """.format(content))
+                    report.extra = [extras.{0}('{1}')]
+        """.format(extension, content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
-        src = 'data:image/png;base64,{0}'.format(content)
+        src = 'data:{0};base64,{1}'.format(mime_type, content)
         assert '<img src="{0}"/>'.format(src) in html
 
-    @pytest.mark.parametrize('file_extension,file_type',
-                             [('png', 'image'),
-                              ('json', 'json'),
-                              ('txt', 'text')])
-    def test_extra_separated(self, testdir, file_extension, file_type):
+    @pytest.mark.parametrize('file_extension, extra_type, file_type',
+                             [('png', 'image', 'image'),
+                              ('png', 'png', 'image'),
+                              ('svg', 'svg', 'image'),
+                              ('jpg', 'jpg', 'image'),
+                              ('json', 'json', 'json'),
+                              ('txt', 'text', 'text')])
+    def test_extra_separated(self, testdir, file_extension,
+                             extra_type, file_type):
         content = b64encode(str(random.random())
                             .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
@@ -339,7 +348,7 @@ class TestHTML:
                 if report.when == 'call':
                     from pytest_html import extras
                     report.extra = [extras.{0}('{1}')]
-        """.format(file_type, content))
+        """.format(extra_type, content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         hash_key = ('test_extra_separated.py::'
@@ -355,11 +364,15 @@ class TestHTML:
         assert link in html
         assert os.path.exists(src)
 
-    @pytest.mark.parametrize('file_extension,file_type',
-                             [('png', 'image'),
-                              ('json', 'json'),
-                              ('txt', 'text')])
-    def test_extra_separated_rerun(self, testdir, file_extension, file_type):
+    @pytest.mark.parametrize('file_extension, extra_type, file_type',
+                             [('png', 'png', 'image'),
+                              ('png', 'image', 'image'),
+                              ('svg', 'svg', 'image'),
+                              ('jpg', 'jpg', 'image'),
+                              ('json', 'json', 'json'),
+                              ('txt', 'text', 'text')])
+    def test_extra_separated_rerun(self, testdir, file_extension,
+                                   extra_type, file_type):
         content = b64encode(str(random.random())
                             .encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
@@ -371,7 +384,7 @@ class TestHTML:
                 if report.when == 'call':
                     from pytest_html import extras
                     report.extra = [extras.{0}('{1}')]
-        """.format(file_type, content))
+        """.format(extra_type, content))
         testdir.makepyfile("""
             import pytest
             @pytest.mark.flaky(reruns=2)

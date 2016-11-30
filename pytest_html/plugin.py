@@ -160,8 +160,9 @@ class HTMLReport(object):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
                 if self.self_contained:
-                    src = 'data:image/png;base64,{0}'.format(
-                            extra.get('content'))
+                    src = 'data:{0};base64,{1}'.format(
+                        extra.get('mime_type'),
+                        extra.get('content'))
                     self.additional_html.append(html.div(
                         html.img(src=src), class_='image'))
                 else:
@@ -171,7 +172,8 @@ class HTMLReport(object):
                     else:
                         content = b64decode(content)
                     href = src = self.create_asset(
-                        content, extra_index, test_index, 'png', 'wb')
+                        content, extra_index, test_index,
+                        extra.get('extension'), 'wb')
                     self.additional_html.append(html.div(
                         html.a(html.img(src=src), href=href),
                         class_='image'))
@@ -183,10 +185,12 @@ class HTMLReport(object):
             elif extra.get('format') == extras.FORMAT_JSON:
                 content = json.dumps(extra.get('content'))
                 if self.self_contained:
-                    href = data_uri(content, mime_type='application/json')
+                    href = data_uri(content,
+                                    mime_type=extra.get('mime_type'))
                 else:
                     href = self.create_asset(content, extra_index,
-                                             test_index, 'json')
+                                             test_index,
+                                             extra.get('extension'))
 
             elif extra.get('format') == extras.FORMAT_TEXT:
                 content = extra.get('content')
@@ -194,7 +198,8 @@ class HTMLReport(object):
                     href = data_uri(content)
                 else:
                     href = self.create_asset(content, extra_index,
-                                             test_index, 'txt')
+                                             test_index,
+                                             extra.get('extension'))
 
             elif extra.get('format') == extras.FORMAT_URL:
                 href = extra.get('content')
@@ -382,7 +387,7 @@ class HTMLReport(object):
                     colspan='5')],
                     id='not-found-message', hidden='true'),
             id='results-table-head'),
-                self.test_logs],  id='results-table')]
+                self.test_logs], id='results-table')]
 
         main_js = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'main.js'))

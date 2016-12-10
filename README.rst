@@ -77,6 +77,7 @@ report object. There are five different extras you can add
 - URL:  ``report.extra = [extra.url('http://www.example.com/')]``
 
 PNG, JPEG and SVG are predifend images types but you can add any image type you want.
+
 - PNG: ``report.extra = [extra.png(image)]``
 - JPG: ``report.extra = [extra.jpg(image)]``
 - SVG: ``report.extra = [extra.svg(image)]``

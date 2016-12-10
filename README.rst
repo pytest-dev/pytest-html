@@ -78,7 +78,21 @@ You can add change the *Environment* section of the report by modifying
       request.config._environment.append(('foo', 'bar'))
 
 You can add details to the HTML reports by creating an 'extra' list on the
-report object. The following example adds the various types of extras using a
+report object. There are five different extras you can add:
+
+- HTML: ``report.extra = [extra.html('<div>Additional HTML</div>')]``
+- JSON: ``report.extra = [extra.json({'name': 'pytest'})]``
+- TEXT: ``report.extra = [extra.text('Add some simple Text')]``
+- URL:  ``report.extra = [extra.url('http://www.example.com/')]``
+
+PNG, JPEG and SVG are predifend images types but you can add any image type you want.
+
+- PNG: ``report.extra = [extra.png(image)]``
+- JPG: ``report.extra = [extra.jpg(image)]``
+- SVG: ``report.extra = [extra.svg(image)]``
+- Any image type: ``report.extra = [extra.image(image, mime_type='image/gif', extension='gif')]``
+
+The following example adds the various types of extras using a
 :code:`pytest_runtest_makereport` hook, which can be implemented in a plugin or
 conftest.py file:
 

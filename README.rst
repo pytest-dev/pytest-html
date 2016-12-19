@@ -43,6 +43,15 @@ Then run your tests with:
 
   $ pytest --html=report.html
 
+ANSI codes
+----------
+
+Note that ANSI code support depends on the
+`ansi2html <https://pypi.python.org/pypi/ansi2html/>`_ package. Due to the use
+of a less permissive license, this package is not included as a dependency. If
+you have this package installed, then ANSI codes will be converted to HTML in
+your report.
+
 Creating a self-contained report
 ----------------------------------
 

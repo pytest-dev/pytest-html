@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**1.13.0 (2016-12-19)**
+
+* Disable ANSI codes support by default due to dependency on
+  `ansi2html <https://pypi.python.org/pypi/ansi2html/>`_ package with less
+  permissive licensing
+
 **1.12.0 (2016-11-30)**
 
 * Add support for JPG and SVG images

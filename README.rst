@@ -69,7 +69,7 @@ You can add change the *Environment* section of the report by modifying
       request.config._environment.append(('foo', 'bar'))
 
 You can add details to the HTML reports by creating an 'extra' list on the
-report object. There are five different extras you can add
+report object. There are five different extras you can add:
 
 - HTML: ``report.extra = [extra.html('<div>Additional HTML</div>')]``
 - JSON: ``report.extra = [extra.json({'name': 'pytest'})]``

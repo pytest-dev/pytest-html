@@ -80,6 +80,10 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
 /*------------------
  * 2. Extra
  *------------------*/
+.col-links a {
+	float: right;
+	clear: right;
+}
 
 .log:only-child {
 	height: inherit

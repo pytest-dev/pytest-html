@@ -68,6 +68,9 @@ convenient when sharing your results. This can be done in the following way:
 Enhancing reports
 -----------------
 
+Environment
+~~~~~~~~~~~
+
 You can add change the *Environment* section of the report by modifying
 ``request.config._html.environment`` from a fixture:
 
@@ -77,20 +80,31 @@ You can add change the *Environment* section of the report by modifying
   def _environment(request):
       request.config._environment.append(('foo', 'bar'))
 
+Extra content
+~~~~~~~~~~~~~
+
 You can add details to the HTML reports by creating an 'extra' list on the
-report object. There are five different extras you can add:
+report object. Here are the types of extra content that can be added:
 
-- HTML: ``report.extra = [extra.html('<div>Additional HTML</div>')]``
-- JSON: ``report.extra = [extra.json({'name': 'pytest'})]``
-- TEXT: ``report.extra = [extra.text('Add some simple Text')]``
-- URL:  ``report.extra = [extra.url('http://www.example.com/')]``
+==========  ============================================
+Type        Example
+==========  ============================================
+Raw HTML    ``extra.html('<div>Additional HTML</div>')``
+`JSON`_     ``extra.json({'name': 'pytest'})``
+Plain text  ``extra.text('Add some simple Text')``
+URL         ``extra.url('http://www.example.com/')``
+Image       ``extra.image(image, mime_type='image/gif', extension='gif')``
+==========  ============================================
 
-PNG, JPEG and SVG are predifend images types but you can add any image type you want.
+There are also convenient types for several image formats:
 
-- PNG: ``report.extra = [extra.png(image)]``
-- JPG: ``report.extra = [extra.jpg(image)]``
-- SVG: ``report.extra = [extra.svg(image)]``
-- Any image type: ``report.extra = [extra.image(image, mime_type='image/gif', extension='gif')]``
+============  ====================
+Image format  Example
+============  ====================
+PNG           ``extra.png(image)``
+JPEG          ``extra.jpg(image)``
+SVG           ``extra.svg(image)``
+============  ====================
 
 The following example adds the various types of extras using a
 :code:`pytest_runtest_makereport` hook, which can be implemented in a plugin or
@@ -127,3 +141,5 @@ Resources
 - `Release Notes <http://github.com/pytest-dev/pytest-html/blob/master/CHANGES.rst>`_
 - `Issue Tracker <http://github.com/pytest-dev/pytest-html/issues>`_
 - `Code <http://github.com/pytest-dev/pytest-html/>`_
+
+.. _JSON: http://json.org/

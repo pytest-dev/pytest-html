@@ -9,7 +9,6 @@ import datetime
 import json
 import os
 import pkg_resources
-import platform
 import sys
 import time
 import bisect
@@ -22,7 +21,6 @@ except ImportError:
     # ansi2html is not installed
     ANSI = False
 
-import pytest
 from py.xml import html, raw
 
 from . import extras
@@ -32,18 +30,11 @@ PY3 = sys.version_info[0] == 3
 
 # Python 2.X and 3.X compatibility
 if PY3:
+    basestring = str
     from html import escape
 else:
     from codecs import open
     from cgi import escape
-
-
-@pytest.fixture(scope='session', autouse=True)
-def environment(request):
-    """Provide environment details for HTML report"""
-    request.config._environment.extend([
-        ('Python', platform.python_version()),
-        ('Platform', platform.platform())])
 
 
 def pytest_addoption(parser):
@@ -60,7 +51,6 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    config._environment = []
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
@@ -69,16 +59,6 @@ def pytest_configure(config):
                                   config.pluginmanager
                                   .hasplugin('rerunfailures'))
         config.pluginmanager.register(config._html)
-    if hasattr(config, 'slaveoutput'):
-        config.slaveoutput['environment'] = config._environment
-
-
-@pytest.mark.optionalhook
-def pytest_testnodedown(node):
-    # note that any environments from remote slaves will be replaced with the
-    # environment from the final slave to quit
-    if hasattr(node, 'slaveoutput'):
-        node.config._environment = node.slaveoutput['environment']
 
 
 def pytest_unconfigure(config):
@@ -413,14 +393,7 @@ class HTMLReport(object):
                 ' v{0}'.format(__version__)),
             onLoad='init()')
 
-        if session.config._environment:
-            environment = set(session.config._environment)
-            body.append(html.h2('Environment'))
-            body.append(html.table(
-                [html.tr(html.td(e[0]), html.td(e[1])) for e in sorted(
-                    environment, key=lambda e: e[0]) if e[1]],
-                id='environment'))
-
+        body.extend(self._generate_metadata(session.config))
         body.extend(summary)
         body.extend(results)
 
@@ -433,6 +406,27 @@ class HTMLReport(object):
                                              errors='xmlcharrefreplace')
             unicode_doc = unicode_doc.decode('utf-8')
         return unicode_doc
+
+    def _generate_metadata(self, config):
+        metadata = [html.h2('Metadata')]
+        rows = []
+        d = config._metadata
+
+        for key in [k for k in sorted(d.keys()) if d[k]]:
+            value = d[key]
+            if isinstance(value, basestring) and value.startswith('http'):
+                value = html.a(value, href=value, target='_blank')
+            elif not isinstance(value, basestring):
+                try:
+                    value = [': '.join([k, v]) for k, v in value.items()]
+                except AttributeError:
+                    pass  # not a dictionary
+                finally:
+                    value = ', '.join(value)
+            rows.append(html.tr(html.td(key), html.td(value)))
+
+        metadata.append(html.table(rows, id='metadata'))
+        return metadata
 
     def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)

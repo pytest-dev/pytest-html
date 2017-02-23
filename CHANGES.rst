@@ -3,6 +3,8 @@ Release Notes
 
 **1.14.0 (unreleased)**
 
+* Replace environment section with values from
+  `pytest-metadata <https://pypi.python.org/pypi/pytest-metadata/>`_
 * Fix encoding for asset files
 * Escape contents of log sections
 

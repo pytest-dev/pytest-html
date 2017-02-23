@@ -236,11 +236,12 @@ class HTMLReport(object):
                             log.append(raw(escape(line)))
                     log.append(html.br())
 
-            for header, content in report.sections:
+            for section in report.sections:
+                header, content = map(escape, section)
                 log.append(' {0} '.format(header).center(80, '-'))
                 log.append(html.br())
                 if ANSI:
-                    converter = Ansi2HTMLConverter(inline=False)
+                    converter = Ansi2HTMLConverter(inline=False, escaped=False)
                     content = converter.convert(content, full=False)
                 log.append(raw(content))
 

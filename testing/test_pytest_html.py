@@ -207,18 +207,17 @@ class TestHTML:
         regex_css_link = '<link href="assets/style.css" rel="stylesheet"'
         assert re.search(regex_css_link, html) is not None
 
-    def test_stdout(self, testdir):
-        content = (str(random.random()), str(random.random()))
+    @pytest.mark.parametrize('result', ['pass', 'fail'])
+    def test_stdout(self, testdir, result):
+        content = '<spam>ham</spam>'
+        escaped = '&lt;spam&gt;ham&lt;/spam&gt;'
         testdir.makepyfile("""
-            def test_pass():
-                print({0})
-            def test_fail():
-                print({1})
-                assert False""".format(*content))
-        result, html = run(testdir)
-        assert result.ret
-        for c in content:
-            assert c in html
+            def test_stdout():
+                print('{0}')
+                assert '{1}' == 'pass'""".format(content, result))
+        _, html = run(testdir)
+        assert content not in html
+        assert escaped in html
 
     def test_extra_html(self, testdir):
         content = str(random.random())
@@ -490,6 +489,12 @@ class TestHTML:
         assert_results(html, passed=1)
 
     def test_ansi_color(self, testdir):
+        try:
+            import ansi2html  # NOQA
+            ANSI = True
+        except ImportError:
+            # ansi2html is not installed
+            ANSI = False
         pass_content = ["<span class=\"ansi31\">RCOLOR",
                         "<span class=\"ansi32\">GCOLOR",
                         "<span class=\"ansi33\">YCOLOR"]
@@ -503,4 +508,7 @@ class TestHTML:
         result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
         for content in pass_content:
-            assert content in html
+            if ANSI:
+                assert content in html
+            else:
+                assert content not in html

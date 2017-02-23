@@ -1,6 +1,10 @@
 Release Notes
 -------------
 
+**1.14.0 (unreleased)**
+
+* Escape contents of log sections
+
 **1.13.0 (2016-12-19)**
 
 * Disable ANSI codes support by default due to dependency on

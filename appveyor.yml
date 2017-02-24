@@ -1,0 +1,22 @@
+cache:
+  - '%LOCALAPPDATA%\pip\Cache'
+environment:
+  matrix:
+    - TOXENV: flake8
+      PYTHON_HOME: C:\Python36
+    - TOXENV: py36-pytest30
+      PYTHON_HOME: C:\Python36
+    - TOXENV: py36-pytest29
+      PYTHON_HOME: C:\Python36
+    - TOXENV: flake8
+      PYTHON_HOME: C:\Python27
+    - TOXENV: py27-pytest30
+      PYTHON_HOME: C:\Python27
+    - TOXENV: py27-pytest29
+      PYTHON_HOME: C:\Python27
+install:
+  - '%PYTHON_HOME%\Scripts\pip --version'
+  - '%PYTHON_HOME%\Scripts\pip install tox'
+build: off
+test_script:
+  - cmd: '%PYTHON_HOME%\Scripts\tox'

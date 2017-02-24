@@ -327,17 +327,37 @@ class TestHTML:
         src = 'data:{0};base64,{1}'.format(mime_type, content)
         assert '<img src="{0}"/>'.format(src) in html
 
-    @pytest.mark.parametrize('file_extension, extra_type, file_type',
-                             [('png', 'image', 'image'),
-                              ('png', 'png', 'image'),
-                              ('svg', 'svg', 'image'),
-                              ('jpg', 'jpg', 'image'),
-                              ('json', 'json', 'json'),
-                              ('txt', 'text', 'text')])
-    def test_extra_separated(self, testdir, file_extension,
-                             extra_type, file_type):
-        content = b64encode(str(random.random())
-                            .encode('utf-8')).decode('ascii')
+    def test_extra_text_separated(self, testdir):
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.text(u'\u0081')]
+        """)
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        hash_key = ('test_extra_text_separated.py::'
+                    'test_pass01').encode('utf-8')
+        hash_generator = hashlib.md5()
+        hash_generator.update(hash_key)
+        assert result.ret == 0
+        src = '{0}/{1}'.format('assets', '{0}.txt'.
+                               format(hash_generator.hexdigest()))
+        link = ('<a class="text" href="{0}" target="_blank">'.format(src))
+        assert link in html
+        assert os.path.exists(src)
+
+    @pytest.mark.parametrize('file_extension, extra_type', [
+        ('png', 'image'),
+        ('png', 'png'),
+        ('svg', 'svg'),
+        ('jpg', 'jpg')])
+    def test_extra_image_separated(self, testdir, file_extension, extra_type):
+        content = b64encode('foo'.encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
             import pytest
             @pytest.mark.hookwrapper
@@ -350,7 +370,7 @@ class TestHTML:
         """.format(extra_type, content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
-        hash_key = ('test_extra_separated.py::'
+        hash_key = ('test_extra_image_separated.py::'
                     'test_pass01').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
@@ -358,22 +378,18 @@ class TestHTML:
         src = '{0}/{1}'.format('assets', '{0}.{1}'.
                                format(hash_generator.hexdigest(),
                                       file_extension))
-        link = ('<a class="{0}" href="{1}" '
-                'target="_blank">'.format(file_type, src))
+        link = ('<a class="image" href="{0}" target="_blank">'.format(src))
         assert link in html
         assert os.path.exists(src)
 
-    @pytest.mark.parametrize('file_extension, extra_type, file_type',
-                             [('png', 'png', 'image'),
-                              ('png', 'image', 'image'),
-                              ('svg', 'svg', 'image'),
-                              ('jpg', 'jpg', 'image'),
-                              ('json', 'json', 'json'),
-                              ('txt', 'text', 'text')])
-    def test_extra_separated_rerun(self, testdir, file_extension,
-                                   extra_type, file_type):
-        content = b64encode(str(random.random())
-                            .encode('utf-8')).decode('ascii')
+    @pytest.mark.parametrize('file_extension, extra_type', [
+        ('png', 'image'),
+        ('png', 'png'),
+        ('svg', 'svg'),
+        ('jpg', 'jpg')])
+    def test_extra_image_separated_rerun(self, testdir, file_extension,
+                                         extra_type):
+        content = b64encode('foo'.encode('utf-8')).decode('ascii')
         testdir.makeconftest("""
             import pytest
             @pytest.mark.hookwrapper
@@ -392,14 +408,13 @@ class TestHTML:
         result, html = run(testdir)
 
         for i in range(1, 4):
-            hash_key = ('test_extra_separated_rerun.py::'
+            hash_key = ('test_extra_image_separated_rerun.py::'
                         'test_fail0{0}'.format(i)).encode('utf-8')
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key)
             src = 'assets/{0}.{1}'.format(hash_generator.hexdigest(),
                                           file_extension)
-            link = ('<a class="{0}" href="{1}" '
-                    'target="_blank">'.format(file_type, src))
+            link = ('<a class="image" href="{0}" target="_blank">'.format(src))
             assert result.ret
             assert link in html
             assert os.path.exists(src)

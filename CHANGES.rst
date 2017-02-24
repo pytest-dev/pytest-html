@@ -3,6 +3,7 @@ Release Notes
 
 **1.14.0 (unreleased)**
 
+* Fix encoding for asset files
 * Escape contents of log sections
 
 **1.13.0 (2016-12-19)**

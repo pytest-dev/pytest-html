@@ -72,7 +72,7 @@ class TestHTML:
             import time
             def test_sleep():
                 time.sleep({0:f})
-        """.format(sleep))
+        """.format(sleep * 2))
         result, html = run(testdir)
         assert result.ret == 0
         assert_results(html, duration=sleep)

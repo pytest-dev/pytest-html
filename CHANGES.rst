@@ -3,6 +3,7 @@ Release Notes
 
 **1.14.0 (unreleased)**
 
+* Add hooks for modifying the test results table
 * Replace environment section with values from
   `pytest-metadata <https://pypi.python.org/pypi/pytest-metadata/>`_
 * Fix encoding for asset files

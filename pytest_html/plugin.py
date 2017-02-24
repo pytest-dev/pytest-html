@@ -37,6 +37,11 @@ else:
     from cgi import escape
 
 
+def pytest_addhooks(pluginmanager):
+    from . import hooks
+    pluginmanager.add_hookspecs(hooks)
+
+
 def pytest_addoption(parser):
     group = parser.getgroup('terminal reporting')
     group.addoption('--html', action='store', dest='htmlpath',
@@ -54,10 +59,11 @@ def pytest_configure(config):
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
-        config._html = HTMLReport(htmlpath,
-                                  config.getoption('self_contained_html'),
-                                  config.pluginmanager
-                                  .hasplugin('rerunfailures'))
+        config._html = HTMLReport(
+            htmlpath,
+            config.getoption('self_contained_html'),
+            config.pluginmanager.hasplugin('rerunfailures'),
+            config)
         config.pluginmanager.register(config._html)
 
 
@@ -78,7 +84,7 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
 
 class HTMLReport(object):
 
-    def __init__(self, logfile, self_contained, has_rerun):
+    def __init__(self, logfile, self_contained, has_rerun, config):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
@@ -88,10 +94,11 @@ class HTMLReport(object):
         self.xfailed = self.xpassed = 0
         self.rerun = 0 if has_rerun else None
         self.self_contained = self_contained
+        self.config = config
 
     class TestResult:
 
-        def __init__(self, outcome, report, self_contained, logfile):
+        def __init__(self, outcome, report, self_contained, logfile, config):
             self.test_id = report.nodeid
             if report.when != 'call':
                 self.test_id = '::'.join([report.nodeid, report.when])
@@ -101,6 +108,7 @@ class HTMLReport(object):
             self.links_html = []
             self.self_contained = self_contained
             self.logfile = logfile
+            self.config = config
 
             test_index = hasattr(report, 'rerun') and report.rerun + 1 or 0
 
@@ -109,14 +117,18 @@ class HTMLReport(object):
 
             self.append_log_html(report, self.additional_html)
 
-            self.row_table = html.tr([
+            cells = [
                 html.td(self.outcome, class_='col-result'),
                 html.td(self.test_id, class_='col-name'),
                 html.td('{0:.2f}'.format(self.time), class_='col-duration'),
-                html.td(self.links_html, class_='col-links')])
+                html.td(self.links_html, class_='col-links')]
+
+            self.config.hook.pytest_html_results_table_row(
+                report=report, cells=cells)
+            self.row_table = html.tr(cells)
 
             self.row_extra = html.tr(html.td(self.additional_html,
-                                     class_='extra', colspan='5'))
+                                     class_='extra', colspan=len(cells)))
 
         def __lt__(self, other):
             order = ('Error', 'Failed', 'Rerun', 'XFailed',
@@ -233,7 +245,7 @@ class HTMLReport(object):
 
     def _appendrow(self, outcome, report):
         result = self.TestResult(outcome, report, self.self_contained,
-                                 self.logfile)
+                                 self.logfile, self.config)
         index = bisect.bisect_right(self.results, result)
         self.results.insert(index, result)
         self.test_logs.insert(index, html.tbody(result.row_table,
@@ -362,19 +374,20 @@ class HTMLReport(object):
             if i < len(outcomes):
                 summary.append(', ')
 
+        cells = [
+            html.th('Result',
+                    class_='sortable result initial-sort',
+                    col='result'),
+            html.th('Test', class_='sortable', col='name'),
+            html.th('Duration', class_='sortable numeric', col='duration'),
+            html.th('Links')]
+        session.config.hook.pytest_html_results_table_header(cells=cells)
+
         results = [html.h2('Results'), html.table([html.thead(
-            html.tr([
-                html.th('Result',
-                        class_='sortable result initial-sort',
-                        col='result'),
-                html.th('Test', class_='sortable', col='name'),
-                html.th('Duration',
-                        class_='sortable numeric',
-                        col='duration'),
-                html.th('Links')]),
+            html.tr(cells),
             html.tr([
                 html.th('No results found. Try to check the filters',
-                    colspan='5')],
+                    colspan=len(cells))],
                     id='not-found-message', hidden='true'),
             id='results-table-head'),
                 self.test_logs], id='results-table')]

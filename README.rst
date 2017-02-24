@@ -128,6 +128,65 @@ conftest.py file:
               extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
           report.extra = extra
 
+Modifying the results table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can modify the columns by implementing custom hooks for the header and
+rows. The following example :code:`conftest.py` adds a description column with
+the test function docstring, adds a sortable time column, and removes the links
+column:
+
+.. code-block:: python
+
+  from datetime import datetime
+  from py.xml import html
+  import pytest
+
+  @pytest.mark.optionalhook
+  def pytest_html_results_table_header(cells):
+      cells.insert(2, html.th('Description'))
+      cells.insert(0, html.th('Time', class_='sortable time', col='time'))
+      cells.pop()
+
+  @pytest.mark.optionalhook
+  def pytest_html_results_table_row(report, cells):
+      cells.insert(2, html.td(report.description))
+      cells.insert(1, html.td(datetime.utcnow(), class_='col-time'))
+      cells.pop()
+
+  @pytest.mark.hookwrapper
+  def pytest_runtest_makereport(item, call):
+      outcome = yield
+      report = outcome.get_result()
+      report.description = str(item.function.__doc__)
+
+You can also remove results by implementing the
+:code:`pytest_html_results_table_row` hook and removing all cells. The
+following example removes all passed results from the report:
+
+.. code-block:: python
+
+  import pytest
+
+  @pytest.mark.optionalhook
+  def pytest_html_results_table_row(report, cells):
+      if report.passed:
+        del cells[:]
+
+The log output and additional HTML can be modified by implementing the
+:code:`pytest_html_results_html` hook. The following example replaces all
+additional HTML and log output with a notice that the log is empty:
+
+.. code-block:: python
+
+  import pytest
+
+  @pytest.mark.optionalhook
+  def pytest_html_results_table_html(report, data):
+      if report.passed:
+          del data[:]
+          data.append(html.div('No log output captured.', class_='empty log'))
+
 Screenshots
 -----------
 

@@ -59,11 +59,7 @@ def pytest_configure(config):
     htmlpath = config.option.htmlpath
     # prevent opening htmlpath on slave nodes (xdist)
     if htmlpath and not hasattr(config, 'slaveinput'):
-        config._html = HTMLReport(
-            htmlpath,
-            config.getoption('self_contained_html'),
-            config.pluginmanager.hasplugin('rerunfailures'),
-            config)
+        config._html = HTMLReport(htmlpath, config)
         config.pluginmanager.register(config._html)
 
 
@@ -84,7 +80,7 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
 
 class HTMLReport(object):
 
-    def __init__(self, logfile, self_contained, has_rerun, config):
+    def __init__(self, logfile, config):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
@@ -92,13 +88,14 @@ class HTMLReport(object):
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
+        has_rerun = config.pluginmanager.hasplugin('rerunfailures')
         self.rerun = 0 if has_rerun else None
-        self.self_contained = self_contained
+        self.self_contained = config.getoption('self_contained_html')
         self.config = config
 
     class TestResult:
 
-        def __init__(self, outcome, report, self_contained, logfile, config):
+        def __init__(self, outcome, report, logfile, config):
             self.test_id = report.nodeid
             if report.when != 'call':
                 self.test_id = '::'.join([report.nodeid, report.when])
@@ -106,9 +103,10 @@ class HTMLReport(object):
             self.outcome = outcome
             self.additional_html = []
             self.links_html = []
-            self.self_contained = self_contained
+            self.self_contained = config.getoption('self_contained_html')
             self.logfile = logfile
             self.config = config
+            self.row_table = self.row_extra = None
 
             test_index = hasattr(report, 'rerun') and report.rerun + 1 or 0
 
@@ -125,10 +123,14 @@ class HTMLReport(object):
 
             self.config.hook.pytest_html_results_table_row(
                 report=report, cells=cells)
-            self.row_table = html.tr(cells)
 
-            self.row_extra = html.tr(html.td(self.additional_html,
-                                     class_='extra', colspan=len(cells)))
+            self.config.hook.pytest_html_results_table_html(
+                report=report, data=self.additional_html)
+
+            if len(cells) > 0:
+                self.row_table = html.tr(cells)
+                self.row_extra = html.tr(html.td(self.additional_html,
+                                         class_='extra', colspan=len(cells)))
 
         def __lt__(self, other):
             order = ('Error', 'Failed', 'Rerun', 'XFailed',
@@ -244,13 +246,16 @@ class HTMLReport(object):
             additional_html.append(log)
 
     def _appendrow(self, outcome, report):
-        result = self.TestResult(outcome, report, self.self_contained,
-                                 self.logfile, self.config)
-        index = bisect.bisect_right(self.results, result)
-        self.results.insert(index, result)
-        self.test_logs.insert(index, html.tbody(result.row_table,
-                              result.row_extra, class_=result.outcome.lower() +
-                              ' results-table-row'))
+        result = self.TestResult(outcome, report, self.logfile, self.config)
+        if result.row_table is not None:
+            index = bisect.bisect_right(self.results, result)
+            self.results.insert(index, result)
+            tbody = html.tbody(
+                result.row_table,
+                class_='{0} results-table-row'.format(result.outcome.lower()))
+            if result.row_extra is not None:
+                tbody.append(result.row_extra)
+            self.test_logs.insert(index, tbody)
 
     def append_passed(self, report):
         if report.when == 'call':

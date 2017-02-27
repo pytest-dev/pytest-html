@@ -9,3 +9,7 @@ def pytest_html_results_table_header(cells):
 
 def pytest_html_results_table_row(report, cells):
     """ Called after building results table row. """
+
+
+def pytest_html_results_table_html(report, data):
+    """ Called after building results table additional HTML. """

@@ -421,10 +421,8 @@ class TestHTML:
 
     def test_no_environment(self, testdir):
         testdir.makeconftest("""
-            import pytest
-            @pytest.fixture(autouse=True)
-            def _environment(request):
-                request.config._environment = None
+            def pytest_configure(config):
+                config._metadata = None
         """)
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
@@ -434,11 +432,8 @@ class TestHTML:
     def test_environment(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
-            import pytest
-            @pytest.fixture(autouse=True)
-            def _environment(request):
-                for i in range(2):
-                    request.config._environment.append(('content', '{0}'))
+            def pytest_configure(config):
+                config._metadata['content'] = '{0}'
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
@@ -449,11 +444,9 @@ class TestHTML:
     def test_environment_xdist(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
-            import pytest
-            @pytest.fixture(autouse=True)
-            def _environment(request):
+            def pytest_configure(config):
                 for i in range(2):
-                    request.config._environment.append(('content', '{0}'))
+                    config._metadata['content'] = '{0}'
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir, 'report.html', '-n', '1')
@@ -464,11 +457,9 @@ class TestHTML:
     def test_environment_xdist_reruns(self, testdir):
         content = str(random.random())
         testdir.makeconftest("""
-            import pytest
-            @pytest.fixture(autouse=True)
-            def _environment(request):
+            def pytest_configure(config):
                 for i in range(2):
-                    request.config._environment.append(('content', '{0}'))
+                    config._metadata['content'] = '{0}'
         """.format(content))
         testdir.makepyfile('def test_fail(): assert False')
         result, html = run(testdir, 'report.html', '-n', '1', '--reruns', '1')

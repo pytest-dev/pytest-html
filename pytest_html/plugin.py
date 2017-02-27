@@ -393,7 +393,7 @@ class HTMLReport(object):
                 ' v{0}'.format(__version__)),
             onLoad='init()')
 
-        body.extend(self._generate_metadata(session.config))
+        body.extend(self._generate_environment(session.config))
         body.extend(summary)
         body.extend(results)
 
@@ -407,13 +407,16 @@ class HTMLReport(object):
             unicode_doc = unicode_doc.decode('utf-8')
         return unicode_doc
 
-    def _generate_metadata(self, config):
-        metadata = [html.h2('Metadata')]
-        rows = []
-        d = config._metadata
+    def _generate_environment(self, config):
+        if not hasattr(config, '_metadata') or config._metadata is None:
+            return []
 
-        for key in [k for k in sorted(d.keys()) if d[k]]:
-            value = d[key]
+        metadata = config._metadata
+        environment = [html.h2('Environment')]
+        rows = []
+
+        for key in [k for k in sorted(metadata.keys()) if metadata[k]]:
+            value = metadata[key]
             if isinstance(value, basestring) and value.startswith('http'):
                 value = html.a(value, href=value, target='_blank')
             elif not isinstance(value, basestring):
@@ -425,8 +428,8 @@ class HTMLReport(object):
                     value = ', '.join(value)
             rows.append(html.tr(html.td(key), html.td(value)))
 
-        metadata.append(html.table(rows, id='metadata'))
-        return metadata
+        environment.append(html.table(rows, id='environment'))
+        return environment
 
     def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)

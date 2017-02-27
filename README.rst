@@ -71,14 +71,14 @@ Enhancing reports
 Environment
 ~~~~~~~~~~~
 
-You can add change the *Environment* section of the report by modifying
-``request.config._html.environment`` from a fixture:
+The *Environment* section is provided by the `pytest-metadata
+<https://pypi.python.org/pypi/pytest-metadata/>`_, plugin, and can be accessed
+via the :code:`pytest_configure` hook:
 
 .. code-block:: python
 
-  @pytest.fixture(autouse=True)
-  def _environment(request):
-      request.config._environment.append(('foo', 'bar'))
+  def pytest_configure(config):
+      config._metadata['foo'] = 'bar'
 
 Extra content
 ~~~~~~~~~~~~~

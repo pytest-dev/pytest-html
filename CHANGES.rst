@@ -1,7 +1,7 @@
 Release Notes
 -------------
 
-**1.14.0 (unreleased)**
+**1.14.0 (2017-02-27)**
 
 * Add hooks for modifying the test results table
 * Replace environment section with values from

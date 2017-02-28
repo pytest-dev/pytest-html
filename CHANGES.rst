@@ -1,6 +1,11 @@
 Release Notes
 -------------
 
+**1.14.1 (2017-02-28)**
+
+* Present metadata without additional formatting to avoid issues due to
+  unpredictable content types
+
 **1.14.0 (2017-02-27)**
 
 * Add hooks for modifying the test results table

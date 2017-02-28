@@ -437,13 +437,6 @@ class HTMLReport(object):
             value = metadata[key]
             if isinstance(value, basestring) and value.startswith('http'):
                 value = html.a(value, href=value, target='_blank')
-            elif not isinstance(value, basestring):
-                try:
-                    value = [': '.join([k, v]) for k, v in value.items()]
-                except AttributeError:
-                    pass  # not a dictionary
-                finally:
-                    value = ', '.join(value)
             rows.append(html.tr(html.td(key), html.td(value)))
 
         environment.append(html.table(rows, id='environment'))

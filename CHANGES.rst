@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**1.15.0 (unreleased)**
+
+* Add ability to specify images as file or URL
+
+  * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
+
 **1.14.2 (2017-03-10)**
 
 * Always encode content for data URI

@@ -53,7 +53,7 @@ you have this package installed, then ANSI codes will be converted to HTML in
 your report.
 
 Creating a self-contained report
-----------------------------------
+--------------------------------
 
 In order to respect the `Content Security Policy (CSP)
 <https://developer.mozilla.org/docs/Web/Security/CSP>`_,
@@ -64,6 +64,12 @@ convenient when sharing your results. This can be done in the following way:
 .. code-block:: bash
 
    $ pytest --html=report.html --self-contained-html
+
+Images added as files or links are going to be linked as external resources,
+meaning that the standalone report HTML-file may not display these images
+as expected.
+
+The plugin will issue a warning when adding files or links to the standalone report.
 
 Enhancing reports
 -----------------
@@ -94,7 +100,16 @@ Raw HTML    ``extra.html('<div>Additional HTML</div>')``
 Plain text  ``extra.text('Add some simple Text')``
 URL         ``extra.url('http://www.example.com/')``
 Image       ``extra.image(image, mime_type='image/gif', extension='gif')``
+Image       ``extra.image('/path/to/file.png')``
+Image       ``extra.image('http://some_image.png')``
 ==========  ============================================
+
+**Note**: When adding an image from file, the path can be either absolute
+or relative.
+
+**Note**: When using ``--self-contained-html``, images added as files or links
+may not work as expected, see section `Creating a self-contained report`_ for
+more info.
 
 There are also convenient types for several image formats:
 

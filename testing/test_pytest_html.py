@@ -418,6 +418,21 @@ class TestHTML:
             assert link in html
             assert os.path.exists(src)
 
+    def test_extra_text_encoding(self, testdir):
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.text(u'\u2318')]
+        """)
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir, 'report.html', '--self-contained-html')
+        assert result.ret == 0
+
     def test_no_environment(self, testdir):
         testdir.makeconftest("""
             def pytest_configure(config):

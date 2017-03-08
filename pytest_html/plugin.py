@@ -71,10 +71,7 @@ def pytest_unconfigure(config):
 
 
 def data_uri(content, mime_type='text/plain', charset='utf-8'):
-    if PY3:
-        data = b64encode(content.encode(charset)).decode('ascii')
-    else:
-        data = b64encode(content)
+    data = b64encode(content.encode(charset)).decode('ascii')
     return 'data:{0};charset={1};base64,{2}'.format(mime_type, charset, data)
 
 

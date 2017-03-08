@@ -236,8 +236,10 @@ class TestHTML:
         assert result.ret == 0
         assert content in html
 
-    def test_extra_text(self, testdir):
-        content = str(random.random())
+    @pytest.mark.parametrize('content, encoded', [
+        ("u'\u0081'", 'woE='),
+        ("'foo'", 'Zm9v')])
+    def test_extra_text(self, testdir, content, encoded):
         testdir.makeconftest("""
             import pytest
             @pytest.mark.hookwrapper
@@ -246,16 +248,12 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.text('{0}')]
+                    report.extra = [extras.text({0})]
         """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
-        if PY3:
-            data = b64encode(content.encode('utf-8')).decode('ascii')
-        else:
-            data = b64encode(content)
-        href = 'data:text/plain;charset=utf-8;base64,{0}'.format(data)
+        href = 'data:text/plain;charset=utf-8;base64,{0}'.format(encoded)
         link = '<a class="text" href="{0}" target="_blank">Text</a>'.format(
             href)
         assert link in html
@@ -327,7 +325,8 @@ class TestHTML:
         src = 'data:{0};base64,{1}'.format(mime_type, content)
         assert '<img src="{0}"/>'.format(src) in html
 
-    def test_extra_text_separated(self, testdir):
+    @pytest.mark.parametrize('content', [("u'\u0081'"), ("'foo'")])
+    def test_extra_text_separated(self, testdir, content):
         testdir.makeconftest("""
             import pytest
             @pytest.mark.hookwrapper
@@ -336,8 +335,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.text(u'\u0081')]
-        """)
+                    report.extra = [extras.text({0})]
+        """.format(content))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         hash_key = ('test_extra_text_separated.py::'

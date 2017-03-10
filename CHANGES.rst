@@ -1,6 +1,14 @@
 Release Notes
 -------------
 
+**1.14.2 (2017-03-10)**
+
+* Always encode content for data URI
+
+  * Thanks to `@micheletest <https://github.com/micheletest>`_ and
+    `@BeyondEvil <https://github.com/BeyondEvil>`_ for reporting the issue and
+    confirming the fix
+
 **1.14.1 (2017-02-28)**
 
 * Present metadata without additional formatting to avoid issues due to

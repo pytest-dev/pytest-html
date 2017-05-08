@@ -94,6 +94,8 @@ Raw HTML    ``extra.html('<div>Additional HTML</div>')``
 Plain text  ``extra.text('Add some simple Text')``
 URL         ``extra.url('http://www.example.com/')``
 Image       ``extra.image(image, mime_type='image/gif', extension='gif')``
+Image       ``extra.image('file:///path/to/file.png')``
+Image       ``extra.image('http://some_image.png')``
 ==========  ============================================
 
 There are also convenient types for several image formats:

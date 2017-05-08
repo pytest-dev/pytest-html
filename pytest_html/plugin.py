@@ -13,6 +13,7 @@ import sys
 import time
 import bisect
 import hashlib
+import re
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -157,14 +158,15 @@ class HTMLReport(object):
         def append_extra_html(self, extra, extra_index, test_index):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
-                if self.self_contained:
+                content = extra.get('content')
+                if re.match('^file|^http', content):
+                    html_div = html.img(src=content)
+                elif self.self_contained:
                     src = 'data:{0};base64,{1}'.format(
                         extra.get('mime_type'),
-                        extra.get('content'))
-                    self.additional_html.append(html.div(
-                        html.img(src=src), class_='image'))
+                        content)
+                    html_div = html.img(src=src)
                 else:
-                    content = extra.get('content')
                     if PY3:
                         content = b64decode(content.encode('utf-8'))
                     else:
@@ -172,9 +174,8 @@ class HTMLReport(object):
                     href = src = self.create_asset(
                         content, extra_index, test_index,
                         extra.get('extension'), 'wb')
-                    self.additional_html.append(html.div(
-                        html.a(html.img(src=src), href=href),
-                        class_='image'))
+                    html_div = html.a(html.img(src=src), href=href)
+                self.additional_html.append(html.div(html_div, class_='image'))
 
             elif extra.get('format') == extras.FORMAT_HTML:
                 self.additional_html.append(html.div(

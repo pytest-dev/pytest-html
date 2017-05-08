@@ -418,6 +418,24 @@ class TestHTML:
             assert link in html
             assert os.path.exists(src)
 
+    @pytest.mark.parametrize('type', ["https://", "file://"])
+    def test_extra_image_non_b64(self, testdir, type):
+        content = type
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.image('{0}')]
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir, 'report.html')
+        assert result.ret == 0
+        assert '<img src="{0}"/>'.format(content) in html
+
     def test_extra_text_encoding(self, testdir):
         testdir.makeconftest("""
             import pytest

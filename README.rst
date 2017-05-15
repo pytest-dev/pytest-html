@@ -5,19 +5,19 @@ pytest-html is a plugin for `pytest <http://pytest.org>`_ that generates a
 HTML report for the test results.
 
 .. image:: https://img.shields.io/badge/license-MPL%202.0-blue.svg
-:target: https://github.com/pytest-dev/pytest-html/blob/master/LICENSE
+   :target: https://github.com/pytest-dev/pytest-html/blob/master/LICENSE
    :alt: License
 .. image:: https://img.shields.io/pypi/v/pytest-html.svg
-:target: https://pypi.python.org/pypi/pytest-html/
+   :target: https://pypi.python.org/pypi/pytest-html/
    :alt: PyPI
 .. image:: https://img.shields.io/travis/pytest-dev/pytest-html.svg
-:target: https://travis-ci.org/pytest-dev/pytest-html/
+   :target: https://travis-ci.org/pytest-dev/pytest-html/
    :alt: Travis
 .. image:: https://img.shields.io/github/issues-raw/pytest-dev/pytest-html.svg
-:target: https://github.com/pytest-dev/pytest-html/issues
+   :target: https://github.com/pytest-dev/pytest-html/issues
    :alt: Issues
 .. image:: https://img.shields.io/requires/github/pytest-dev/pytest-html.svg
-:target: https://requires.io/github/pytest-dev/pytest-html/requirements/?branch=master
+   :target: https://requires.io/github/pytest-dev/pytest-html/requirements/?branch=master
    :alt: Requirements
 
 Requirements
@@ -53,7 +53,7 @@ you have this package installed, then ANSI codes will be converted to HTML in
 your report.
 
 Creating a self-contained report
---------------------------------
+----------------------------------
 
 In order to respect the `Content Security Policy (CSP)
 <https://developer.mozilla.org/docs/Web/Security/CSP>`_,
@@ -199,7 +199,7 @@ Screenshots
 -----------
 
 .. image:: https://cloud.githubusercontent.com/assets/122800/11952194/62daa964-a88e-11e5-9745-2aa5b714c8bb.png
-:target: https://cloud.githubusercontent.com/assets/122800/11951695/f371b926-a88a-11e5-91c2-499166776bd3.png
+   :target: https://cloud.githubusercontent.com/assets/122800/11951695/f371b926-a88a-11e5-91c2-499166776bd3.png
    :alt: Enhanced HTML report
 
 Resources

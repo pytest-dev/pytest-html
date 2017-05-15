@@ -128,6 +128,14 @@ conftest.py file:
               extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
           report.extra = extra
 
+You can also specify the :code:`name` argument for all types other than :code:`html` which will change the title of the
+created hyper link:
+
+.. code-block:: python
+
+    extra.append(pytest_html.extras.text('some string', name='Different title'))
+
+
 Modifying the results table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

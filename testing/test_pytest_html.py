@@ -418,9 +418,9 @@ class TestHTML:
             assert link in html
             assert os.path.exists(src)
 
-    @pytest.mark.parametrize('type', ["https://", "file://"])
-    def test_extra_image_non_b64(self, testdir, type):
-        content = type
+    @pytest.mark.parametrize('src_type', ["https://", "file://"])
+    def test_extra_image_non_b64(self, testdir, src_type):
+        content = src_type
         testdir.makeconftest("""
             import pytest
             @pytest.mark.hookwrapper

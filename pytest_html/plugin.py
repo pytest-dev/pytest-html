@@ -13,7 +13,7 @@ import sys
 import time
 import bisect
 import hashlib
-import re
+import warnings
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -159,7 +159,12 @@ class HTMLReport(object):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
                 content = extra.get('content')
-                if re.match('^file|^http', content):
+                if content.startswith(('file', 'http')) or \
+                        os.path.isfile(content):
+                    if self.self_contained:
+                        warnings.warn('Images added via file or link, '
+                                      'may not work as expected when '
+                                      'using --self-contained-html')
                     html_div = html.img(src=content)
                 elif self.self_contained:
                     src = 'data:{0};base64,{1}'.format(

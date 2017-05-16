@@ -98,6 +98,8 @@ Image       ``extra.image('file:///path/to/file.png')``
 Image       ``extra.image('http://some_image.png')``
 ==========  ============================================
 
+**Note**: When using ``--self-contained-html``, images added as files or links may not work as expected.
+
 There are also convenient types for several image formats:
 
 ============  ====================

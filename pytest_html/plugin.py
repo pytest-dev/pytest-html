@@ -162,9 +162,9 @@ class HTMLReport(object):
                 if content.startswith(('file', 'http')) or \
                         os.path.isfile(content):
                     if self.self_contained:
-                        warnings.warn('Images added via file or link, '
-                                      'may not work as expected when '
-                                      'using --self-contained-html')
+                        warnings.warn('Self-contained HTML report '
+                                      'includes link to external '
+                                      'resource: {}'.format(content))
                     html_div = html.img(src=content)
                 elif self.self_contained:
                     src = 'data:{0};base64,{1}'.format(

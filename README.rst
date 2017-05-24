@@ -202,6 +202,18 @@ Screenshots
    :target: https://cloud.githubusercontent.com/assets/122800/11951695/f371b926-a88a-11e5-91c2-499166776bd3.png
    :alt: Enhanced HTML report
 
+Contributing
+------------
+
+Fork the repository and submit PRs with bug fixes and enhancements,  contributions are very welcome.
+
+Tests can be run locally with `tox`_, for example to execute tests for Python 2.7 and 3.6 execute::
+
+    tox -e py27,py36
+
+
+.. _`tox`: https://tox.readthedocs.org/en/latest/
+
 Resources
 ---------
 

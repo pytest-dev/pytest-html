@@ -537,3 +537,23 @@ class TestHTML:
                 assert content in html
             else:
                 assert content not in html
+
+    @pytest.mark.parametrize('content', [("'foo'"), ("u'\u0081'")])
+    def test_utf8_longrepr(self, testdir, content):
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    report.longrepr = 'utf8 longrepr: ' + {0}
+        """.format(content))
+        testdir.makepyfile("""
+            def test_fail():
+                testtext = 'utf8 longrepr: '
+                assert False
+        """)
+        result, html = run(testdir, 'report.html', '--self-contained-html')
+        assert result.ret
+        assert 'utf8 longrepr' in html

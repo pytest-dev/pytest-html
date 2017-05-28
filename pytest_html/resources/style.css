@@ -80,6 +80,10 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
 /*------------------
  * 2. Extra
  *------------------*/
+.col-links a {
+	float: right;
+	clear: right;
+}
 
 .log:only-child {
 	height: inherit
@@ -90,14 +94,14 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
 	color: black;
 	display: block;
 	font-family: "Courier New", Courier, monospace;
-	height: 230px;
-	overflow-y: scroll;
+	height: 100%;
 	padding: 5px;
 	white-space: pre-wrap
 }
 div.image {
 	border: 1px solid #e6e6e6;
 	float: right;
+	clear: right;
 	height: 240px;
 	margin-left: 5px;
 	overflow: hidden;

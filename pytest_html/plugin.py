@@ -213,7 +213,15 @@ class HTMLReport(object):
         def append_log_html(self, report, additional_html):
             log = html.div(class_='log')
             if report.longrepr:
-                for line in report.longreprtext.splitlines():
+                if hasattr(report, 'longreprtext'):
+                    lines = report.longreprtext.splitlines()
+                else:
+                    # pytest 2.9
+                    if not PY3:
+                        lines = unicode(report.longrepr).splitlines()
+                    else:
+                        lines = str(report.longrepr).splitlines()
+                for line in lines:
                     separator = line.startswith('_ ' * 10)
                     if separator:
                         log.append(line[:80])

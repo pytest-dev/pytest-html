@@ -165,7 +165,7 @@ class HTMLReport(object):
                         warnings.warn('Self-contained HTML report '
                                       'includes link to external '
                                       'resource: {}'.format(content))
-                    html_div = html.img(src=content)
+                    html_div = html.a(html.img(src=content), href=content)
                 elif self.self_contained:
                     src = 'data:{0};base64,{1}'.format(
                         extra.get('mime_type'),

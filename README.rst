@@ -52,10 +52,8 @@ of a less permissive license, this package is not included as a dependency. If
 you have this package installed, then ANSI codes will be converted to HTML in
 your report.
 
-.. _self-contained:
-
 Creating a self-contained report
-----------------------------------
+--------------------------------
 
 In order to respect the `Content Security Policy (CSP)
 <https://developer.mozilla.org/docs/Web/Security/CSP>`_,
@@ -110,8 +108,8 @@ Image       ``extra.image('http://some_image.png')``
 or relative.
 
 **Note**: When using ``--self-contained-html``, images added as files or links
-may not work as expected, see the
-:ref:`Creating a self-contained report <self-contained>` section for more info.
+may not work as expected, see section `Creating a self-contained report`_ for
+more info.
 
 There are also convenient types for several image formats:
 

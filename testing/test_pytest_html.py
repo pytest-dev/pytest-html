@@ -436,22 +436,7 @@ class TestHTML:
             testdir.makefile('.png', image='pretty picture')
         result, html = run(testdir, 'report.html')
         assert result.ret == 0
-        assert '<img src="{0}"/>'.format(content) in html
-
-    def test_extra_text_encoding(self, testdir):
-        testdir.makeconftest("""
-            import pytest
-            @pytest.mark.hookwrapper
-            def pytest_runtest_makereport(item, call):
-                outcome = yield
-                report = outcome.get_result()
-                if report.when == 'call':
-                    from pytest_html import extras
-                    report.extra = [extras.text(u'\u2318')]
-        """)
-        testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir, 'report.html', '--self-contained-html')
-        assert result.ret == 0
+        assert '<a href="{0}"><img src="{0}"/>'.format(content) in html
 
     def test_no_environment(self, testdir):
         testdir.makeconftest("""

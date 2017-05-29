@@ -214,14 +214,14 @@ class HTMLReport(object):
             log = html.div(class_='log')
             if report.longrepr:
                 if hasattr(report, 'longreprtext'):
-                    lines = report.longreprtext.splitlines()
+                    reptext = report.longreprtext
                 else:
                     # pytest 2.9
                     if not PY3:
-                        lines = unicode(report.longrepr).splitlines()
+                        reptext = unicode(report.longrepr)  # noqa: F821
                     else:
-                        lines = str(report.longrepr).splitlines()
-                for line in lines:
+                        reptext = str(report.longrepr)
+                for line in reptext.splitlines():
                     separator = line.startswith('_ ' * 10)
                     if separator:
                         log.append(line[:80])

@@ -10,9 +10,10 @@ matrix:
     env: TOXENV=flake8
   - language: python
     python: 2.7
+    env: TOXENV=py27
   - language: python
     python: 2.7
-    env: TOXENV=ansi2html
+    env: TOXENV=py27-ansi2html
   - language: python
     python: 3.6
     env: TOXENV=flake8
@@ -21,24 +22,21 @@ matrix:
     env: TOXENV=py36
   - language: python
     python: 3.6
-    env: TOXENV=ansi2html
+    env: TOXENV=py36-ansi2html
   - language: python
     python: pypy
+    env: TOXENV=pypy
   - language: python
     python: pypy
-    env: TOXENV=ansi2html
+    env: TOXENV=pypy-ansi2html
   - language: python
     python: pypy3
+    env: TOXENV=pypy3
   - language: python
     python: pypy3
-    env: TOXENV=ansi2html
-  - language: python
-    python: nightly
-  - language: python
-    python: nightly
-    env: TOXENV=ansi2html
+    env: TOXENV=pypy3-ansi2html
 install:
-- pip install tox-travis
+- pip install tox
 script:
 - tox
 deploy:

@@ -10,52 +10,33 @@ matrix:
     env: TOXENV=flake8
   - language: python
     python: 2.7
-    env: TOXENV=pytest29
   - language: python
     python: 2.7
-    env: TOXENV=pytest30
-  - language: python
-    python: 2.7
-    env: TOXENV=pytest30-ansi2html
+    env: TOXENV=ansi2html
   - language: python
     python: 3.6
     env: TOXENV=flake8
   - language: python
     python: 3.6
-    env: TOXENV=pytest29
+    env: TOXENV=py36
   - language: python
     python: 3.6
-    env: TOXENV=pytest30
-  - language: python
-    python: 3.6
-    env: TOXENV=pytest30-ansi2html
+    env: TOXENV=ansi2html
   - language: python
     python: pypy
-    env: TOXENV=pytest29
   - language: python
     python: pypy
-    env: TOXENV=pytest30
-  - language: python
-    python: pypy
-    env: TOXENV=pytest30-ansi2html
+    env: TOXENV=ansi2html
   - language: python
     python: pypy3
-    env: TOXENV=pytest29
   - language: python
     python: pypy3
-    env: TOXENV=pytest30
-  - language: python
-    python: pypy3
-    env: TOXENV=pytest30-ansi2html
+    env: TOXENV=ansi2html
   - language: python
     python: nightly
-    env: TOXENV=pytest29
   - language: python
     python: nightly
-    env: TOXENV=pytest30
-  - language: python
-    python: nightly
-    env: TOXENV=pytest30-ansi2html
+    env: TOXENV=ansi2html
 install:
 - pip install tox-travis
 script:
@@ -70,4 +51,4 @@ deploy:
     tags: true
     repo: pytest-dev/pytest-html
     python: 3.6
-    condition: "$TOXENV = pytest30"
+    condition: "$TOXENV = py36"

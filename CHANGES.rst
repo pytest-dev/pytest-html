@@ -3,6 +3,11 @@ Release Notes
 
 **1.15.0 (unreleased)**
 
+* Fix encoding issue in longrepr values
+
+  * Thanks to `@tomga <https://github.com/tomga>`_ for reporting the issue and
+    providing a fix
+
 * Add ability to specify images as file or URL
 
   * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR

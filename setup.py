@@ -12,7 +12,7 @@ setup(name='pytest-html',
       entry_points={'pytest11': ['html = pytest_html.plugin']},
       setup_requires=['setuptools_scm'],
       install_requires=[
-        'pytest>=2.3',
+        'pytest>=3.0',
         'pytest-metadata'],
       license='Mozilla Public License 2.0 (MPL 2.0)',
       keywords='py.test pytest html report',

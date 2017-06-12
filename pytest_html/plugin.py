@@ -105,11 +105,50 @@ class HTMLReport(object):
             self.logfile = logfile
             self.config = config
             self.row_table = self.row_extra = None
+            self.images = []
 
             test_index = hasattr(report, 'rerun') and report.rerun + 1 or 0
 
             for extra_index, extra in enumerate(getattr(report, 'extra', [])):
                 self.append_extra_html(extra, extra_index, test_index)
+
+            num_of_images = len(self.images)
+            if num_of_images == 1:  # Only one image, no need for carousel
+                src, name = self.images.pop()
+                self.additional_html.append(
+                    html.div(html.a(html.img(src=src, alt=name),
+                                    href=src, target='_blank'),
+                             class_='image'))
+
+            elif num_of_images > 1:  # More than one image, build carousel
+                image_html = []
+                for image in range(num_of_images):
+                    carousel_html = []
+                    src, name = self.images[image]
+
+                    # Add (current) image
+                    carousel_html.append(html.a(html.img(
+                        src=src, alt=name), href=src, target='_blank'))
+
+                    # Add previous image
+                    prev_image = (image - 1) % num_of_images
+                    carousel_html.append(
+                        html.a('<', class_='button prev',
+                               href='#{}'.format(self.images[prev_image][0])))
+
+                    # Add next image
+                    next_image = (image + 1) % num_of_images
+                    carousel_html.append(
+                        html.a('>', class_='button next',
+                               href='#{}'.format(self.images[next_image][0])))
+                    image_html.append(
+                        html.div(carousel_html, id='{}'.format(src)))
+                self.additional_html.append(
+                    html.div(html.div(image_html, class_='carousel_inner'),
+                             class_='carousel'))
+
+            else:
+                pass  # No images, append nothing
 
             self.append_log_html(report, self.additional_html)
 
@@ -158,29 +197,26 @@ class HTMLReport(object):
         def append_extra_html(self, extra, extra_index, test_index):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
-                content = extra.get('content')
+                src = content = extra.get('content')
                 if content.startswith(('file', 'http')) or \
                         os.path.isfile(content):
                     if self.self_contained:
                         warnings.warn('Self-contained HTML report '
                                       'includes link to external '
                                       'resource: {}'.format(content))
-                    html_div = html.a(html.img(src=content), href=content)
                 elif self.self_contained:
                     src = 'data:{0};base64,{1}'.format(
                         extra.get('mime_type'),
                         content)
-                    html_div = html.img(src=src)
                 else:
                     if PY3:
                         content = b64decode(content.encode('utf-8'))
                     else:
                         content = b64decode(content)
-                    href = src = self.create_asset(
+                    src = self.create_asset(
                         content, extra_index, test_index,
                         extra.get('extension'), 'wb')
-                    html_div = html.a(html.img(src=src), href=href)
-                self.additional_html.append(html.div(html_div, class_='image'))
+                self.images.append((src, extra.get('name')))
 
             elif extra.get('format') == extras.FORMAT_HTML:
                 self.additional_html.append(html.div(

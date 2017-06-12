@@ -54,6 +54,7 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
  * 1. Table Layout
  * 2. Extra
  * 3. Sorting items
+ * 4. Image carousel
  *
  ******************************/
 
@@ -154,4 +155,46 @@ div.image img {
 .desc.active .sort-icon {
 	/*finish triangle*/
 	border-top: 8px solid #999;
+}
+
+/*------------------
+ * 4. Image carousel
+ *------------------*/
+.carousel {
+    border: 1px solid #e6e6e6;
+    float: right;
+    margin-left: 5px;
+    font-family: verdana, arial, sans-serif;
+}
+
+.carousel_inner {
+    height: 240px;
+    overflow: hidden;
+}
+
+.carousel_inner div {
+    height: 240px;
+    position: relative;
+}
+
+.carousel_inner div > a > img {
+    display: block;
+    width: 320px;
+    margin: 0 auto;
+}
+
+.button {
+    text-decoration: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 40px;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
 }

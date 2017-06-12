@@ -323,7 +323,9 @@ class TestHTML:
         result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret == 0
         src = 'data:{0};base64,{1}'.format(mime_type, content)
-        assert '<img src="{0}"/>'.format(src) in html
+        link = ('<div class="image"><a href="{0}" target="_blank">'
+                '<img alt="Image" src="{0}"/>'.format(src))
+        assert link in html
 
     @pytest.mark.parametrize('content', [("u'\u0081'"), ("'foo'")])
     def test_extra_text_separated(self, testdir, content):
@@ -377,7 +379,8 @@ class TestHTML:
         src = '{0}/{1}'.format('assets', '{0}.{1}'.
                                format(hash_generator.hexdigest(),
                                       file_extension))
-        link = ('<a class="image" href="{0}" target="_blank">'.format(src))
+        link = ('<div class="image"><a href="{0}" target="_blank">'
+                '<img alt="Image" src="{0}"/>'.format(src))
         assert link in html
         assert os.path.exists(src)
 
@@ -413,7 +416,8 @@ class TestHTML:
             hash_generator.update(hash_key)
             src = 'assets/{0}.{1}'.format(hash_generator.hexdigest(),
                                           file_extension)
-            link = ('<a class="image" href="{0}" target="_blank">'.format(src))
+            link = ('<div class="image"><a href="{0}" target="_blank">'
+                    '<img alt="Image" src="{0}"/>'.format(src))
             assert result.ret
             assert link in html
             assert os.path.exists(src)
@@ -436,7 +440,81 @@ class TestHTML:
             testdir.makefile('.png', image='pretty picture')
         result, html = run(testdir, 'report.html')
         assert result.ret == 0
-        assert '<a href="{0}"><img src="{0}"/>'.format(content) in html
+        link = ('<div class="image"><a href="{0}" target="_blank">'
+                '<img alt="Image" src="{0}"/>'.format(content))
+        assert link in html
+
+    @pytest.mark.parametrize('mime_type, extension',
+                             [('image/png', 'png'),
+                              ('image/png', 'image'),
+                              ('image/jpeg', 'jpg'),
+                              ('image/svg+xml', 'svg')])
+    def test_image_gallery(self, testdir, mime_type, extension):
+        image_one = str(random.random())
+        image_two = str(random.random())
+        testdir.makeconftest("""
+                import pytest
+                @pytest.mark.hookwrapper
+                def pytest_runtest_makereport(item, call):
+                    outcome = yield
+                    report = outcome.get_result()
+                    if report.when == 'call':
+                        from pytest_html import extras
+                        report.extra = [extras.{0}('{1}'),
+                        extras.{0}('{2}')]
+            """.format(extension, image_one, image_two))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir, 'report.html', '--self-contained-html')
+        assert result.ret == 0
+        src_one = 'data:{0};base64,{1}'.format(mime_type, image_one)
+        src_two = 'data:{0};base64,{1}'.format(mime_type, image_two)
+        link_one = '<div id="{0}"><a href="{0}" target="_blank">'.format(
+            src_one)
+        link_two = '<div id="{0}"><a href="{0}" target="_blank">'.format(
+            src_two)
+        assert link_one in html
+        assert link_two in html
+
+    @pytest.mark.parametrize('file_extension, extra_type', [
+        ('png', 'image'),
+        ('png', 'png'),
+        ('svg', 'svg'),
+        ('jpg', 'jpg')])
+    def test_image_gallery_separated(self, testdir, file_extension,
+                                     extra_type):
+        image_one = b64encode('foo'.encode('utf-8')).decode('ascii')
+        image_two = b64encode('bar'.encode('utf-8')).decode('ascii')
+        testdir.makeconftest("""
+                import pytest
+                @pytest.mark.hookwrapper
+                def pytest_runtest_makereport(item, call):
+                    outcome = yield
+                    report = outcome.get_result()
+                    if report.when == 'call':
+                        from pytest_html import extras
+                        report.extra = [extras.{0}('{1}'),
+                        extras.{0}('{2}')]
+            """.format(extra_type, image_one, image_two))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+
+        hash_key = ('test_image_gallery_separated.py::'
+                    'test_pass01').encode('utf-8')
+        hash_generator = hashlib.md5()
+        hash_generator.update(hash_key)
+        assert result.ret == 0
+        src = '{0}/{1}'.format('assets', '{0}.{1}'.
+                               format(hash_generator.hexdigest(),
+                                      file_extension))
+        link_one = ('<div id="{0}"><a href="{0}" target="_blank">'.format(src))
+        src = '{0}/{1}'.format('assets', '{0}.{1}'.
+                               format(hash_generator.hexdigest(),
+                                      file_extension))
+        link_two = ('<div id="{0}"><a href="{0}" target="_blank">'.format(src))
+        assert link_one in html
+        assert link_two in html
+        assert os.path.exists(src)
 
     def test_no_environment(self, testdir):
         testdir.makeconftest("""

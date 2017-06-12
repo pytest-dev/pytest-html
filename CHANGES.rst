@@ -1,7 +1,7 @@
 Release Notes
 -------------
 
-**1.15.0 (unreleased)**
+**1.15.0 (2017-06-09)**
 
 * Fix encoding issue in longrepr values
 

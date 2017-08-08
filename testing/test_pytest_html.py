@@ -238,7 +238,8 @@ class TestHTML:
 
     @pytest.mark.parametrize('content, encoded', [
         ("u'\u0081'", 'woE='),
-        ("'foo'", 'Zm9v')])
+        ("'foo'", 'Zm9v'),
+        ("b'\\xe2\\x80\\x93'", "4oCT")])
     def test_extra_text(self, testdir, content, encoded):
         testdir.makeconftest("""
             import pytest
@@ -325,7 +326,8 @@ class TestHTML:
         src = 'data:{0};base64,{1}'.format(mime_type, content)
         assert '<img src="{0}"/>'.format(src) in html
 
-    @pytest.mark.parametrize('content', [("u'\u0081'"), ("'foo'")])
+    @pytest.mark.parametrize('content', [("u'\u0081'"), ("'foo'"),
+                                         ("b'\\xe2\\x80\\x93'")])
     def test_extra_text_separated(self, testdir, content):
         testdir.makeconftest("""
             import pytest

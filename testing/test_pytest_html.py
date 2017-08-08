@@ -342,7 +342,7 @@ class TestHTML:
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         hash_key = ('test_extra_text_separated.py::'
-                    'test_pass01').encode('utf-8')
+                    'test_pass00').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
         assert result.ret == 0
@@ -372,7 +372,7 @@ class TestHTML:
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         hash_key = ('test_extra_image_separated.py::'
-                    'test_pass01').encode('utf-8')
+                    'test_pass00').encode('utf-8')
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key)
         assert result.ret == 0

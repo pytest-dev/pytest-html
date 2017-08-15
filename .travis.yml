@@ -1,52 +1,51 @@
-matrix:
+language: python
+jobs:
   include:
-  - language: node_js
-    install:
-    - npm install grunt-cli grunt grunt-contrib-qunit
-    script:
-    - grunt test
-  - language: python
-    python: 2.7
-    env: TOXENV=flake8
-  - language: python
-    python: 2.7
-    env: TOXENV=py27
-  - language: python
-    python: 2.7
-    env: TOXENV=py27-ansi2html
-  - language: python
-    python: 3.6
-    env: TOXENV=flake8
-  - language: python
-    python: 3.6
-    env: TOXENV=py36
-  - language: python
-    python: 3.6
-    env: TOXENV=py36-ansi2html
-  - language: python
-    python: pypy
-    env: TOXENV=pypy
-  - language: python
-    python: pypy
-    env: TOXENV=pypy-ansi2html
-  - language: python
-    python: pypy3
-    env: TOXENV=pypy3
-  - language: python
-    python: pypy3
-    env: TOXENV=pypy3-ansi2html
-install:
-- pip install tox
-script:
-- tox
-deploy:
-  provider: pypi
-  user: davehunt
-  password:
-    secure: QTNaSfTEZnCEINpCfzdOiOPZ1s6co9Fz2cEt5zv/dSZAJCiKNZvvbMzsOsRMQl1MJvp+cSHiuOir46vEGxzh2+FIl+RRSlENqF2G7jGJpfJfukBxYAhSvt9ZLT4UyBbgYz5sv9A4zs+Yo72xAS9eP+zf5bDVaQh0EzudUbb0Mv4=
-  distributions: sdist bdist_wheel
-  on:
-    tags: true
-    repo: pytest-dev/pytest-html
-    python: 3.6
-    condition: "$TOXENV = py36"
+    - stage:
+      language: node_js
+      install: npm install grunt-cli grunt grunt-contrib-qunit
+      script: grunt test
+    - stage:
+      python: 3.6
+      env: TOXENV=flake8
+    - stage:
+      python: 2.7
+      env: TOXENV=py27
+    - stage:
+      python: 2.7
+      env: TOXENV=py27-ansi2html
+    - stage:
+      python: 3.6
+      env: TOXENV=py36
+    - stage:
+      python: 3.6
+      env: TOXENV=py36-ansi2html
+    - stage:
+      python: pypy
+      env: TOXENV=pypy
+    - stage:
+      python: pypy
+      env: TOXENV=pypy-ansi2html
+    - stage:
+      python: pypy3
+      env: TOXENV=pypy3
+    - stage:
+      python: pypy3
+      env: TOXENV=pypy3-ansi2html
+    - stage: deploy
+      python: 3.6
+      install: skip
+      script: skip
+      deploy:
+        provider: pypi
+        user: davehunt
+        password:
+          secure: QTNaSfTEZnCEINpCfzdOiOPZ1s6co9Fz2cEt5zv/dSZAJCiKNZvvbMzsOsRMQl1MJvp+cSHiuOir46vEGxzh2+FIl+RRSlENqF2G7jGJpfJfukBxYAhSvt9ZLT4UyBbgYz5sv9A4zs+Yo72xAS9eP+zf5bDVaQh0EzudUbb0Mv4=
+        distributions: sdist bdist_wheel
+        on:
+          tags: true
+          repo: pytest-dev/pytest-html
+cache:
+  pip: true
+install: pip install tox
+script: tox

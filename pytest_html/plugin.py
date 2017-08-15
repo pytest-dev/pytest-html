@@ -199,7 +199,7 @@ class HTMLReport(object):
             elif extra.get('format') == extras.FORMAT_TEXT:
                 content = extra.get('content')
                 if isinstance(content, bytes):
-                    content = content.decode("utf-8")
+                    content = content.decode('utf-8')
                 if self.self_contained:
                     href = data_uri(content)
                 else:

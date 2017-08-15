@@ -1,13 +1,20 @@
 Release Notes
 -------------
 
+**1.15.2 (2017-08-15)**
+
+* Always decode byte string in extra text
+
+  * Thanks to `@ch-t <https://github.com/ch-t>`_ for reporting the issue and
+    providing a fix
+
 **1.15.1 (2017-06-12)**
 
 * Fix pytest dependency to 3.0 or later
 
-* Thanks to `@silvana-i <https://github.com/silvana-i>`_ for reporting the
-  issue and to `@nicoddemus <https://github.com/nicoddemus>`_ for providing a
-  fix
+  * Thanks to `@silvana-i <https://github.com/silvana-i>`_ for reporting the
+    issue and to `@nicoddemus <https://github.com/nicoddemus>`_ for providing a
+    fix
 
 **1.15.0 (2017-06-09)**
 

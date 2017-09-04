@@ -167,7 +167,7 @@ column:
   @pytest.mark.optionalhook
   def pytest_html_results_table_header(cells):
       cells.insert(2, html.th('Description'))
-      cells.insert(0, html.th('Time', class_='sortable time', col='time'))
+      cells.insert(1, html.th('Time', class_='sortable time', col='time'))
       cells.pop()
 
   @pytest.mark.optionalhook

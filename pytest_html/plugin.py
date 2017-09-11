@@ -14,7 +14,6 @@ import time
 import bisect
 import hashlib
 import warnings
-import collections
 
 try:
     from ansi2html import Ansi2HTMLConverter, style

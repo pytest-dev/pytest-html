@@ -440,6 +440,8 @@ class HTMLReport(object):
             value = metadata[key]
             if isinstance(value, basestring) and value.startswith('http'):
                 value = html.a(value, href=value, target='_blank')
+            elif type(value) is list:
+                value = ', '.join(list)
             rows.append(html.tr(html.td(key), html.td(value)))
 
         environment.append(html.table(rows, id='environment'))

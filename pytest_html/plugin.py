@@ -14,6 +14,7 @@ import time
 import bisect
 import hashlib
 import warnings
+import collections
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -440,8 +441,8 @@ class HTMLReport(object):
             value = metadata[key]
             if isinstance(value, basestring) and value.startswith('http'):
                 value = html.a(value, href=value, target='_blank')
-            elif type(value) is list:
-                value = ', '.join(list)
+            elif isinstance(value, (list, tuple, set)):
+                value = ', '.join(value)
             rows.append(html.tr(html.td(key), html.td(value)))
 
         environment.append(html.table(rows, id='environment'))

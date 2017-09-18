@@ -489,11 +489,11 @@ class TestHTML:
         assert result.ret
         assert 'Environment' in html
         assert len(re.findall(content, html)) == 1
-    
+
     def test_environment_list_value(self, testdir):
         content = tuple(str(random.random()) for i in range(10))
         expected_content = ', '.join(content)
-        expected_html_re='<td>content</td>\n\s+<td>{}</td>'.format(expected_content)
+        expected_html_re = '<td>content</td>\n\s+<td>{}</td>'.format(expected_content)
         testdir.makeconftest("""
             def pytest_configure(config):
                 for i in range(2):
@@ -504,7 +504,6 @@ class TestHTML:
         assert result.ret == 0
         assert 'Environment' in html
         assert len(re.findall(expected_html_re, html)) == 1
-
 
     @pytest.mark.xfail(
         sys.version_info < (3, 2) and

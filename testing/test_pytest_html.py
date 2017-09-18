@@ -493,7 +493,9 @@ class TestHTML:
     def test_environment_list_value(self, testdir):
         content = tuple(str(random.random()) for i in range(10))
         expected_content = ', '.join(content)
-        expected_html_re = '<td>content</td>\n\s+<td>{}</td>'.format(expected_content)
+        expected_html_re = '<td>content</td>\n\s+<td>{}</td>'.format(
+            expected_content
+        )
         testdir.makeconftest("""
             def pytest_configure(config):
                 for i in range(2):

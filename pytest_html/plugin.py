@@ -441,7 +441,7 @@ class HTMLReport(object):
             if isinstance(value, basestring) and value.startswith('http'):
                 value = html.a(value, href=value, target='_blank')
             elif isinstance(value, (list, tuple, set)):
-                value = ', '.join(value)
+                value = ', '.join((str(i) for i in value))
             rows.append(html.tr(html.td(key), html.td(value)))
 
         environment.append(html.table(rows, id='environment'))

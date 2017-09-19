@@ -492,7 +492,8 @@ class TestHTML:
 
     def test_environment_list_value(self, testdir):
         content = tuple(str(random.random()) for i in range(10))
-        expected_content = ', '.join(content)
+        content += tuple(random.random() for i in range(10))
+        expected_content = ', '.join((str(i) for i in content))
         expected_html_re = '<td>content</td>\n\s+<td>{}</td>'.format(
             expected_content
         )

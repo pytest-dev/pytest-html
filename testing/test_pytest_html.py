@@ -490,6 +490,24 @@ class TestHTML:
         assert 'Environment' in html
         assert len(re.findall(content, html)) == 1
 
+    def test_environment_list_value(self, testdir):
+        content = tuple(str(random.random()) for i in range(10))
+        content += tuple(random.random() for i in range(10))
+        expected_content = ', '.join((str(i) for i in content))
+        expected_html_re = '<td>content</td>\n\s+<td>{}</td>'.format(
+            expected_content
+        )
+        testdir.makeconftest("""
+            def pytest_configure(config):
+                for i in range(2):
+                    config._metadata['content'] = {0}
+        """.format(content))
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert 'Environment' in html
+        assert len(re.findall(expected_html_re, html)) == 1
+
     @pytest.mark.xfail(
         sys.version_info < (3, 2) and
         LooseVersion(pytest.__version__) >= LooseVersion('2.8.0'),

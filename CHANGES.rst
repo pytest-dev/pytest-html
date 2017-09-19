@@ -1,6 +1,11 @@
 Release Notes
 -------------
 
+**1.16.0 (2017-09-19)**
+
+* Improve rendering of collections in metadata
+  (`@rasmuspeders1 <https://github.com/rasmuspeders1>`_)
+
 **1.15.2 (2017-08-15)**
 
 * Always decode byte string in extra text

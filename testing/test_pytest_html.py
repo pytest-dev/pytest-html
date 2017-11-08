@@ -326,6 +326,12 @@ class TestHTML:
         src = 'data:{0};base64,{1}'.format(mime_type, content)
         assert '<img src="{0}"/>'.format(src) in html
 
+    def test_extra_image_windows(self, mocker, testdir):
+        mock_isfile = mocker.patch('pytest_html.plugin.isfile')
+        mock_isfile.side_effect = ValueError('stat: path too long for Windows')
+        self.test_extra_image(testdir, 'image/png', 'png')
+        assert mock_isfile.call_count == 1
+
     @pytest.mark.parametrize('content', [
         ("u'\u0081'"),
         ("'foo'"),

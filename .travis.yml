@@ -3,7 +3,7 @@ jobs:
   include:
     - stage:
       language: node_js
-      install: npm install grunt-cli grunt grunt-contrib-qunit
+      install: npm install phantomjs-prebuilt@2.1.15 grunt-cli grunt grunt-contrib-qunit
       script: grunt test
     - stage:
       python: 3.6

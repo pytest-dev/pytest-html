@@ -5,6 +5,7 @@
 from __future__ import absolute_import
 
 from base64 import b64encode, b64decode
+from os.path import isfile
 import datetime
 import json
 import os
@@ -159,8 +160,14 @@ class HTMLReport(object):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
                 content = extra.get('content')
-                if content.startswith(('file', 'http')) or \
-                        os.path.isfile(content):
+                try:
+                    is_uri_or_path = (content.startswith(('file', 'http')) or
+                                      isfile(content))
+                except ValueError:
+                    # On Windows, os.path.isfile throws this exception when
+                    # passed a b64 encoded image.
+                    is_uri_or_path = False
+                if is_uri_or_path:
                     if self.self_contained:
                         warnings.warn('Self-contained HTML report '
                                       'includes link to external '

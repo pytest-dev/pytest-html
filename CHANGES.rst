@@ -1,6 +1,15 @@
 Release Notes
 -------------
 
+**1.16.1 (2018-01-04)**
+
+* Fix for including screenshots on Windows
+  (`#124 <https://github.com/pytest-dev/pytest-html/issues/124>`_)
+
+  * Thanks to `@ngavrish <https://github.com/ngavrish>`_ for reporting the
+    issue and to `@pinkie1378 <https://github.com/pinkie1378>`_ for providing a
+    fix
+
 **1.16.0 (2017-09-19)**
 
 * Improve rendering of collections in metadata

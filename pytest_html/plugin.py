@@ -55,6 +55,9 @@ def pytest_addoption(parser):
                     'that the report may not render or function where CSP '
                     'restrictions are in place (see '
                     'https://developer.mozilla.org/docs/Web/Security/CSP)')
+    group.addoption('--append-css', action='append', dest='appendcss',
+                    metavar='path', default=None,
+                    help='append given CSS file content to report style file.')
 
 
 def pytest_configure(config):
@@ -91,6 +94,9 @@ class HTMLReport(object):
         self.rerun = 0 if has_rerun else None
         self.self_contained = config.getoption('self_contained_html')
         self.config = config
+
+        self.css_append = config.getoption('appendcss')
+        self.css_errors = []
 
     class TestResult:
 
@@ -129,7 +135,7 @@ class HTMLReport(object):
             if len(cells) > 0:
                 self.row_table = html.tr(cells)
                 self.row_extra = html.tr(html.td(self.additional_html,
-                                         class_='extra', colspan=len(cells)))
+                                                 class_='extra', colspan=len(cells)))
 
         def __lt__(self, other):
             order = ('Error', 'Failed', 'Rerun', 'XFailed',
@@ -139,7 +145,7 @@ class HTMLReport(object):
         def create_asset(self, content, extra_index,
                          test_index, file_extension, mode='w'):
             hash_key = ''.join([self.test_id, str(extra_index),
-                               str(test_index)]).encode('utf-8')
+                                str(test_index)]).encode('utf-8')
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key)
             asset_file_name = '{0}.{1}'.format(hash_generator.hexdigest(),
@@ -321,6 +327,21 @@ class HTMLReport(object):
             ansi_css.extend([str(r) for r in style.get_styles()])
             self.style_css += '\n'.join(ansi_css)
 
+        # <DF> Add user-provided CSS
+        if self.css_append:
+            self.style_css += '\n'
+            user_css = []
+            for filename in self.css_append:
+                try:
+                    with open(filename, 'r') as css_file:
+                        user_css.append('/* Begin CSS from {} */'.format(filename))
+                        user_css.extend(css_file.readlines())
+                        user_css.append('/* End CSS from {} */'.format(filename))
+                except Exception as e:
+                    self.css_errors.append('Warning: Could not read CSS from {}: {}'.format(filename, e))
+
+            self.style_css += '\n'.join(user_css)
+
         css_href = '{0}/{1}'.format('assets', 'style.css')
         html_css = html.link(href=css_href, rel='stylesheet',
                              type='text/css')
@@ -402,10 +423,10 @@ class HTMLReport(object):
             html.tr(cells),
             html.tr([
                 html.th('No results found. Try to check the filters',
-                    colspan=len(cells))],
+                        colspan=len(cells))],
                     id='not-found-message', hidden='true'),
             id='results-table-head'),
-                self.test_logs], id='results-table')]
+            self.test_logs], id='results-table')]
 
         main_js = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'main.js'))
@@ -501,3 +522,5 @@ class HTMLReport(object):
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: {0}'.format(
             self.logfile))
+        for css_error in self.css_errors:
+            terminalreporter.write_line(css_error)

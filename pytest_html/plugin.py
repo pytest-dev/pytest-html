@@ -440,6 +440,8 @@ class HTMLReport(object):
             return []
 
         metadata = config._metadata
+        config.hook.pytest_html_environment_section_metadata(metadata=metadata)
+
         environment = [html.h2('Environment')]
         rows = []
 

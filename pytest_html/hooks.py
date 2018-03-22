@@ -3,6 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
+def pytest_html_environment_section_metadata(metadata):
+    """ Called after collecting metadata for Environment section. """
+
+
 def pytest_html_results_table_header(cells):
     """ Called after building results table header. """
 

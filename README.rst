@@ -85,6 +85,17 @@ via the :code:`pytest_configure` hook:
   def pytest_configure(config):
       config._metadata['foo'] = 'bar'
 
+You can make changes to the metadata before it's written to the *Environment* section via the :code:`pytest_html_environment_section_metadata` hook. The following example :code:`conftest.py` removes metadata entries of which the key contains "password":
+
+.. code-block:: python
+
+  @pytest.mark.optionalhook
+  def pytest_html_environment_section_metadata(metadata):
+    for key in [k for k in metadata.keys() if metadata[k]]:
+        if "password" in key.lower():
+        del metadata[key]
+
+
 Extra content
 ~~~~~~~~~~~~~
 

@@ -3,6 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
+def pytest_html_results_summary(custom_summary):
+    """ Called after adding run time in Summary section """
+
+
 def pytest_html_results_table_header(cells):
     """ Called after building results table header. """
 

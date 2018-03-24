@@ -25,12 +25,12 @@ table {
  * SUMMARY INFORMATION
  ******************************/
 
-#environment td {
+#environment td, #custom-summary td {
 	padding: 5px;
 	border: 1px solid #E6E6E6;
 }
 
-#environment tr:nth-child(odd) {
+#environment tr:nth-child(odd), #custom-summary tr:nth-child(odd) {
 	background-color: #f6f6f6;
 }
 

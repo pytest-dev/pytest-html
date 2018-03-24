@@ -85,6 +85,18 @@ via the :code:`pytest_configure` hook:
   def pytest_configure(config):
       config._metadata['foo'] = 'bar'
 
+Additional summary information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can add a table to the *Summary* section by using the :code:`pytest_html_results_summary` hook:
+
+.. code-block:: python
+
+   import pytest
+   @pytest.mark.optionalhook
+   def pytest_html_results_summary(custom_summary):
+       custom_summary['foo'] = 'bar'
+
 Extra content
 ~~~~~~~~~~~~~
 

@@ -379,6 +379,7 @@ class HTMLReport(object):
         summary = [html.h2('Summary'), html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(
                 numtests, suite_time_delta)),
+            self._generate_custom_summary(session.config),
             html.p('(Un)check the boxes to filter the results.',
                    class_='filter',
                    hidden='true')]
@@ -438,21 +439,33 @@ class HTMLReport(object):
     def _generate_environment(self, config):
         if not hasattr(config, '_metadata') or config._metadata is None:
             return []
+        else:
+            metadata = config._metadata
+            return [html.h2('Environment'),
+                    html.table(self._create_table_rows_from_dictionary(metadata), id='environment')]
 
-        metadata = config._metadata
-        environment = [html.h2('Environment')]
+    def _generate_custom_summary(self, config):
+        custom_summary = {}
+        config.hook.pytest_html_results_summary(custom_summary=custom_summary)
+
+        if not custom_summary:
+            return []
+        else:
+            return [html.table(self._create_table_rows_from_dictionary(custom_summary), id='custom-summary')]
+
+    @staticmethod
+    def _create_table_rows_from_dictionary(dictionary):
         rows = []
 
-        for key in [k for k in sorted(metadata.keys()) if metadata[k]]:
-            value = metadata[key]
+        for key in [k for k in sorted(dictionary.keys()) if dictionary[k]]:
+            value = dictionary[key]
             if isinstance(value, basestring) and value.startswith('http'):
                 value = html.a(value, href=value, target='_blank')
             elif isinstance(value, (list, tuple, set)):
                 value = ', '.join((str(i) for i in value))
             rows.append(html.tr(html.td(key), html.td(value)))
 
-        environment.append(html.table(rows, id='environment'))
-        return environment
+        return rows
 
     def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)

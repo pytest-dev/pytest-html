@@ -441,7 +441,9 @@ class HTMLReport(object):
         else:
             metadata = config._metadata
             return [html.h2('Environment'),
-                    html.table(self._create_table_rows_from_dictionary(metadata), id='environment')]
+                    html.table(
+                        self._create_table_rows_from_dictionary(metadata),
+                        id='environment')]
 
     def _generate_custom_summary(self, config):
         custom_summary = {}
@@ -450,7 +452,9 @@ class HTMLReport(object):
         if not custom_summary:
             return []
         else:
-            return [html.table(self._create_table_rows_from_dictionary(custom_summary), id='custom-summary')]
+            return [html.table(
+                self._create_table_rows_from_dictionary(custom_summary),
+                id='custom-summary')]
 
     @staticmethod
     def _create_table_rows_from_dictionary(dictionary):

@@ -181,6 +181,16 @@ class TestHTML:
         assert result.ret == 0
         assert_results(html)
 
+    @pytest.mark.parametrize('path', ['', 'directory'])
+    def test_report_title(self, testdir, path):
+        testdir.makepyfile('def test_pass(): pass')
+        report_name = 'report.html'
+        path = os.path.join(path, report_name)
+        result, html = run(testdir, path)
+        assert result.ret == 0
+        report_title = "<h1>{0}</h1>".format(report_name)
+        assert report_title in html
+
     def test_resources_inline_css(self, testdir):
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir, 'report.html', '--self-contained-html')

@@ -4,7 +4,7 @@
 
 
 def pytest_html_results_summary(custom_summary):
-    """ Called after adding run time in Summary section """
+    """ Called at the start of composing the Summary section """
 
 
 def pytest_html_results_table_header(cells):

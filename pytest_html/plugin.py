@@ -376,13 +376,12 @@ class HTMLReport(object):
         if self.rerun is not None:
             outcomes.append(Outcome('rerun', self.rerun))
 
-        summary = [html.h2('Summary'), html.p(
-            '{0} tests ran in {1:.2f} seconds. '.format(
-                numtests, suite_time_delta)),
-            self._generate_custom_summary(session.config),
-            html.p('(Un)check the boxes to filter the results.',
-                   class_='filter',
-                   hidden='true')]
+        summary = [html.h2('Summary'),
+                   self._generate_custom_summary(session.config),
+                   html.p('{0} tests ran in {1:.2f} seconds. '.format(
+                       numtests, suite_time_delta)),
+                   html.p('(Un)check the boxes to filter the results.',
+                          class_='filter', hidden='true')]
 
         for i, outcome in enumerate(outcomes, start=1):
             summary.append(outcome.checkbox)

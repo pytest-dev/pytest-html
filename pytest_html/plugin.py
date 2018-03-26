@@ -96,7 +96,7 @@ class HTMLReport(object):
 
         def __init__(self, outcome, report, logfile, config):
             self.test_id = report.nodeid
-            if report.when != 'call':
+            if getattr(report, 'when', 'call') != 'call':
                 self.test_id = '::'.join([report.nodeid, report.when])
             self.time = getattr(report, 'duration', 0.0)
             self.outcome = outcome
@@ -277,7 +277,7 @@ class HTMLReport(object):
                 self._appendrow('Passed', report)
 
     def append_failed(self, report):
-        if report.when == "call":
+        if getattr(report, 'when', None) == "call":
             if hasattr(report, "wasxfail"):
                 # pytest < 3.0 marked xpasses as failures
                 self.xpassed += 1
@@ -479,6 +479,10 @@ class HTMLReport(object):
             self.append_skipped(report)
         else:
             self.append_other(report)
+
+    def pytest_collectreport(self, report):
+        if report.failed:
+            self.append_failed(report)
 
     def pytest_sessionstart(self, session):
         self.suite_start_time = time.time()

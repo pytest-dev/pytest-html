@@ -219,24 +219,26 @@ class TestHTML:
         assert content not in html
         assert escaped in html
 
-    def test_no_custom_content_in_summary(self, testdir):
-        testdir.makepyfile('def test_pass(): pass')
-        result, html = run(testdir)
-        assert result.ret == 0
-        assert '<table id="custom-summary">' not in html
-
     def test_custom_content_in_summary(self, testdir):
-        content = str(random.random())
+        content_prefix = str(random.random())
+        content_summary = str(random.random())
+        content_suffix = str(random.random())
         testdir.makeconftest("""
             import pytest
+            from py.xml import html
+
             @pytest.mark.optionalhook
-            def pytest_html_results_summary(custom_summary):
-                custom_summary['content'] = {0}
-        """.format(content))
+            def pytest_html_results_summary(prefix, summary, postfix):
+                prefix.append(html.p("prefix is {0}"))
+                summary.extend([html.p("extra summary is {1}")])
+                postfix.extend([html.p("postfix is {2}")])
+        """.format(content_prefix, content_summary, content_suffix))
         testdir.makepyfile('def test_pass(): pass')
         result, html = run(testdir)
         assert result.ret == 0
-        assert len(re.findall(content, html)) == 1
+        assert len(re.findall(content_prefix, html)) == 1
+        assert len(re.findall(content_summary, html)) == 1
+        assert len(re.findall(content_suffix, html)) == 1
 
     def test_extra_html(self, testdir):
         content = str(random.random())

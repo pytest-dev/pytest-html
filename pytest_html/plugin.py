@@ -376,12 +376,12 @@ class HTMLReport(object):
         if self.rerun is not None:
             outcomes.append(Outcome('rerun', self.rerun))
 
-        summary = [html.h2('Summary'),
-                   self._generate_custom_summary(session.config),
-                   html.p('{0} tests ran in {1:.2f} seconds. '.format(
-                       numtests, suite_time_delta)),
-                   html.p('(Un)check the boxes to filter the results.',
-                          class_='filter', hidden='true')]
+        summary = [html.p(
+            '{0} tests ran in {1:.2f} seconds. '.format(
+                numtests, suite_time_delta)),
+            html.p('(Un)check the boxes to filter the results.',
+                   class_='filter',
+                   hidden='true')]
 
         for i, outcome in enumerate(outcomes, start=1):
             summary.append(outcome.checkbox)
@@ -422,7 +422,11 @@ class HTMLReport(object):
             onLoad='init()')
 
         body.extend(self._generate_environment(session.config))
-        body.extend(summary)
+
+        summary_prefix, summary_postfix = [], []
+        session.config.hook.pytest_html_results_summary(prefix=summary_prefix, summary=summary, postfix=summary_postfix)
+        body.extend([html.h2('Summary')] + summary_prefix + summary + summary_postfix)
+
         body.extend(results)
 
         doc = html.html(head, body)
@@ -438,37 +442,21 @@ class HTMLReport(object):
     def _generate_environment(self, config):
         if not hasattr(config, '_metadata') or config._metadata is None:
             return []
-        else:
-            metadata = config._metadata
-            return [html.h2('Environment'),
-                    html.table(
-                        self._create_table_rows_from_dictionary(metadata),
-                        id='environment')]
 
-    def _generate_custom_summary(self, config):
-        custom_summary = {}
-        config.hook.pytest_html_results_summary(custom_summary=custom_summary)
-
-        if not custom_summary:
-            return []
-        else:
-            return [html.table(
-                self._create_table_rows_from_dictionary(custom_summary),
-                id='custom-summary')]
-
-    @staticmethod
-    def _create_table_rows_from_dictionary(dictionary):
+        metadata = config._metadata
+        environment = [html.h2('Environment')]
         rows = []
 
-        for key in [k for k in sorted(dictionary.keys()) if dictionary[k]]:
-            value = dictionary[key]
+        for key in [k for k in sorted(metadata.keys()) if metadata[k]]:
+            value = metadata[key]
             if isinstance(value, basestring) and value.startswith('http'):
                 value = html.a(value, href=value, target='_blank')
             elif isinstance(value, (list, tuple, set)):
                 value = ', '.join((str(i) for i in value))
             rows.append(html.tr(html.td(key), html.td(value)))
 
-        return rows
+        environment.append(html.table(rows, id='environment'))
+        return environment
 
     def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)

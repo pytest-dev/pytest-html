@@ -88,14 +88,16 @@ via the :code:`pytest_configure` hook:
 Additional summary information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can add a table to the *Summary* section by using the :code:`pytest_html_results_summary` hook:
+You can edit the *Summary* section by using the :code:`pytest_html_results_summary` hook:
 
 .. code-block:: python
 
    import pytest
+   from py.xml import html
+
    @pytest.mark.optionalhook
-   def pytest_html_results_summary(custom_summary):
-       custom_summary['foo'] = 'bar'
+   def pytest_html_results_summary(prefix, summary, postfix):
+       prefix.extend([html.p("foo: bar")])
 
 Extra content
 ~~~~~~~~~~~~~

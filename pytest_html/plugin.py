@@ -424,8 +424,10 @@ class HTMLReport(object):
         body.extend(self._generate_environment(session.config))
 
         summary_prefix, summary_postfix = [], []
-        session.config.hook.pytest_html_results_summary(prefix=summary_prefix, summary=summary, postfix=summary_postfix)
-        body.extend([html.h2('Summary')] + summary_prefix + summary + summary_postfix)
+        session.config.hook.pytest_html_results_summary(
+            prefix=summary_prefix, summary=summary, postfix=summary_postfix)
+        body.extend([html.h2('Summary')] + summary_prefix
+                    + summary + summary_postfix)
 
         body.extend(results)
 

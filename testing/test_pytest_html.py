@@ -616,3 +616,14 @@ class TestHTML:
         result, html = run(testdir, 'report.html', '--self-contained-html')
         assert result.ret
         assert 'utf8 longrepr' in html
+
+    def test_collect_error(self, testdir):
+        testdir.makepyfile("""
+            import xyz
+            def test_pass(): pass
+        """)
+        result, html = run(testdir)
+        assert result.ret
+        assert_results(html, tests=0, passed=0, errors=1)
+        regex_error = '(Import|ModuleNotFound)Error: No module named .*xyz'
+        assert re.search(regex_error, html) is not None

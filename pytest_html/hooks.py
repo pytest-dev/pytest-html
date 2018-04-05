@@ -3,6 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
+def pytest_html_results_summary(prefix, summary, postfix):
+    """ Called before adding the summary section to the report """
+
+
 def pytest_html_results_table_header(cells):
     """ Called after building results table header. """
 

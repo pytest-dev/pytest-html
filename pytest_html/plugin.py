@@ -376,7 +376,7 @@ class HTMLReport(object):
         if self.rerun is not None:
             outcomes.append(Outcome('rerun', self.rerun))
 
-        summary = [html.h2('Summary'), html.p(
+        summary = [html.p(
             '{0} tests ran in {1:.2f} seconds. '.format(
                 numtests, suite_time_delta)),
             html.p('(Un)check the boxes to filter the results.',
@@ -423,7 +423,13 @@ class HTMLReport(object):
             onLoad='init()')
 
         body.extend(self._generate_environment(session.config))
-        body.extend(summary)
+
+        summary_prefix, summary_postfix = [], []
+        session.config.hook.pytest_html_results_summary(
+            prefix=summary_prefix, summary=summary, postfix=summary_postfix)
+        body.extend([html.h2('Summary')] + summary_prefix
+                    + summary + summary_postfix)
+
         body.extend(results)
 
         doc = html.html(head, body)

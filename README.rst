@@ -73,6 +73,17 @@ The plugin will issue a warning when adding files or links to the standalone rep
 Enhancing reports
 -----------------
 
+Appearance
+~~~~~~~~~~
+
+Custom CSS (Cascasding Style Sheets) can be passed on the command line using
+the :code:`--css` option. These will be applied in the order specified, and can
+be used to change the appearance of the report.
+
+.. code-block:: bash
+
+  $ pytest --html=report.html --css=highcontrast.css --css=accessible.css
+
 Environment
 ~~~~~~~~~~~
 

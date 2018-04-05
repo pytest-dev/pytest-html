@@ -55,17 +55,19 @@ def pytest_addoption(parser):
                     'that the report may not render or function where CSP '
                     'restrictions are in place (see '
                     'https://developer.mozilla.org/docs/Web/Security/CSP)')
-    group.addoption('--append-css', action='append', dest='appendcss',
-                    metavar='path', default=None,
-                    help='append given CSS file content to report style file.')
+    group.addoption('--css', action='append', metavar='path',
+                    help='append given css file content to report style file.')
 
 
 def pytest_configure(config):
-    htmlpath = config.option.htmlpath
-    # prevent opening htmlpath on slave nodes (xdist)
-    if htmlpath and not hasattr(config, 'slaveinput'):
-        config._html = HTMLReport(htmlpath, config)
-        config.pluginmanager.register(config._html)
+    htmlpath = config.getoption('htmlpath')
+    if htmlpath:
+        for csspath in config.getoption('css') or []:
+            open(csspath)
+        if not hasattr(config, 'slaveinput'):
+            # prevent opening htmlpath on slave nodes (xdist)
+            config._html = HTMLReport(htmlpath, config)
+            config.pluginmanager.register(config._html)
 
 
 def pytest_unconfigure(config):
@@ -94,9 +96,6 @@ class HTMLReport(object):
         self.rerun = 0 if has_rerun else None
         self.self_contained = config.getoption('self_contained_html')
         self.config = config
-
-        self.css_append = config.getoption('appendcss')
-        self.css_errors = []
 
     class TestResult:
 
@@ -135,7 +134,8 @@ class HTMLReport(object):
             if len(cells) > 0:
                 self.row_table = html.tr(cells)
                 self.row_extra = html.tr(html.td(self.additional_html,
-                                                 class_='extra', colspan=len(cells)))
+                                                 class_='extra',
+                                                 colspan=len(cells)))
 
         def __lt__(self, other):
             order = ('Error', 'Failed', 'Rerun', 'XFailed',
@@ -328,19 +328,13 @@ class HTMLReport(object):
             self.style_css += '\n'.join(ansi_css)
 
         # <DF> Add user-provided CSS
-        if self.css_append:
-            self.style_css += '\n'
-            user_css = []
-            for filename in self.css_append:
-                try:
-                    with open(filename, 'r') as css_file:
-                        user_css.append('/* Begin CSS from {} */'.format(filename))
-                        user_css.extend(css_file.readlines())
-                        user_css.append('/* End CSS from {} */'.format(filename))
-                except Exception as e:
-                    self.css_errors.append('Warning: Could not read CSS from {}: {}'.format(filename, e))
-
-            self.style_css += '\n'.join(user_css)
+        for path in self.config.getoption('css') or []:
+            self.style_css += '\n/******************************'
+            self.style_css += '\n * CUSTOM CSS'
+            self.style_css += '\n * {}'.format(path)
+            self.style_css += '\n ******************************/\n\n'
+            with open(path, 'r') as f:
+                self.style_css += f.read()
 
         css_href = '{0}/{1}'.format('assets', 'style.css')
         html_css = html.link(href=css_href, rel='stylesheet',
@@ -522,5 +516,3 @@ class HTMLReport(object):
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep('-', 'generated html file: {0}'.format(
             self.logfile))
-        for css_error in self.css_errors:
-            terminalreporter.write_line(css_error)

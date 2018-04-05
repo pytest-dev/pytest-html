@@ -1,6 +1,30 @@
 Release Notes
 -------------
 
+**1.17.0 (2018-04-05)**
+
+* Add support for custom CSS (`#116 <https://github.com/pytest-dev/pytest-html/issues/116>`_)
+
+  * Thanks to `@APshenkin <https://github.com/APshenkin>`_ for reporting the
+    issue and to `@i-am-david-fernandez
+    <https://github.com/i-am-david-fernandez>`_ for providing a fix
+
+* Report collection errors (`#148 <https://github.com/pytest-dev/pytest-html/issues/148>`_)
+
+  * Thanks to `@Formartha <https://github.com/Formartha>`_ for reporting the
+    issue
+
+* Add hook for modifying summary section (`#109 <https://github.com/pytest-dev/pytest-html/issues/109>`_)
+
+  * Thanks to `@shreyashah <https://github.com/shreyashah>`_ for reporting the
+    issue and to `@j19sch <https://github.com/j19sch>`_ for providing a
+    fix
+
+* Add filename to report as heading
+
+  * Thanks to `@j19sch <https://github.com/j19sch>`_ for the PR
+
+
 **1.16.1 (2018-01-04)**
 
 * Fix for including screenshots on Windows

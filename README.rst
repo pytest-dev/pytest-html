@@ -96,6 +96,9 @@ via the :code:`pytest_configure` hook:
   def pytest_configure(config):
       config._metadata['foo'] = 'bar'
 
+The generated table will be sorted alphabetically unless the metadata is a
+:code:`collections.OrderedDict`.
+
 Additional summary information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

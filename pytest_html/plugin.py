@@ -5,6 +5,7 @@
 from __future__ import absolute_import
 
 from base64 import b64encode, b64decode
+from collections import OrderedDict
 from os.path import isfile
 import datetime
 import json
@@ -465,7 +466,11 @@ class HTMLReport(object):
         environment = [html.h2('Environment')]
         rows = []
 
-        for key in [k for k in sorted(metadata.keys()) if metadata[k]]:
+        keys = [k for k in metadata.keys() if metadata[k]]
+        if not isinstance(metadata, OrderedDict):
+            keys.sort()
+
+        for key in keys:
             value = metadata[key]
             if isinstance(value, basestring) and value.startswith('http'):
                 value = html.a(value, href=value, target='_blank')

@@ -545,6 +545,18 @@ class TestHTML:
         assert 'Environment' in html
         assert len(re.findall(expected_html_re, html)) == 1
 
+    def test_environment_ordered(self, testdir):
+        testdir.makeconftest("""
+            from collections import OrderedDict
+            def pytest_configure(config):
+                config._metadata = OrderedDict([('ZZZ', 1), ('AAA', 2)])
+        """)
+        testdir.makepyfile('def test_pass(): pass')
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert 'Environment' in html
+        assert len(re.findall('ZZZ.+AAA', html, re.DOTALL)) == 1
+
     @pytest.mark.xfail(
         sys.version_info < (3, 2) and
         LooseVersion(pytest.__version__) >= LooseVersion('2.8.0'),

@@ -10,6 +10,9 @@ HTML report for the test results.
 .. image:: https://img.shields.io/pypi/v/pytest-html.svg
    :target: https://pypi.python.org/pypi/pytest-html/
    :alt: PyPI
+.. image:: https://img.shields.io/conda/vn/conda-forge/pytest-html.svg
+   :target: https://anaconda.org/conda-forge/pytest-html
+   :alt: Conda Forge   
 .. image:: https://img.shields.io/travis/pytest-dev/pytest-html.svg
    :target: https://travis-ci.org/pytest-dev/pytest-html/
    :alt: Travis

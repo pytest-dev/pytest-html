@@ -1,6 +1,13 @@
 Release Notes
 -------------
 
+**1.18.0 (2018-05-22)**
+
+* Preserve the order if metadata is ``OrderedDict``
+
+  * Thanks to `@jacebrowning <https://github.com/jacebrowning>`_ for suggesting
+    this enhancement and providing a patch
+
 **1.17.0 (2018-04-05)**
 
 * Add support for custom CSS (`#116 <https://github.com/pytest-dev/pytest-html/issues/116>`_)

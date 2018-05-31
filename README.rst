@@ -12,7 +12,7 @@ HTML report for the test results.
    :alt: PyPI
 .. image:: https://img.shields.io/conda/vn/conda-forge/pytest-html.svg
    :target: https://anaconda.org/conda-forge/pytest-html
-   :alt: Conda Forge   
+   :alt: Conda Forge
 .. image:: https://img.shields.io/travis/pytest-dev/pytest-html.svg
    :target: https://travis-ci.org/pytest-dev/pytest-html/
    :alt: Travis
@@ -239,6 +239,14 @@ additional HTML and log output with a notice that the log is empty:
       if report.passed:
           del data[:]
           data.append(html.div('No log output captured.', class_='empty log'))
+
+Display options
+---------------
+
+By default, all rows in the **Results** table will be expanded except those that have :code:`Passed`.
+
+This behavior can be customized with a query parameter: :code:`?collapsed=Passed,XFailed,Skipped`.
+
 
 Screenshots
 -----------

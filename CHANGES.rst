@@ -1,6 +1,14 @@
 Release Notes
 -------------
 
+**1.19.0 (2018-06-01)**
+
+* Allow collapsed outcomes to be configured by using a query parameter
+
+  * Thanks to `@Formartha <https://github.com/Formartha>`_ for suggesting this
+    enhancement and to `@jacebrowning <https://github.com/jacebrowning>`_ for
+    providing a patch
+
 **1.18.0 (2018-05-22)**
 
 * Preserve the order if metadata is ``OrderedDict``

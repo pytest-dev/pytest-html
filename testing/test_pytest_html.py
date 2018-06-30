@@ -29,7 +29,7 @@ def run(testdir, path='report.html', *args):
 def assert_results_by_outcome(html, test_outcome, test_outcome_number,
                               label=None):
     # Asserts if the test number of this outcome in the summary is correct
-    regex_summary = '(\d)+ {0}'.format(label or test_outcome)
+    regex_summary = r'(\d)+ {0}'.format(label or test_outcome)
     assert int(re.search(regex_summary, html).group(1)) == test_outcome_number
 
     # Asserts if the generated checkbox of this outcome is correct
@@ -47,12 +47,12 @@ def assert_results_by_outcome(html, test_outcome, test_outcome_number,
 def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
                    errors=0, xfailed=0, xpassed=0, rerun=0):
     # Asserts total amount of tests
-    total_tests = re.search('(\d)+ tests ran', html)
+    total_tests = re.search(r'(\d)+ tests ran', html)
     assert int(total_tests.group(1)) == tests
 
     # Asserts tests running duration
     if duration is not None:
-        tests_duration = re.search('([\d,.]+) seconds', html)
+        tests_duration = re.search(r'([\d,.]+) seconds', html)
         assert float(tests_duration.group(1)) >= float(duration)
 
     # Asserts by outcome
@@ -76,7 +76,7 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert_results(html, duration=sleep)
-        p = re.compile('<td class="col-duration">([\d,.]+)</td>')
+        p = re.compile(r'<td class="col-duration">([\d,.]+)</td>')
         m = p.search(html)
         assert float(m.group(1)) >= sleep
 
@@ -531,7 +531,7 @@ class TestHTML:
         content = tuple(str(random.random()) for i in range(10))
         content += tuple(random.random() for i in range(10))
         expected_content = ', '.join((str(i) for i in content))
-        expected_html_re = '<td>content</td>\n\s+<td>{}</td>'.format(
+        expected_html_re = r'<td>content</td>\n\s+<td>{}</td>'.format(
             expected_content
         )
         testdir.makeconftest("""

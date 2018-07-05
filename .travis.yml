@@ -7,7 +7,9 @@ jobs:
       install: npm install phantomjs-prebuilt@2.1.15 grunt-cli grunt grunt-contrib-qunit
       script: grunt test
     - stage:
-      python: 3.6
+      python: 3.7
+      dist: xenial
+      sudo: required
       env: TOXENV=flake8
     - stage:
       python: 2.7
@@ -22,6 +24,16 @@ jobs:
       python: 3.6
       env: TOXENV=py36-ansi2html
     - stage:
+      python: 3.7
+      dist: xenial
+      sudo: required
+      env: TOXENV=py37
+    - stage:
+      python: 3.7
+      dist: xenial
+      sudo: required
+      env: TOXENV=py37-ansi2html
+    - stage:
       python: pypy
       env: TOXENV=pypy
     - stage:
@@ -34,7 +46,9 @@ jobs:
       python: pypy3
       env: TOXENV=pypy3-ansi2html
     - stage: deploy
-      python: 3.6
+      python: 3.7
+      dist: xenial
+      sudo: required
       install: skip
       script: skip
       deploy:

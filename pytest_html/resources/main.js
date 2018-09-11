@@ -38,12 +38,12 @@ function sort_column(elem) {
     sort_table(elem, key(colIndex));
 }
 
-function show_all_extras() {
-    find_all('.col-result').forEach(show_extras);
+function show_all_extras(table_id) {
+    find_all('.col-result', find('#' + table_id)).forEach(show_extras);
 }
 
-function hide_all_extras() {
-    find_all('.col-result').forEach(hide_extras);
+function hide_all_extras(table_id) {
+    find_all('.col-result', find('#' + table_id)).forEach(hide_extras);
 }
 
 function show_extras(colresult_elem) {
@@ -70,11 +70,12 @@ function show_filters() {
 
 function add_collapse() {
     // Add links for show/hide all
-    var resulttable = find('table#results-table');
-    var showhideall = document.createElement("p");
-    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
-                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
-    resulttable.parentElement.insertBefore(showhideall, resulttable);
+    find_all('table.results-table').forEach(function(resulttable) {
+        var showhideall = document.createElement("p");
+        showhideall.innerHTML = '<a href="javascript:show_all_extras(\'' + resulttable.id + '\')">Show all details</a> / ' +
+            '<a href="javascript:hide_all_extras(\'' + resulttable.id + '\')">Hide all details</a>';
+        resulttable.parentElement.insertBefore(showhideall, resulttable);
+    });
 
     // Add show/hide link to each result
     find_all('.col-result').forEach(function(elem) {
@@ -123,21 +124,23 @@ function init () {
 };
 
 function sort_table(clicked, key_func) {
-    var rows = find_all('.results-table-row');
+    var table = clicked.parentNode.parentNode.parentNode;
+    var previous_sibling = table.previousSibling;
+    var rows = find_all('.results-table-row', table);
     var reversed = !clicked.classList.contains('asc');
     var sorted_rows = sort(rows, key_func, reversed);
     /* Whole table is removed here because browsers acts much slower
      * when appending existing elements.
      */
-    var thead = document.getElementById("results-table-head");
-    document.getElementById('results-table').remove();
+    var thead = find('thead', table);
+    table.remove();
     var parent = document.createElement("table");
-    parent.id = "results-table";
+    parent.id = table.id;
     parent.appendChild(thead);
     sorted_rows.forEach(function(elem) {
         parent.appendChild(elem);
     });
-    document.getElementsByTagName("BODY")[0].appendChild(parent);
+    previous_sibling.parentNode.insertBefore(parent, previous_sibling.nextSibling);
 }
 
 function sort(items, key_func, reversed) {
@@ -214,14 +217,15 @@ function is_all_rows_hidden(value) {
 function filter_table(elem) {
     var outcome_att = "data-test-result";
     var outcome = elem.getAttribute(outcome_att);
-    class_outcome = outcome + " results-table-row";
-    var outcome_rows = document.getElementsByClassName(class_outcome);
+    var class_outcome = outcome + " results-table-row";
+    var table = find("#results-table");
+    var outcome_rows = table.getElementsByClassName(class_outcome);
 
     for(var i = 0; i < outcome_rows.length; i++){
         outcome_rows[i].hidden = !elem.checked;
     }
 
-    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var rows = find_all('.results-table-row', table).filter(is_all_rows_hidden);
     var all_rows_hidden = rows.length == 0 ? true : false;
     var not_found_message = document.getElementById("not-found-message");
     not_found_message.hidden = !all_rows_hidden;

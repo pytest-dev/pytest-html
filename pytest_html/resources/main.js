@@ -218,7 +218,8 @@ function filter_table(elem) {
     var outcome_att = "data-test-result";
     var outcome = elem.getAttribute(outcome_att);
     var class_outcome = outcome + " results-table-row";
-    var table = find("#results-table");
+    var prefix_id = elem.getAttribute("data-prefix-id");
+    var table = find("#" + prefix_id + "results-table");
     var outcome_rows = table.getElementsByClassName(class_outcome);
 
     for(var i = 0; i < outcome_rows.length; i++){
@@ -227,6 +228,6 @@ function filter_table(elem) {
 
     var rows = find_all('.results-table-row', table).filter(is_all_rows_hidden);
     var all_rows_hidden = rows.length == 0 ? true : false;
-    var not_found_message = document.getElementById("not-found-message");
+    var not_found_message = document.getElementById(prefix_id + "not-found-message");
     not_found_message.hidden = !all_rows_hidden;
 }

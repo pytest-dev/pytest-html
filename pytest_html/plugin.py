@@ -466,7 +466,7 @@ class HTMLReport(object):
         environment = [html.h2('Environment')]
         rows = []
 
-        keys = [k for k in metadata.keys() if metadata[k]]
+        keys = [k for k in metadata.keys()]
         if not isinstance(metadata, OrderedDict):
             keys.sort()
 

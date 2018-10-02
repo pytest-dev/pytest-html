@@ -56,14 +56,14 @@ def pytest_addoption(parser):
                     'that the report may not render or function where CSP '
                     'restrictions are in place (see '
                     'https://developer.mozilla.org/docs/Web/Security/CSP)')
-    group.addoption('--css', action='append', metavar='path',
+    group.addoption('--css', action='append', metavar='path', default=[],
                     help='append given css file content to report style file.')
 
 
 def pytest_configure(config):
     htmlpath = config.getoption('htmlpath')
     if htmlpath:
-        for csspath in config.getoption('css') or []:
+        for csspath in config.getoption('css'):
             open(csspath)
         if not hasattr(config, 'slaveinput'):
             # prevent opening htmlpath on slave nodes (xdist)
@@ -329,7 +329,7 @@ class HTMLReport(object):
             self.style_css += '\n'.join(ansi_css)
 
         # <DF> Add user-provided CSS
-        for path in self.config.getoption('css') or []:
+        for path in self.config.getoption('css'):
             self.style_css += '\n/******************************'
             self.style_css += '\n * CUSTOM CSS'
             self.style_css += '\n * {}'.format(path)

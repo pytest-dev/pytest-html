@@ -38,6 +38,7 @@ if PY3:
 else:
     from codecs import open
     from cgi import escape
+    import locale
 
 
 def pytest_addhooks(pluginmanager):
@@ -310,6 +311,9 @@ class HTMLReport(object):
         self._appendrow('Rerun', report)
 
     def _generate_report(self, session):
+        # enforce English locale so no non-ascii chars will crash the html
+        if not PY3:
+            locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
         suite_stop_time = time.time()
         suite_time_delta = suite_stop_time - self.suite_start_time
         numtests = self.passed + self.failed + self.xpassed + self.xfailed

@@ -38,7 +38,9 @@ if PY3:
 else:
     from codecs import open
     from cgi import escape
-
+    # force English locale so unicode date won't crash strftime
+    import locale
+    locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
 
 def pytest_addhooks(pluginmanager):
     from . import hooks

@@ -64,7 +64,6 @@ def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
     assert_results_by_outcome(html, 'xpassed', xpassed, 'unexpected passes')
     assert_results_by_outcome(html, 'rerun', rerun)
 
-
 class TestHTML:
     def test_durations(self, testdir):
         sleep = float(0.2)
@@ -444,7 +443,7 @@ class TestHTML:
         """.format(extra_type, content))
         testdir.makepyfile("""
             import pytest
-            @pytest.mark.flaky(reruns=2)
+            @pytest.mark.flaky(reruns=4)
             def test_fail():
                 assert False""")
         result, html = run(testdir)

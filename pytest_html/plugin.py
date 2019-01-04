@@ -113,9 +113,6 @@ class HTMLReport(object):
             self.config = config
             self.row_table = self.row_extra = None
 
-            # test_index = hasattr(report, 'rerun') and report.rerun + 1 or 0
-            # print hasattr(report, 'execution_count')
-
             for extra_index, extra in enumerate(getattr(report, 'extra', [])):
                 self.append_extra_html(extra, extra_index, test_index)
 

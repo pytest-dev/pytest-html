@@ -139,7 +139,9 @@ class TestHTML:
 
     def test_setup_error(self, testdir):
         testdir.makepyfile("""
-            def pytest_funcarg__arg(request):
+            import pytest
+            @pytest.fixture
+            def arg(request):
                 raise ValueError()
             def test_function(arg):
                 pass

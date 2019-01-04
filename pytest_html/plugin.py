@@ -100,7 +100,7 @@ class HTMLReport(object):
 
     class TestResult:
 
-        def __init__(self, outcome, report, logfile, config, test_index = 0):
+        def __init__(self, outcome, report, logfile, config, test_index=0):
             self.test_id = report.nodeid
             if getattr(report, 'when', 'call') != 'call':
                 self.test_id = '::'.join([report.nodeid, report.when])
@@ -261,7 +261,8 @@ class HTMLReport(object):
             additional_html.append(log)
 
     def _appendrow(self, outcome, report):
-        result = self.TestResult(outcome, report, self.logfile, self.config, self.rerun)
+        result = self.TestResult(outcome, report, self.logfile, self.config,
+                                 self.rerun)
         if result.row_table is not None:
             index = bisect.bisect_right(self.results, result)
             self.results.insert(index, result)

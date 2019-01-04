@@ -64,6 +64,7 @@ def assert_results(html, tests=1, duration=None, passed=1, skipped=0, failed=0,
     assert_results_by_outcome(html, 'xpassed', xpassed, 'unexpected passes')
     assert_results_by_outcome(html, 'rerun', rerun)
 
+
 class TestHTML:
     def test_durations(self, testdir):
         sleep = float(0.2)

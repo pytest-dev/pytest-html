@@ -444,7 +444,7 @@ class TestHTML:
         """.format(extra_type, content))
         testdir.makepyfile("""
             import pytest
-            @pytest.mark.flaky(reruns=4)
+            @pytest.mark.flaky(reruns=2)
             def test_fail():
                 assert False""")
         result, html = run(testdir)

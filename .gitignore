@@ -12,6 +12,7 @@ dist
 # IDE Specific files
 ### Pycharm IDE - Jetbrains
 .idea/*
+.vscode/*
 
 ### PyDev IDE - Eclipse
 .metadata

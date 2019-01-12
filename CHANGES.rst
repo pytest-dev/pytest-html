@@ -14,7 +14,7 @@ Release Notes
 
 * Always define __version__ even if get_distribution() fails (`@nicoddemus <https://github.com/nicoddemus>`_)
 
-*  Refactor css config code (`@crazymerlyn <http://github.com/crazymerlyn>`_)
+* Refactor css config code (`@crazymerlyn <http://github.com/crazymerlyn>`_)
 
 **1.19.0 (2018-06-01)**
 

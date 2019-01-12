@@ -268,7 +268,7 @@ Tests can be run locally with `tox`_, for example to execute tests for Python 2.
 .. _`tox`: https://tox.readthedocs.org/en/latest/
 
 Releasing a new version
-_______________________
+-----------------------
 
 Follow these steps to release a new version of the project:
 

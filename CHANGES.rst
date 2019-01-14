@@ -1,6 +1,21 @@
 Release Notes
 -------------
 
+**1.20.9 (2019-01-12)**
+
+* Tests running with Pytest 4.0 and Python 3.7
+
+* Stop filtering out falsy environment values (`#175 <https://github.com/pytest-dev/pytest-html/issues/175>`_)
+
+    * Thanks to `@jknotts <https://github.com/jknotts>`_ for reporting the issue 
+      and to `@crazymerlyn <http://github.com/crazymerlyn>`_ for providing a fix
+
+* Removed extraneous space from anchor tag (`@chardbury <https://github.com/chardbury>`_)
+
+* Always define __version__ even if get_distribution() fails (`@nicoddemus <https://github.com/nicoddemus>`_)
+
+* Refactor css config code (`@crazymerlyn <http://github.com/crazymerlyn>`_)
+
 **1.19.0 (2018-06-01)**
 
 * Allow collapsed outcomes to be configured by using a query parameter

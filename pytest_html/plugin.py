@@ -454,7 +454,7 @@ class HTMLReport(object):
 
         doc = html.html(head, body)
 
-        unicode_doc = u'<!DOCTYPE html>\n{0}'.format(doc.unicode(indent=2))
+        unicode_doc = u'<!DOCTYPE html>\n{0}'.format(doc.unicode(indent=2, errors='ignore'))
         if PY3:
             # Fix encoding issues, e.g. with surrogates
             unicode_doc = unicode_doc.encode('utf-8',

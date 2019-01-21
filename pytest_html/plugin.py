@@ -39,7 +39,6 @@ else:
     from codecs import open
     from cgi import escape
     import locale
-    import string
 
 
 def pytest_addhooks(pluginmanager):
@@ -451,11 +450,7 @@ class HTMLReport(object):
         body.extend([html.h2('Summary')] + summary_prefix
                     + summary + summary_postfix)
 
-        # Filter out any non-printable characters. Trying to battle "UnicodeDecodeError: 'ascii' codec can't decode byte 0xde in position 70: ordinal not in range(128)"
-        if not all(c in string.printable for c in results):
-            body.extend(filter(lambda c : c in string.printable, results))
-        else:
-            body.extend(results)
+        body.extend(results)
 
         doc = html.html(head, body)
 

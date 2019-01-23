@@ -184,7 +184,9 @@ class HTMLReport(object):
                     src = 'data:{0};base64,{1}'.format(
                         extra.get('mime_type'),
                         content)
-                    html_div = html.img(src=src)
+                    html_div = html.a(html.img(src=src),
+                                      href=src,
+                                      target='_blank')
                 else:
                     if PY3:
                         content = b64decode(content.encode('utf-8'))

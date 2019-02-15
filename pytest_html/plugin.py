@@ -58,6 +58,8 @@ def pytest_addoption(parser):
                     'https://developer.mozilla.org/docs/Web/Security/CSP)')
     group.addoption('--css', action='append', metavar='path', default=[],
                     help='append given css file content to report style file.')
+    group.addoption('--assets_name_hashing', action='store', default=True,
+                    help='when True, assets names are hashed')
 
 
 def pytest_configure(config):
@@ -145,11 +147,17 @@ class HTMLReport(object):
 
         def create_asset(self, content, extra_index,
                          test_index, file_extension, mode='w'):
+            assets_hashing = self.config.getoption('assets_name_hashing')
             hash_key = ''.join([self.test_id, str(extra_index),
                                 str(test_index)]).encode('utf-8')
-            hash_generator = hashlib.md5()
-            hash_generator.update(hash_key)
-            asset_file_name = '{0}.{1}'.format(hash_generator.hexdigest(),
+            if assets_hashing:
+                hash_generator = hashlib.md5()
+                hash_generator.update(hash_key)
+                file_name = hash_generator.hexdigest()
+            else:
+                file_name = hash_key
+
+            asset_file_name = '{0}.{1}'.format(file_name,
                                                file_extension)
             asset_path = os.path.join(os.path.dirname(self.logfile),
                                       'assets', asset_file_name)

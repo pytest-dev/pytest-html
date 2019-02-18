@@ -58,8 +58,6 @@ def pytest_addoption(parser):
                     'https://developer.mozilla.org/docs/Web/Security/CSP)')
     group.addoption('--css', action='append', metavar='path', default=[],
                     help='append given css file content to report style file.')
-    group.addoption('--assets_name_hashing', action='store', default=True,
-                    help='when True, assets names are hashed')
 
 
 def pytest_configure(config):
@@ -71,6 +69,7 @@ def pytest_configure(config):
             # prevent opening htmlpath on slave nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
             config.pluginmanager.register(config._html)
+    config.assets_name_hashing = True
 
 
 def pytest_unconfigure(config):
@@ -147,7 +146,7 @@ class HTMLReport(object):
 
         def create_asset(self, content, extra_index,
                          test_index, file_extension, mode='w'):
-            assets_hashing = self.config.getoption('assets_name_hashing')
+            assets_hashing = self.config.assets_name_hashing
             hash_key = ''.join([self.test_id, str(extra_index),
                                 str(test_index)]).encode('utf-8')
             if assets_hashing:

@@ -150,7 +150,9 @@ class HTMLReport(object):
                                 str(test_index)])
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key.encode('utf-8'))
-            asset_file_name = '{0}_{1}.{2}'.format(hash_key, hash_generator.hexdigest(), file_extension)
+            asset_file_name = '{0}_{1}.{2}'.format(hash_key,
+                                                   hash_generator.hexdigest(),
+                                                   file_extension)
             asset_path = os.path.join(os.path.dirname(self.logfile),
                                       'assets', asset_file_name)
             if not os.path.exists(os.path.dirname(asset_path)):

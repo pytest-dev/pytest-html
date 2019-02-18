@@ -416,8 +416,9 @@ class TestHTML:
         hash_generator = hashlib.md5()
         hash_generator.update(hash_key.encode('utf-8'))
         assert result.ret == 0
-        src = '{0}/{1}'.format('assets', '{0}_{1}.{2}'.
-                               format(hash_key, hash_generator.hexdigest(), file_extension))
+        src = '{0}/{1}'.format('assets', '{0}_{1}.{2}'.format(hash_key,
+                                                              hash_generator.hexdigest(),
+                                                              file_extension))
         link = ('<a class="image" href="{0}" target="_blank">'.format(src))
         assert link in html
         assert os.path.exists(src)
@@ -452,8 +453,9 @@ class TestHTML:
                         'test_fail0{0}'.format(i))
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key.encode('utf-8'))
-            src = 'assets/{0}_{1}.{2}'.format(hash_key, hash_generator.hexdigest(),
-                                          file_extension)
+            src = 'assets/{0}_{1}.{2}'.format(hash_key,
+                                              hash_generator.hexdigest(),
+                                              file_extension)
             link = ('<a class="image" href="{0}" target="_blank">'.format(src))
             assert result.ret
             assert link in html

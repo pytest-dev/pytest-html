@@ -449,9 +449,9 @@ class TestHTML:
 
         for i in range(1, 4):
             hash_key = ('test_extra_image_separated_rerun.py::'
-                        'test_fail0{0}'.format(i)).encode('utf-8')
+                        'test_fail0{0}'.format(i))
             hash_generator = hashlib.md5()
-            hash_generator.update(hash_key)
+            hash_generator.update(hash_key.encode('utf-8'))
             src = 'assets/{0}_{1}.{2}'.format(hash_key, hash_generator.hexdigest(),
                                           file_extension)
             link = ('<a class="image" href="{0}" target="_blank">'.format(src))

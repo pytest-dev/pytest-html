@@ -69,7 +69,6 @@ def pytest_configure(config):
             # prevent opening htmlpath on slave nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
             config.pluginmanager.register(config._html)
-    config.assets_name_hashing = True
 
 
 def pytest_unconfigure(config):
@@ -146,18 +145,12 @@ class HTMLReport(object):
 
         def create_asset(self, content, extra_index,
                          test_index, file_extension, mode='w'):
-            assets_hashing = self.config.assets_name_hashing
-            hash_key = ''.join([self.test_id, str(extra_index),
-                                str(test_index)]).encode('utf-8')
-            if assets_hashing:
-                hash_generator = hashlib.md5()
-                hash_generator.update(hash_key)
-                file_name = hash_generator.hexdigest()
-            else:
-                file_name = hash_key
 
-            asset_file_name = '{0}.{1}'.format(file_name,
-                                               file_extension)
+            hash_key = ''.join([self.test_id, str(extra_index),
+                                str(test_index)])
+            hash_generator = hashlib.md5()
+            hash_generator.update(hash_key.encode('utf-8'))
+            asset_file_name = '{0}_{1}.{2}'.format(hash_key, hash_generator.hexdigest(), file_extension)
             asset_path = os.path.join(os.path.dirname(self.logfile),
                                       'assets', asset_file_name)
             if not os.path.exists(os.path.dirname(asset_path)):

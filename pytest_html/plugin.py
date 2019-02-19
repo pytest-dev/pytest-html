@@ -145,12 +145,14 @@ class HTMLReport(object):
 
         def create_asset(self, content, extra_index,
                          test_index, file_extension, mode='w'):
+
             hash_key = ''.join([self.test_id, str(extra_index),
-                                str(test_index)]).encode('utf-8')
+                                str(test_index)])
             hash_generator = hashlib.md5()
-            hash_generator.update(hash_key)
-            asset_file_name = '{0}.{1}'.format(hash_generator.hexdigest(),
-                                               file_extension)
+            hash_generator.update(hash_key.encode('utf-8'))
+            asset_file_name = '{0}_{1}.{2}'.format(hash_key,
+                                                   hash_generator.hexdigest(),
+                                                   file_extension)
             asset_path = os.path.join(os.path.dirname(self.logfile),
                                       'assets', asset_file_name)
             if not os.path.exists(os.path.dirname(asset_path)):

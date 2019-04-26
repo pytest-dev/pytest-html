@@ -21,9 +21,12 @@ pytest_plugins = "pytester",
 def run(testdir, path='report.html', *args):
     path = testdir.tmpdir.join(path)
     result = testdir.runpytest('--html', path, *args)
+    return result, read_html(path)
+
+
+def read_html(path):
     with open(str(path)) as f:
-        html = f.read()
-    return result, html
+        return f.read()
 
 
 def assert_results_by_outcome(html, test_outcome, test_outcome_number,
@@ -192,6 +195,25 @@ class TestHTML:
         assert result.ret == 0
         report_title = "<h1>{0}</h1>".format(report_name)
         assert report_title in html
+
+    def test_report_title_addopts_env_var(self, testdir, monkeypatch):
+        report_location = "REPORT_LOCATION"
+        report_name = "MuhReport"
+        monkeypatch.setenv(report_location, report_name)
+        testdir.makefile(
+            ".ini",
+            pytest="""
+            [pytest]
+            addopts = --html ${0}
+        """.format(
+                report_location
+            ),
+        )
+        testdir.makepyfile('def test_pass(): pass')
+        result = testdir.runpytest()
+        assert result.ret == 0
+        report_title = "<h1>{0}</h1>".format(report_name)
+        assert report_title in read_html(report_name)
 
     def test_resources_inline_css(self, testdir):
         testdir.makepyfile('def test_pass(): pass')

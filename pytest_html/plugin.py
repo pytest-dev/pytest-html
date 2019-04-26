@@ -432,7 +432,7 @@ class HTMLReport(object):
 
         body = html.body(
             html.script(raw(main_js)),
-            html.h1(os.path.basename(session.config.option.htmlpath)),
+            html.h1(os.path.basename(self.logfile)),
             html.p('Report generated on {0} at {1} by '.format(
                 generated.strftime('%d-%b-%Y'),
                 generated.strftime('%H:%M:%S')),

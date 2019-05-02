@@ -16,6 +16,7 @@ import time
 import bisect
 import hashlib
 import warnings
+import re
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -83,6 +84,15 @@ def pytest_unconfigure(config):
 def data_uri(content, mime_type='text/plain', charset='utf-8'):
     data = b64encode(content.encode(charset)).decode('ascii')
     return 'data:{0};charset={1};base64,{2}'.format(mime_type, charset, data)
+
+
+def convert_key_to_id(key):
+    # Consider HTML id as ASCII [0-9, A-Z, a-z] + [_.-] strings
+    def remove_non_ascii(matchgroup):
+        return ''
+
+    escaped_id = key.lower().replace(" ", "-")
+    return re.sub(r'[^0-9a-zA-Z._-]', remove_non_ascii, escaped_id)
 
 
 class HTMLReport(object):
@@ -478,10 +488,14 @@ class HTMLReport(object):
         h_result = getattr(html, 'h{}'.format(h_result_level))
 
         for k, v in _current_level.items():
-            results.append(hx(k, id='{}-title'.format(k)))
-            li = html.li(html.a(k.title(), href='#{}-title'.format(k)))
+            key = _key + [k]
+            prefix_id = '-'.join(key)
+            if prefix_id:
+                prefix_id += '-'
+            prefix_id = convert_key_to_id(prefix_id)
+            results.append(hx(k, id='{}title'.format(prefix_id)))
+            li = html.li(html.a(k.title(), href='#{}title'.format(prefix_id)))
             if not isinstance(v, list):  # Not leaf yet
-                key = _key + [k]
                 subsum, subres = self._generate_all_results(session,
                                                             key,
                                                             v,
@@ -489,13 +503,12 @@ class HTMLReport(object):
                 results.extend(subres)
                 li.append(html.ul(subsum))
             else:
-                results.extend(self._generate_results(session,
-                                                      _key + [k], h_result))
+                results.extend(self._generate_results(session, key, prefix_id, h_result))
             summary.append(li)
 
         return summary, results
 
-    def _generate_results(self, session, key, h_result=html.h2):
+    def _generate_results(self, session, key, prefix_id='', h_result=html.h2):
         class Outcome:
 
             def __init__(self, outcome, total=0, label=None,
@@ -514,7 +527,7 @@ class HTMLReport(object):
             def generate_checkbox(self):
                 checkbox_kwargs = {'data-test-result':
                                    self.test_result.lower(),
-                                   'data-prefix-id': self.prefix_id}
+                                   'data-prefix-id': convert_key_to_id(self.prefix_id)}
                 if self.total == 0:
                     checkbox_kwargs['disabled'] = 'true'
 
@@ -530,10 +543,6 @@ class HTMLReport(object):
                 self.summary_item = html.span('{0} {1}'.
                                               format(self.total, self.label),
                                               class_=self.class_html)
-
-        prefix_id = '-'.join(key)
-        if prefix_id:
-            prefix_id += '-'
 
         outcomes = [Outcome('passed',
                             self._get_indexed_counter(self.passed, key),

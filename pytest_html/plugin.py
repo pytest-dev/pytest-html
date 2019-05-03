@@ -423,7 +423,6 @@ class HTMLReport(object):
             html.title('Test Report'),
             html_css)
 
-
         main_js = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'main.js'))
         if PY3:
@@ -493,7 +492,10 @@ class HTMLReport(object):
                 li.append(html.ul(sublinks))
             else:
                 subres = self._generate_summary(session, key, prefix_id)
-                subres.extend(self._generate_results(session, key, prefix_id, h_result))
+                subres.extend(self._generate_results(session,
+                                                     key,
+                                                     prefix_id,
+                                                     h_result))
             links_summary.append(li)
             results.extend(subres)
 
@@ -516,9 +518,10 @@ class HTMLReport(object):
                 self.generate_summary_item()
 
             def generate_checkbox(self):
+                data_pref = convert_key_to_id(self.prefix_id)
                 checkbox_kwargs = {'data-test-result':
                                    self.test_result.lower(),
-                                   'data-prefix-id': convert_key_to_id(self.prefix_id)}
+                                   'data-prefix-id': data_pref}
                 if self.total == 0:
                     checkbox_kwargs['disabled'] = 'true'
 
@@ -574,7 +577,7 @@ class HTMLReport(object):
 
         summary_text = '{} tests ran'.format(numtests)
         if key == ['_default']:
-            summary_text += ' in {:.2f} seconds. '.format(self.suite_time_delta)
+            summary_text += ' in {:.2f} seconds.'.format(self.suite_time_delta)
 
         summary = [html.p(summary_text),
                    html.p('(Un)check the boxes to filter the results.',
@@ -591,9 +594,10 @@ class HTMLReport(object):
         session.config.hook.pytest_html_results_summary(
             prefix=summary_prefix, summary=summary, postfix=summary_postfix)
 
-        summary = [h_summary('Summary')] + summary_prefix + summary + summary_postfix
-
-        return summary
+        return ([h_summary('Summary')] +
+                summary_prefix +
+                summary +
+                summary_postfix)
 
     def _generate_results(self, session, key, prefix_id='', h_result=html.h2):
         cells = [

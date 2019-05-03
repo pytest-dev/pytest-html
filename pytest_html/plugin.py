@@ -321,10 +321,13 @@ class HTMLReport(object):
             counter[last] = 0
         counter[last] += 1
 
-    def _count(self, *args):
+    def _count(self, index, *args):
         total = 0
         for counter in args:
-            total += counter['_total']
+            if index == ['_default']:
+                total += counter['_total']
+            else:
+                total += self._get_indexed_counter(counter, index)
         return total
 
     def _appendrow(self, outcome, report):
@@ -384,11 +387,7 @@ class HTMLReport(object):
 
     def _generate_report(self, session):
         suite_stop_time = time.time()
-        suite_time_delta = suite_stop_time - self.suite_start_time
-        numtests = self._count(self.passed,
-                               self.failed,
-                               self.xpassed,
-                               self.xfailed)
+        self.suite_time_delta = suite_stop_time - self.suite_start_time
         generated = datetime.datetime.now()
 
         self.style_css = pkg_resources.resource_string(
@@ -442,25 +441,16 @@ class HTMLReport(object):
 
         body.extend(self._generate_environment(session.config))
 
-        summary = [html.p(
-            '{0} tests ran in {1:.2f} seconds. '.format(
-                numtests, suite_time_delta)),
-            html.p('(Un)check the boxes to filter the results.',
-                   class_='filter',
-                   hidden='true')]
-        summary_prefix, summary_postfix = [], []
-        session.config.hook.pytest_html_results_summary(
-            prefix=summary_prefix, summary=summary, postfix=summary_postfix)
-        body.extend([html.h2('Summary')] + summary_prefix
-                    + summary + summary_postfix)
+        body.extend(self._generate_summary(session, ['_default']))
 
         if not self.group_report_keys:
             results = self._generate_results(session, ['_default'])
+            body.extend(results)
         else:
             links_summary, results = self._generate_all_results(session)
             body.append(html.p('List of test reports:',
                                html.ul(links_summary)))
-        body.extend(results)
+            body.extend(results)
 
         doc = html.html(head, body)
 
@@ -475,7 +465,7 @@ class HTMLReport(object):
     def _generate_all_results(self, session,
                               _key=None, _current_level=None, _h_level=2):
         results = []
-        summary = []
+        links_summary = []
         if _current_level is None:
             _current_level = self.results
         if _key is None:
@@ -496,19 +486,20 @@ class HTMLReport(object):
             results.append(hx(k, id='{}title'.format(prefix_id)))
             li = html.li(html.a(k.title(), href='#{}title'.format(prefix_id)))
             if not isinstance(v, list):  # Not leaf yet
-                subsum, subres = self._generate_all_results(session,
-                                                            key,
-                                                            v,
-                                                            _h_level + 1)
-                results.extend(subres)
-                li.append(html.ul(subsum))
+                sublinks, subres = self._generate_all_results(session,
+                                                              key,
+                                                              v,
+                                                              _h_level + 1)
+                li.append(html.ul(sublinks))
             else:
-                results.extend(self._generate_results(session, key, prefix_id, h_result))
-            summary.append(li)
+                subres = self._generate_summary(session, key, prefix_id)
+                subres.extend(self._generate_results(session, key, prefix_id, h_result))
+            links_summary.append(li)
+            results.extend(subres)
 
-        return summary, results
+        return links_summary, results
 
-    def _generate_results(self, session, key, prefix_id='', h_result=html.h2):
+    def _generate_summary(self, session, key, prefix_id='', h_summary=html.h2):
         class Outcome:
 
             def __init__(self, outcome, total=0, label=None,
@@ -575,6 +566,36 @@ class HTMLReport(object):
             if i < len(outcomes):
                 outcome_section.append(', ')
 
+        numtests = self._count(key,
+                               self.passed,
+                               self.failed,
+                               self.xpassed,
+                               self.xfailed)
+
+        summary_text = '{} tests ran'.format(numtests)
+        if key == ['_default']:
+            summary_text += ' in {:.2f} seconds. '.format(self.suite_time_delta)
+
+        summary = [html.p(summary_text),
+                   html.p('(Un)check the boxes to filter the results.',
+                          class_='filter',
+                          hidden='true')]
+
+        for i, outcome in enumerate(outcomes, start=1):
+            summary.append(outcome.checkbox)
+            summary.append(outcome.summary_item)
+            if i < len(outcomes):
+                summary.append(', ')
+
+        summary_prefix, summary_postfix = [], []
+        session.config.hook.pytest_html_results_summary(
+            prefix=summary_prefix, summary=summary, postfix=summary_postfix)
+
+        summary = [h_summary('Summary')] + summary_prefix + summary + summary_postfix
+
+        return summary
+
+    def _generate_results(self, session, key, prefix_id='', h_result=html.h2):
         cells = [
             html.th('Result',
                     class_='sortable result initial-sort',

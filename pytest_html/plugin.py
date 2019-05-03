@@ -440,7 +440,10 @@ class HTMLReport(object):
 
         body.extend(self._generate_environment(session.config))
 
-        body.extend(self._generate_summary(session, ['_default']))
+        include_outcome = not self.group_report_keys
+        body.extend(self._generate_summary(session,
+                                           ['_default'],
+                                           include_outcome=include_outcome))
 
         if not self.group_report_keys:
             results = self._generate_results(session, ['_default'])
@@ -501,7 +504,8 @@ class HTMLReport(object):
 
         return links_summary, results
 
-    def _generate_summary(self, session, key, prefix_id='', h_summary=html.h2):
+    def _generate_summary(self, session, key,
+                          prefix_id='', h_summary=html.h2, include_outcome=True):
         class Outcome:
 
             def __init__(self, outcome, total=0, label=None,
@@ -579,16 +583,17 @@ class HTMLReport(object):
         if key == ['_default']:
             summary_text += ' in {:.2f} seconds.'.format(self.suite_time_delta)
 
-        summary = [html.p(summary_text),
-                   html.p('(Un)check the boxes to filter the results.',
-                          class_='filter',
-                          hidden='true')]
+        summary = [html.p(summary_text)]
 
-        for i, outcome in enumerate(outcomes, start=1):
-            summary.append(outcome.checkbox)
-            summary.append(outcome.summary_item)
-            if i < len(outcomes):
-                summary.append(', ')
+        if include_outcome:
+            summary.append(html.p('(Un)check the boxes to filter the results.',
+                                  class_='filter',
+                                  hidden='true'))
+            for i, outcome in enumerate(outcomes, start=1):
+                summary.append(outcome.checkbox)
+                summary.append(outcome.summary_item)
+                if i < len(outcomes):
+                    summary.append(', ')
 
         summary_prefix, summary_postfix = [], []
         session.config.hook.pytest_html_results_summary(

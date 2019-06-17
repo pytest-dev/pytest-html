@@ -521,5 +521,6 @@ class HTMLReport(object):
         self._save_report(report_content)
 
     def pytest_terminal_summary(self, terminalreporter):
-        terminalreporter.write_sep('-', 'generated html file: {0}'.format(
-            self.logfile))
+        terminalreporter.write_sep(
+            '-',
+            'generated html file: file://{0}'.format(self.logfile))

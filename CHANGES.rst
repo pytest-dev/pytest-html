@@ -1,6 +1,15 @@
 Release Notes
 -------------
 
+**1.21.0 (2019-06-17)**
+
+* Allow opening generated html report in browser (`@ssbarnea <https://github.com/ssbarnea>`_)
+
+* Handle when report title is stored as an environment variable (`@BeyondEvil <https://github.com/BeyondEvil>`_)
+
+* Change assets naming method (`@SunInJuly <https://github.com/SunInJuly>`_)
+
+
 **1.20.0 (2019-01-14)**
 
 * Tests running with Pytest 4.0 and Python 3.7

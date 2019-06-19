@@ -503,6 +503,35 @@ class TestHTML:
         assert result.ret == 0
         assert '<a href="{0}"><img src="{0}"/>'.format(content) in html
 
+    def test_very_long_test_name(self, testdir):
+        testdir.makeconftest("""
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.image('image.png')]
+        """)
+        # This will get truncated
+        test_name = 'test_{}'.format('a' * 300)
+        testdir.makepyfile("""
+            def {0}():
+                assert False
+        """.format(test_name))
+        result, html = run(testdir)
+
+        hash_key = 'test_very_long_test_name.py::{}00'.format(test_name)
+        hash_generator = hashlib.md5()
+        hash_generator.update(hash_key.encode('utf-8'))
+        src = 'assets/{0}_{1}.png'.format(hash_key[:218],
+                                          hash_generator.hexdigest())
+        link = ('<a class="image" href="{0}" target="_blank">'.format(src))
+        assert result.ret
+        assert link in html
+        assert os.path.exists(src)
+
     def test_no_environment(self, testdir):
         testdir.makeconftest("""
             def pytest_configure(config):

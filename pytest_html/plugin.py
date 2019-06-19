@@ -150,8 +150,13 @@ class HTMLReport(object):
                                 str(test_index)])
             hash_generator = hashlib.md5()
             hash_generator.update(hash_key.encode('utf-8'))
-            asset_file_name = '{0}_{1}.{2}'.format(hash_key,
-                                                   hash_generator.hexdigest(),
+            hex_digest = hash_generator.hexdigest()
+            # 255 is the common max filename length on various filesystems,
+            # we subtract hash length, file extension length and 2 more
+            # characters for the underscore and dot
+            max_length = 255 - len(hex_digest) - len(file_extension) - 2
+            asset_file_name = '{0}_{1}.{2}'.format(hash_key[:max_length],
+                                                   hex_digest,
                                                    file_extension)
             asset_path = os.path.join(os.path.dirname(self.logfile),
                                       'assets', asset_file_name)

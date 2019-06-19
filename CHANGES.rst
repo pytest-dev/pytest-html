@@ -1,9 +1,10 @@
 Release Notes
 -------------
 
-** 1.21.1 (2019-06-19)**
+**1.21.1 (2019-06-19)**
 
 * Fix issue with assets filenames being too long.
+
   * Thanks to `@D3X <https://github.com/D3X>`_ for reporting and providing a fix
 
 **1.21.0 (2019-06-17)**

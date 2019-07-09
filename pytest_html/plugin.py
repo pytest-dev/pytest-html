@@ -263,6 +263,7 @@ class HTMLReport(object):
                     converter = Ansi2HTMLConverter(inline=False, escaped=False)
                     content = converter.convert(content, full=False)
                 log.append(raw(content))
+                log.append(html.br())
 
             if len(log) == 0:
                 log = html.div(class_='empty log')

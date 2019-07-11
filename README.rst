@@ -240,6 +240,45 @@ additional HTML and log output with a notice that the log is empty:
           del data[:]
           data.append(html.div('No log output captured.', class_='empty log'))
 
+Grouping test results
+~~~~~~~~~~~~~~~~~~~~~
+
+By default, the generated report will be a flat array containing the results of all the defined
+tests. It is possible to group these results by defining some keys. It also allows defining a group
+hierarchy of undefined depth.
+
+Group keys are defined in the :code:`pytest_runtest_makereport` hook. The following example defines
+2 keys `key1` and `key2` whose value will be the `argx` and `argy` values passed to the test.
+
+.. code-block:: python
+
+  import pytest
+  @pytest.mark.hookwrapper
+  def pytest_runtest_makereport(item, call):
+      outcome = yield
+      report = outcome.get_result()
+      report.key1 = item.funcargs["argx"]
+      report.key2 = item.funcargs["argy"]
+
+Then to generate a grouped report, you can use the `--group-by` option:
+
+.. code-block:: bash
+
+  $ pytest --html=report.html --group-by key1 --group-by key2
+
+Keys will be considered in the order the are given on the command line. The previous example will
+generate the following hierarchy:
+
+.. code-block::
+
+   key1 = "Value 1"
+   |-- key2 = "Value 1.1"
+   |-- key2 = "Value 1.2"
+   key1 = "Value 2"
+   |-- key2 = "Value 2.1"
+   |-- key2 = "Value 2.2"
+
+
 Display options
 ---------------
 

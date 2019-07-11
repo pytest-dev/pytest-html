@@ -16,6 +16,7 @@ import time
 import bisect
 import hashlib
 import warnings
+import re
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -58,6 +59,8 @@ def pytest_addoption(parser):
                     'https://developer.mozilla.org/docs/Web/Security/CSP)')
     group.addoption('--css', action='append', metavar='path', default=[],
                     help='append given css file content to report style file.')
+    group.addoption('--group-by', help='Group report using these attributes',
+                    action='append')
 
 
 def pytest_configure(config):
@@ -83,19 +86,32 @@ def data_uri(content, mime_type='text/plain', charset='utf-8'):
     return 'data:{0};charset={1};base64,{2}'.format(mime_type, charset, data)
 
 
+def convert_key_to_id(key):
+    # Consider HTML id as ASCII [0-9, A-Z, a-z] + [_.-] strings
+    def remove_non_ascii(matchgroup):
+        return ''
+
+    escaped_id = key.lower().replace(" ", "-")
+    return re.sub(r'[^0-9a-zA-Z._-]', remove_non_ascii, escaped_id)
+
+
 class HTMLReport(object):
 
     def __init__(self, logfile, config):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
-        self.test_logs = []
-        self.results = []
-        self.errors = self.failed = 0
-        self.passed = self.skipped = 0
-        self.xfailed = self.xpassed = 0
+        self.test_logs = {}
+        self.results = {}
+        self.errors = {'_total': 0}
+        self.failed = {'_total': 0}
+        self.passed = {'_total': 0}
+        self.skipped = {'_total': 0}
+        self.xfailed = {'_total': 0}
+        self.xpassed = {'_total': 0}
         has_rerun = config.pluginmanager.hasplugin('rerunfailures')
-        self.rerun = 0 if has_rerun else None
+        self.rerun = {'_total': 0} if has_rerun else None
         self.self_contained = config.getoption('self_contained_html')
+        self.group_report_keys = config.getoption('group_by')
         self.config = config
 
     class TestResult:
@@ -270,57 +286,114 @@ class HTMLReport(object):
                 log.append('No log output captured.')
             additional_html.append(log)
 
+    def _get_index(self, report):
+        test_group_index = ['_default']
+        if self.group_report_keys:
+            test_group_index = [getattr(report, c)
+                                for c in self.group_report_keys]
+        return test_group_index
+
+    def _get_indexed_obj(self, obj, index, _type):
+        out = obj
+        last = index[-1]
+        index = index[:-1]
+        while index:
+            key = index[0]
+            if key not in obj:
+                obj[key] = {}
+            out = obj[key]
+            index.pop(0)
+        if last not in out:
+            out[last] = 0 if _type == 'counter' else []
+        return out[last]
+
+    def _get_indexed_list(self, l, index):
+        return self._get_indexed_obj(l, index, 'list')
+
+    def _get_indexed_counter(self, c, index):
+        return self._get_indexed_obj(c, index, 'counter')
+
+    def _increment_counter(self, counter, index):
+        counter['_total'] += 1  # Start by incrementing total
+        last = index[-1]
+        index = index[:-1]
+        while index:
+            key = index[0]
+            if key not in counter:
+                counter[key] = {}
+            counter = counter[key]
+            index.pop(0)
+        if last not in counter:
+            counter[last] = 0
+        counter[last] += 1
+
+    def _count(self, index, *args):
+        total = 0
+        for counter in args:
+            if index == ['_default']:
+                total += counter['_total']
+            else:
+                total += self._get_indexed_counter(counter, index)
+        return total
+
     def _appendrow(self, outcome, report):
         result = self.TestResult(outcome, report, self.logfile, self.config)
         if result.row_table is not None:
-            index = bisect.bisect_right(self.results, result)
-            self.results.insert(index, result)
+            test_group_index = self._get_index(report)
+            result_list = self._get_indexed_list(self.results,
+                                                 test_group_index)
+            index = bisect.bisect_right(result_list, result)
+            result_list.insert(index, result)
             tbody = html.tbody(
                 result.row_table,
                 class_='{0} results-table-row'.format(result.outcome.lower()))
             if result.row_extra is not None:
                 tbody.append(result.row_extra)
-            self.test_logs.insert(index, tbody)
+            logs = self._get_indexed_list(self.test_logs, test_group_index)
+            logs.insert(index, tbody)
 
     def append_passed(self, report):
         if report.when == 'call':
+            test_group_index = self._get_index(report)
             if hasattr(report, "wasxfail"):
-                self.xpassed += 1
+                self._increment_counter(self.xpassed, test_group_index)
                 self._appendrow('XPassed', report)
             else:
-                self.passed += 1
+                self._increment_counter(self.passed, test_group_index)
                 self._appendrow('Passed', report)
 
     def append_failed(self, report):
+        test_group_index = self._get_index(report)
         if getattr(report, 'when', None) == "call":
             if hasattr(report, "wasxfail"):
                 # pytest < 3.0 marked xpasses as failures
-                self.xpassed += 1
+                self._increment_counter(self.xpassed, test_group_index)
                 self._appendrow('XPassed', report)
             else:
-                self.failed += 1
+                self._increment_counter(self.failed, test_group_index)
                 self._appendrow('Failed', report)
         else:
-            self.errors += 1
+            self._increment_counter(self.errors, test_group_index)
             self._appendrow('Error', report)
 
     def append_skipped(self, report):
+        test_group_index = self._get_index(report)
         if hasattr(report, "wasxfail"):
-            self.xfailed += 1
+            self._increment_counter(self.xfailed, test_group_index)
             self._appendrow('XFailed', report)
         else:
-            self.skipped += 1
+            self._increment_counter(self.skipped, test_group_index)
             self._appendrow('Skipped', report)
 
     def append_other(self, report):
         # For now, the only "other" the plugin give support is rerun
-        self.rerun += 1
+        test_group_index = self._get_index(report)
+        self._increment_counter(self.rerun, test_group_index)
         self._appendrow('Rerun', report)
 
     def _generate_report(self, session):
         suite_stop_time = time.time()
-        suite_time_delta = suite_stop_time - self.suite_start_time
-        numtests = self.passed + self.failed + self.xpassed + self.xfailed
+        self.suite_time_delta = suite_stop_time - self.suite_start_time
         generated = datetime.datetime.now()
 
         self.style_css = pkg_resources.resource_string(
@@ -356,81 +429,6 @@ class HTMLReport(object):
             html.title('Test Report'),
             html_css)
 
-        class Outcome:
-
-            def __init__(self, outcome, total=0, label=None,
-                         test_result=None, class_html=None):
-                self.outcome = outcome
-                self.label = label or outcome
-                self.class_html = class_html or outcome
-                self.total = total
-                self.test_result = test_result or outcome
-
-                self.generate_checkbox()
-                self.generate_summary_item()
-
-            def generate_checkbox(self):
-                checkbox_kwargs = {'data-test-result':
-                                   self.test_result.lower()}
-                if self.total == 0:
-                    checkbox_kwargs['disabled'] = 'true'
-
-                self.checkbox = html.input(type='checkbox',
-                                           checked='true',
-                                           onChange='filter_table(this)',
-                                           name='filter_checkbox',
-                                           class_='filter',
-                                           hidden='true',
-                                           **checkbox_kwargs)
-
-            def generate_summary_item(self):
-                self.summary_item = html.span('{0} {1}'.
-                                              format(self.total, self.label),
-                                              class_=self.class_html)
-
-        outcomes = [Outcome('passed', self.passed),
-                    Outcome('skipped', self.skipped),
-                    Outcome('failed', self.failed),
-                    Outcome('error', self.errors, label='errors'),
-                    Outcome('xfailed', self.xfailed,
-                            label='expected failures'),
-                    Outcome('xpassed', self.xpassed,
-                            label='unexpected passes')]
-
-        if self.rerun is not None:
-            outcomes.append(Outcome('rerun', self.rerun))
-
-        summary = [html.p(
-            '{0} tests ran in {1:.2f} seconds. '.format(
-                numtests, suite_time_delta)),
-            html.p('(Un)check the boxes to filter the results.',
-                   class_='filter',
-                   hidden='true')]
-
-        for i, outcome in enumerate(outcomes, start=1):
-            summary.append(outcome.checkbox)
-            summary.append(outcome.summary_item)
-            if i < len(outcomes):
-                summary.append(', ')
-
-        cells = [
-            html.th('Result',
-                    class_='sortable result initial-sort',
-                    col='result'),
-            html.th('Test', class_='sortable', col='name'),
-            html.th('Duration', class_='sortable numeric', col='duration'),
-            html.th('Links')]
-        session.config.hook.pytest_html_results_table_header(cells=cells)
-
-        results = [html.h2('Results'), html.table([html.thead(
-            html.tr(cells),
-            html.tr([
-                html.th('No results found. Try to check the filters',
-                        colspan=len(cells))],
-                    id='not-found-message', hidden='true'),
-            id='results-table-head'),
-            self.test_logs], id='results-table')]
-
         main_js = pkg_resources.resource_string(
             __name__, os.path.join('resources', 'main.js'))
         if PY3:
@@ -448,13 +446,19 @@ class HTMLReport(object):
 
         body.extend(self._generate_environment(session.config))
 
-        summary_prefix, summary_postfix = [], []
-        session.config.hook.pytest_html_results_summary(
-            prefix=summary_prefix, summary=summary, postfix=summary_postfix)
-        body.extend([html.h2('Summary')] + summary_prefix
-                    + summary + summary_postfix)
+        include_outcome = not self.group_report_keys
+        body.extend(self._generate_summary(session,
+                                           ['_default'],
+                                           include_outcome=include_outcome))
 
-        body.extend(results)
+        if not self.group_report_keys:
+            results = self._generate_results(session, ['_default'])
+            body.extend(results)
+        else:
+            links_summary, results = self._generate_all_results(session)
+            body.append(html.p('List of test reports:',
+                               html.ul(links_summary)))
+            body.extend(results)
 
         doc = html.html(head, body)
 
@@ -465,6 +469,169 @@ class HTMLReport(object):
                                              errors='xmlcharrefreplace')
             unicode_doc = unicode_doc.decode('utf-8')
         return unicode_doc
+
+    def _generate_all_results(self, session,
+                              _key=None, _current_level=None, _h_level=2):
+        results = []
+        links_summary = []
+        if _current_level is None:
+            _current_level = self.results
+        if _key is None:
+            _key = []
+        h_result_level = _h_level + 1
+        if _h_level > 6:
+            _h_level = 6
+            h_result_level = 6
+        hx = getattr(html, 'h{}'.format(_h_level))
+        h_result = getattr(html, 'h{}'.format(h_result_level))
+
+        for k, v in _current_level.items():
+            key = _key + [k]
+            prefix_id = '-'.join(key)
+            if prefix_id:
+                prefix_id += '-'
+            prefix_id = convert_key_to_id(prefix_id)
+            results.append(hx(k, id='{}title'.format(prefix_id)))
+            li = html.li(html.a(k.title(), href='#{}title'.format(prefix_id)))
+            if not isinstance(v, list):  # Not leaf yet
+                sublinks, subres = self._generate_all_results(session,
+                                                              key,
+                                                              v,
+                                                              _h_level + 1)
+                li.append(html.ul(sublinks))
+            else:
+                subres = self._generate_summary(session, key, prefix_id)
+                subres.extend(self._generate_results(session,
+                                                     key,
+                                                     prefix_id,
+                                                     h_result))
+            links_summary.append(li)
+            results.extend(subres)
+
+        return links_summary, results
+
+    def _generate_summary(self, session, key,
+                          prefix_id='', h_summary=html.h2, include_outcome=True):
+        class Outcome:
+
+            def __init__(self, outcome, total=0, label=None,
+                         test_result=None, class_html=None,
+                         prefix_id=None):
+                self.outcome = outcome
+                self.label = label or outcome
+                self.class_html = class_html or outcome
+                self.total = total
+                self.test_result = test_result or outcome
+                self.prefix_id = prefix_id
+
+                self.generate_checkbox()
+                self.generate_summary_item()
+
+            def generate_checkbox(self):
+                data_pref = convert_key_to_id(self.prefix_id)
+                checkbox_kwargs = {'data-test-result':
+                                   self.test_result.lower(),
+                                   'data-prefix-id': data_pref}
+                if self.total == 0:
+                    checkbox_kwargs['disabled'] = 'true'
+
+                self.checkbox = html.input(type='checkbox',
+                                           checked='true',
+                                           onChange='filter_table(this)',
+                                           name='filter_checkbox',
+                                           class_='filter',
+                                           hidden='true',
+                                           **checkbox_kwargs)
+
+            def generate_summary_item(self):
+                self.summary_item = html.span('{0} {1}'.
+                                              format(self.total, self.label),
+                                              class_=self.class_html)
+
+        outcomes = [Outcome('passed',
+                            self._get_indexed_counter(self.passed, key),
+                            prefix_id=prefix_id),
+                    Outcome('skipped',
+                            self._get_indexed_counter(self.skipped, key),
+                            prefix_id=prefix_id),
+                    Outcome('failed',
+                            self._get_indexed_counter(self.failed, key),
+                            prefix_id=prefix_id),
+                    Outcome('error',
+                            self._get_indexed_counter(self.errors, key),
+                            label='errors', prefix_id=prefix_id),
+                    Outcome('xfailed',
+                            self._get_indexed_counter(self.xfailed, key),
+                            label='expected failures', prefix_id=prefix_id),
+                    Outcome('xpassed',
+                            self._get_indexed_counter(self.xpassed, key),
+                            label='unexpected passes', prefix_id=prefix_id)]
+
+        if self.rerun is not None:
+            outcomes.append(Outcome('rerun',
+                                    self._get_indexed_counter(self.rerun, key),
+                                    prefix_id=prefix_id))
+
+        outcome_section = []
+        for i, outcome in enumerate(outcomes, start=1):
+            outcome_section.append(outcome.checkbox)
+            outcome_section.append(outcome.summary_item)
+            if i < len(outcomes):
+                outcome_section.append(', ')
+
+        numtests = self._count(key,
+                               self.passed,
+                               self.failed,
+                               self.xpassed,
+                               self.xfailed)
+
+        summary_text = '{} tests ran'.format(numtests)
+        if key == ['_default']:
+            summary_text += ' in {:.2f} seconds.'.format(self.suite_time_delta)
+
+        summary = [html.p(summary_text)]
+
+        if include_outcome:
+            summary.append(html.p('(Un)check the boxes to filter the results.',
+                                  class_='filter',
+                                  hidden='true'))
+            for i, outcome in enumerate(outcomes, start=1):
+                summary.append(outcome.checkbox)
+                summary.append(outcome.summary_item)
+                if i < len(outcomes):
+                    summary.append(', ')
+
+        summary_prefix, summary_postfix = [], []
+        session.config.hook.pytest_html_results_summary(
+            prefix=summary_prefix, summary=summary, postfix=summary_postfix)
+
+        return ([h_summary('Summary')] +
+                summary_prefix +
+                summary +
+                summary_postfix)
+
+    def _generate_results(self, session, key, prefix_id='', h_result=html.h2):
+        cells = [
+            html.th('Result',
+                    class_='sortable result initial-sort',
+                    col='result'),
+            html.th('Test', class_='sortable', col='name'),
+            html.th('Duration', class_='sortable numeric', col='duration'),
+            html.th('Links')]
+        session.config.hook.pytest_html_results_table_header(cells=cells)
+
+        results = [h_result('Results'), html.table([html.thead(
+            html.tr(cells),
+            html.tr([
+                html.th('No results found. Try to check the filters',
+                        colspan=len(cells))],
+                    id=prefix_id + 'not-found-message', hidden='true'),
+            id='-'.join(key) + 'results-table-head'),
+            self._get_indexed_list(self.test_logs, key)],
+            id=prefix_id + 'results-table',
+            class_='results-table')]
+
+        return results
 
     def _generate_environment(self, config):
         if not hasattr(config, '_metadata') or config._metadata is None:

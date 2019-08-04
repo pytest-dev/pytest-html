@@ -10,7 +10,6 @@ import sys
 import pkg_resources
 import random
 import re
-import hashlib
 
 import pytest
 
@@ -469,13 +468,8 @@ class TestHTML:
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
-        hash_key = "test_extra_text_separated.py::" "test_pass00"
-        hash_generator = hashlib.md5()
-        hash_generator.update(hash_key.encode("utf-8"))
         assert result.ret == 0
-        src = "{0}/{1}".format(
-            "assets", "{0}_{1}.txt".format(hash_key, hash_generator.hexdigest())
-        )
+        src = "assets/test_extra_text_separated.py__test_pass_0_0.txt"
         link = '<a class="text" href="{0}" target="_blank">'.format(src)
         assert link in html
         assert os.path.exists(src)
@@ -502,13 +496,9 @@ class TestHTML:
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
-        hash_key = "test_extra_image_separated.py::test_pass00"
-        hash_generator = hashlib.md5()
-        hash_generator.update(hash_key.encode("utf-8"))
         assert result.ret == 0
-        src = "{0}/{1}".format(
-            "assets",
-            "{0}_{1}.{2}".format(hash_key, hash_generator.hexdigest(), file_extension),
+        src = "assets/test_extra_image_separated.py__test_pass_0_0.{}".format(
+            file_extension
         )
         link = '<a class="image" href="{0}" target="_blank">'.format(src)
         assert link in html
@@ -544,12 +534,8 @@ class TestHTML:
         result, html = run(testdir)
 
         for i in range(1, 4):
-            hash_key = "test_extra_image_separated_rerun.py::" "test_fail0{0}".format(i)
-            hash_generator = hashlib.md5()
-            hash_generator.update(hash_key.encode("utf-8"))
-            src = "assets/{0}_{1}.{2}".format(
-                hash_key, hash_generator.hexdigest(), file_extension
-            )
+            asset_name = "test_extra_image_separated_rerun.py__test_fail"
+            src = "assets/{}_0_{}.{}".format(asset_name, i, file_extension)
             link = '<a class="image" href="{0}" target="_blank">'.format(src)
             assert result.ret
             assert link in html
@@ -603,15 +589,35 @@ class TestHTML:
             )
         )
         result, html = run(testdir)
-
-        hash_key = "test_very_long_test_name.py::{}00".format(test_name)
-        hash_generator = hashlib.md5()
-        hash_generator.update(hash_key.encode("utf-8"))
-        src = "assets/{0}_{1}.png".format(hash_key[:218], hash_generator.hexdigest())
+        file_name = "test_very_long_test_name.py__{}_0_0.png".format(test_name)[-255:]
+        src = "assets/" + file_name
         link = '<a class="image" href="{0}" target="_blank">'.format(src)
         assert result.ret
         assert link in html
         assert os.path.exists(src)
+
+    def test_no_invalid_characters_in_filename(self, testdir):
+        testdir.makeconftest(
+            """
+            import pytest
+            @pytest.mark.hookwrapper
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.image('image.png')]
+        """
+        )
+        testdir.makepyfile(
+            """
+            def test_fail():
+                assert False
+        """
+        )
+        run(testdir)
+        for filename in os.listdir("assets"):
+            assert re.search(r'[:\\<>\*\?\|"}{}~]', filename) is None
 
     def test_no_environment(self, testdir):
         testdir.makeconftest(

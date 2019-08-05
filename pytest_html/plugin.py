@@ -15,6 +15,7 @@ import sys
 import time
 import bisect
 import warnings
+import re
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -168,7 +169,7 @@ class HTMLReport(object):
         ):
             # 255 is the common max filename length on various filesystems
             asset_file_name = "{}_{}_{}.{}".format(
-                self.test_id.replace(":", "_"),
+                re.sub(r"[^\w\.]", "_", self.test_id),
                 str(extra_index),
                 str(test_index),
                 file_extension,

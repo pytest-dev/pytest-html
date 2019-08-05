@@ -299,7 +299,6 @@ class TestHTML:
             import pytest
             from py.xml import html
 
-            @pytest.mark.optionalhook
             def pytest_html_results_summary(prefix, summary, postfix):
                 prefix.append(html.p("prefix is {0}"))
                 summary.extend([html.p("extra summary is {1}")])
@@ -320,7 +319,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -344,7 +343,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -367,7 +366,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -395,7 +394,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -426,7 +425,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -456,7 +455,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -489,7 +488,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -523,7 +522,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -561,7 +560,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -583,7 +582,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -776,7 +775,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()

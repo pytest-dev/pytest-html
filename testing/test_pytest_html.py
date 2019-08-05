@@ -599,7 +599,7 @@ class TestHTML:
         testdir.makeconftest(
             """
             import pytest
-            @pytest.mark.hookwrapper
+            @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()

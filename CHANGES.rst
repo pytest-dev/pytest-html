@@ -1,6 +1,18 @@
 Release Notes
 -------------
 
+**1.22.0 (2019-08-06)**
+
+* Refactor assets naming to be more readable and OS safe.
+
+  * This solves multiple reported issues, mainly from Windows users.
+  * Thanks to `@franz-95 <https://github.com/franz-95>`_ and `@Uil2Liv <https://github.com/Uil2liv>`_
+    for reporting and testing fixes.
+
+* Add line break to log section of the report.
+
+  * Thanks to `@borntyping <https://github.com/borntyping>`_ for reporting and fixing!
+
 **1.21.1 (2019-06-19)**
 
 * Fix issue with assets filenames being too long.

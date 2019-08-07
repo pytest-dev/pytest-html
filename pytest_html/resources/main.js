@@ -148,6 +148,9 @@ function sort(items, key_func, reversed) {
     sort_array.sort(function(a, b) {
         var key_a = a[0];
         var key_b = b[0];
+
+        if (key_a == key_b) return 0;
+
         if (reversed) {
             return (key_a < key_b ? 1 : -1);
         } else {

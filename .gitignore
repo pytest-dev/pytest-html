@@ -31,4 +31,4 @@ local.properties
 ##Tests JS
 node_modules/
 
-Pipfile
+Pipfile.lock

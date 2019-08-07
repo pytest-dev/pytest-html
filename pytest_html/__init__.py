@@ -5,6 +5,6 @@ try:
     __version__ = get_distribution(__name__).version
 except DistributionNotFound:
     # package is not installed
-    __version__ = 'unknown'
+    __version__ = "unknown"
 
-__pypi_url__ = 'https://pypi.python.org/pypi/pytest-html'
+__pypi_url__ = "https://pypi.python.org/pypi/pytest-html"

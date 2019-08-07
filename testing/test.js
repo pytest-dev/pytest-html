@@ -21,11 +21,21 @@
      sort_column(row_sort);
      assert.equal(find_all('.results-table-row')[0].className, first_element_now);
    }
+
+   //check col-name, tests should be in this order test-1 => (test-2 => test-3) on col-name
+   assert.equal(find_all('.col-name')[1].className, 'test-2 col-name');
+
    //result
    sort_column_test('[col=result]',
                     'rerun results-table-row', 'passed results-table-row');
+
+   //make sure sorting the result column does not change the tests order in the col-name
+   //tests should be in this order (test-2 => test-3) => test1 on col-name
+   assert.equal(find_all('.col-name')[0].className, 'test-2 col-name');
+
    sort_column_test('[col=result]',
                     'passed results-table-row', 'rerun results-table-row');
+
 
    //name
    sort_column_test('[col=name]',

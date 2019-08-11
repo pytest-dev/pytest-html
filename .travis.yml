@@ -8,6 +8,7 @@ jobs:
       script: grunt test
 
     -
+      name: Linting
       python: 3.7
       dist: xenial
       sudo: required

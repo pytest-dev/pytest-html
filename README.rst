@@ -253,28 +253,9 @@ Screenshots
 Contributing
 ------------
 
-Fork the repository and submit PRs with bug fixes and enhancements,  contributions are very welcome.
+We welcome contributions.
 
-Tests can be run locally with `tox`_, for example to execute tests for Python 2.7 and 3.6 execute::
-
-    tox -e py27,py36
-
-
-.. _`tox`: https://tox.readthedocs.org/en/latest/
-
-Releasing a new version
------------------------
-
-Follow these steps to release a new version of the project:
-
-1. Update your local master with the upstream master (``git pull --rebase upstream master``)
-2. Create a new branch and update ``CHANGES.rst`` with the new version, today's date, and all changes/new features
-3. Commit and push the new branch and then create a new pull request
-4. Wait for tests and reviews and then merge the branch
-5. Once merged, update your local master again (``git pull --rebase upstream master``)
-6. Tag the release with the new release version (``git tag v<new tag>``)
-7. Push the tag (``git push upstream --tags``)
-8. Done. You can monitor the progress on `Travis <https://travis-ci.org/pytest-dev/pytest-html/>`_
+To learn more, see `Development <https://github.com/pytest-dev/pytest-html/blob/master/development.rst>`_
 
 Resources
 ---------

@@ -8,16 +8,14 @@ jobs:
       script: grunt test
 
     -
+      name: Linting
       python: 3.7
       dist: xenial
       sudo: required
-      env: TOXENV=flake8
-
-    -
-      python: 3.7
-      dist: xenial
-      sudo: required
-      env: TOXENV=black
+      env: TOXENV=linting
+      cache:
+        directories:
+          - $HOME/.cache/pre-commit
 
     -
       python: 2.7

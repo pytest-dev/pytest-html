@@ -3,17 +3,14 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from base64 import b64encode
-from distutils.version import LooseVersion
 import json
 import os
-import sys
 import pkg_resources
 import random
 import re
 
 import pytest
 
-PY3 = sys.version_info[0] == 3
 pytest_plugins = ("pytester",)
 
 
@@ -253,8 +250,7 @@ class TestHTML:
         content = pkg_resources.resource_string(
             "pytest_html", os.path.join("resources", "style.css")
         )
-        if PY3:
-            content = content.decode("utf-8")
+        content = content.decode("utf-8")
         assert content
         assert content in html
 
@@ -266,8 +262,7 @@ class TestHTML:
         content = pkg_resources.resource_string(
             "pytest_html", os.path.join("resources", "main.js")
         )
-        if PY3:
-            content = content.decode("utf-8")
+        content = content.decode("utf-8")
         assert content
         assert content in html
         regex_css_link = '<link href="assets/style.css" rel="stylesheet"'
@@ -380,10 +375,7 @@ class TestHTML:
         result, html = run(testdir, "report.html", "--self-contained-html")
         assert result.ret == 0
         content_str = json.dumps(content)
-        if PY3:
-            data = b64encode(content_str.encode("utf-8")).decode("ascii")
-        else:
-            data = b64encode(content_str)
+        data = b64encode(content_str.encode("utf-8")).decode("ascii")
         href = "data:application/json;charset=utf-8;base64,{0}".format(data)
         link = '<a class="json" href="{0}" target="_blank">JSON</a>'.format(href)
         assert link in html
@@ -714,12 +706,6 @@ class TestHTML:
         assert "Environment" in html
         assert len(re.findall("ZZZ.+AAA", html, re.DOTALL)) == 1
 
-    @pytest.mark.xfail(
-        sys.version_info < (3, 2)
-        and LooseVersion(pytest.__version__) >= LooseVersion("2.8.0"),
-        reason="Fails on earlier versions of Python and pytest",
-        run=False,
-    )
     def test_xdist_crashing_slave(self, testdir):
         """https://github.com/pytest-dev/pytest-html/issues/21"""
         testdir.makepyfile(

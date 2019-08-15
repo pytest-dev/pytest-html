@@ -11,11 +11,12 @@ import datetime
 import json
 import os
 import pkg_resources
-import sys
 import time
 import bisect
 import warnings
 import re
+
+from html import escape
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -29,16 +30,6 @@ from py.xml import html, raw
 
 from . import extras
 from . import __version__, __pypi_url__
-
-PY3 = sys.version_info[0] == 3
-
-# Python 2.X and 3.X compatibility
-if PY3:
-    basestring = str
-    from html import escape
-else:
-    from codecs import open
-    from cgi import escape
 
 
 def pytest_addhooks(pluginmanager):
@@ -212,8 +203,7 @@ class HTMLReport(object):
                     src = "data:{0};base64,{1}".format(extra.get("mime_type"), content)
                     html_div = html.img(src=src)
                 else:
-                    if PY3:
-                        content = content.encode("utf-8")
+                    content = content.encode("utf-8")
 
                     content = b64decode(content)
                     href = src = self.create_asset(
@@ -346,8 +336,7 @@ class HTMLReport(object):
         self.style_css = pkg_resources.resource_string(
             __name__, os.path.join("resources", "style.css")
         )
-        if PY3:
-            self.style_css = self.style_css.decode("utf-8")
+        self.style_css = self.style_css.decode("utf-8")
 
         if ANSI:
             ansi_css = [
@@ -473,8 +462,7 @@ class HTMLReport(object):
         main_js = pkg_resources.resource_string(
             __name__, os.path.join("resources", "main.js")
         )
-        if PY3:
-            main_js = main_js.decode("utf-8")
+        main_js = main_js.decode("utf-8")
 
         body = html.body(
             html.script(raw(main_js)),
@@ -502,10 +490,10 @@ class HTMLReport(object):
         doc = html.html(head, body)
 
         unicode_doc = u"<!DOCTYPE html>\n{0}".format(doc.unicode(indent=2))
-        if PY3:
-            # Fix encoding issues, e.g. with surrogates
-            unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
-            unicode_doc = unicode_doc.decode("utf-8")
+
+        # Fix encoding issues, e.g. with surrogates
+        unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
+        unicode_doc = unicode_doc.decode("utf-8")
         return unicode_doc
 
     def _generate_environment(self, config):
@@ -522,7 +510,7 @@ class HTMLReport(object):
 
         for key in keys:
             value = metadata[key]
-            if isinstance(value, basestring) and value.startswith("http"):
+            if isinstance(value, str) and value.startswith("http"):
                 value = html.a(value, href=value, target="_blank")
             elif isinstance(value, (list, tuple, set)):
                 value = ", ".join((str(i) for i in value))

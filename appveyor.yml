@@ -9,11 +9,7 @@ environment:
     - TOXENV: py36-pytest29
       PYTHON_HOME: C:\Python36
     - TOXENV: flake8
-      PYTHON_HOME: C:\Python27
-    - TOXENV: py27-pytest30
-      PYTHON_HOME: C:\Python27
-    - TOXENV: py27-pytest29
-      PYTHON_HOME: C:\Python27
+      PYTHON_HOME: C:\Python37
 install:
   - '%PYTHON_HOME%\Scripts\pip --version'
   - '%PYTHON_HOME%\Scripts\pip install tox'

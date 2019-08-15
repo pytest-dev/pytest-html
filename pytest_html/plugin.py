@@ -86,10 +86,10 @@ def pytest_unconfigure(config):
 
 def data_uri(content, mime_type="text/plain", charset="utf-8"):
     data = b64encode(content.encode(charset)).decode("ascii")
-    return "data:{0};charset={1};base64,{2}".format(mime_type, charset, data)
+    return f"data:{mime_type};charset={charset};base64,{data}"
 
 
-class HTMLReport(object):
+class HTMLReport:
     def __init__(self, logfile, config):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
@@ -127,7 +127,7 @@ class HTMLReport(object):
             cells = [
                 html.td(self.outcome, class_="col-result"),
                 html.td(self.test_id, class_="col-name"),
-                html.td("{0:.2f}".format(self.time), class_="col-duration"),
+                html.td(f"{self.time:.2f}", class_="col-duration"),
                 html.td(self.links_html, class_="col-links"),
             ]
 
@@ -172,7 +172,7 @@ class HTMLReport(object):
             if not os.path.exists(os.path.dirname(asset_path)):
                 os.makedirs(os.path.dirname(asset_path))
 
-            relative_path = "{0}/{1}".format("assets", asset_file_name)
+            relative_path = "{}/{}".format("assets", asset_file_name)
 
             kwargs = {"encoding": "utf-8"} if "b" not in mode else {}
             with open(asset_path, mode, **kwargs) as f:
@@ -200,7 +200,7 @@ class HTMLReport(object):
                         )
                     html_div = html.a(html.img(src=content), href=content)
                 elif self.self_contained:
-                    src = "data:{0};base64,{1}".format(extra.get("mime_type"), content)
+                    src = "data:{};base64,{}".format(extra.get("mime_type"), content)
                     html_div = html.img(src=src)
                 else:
                     content = content.encode("utf-8")
@@ -266,7 +266,7 @@ class HTMLReport(object):
 
             for section in report.sections:
                 header, content = map(escape, section)
-                log.append(" {0} ".format(header).center(80, "-"))
+                log.append(f" {header} ".center(80, "-"))
                 log.append(html.br())
                 if ANSI:
                     converter = Ansi2HTMLConverter(inline=False, escaped=False)
@@ -286,7 +286,7 @@ class HTMLReport(object):
             self.results.insert(index, result)
             tbody = html.tbody(
                 result.row_table,
-                class_="{0} results-table-row".format(result.outcome.lower()),
+                class_="{} results-table-row".format(result.outcome.lower()),
             )
             if result.row_extra is not None:
                 tbody.append(result.row_extra)
@@ -351,12 +351,12 @@ class HTMLReport(object):
         for path in self.config.getoption("css"):
             self.style_css += "\n/******************************"
             self.style_css += "\n * CUSTOM CSS"
-            self.style_css += "\n * {}".format(path)
+            self.style_css += f"\n * {path}"
             self.style_css += "\n ******************************/\n\n"
             with open(path, "r") as f:
                 self.style_css += f.read()
 
-        css_href = "{0}/{1}".format("assets", "style.css")
+        css_href = "{}/{}".format("assets", "style.css")
         html_css = html.link(href=css_href, rel="stylesheet", type="text/css")
         if self.self_contained:
             html_css = html.style(raw(self.style_css))
@@ -395,7 +395,7 @@ class HTMLReport(object):
 
             def generate_summary_item(self):
                 self.summary_item = html.span(
-                    "{0} {1}".format(self.total, self.label), class_=self.class_html
+                    f"{self.total} {self.label}", class_=self.class_html
                 )
 
         outcomes = [
@@ -412,7 +412,7 @@ class HTMLReport(object):
 
         summary = [
             html.p(
-                "{0} tests ran in {1:.2f} seconds. ".format(numtests, suite_time_delta)
+                f"{numtests} tests ran in {suite_time_delta:.2f} seconds. "
             ),
             html.p(
                 "(Un)check the boxes to filter the results.",
@@ -468,11 +468,11 @@ class HTMLReport(object):
             html.script(raw(main_js)),
             html.h1(os.path.basename(self.logfile)),
             html.p(
-                "Report generated on {0} at {1} by ".format(
+                "Report generated on {} at {} by ".format(
                     generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")
                 ),
                 html.a("pytest-html", href=__pypi_url__),
-                " v{0}".format(__version__),
+                f" v{__version__}",
             ),
             onLoad="init()",
         )
@@ -489,7 +489,7 @@ class HTMLReport(object):
 
         doc = html.html(head, body)
 
-        unicode_doc = u"<!DOCTYPE html>\n{0}".format(doc.unicode(indent=2))
+        unicode_doc = "<!DOCTYPE html>\n{}".format(doc.unicode(indent=2))
 
         # Fix encoding issues, e.g. with surrogates
         unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
@@ -513,7 +513,7 @@ class HTMLReport(object):
             if isinstance(value, str) and value.startswith("http"):
                 value = html.a(value, href=value, target="_blank")
             elif isinstance(value, (list, tuple, set)):
-                value = ", ".join((str(i) for i in value))
+                value = ", ".join(str(i) for i in value)
             rows.append(html.tr(html.td(key), html.td(value)))
 
         environment.append(html.table(rows, id="environment"))
@@ -558,5 +558,5 @@ class HTMLReport(object):
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep(
-            "-", "generated html file: file://{0}".format(self.logfile)
+            "-", f"generated html file: file://{self.logfile}"
         )

@@ -201,9 +201,7 @@ class HTMLReport:
                     src = "data:{};base64,{}".format(extra.get("mime_type"), content)
                     html_div = html.img(src=src)
                 else:
-                    content = content.encode("utf-8")
-
-                    content = b64decode(content)
+                    content = b64decode(content.encode("utf-8"))
                     href = src = self.create_asset(
                         content, extra_index, test_index, extra.get("extension"), "wb"
                     )
@@ -333,8 +331,7 @@ class HTMLReport:
 
         self.style_css = pkg_resources.resource_string(
             __name__, os.path.join("resources", "style.css")
-        )
-        self.style_css = self.style_css.decode("utf-8")
+        ).decode("utf-8")
 
         if ANSI:
             ansi_css = [
@@ -459,8 +456,7 @@ class HTMLReport:
 
         main_js = pkg_resources.resource_string(
             __name__, os.path.join("resources", "main.js")
-        )
-        main_js = main_js.decode("utf-8")
+        ).decode("utf-8")
 
         body = html.body(
             html.script(raw(main_js)),
@@ -491,8 +487,7 @@ class HTMLReport:
 
         # Fix encoding issues, e.g. with surrogates
         unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
-        unicode_doc = unicode_doc.decode("utf-8")
-        return unicode_doc
+        return unicode_doc.decode("utf-8")
 
     def _generate_environment(self, config):
         if not hasattr(config, "_metadata") or config._metadata is None:

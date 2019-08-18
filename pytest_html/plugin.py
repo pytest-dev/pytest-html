@@ -170,7 +170,7 @@ class HTMLReport:
             if not os.path.exists(os.path.dirname(asset_path)):
                 os.makedirs(os.path.dirname(asset_path))
 
-            relative_path = "{}/{}".format("assets", asset_file_name)
+            relative_path = f"assets/{asset_file_name}"
 
             kwargs = {"encoding": "utf-8"} if "b" not in mode else {}
             with open(asset_path, mode, **kwargs) as f:
@@ -354,7 +354,7 @@ class HTMLReport:
             with open(path, "r") as f:
                 self.style_css += f.read()
 
-        css_href = "{}/{}".format("assets", "style.css")
+        css_href = "assets/style.css"
         html_css = html.link(href=css_href, rel="stylesheet", type="text/css")
         if self.self_contained:
             html_css = html.style(raw(self.style_css))

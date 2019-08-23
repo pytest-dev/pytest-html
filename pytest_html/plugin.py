@@ -385,7 +385,7 @@ class HTMLReport:
                     name="filter_checkbox",
                     class_="filter",
                     hidden="true",
-                    **checkbox_kwargs
+                    **checkbox_kwargs,
                 )
 
             def generate_summary_item(self):
@@ -406,9 +406,7 @@ class HTMLReport:
             outcomes.append(Outcome("rerun", self.rerun))
 
         summary = [
-            html.p(
-                f"{numtests} tests ran in {suite_time_delta:.2f} seconds. "
-            ),
+            html.p(f"{numtests} tests ran in {suite_time_delta:.2f} seconds. "),
             html.p(
                 "(Un)check the boxes to filter the results.",
                 class_="filter",
@@ -550,6 +548,4 @@ class HTMLReport:
         self._save_report(report_content)
 
     def pytest_terminal_summary(self, terminalreporter):
-        terminalreporter.write_sep(
-            "-", f"generated html file: file://{self.logfile}"
-        )
+        terminalreporter.write_sep("-", f"generated html file: file://{self.logfile}")

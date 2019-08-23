@@ -262,7 +262,7 @@ class HTMLReport:
 
             for section in report.sections:
                 header, content = map(escape, section)
-                log.append(f" {header} ".center(80, "-"))
+                log.append(f" {header:-^80} ")
                 log.append(html.br())
                 if ANSI:
                     converter = Ansi2HTMLConverter(inline=False, escaped=False)

@@ -33,7 +33,7 @@ def assert_results_by_outcome(html, test_outcome, test_outcome_number, label=Non
     # Asserts if the generated checkbox of this outcome is correct
     regex_checkbox = (
         '<input checked="true" class="filter" '
-        'data-test-result="{}"'.format(test_outcome)
+        f'data-test-result="{test_outcome}"'
     )
     if test_outcome_number == 0:
         regex_checkbox += ' disabled="true"'
@@ -103,13 +103,11 @@ class TestHTML:
     def test_skip(self, testdir):
         reason = str(random.random())
         testdir.makepyfile(
-            """
+            f"""
             import pytest
             def test_skip():
-                pytest.skip('{}')
-        """.format(
-                reason
-            )
+                pytest.skip('{reason}')
+        """
         )
         result, html = run(testdir)
         assert result.ret == 0
@@ -180,13 +178,11 @@ class TestHTML:
     def test_xfail(self, testdir):
         reason = str(random.random())
         testdir.makepyfile(
-            """
+            f"""
             import pytest
             def test_xfail():
-                pytest.xfail('{}')
-        """.format(
-                reason
-            )
+                pytest.xfail('{reason}')
+        """
         )
         result, html = run(testdir)
         assert result.ret == 0
@@ -229,12 +225,10 @@ class TestHTML:
         monkeypatch.setenv(report_location, report_name)
         testdir.makefile(
             ".ini",
-            pytest="""
+            pytest=f"""
             [pytest]
-            addopts = --html ${}
-        """.format(
-                report_location
-            ),
+            addopts = --html ${report_location}
+        """,
         )
         testdir.makepyfile("def test_pass(): pass")
         result = testdir.runpytest()
@@ -273,12 +267,10 @@ class TestHTML:
         content = "<spam>ham</spam>"
         escaped = "&lt;spam&gt;ham&lt;/spam&gt;"
         testdir.makepyfile(
-            """
+            f"""
             def test_stdout():
-                print('{}')
-                assert '{}' == 'pass'""".format(
-                content, result
-            )
+                print('{content}')
+                assert f'{result}' == 'pass'"""
         )
         _, html = run(testdir)
         assert content not in html
@@ -289,17 +281,15 @@ class TestHTML:
         content_summary = str(random.random())
         content_suffix = str(random.random())
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             from py.xml import html
 
             def pytest_html_results_summary(prefix, summary, postfix):
-                prefix.append(html.p("prefix is {}"))
-                summary.extend([html.p("extra summary is {}")])
-                postfix.extend([html.p("postfix is {}")])
-        """.format(
-                content_prefix, content_summary, content_suffix
-            )
+                prefix.append(html.p("prefix is {content_prefix}"))
+                summary.extend([html.p("extra summary is {content_summary}")])
+                postfix.extend([html.p("postfix is {content_suffix}")])
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
@@ -311,7 +301,7 @@ class TestHTML:
     def test_extra_html(self, testdir):
         content = str(random.random())
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -319,10 +309,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.html('<div>{}</div>')]
-        """.format(
-                content
-            )
+                    report.extra = [extras.html('<div>{content}</div>')]
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
@@ -335,7 +323,7 @@ class TestHTML:
     )
     def test_extra_text(self, testdir, content, encoded):
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -343,10 +331,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.text({})]
-        """.format(
-                content
-            )
+                    report.extra = [extras.text({content})]
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir, "report.html", "--self-contained-html")
@@ -358,7 +344,7 @@ class TestHTML:
     def test_extra_json(self, testdir):
         content = {str(random.random()): str(random.random())}
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -366,10 +352,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.json({})]
-        """.format(
-                content
-            )
+                    report.extra = [extras.json({content})]
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir, "report.html", "--self-contained-html")
@@ -383,7 +367,7 @@ class TestHTML:
     def test_extra_url(self, testdir):
         content = str(random.random())
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -391,10 +375,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.url('{}')]
-        """.format(
-                content
-            )
+                    report.extra = [extras.url('{content}')]
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
@@ -414,7 +396,7 @@ class TestHTML:
     def test_extra_image(self, testdir, mime_type, extension):
         content = str(random.random())
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -422,10 +404,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.{}('{}')]
-        """.format(
-                extension, content
-            )
+                    report.extra = [extras.{extension}('{content}')]
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir, "report.html", "--self-contained-html")
@@ -444,7 +424,7 @@ class TestHTML:
     )
     def test_extra_text_separated(self, testdir, content):
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -452,10 +432,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.text({})]
-        """.format(
-                content
-            )
+                    report.extra = [extras.text({content})]
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
@@ -472,7 +450,7 @@ class TestHTML:
     def test_extra_image_separated(self, testdir, file_extension, extra_type):
         content = b64encode(b"foo").decode("ascii")
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -480,17 +458,13 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.{}('{}')]
-        """.format(
-                extra_type, content
-            )
+                    report.extra = [extras.{extra_type}('{content}')]
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
         assert result.ret == 0
-        src = "assets/test_extra_image_separated.py__test_pass_0_0.{}".format(
-            file_extension
-        )
+        src = f"assets/test_extra_image_separated.py__test_pass_0_0.{file_extension}"
         link = f'<a class="image" href="{src}" target="_blank">'
         assert link in html
         assert os.path.exists(src)
@@ -502,7 +476,7 @@ class TestHTML:
     def test_extra_image_separated_rerun(self, testdir, file_extension, extra_type):
         content = b64encode(b"foo").decode("ascii")
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -510,10 +484,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.{}('{}')]
-        """.format(
-                extra_type, content
-            )
+                    report.extra = [extras.{extra_type}('{content}')]
+        """
         )
         testdir.makepyfile(
             """
@@ -536,7 +508,7 @@ class TestHTML:
     def test_extra_image_non_b64(self, testdir, src_type):
         content = src_type
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
@@ -544,10 +516,8 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extra = [extras.image('{}')]
-        """.format(
-                content
-            )
+                    report.extra = [extras.image('{content}')]
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         if src_type == "image.png":
@@ -572,12 +542,10 @@ class TestHTML:
         # This will get truncated
         test_name = "test_{}".format("a" * 300)
         testdir.makepyfile(
-            """
-            def {}():
+            f"""
+            def {test_name}():
                 assert False
-        """.format(
-                test_name
-            )
+        """
         )
         result, html = run(testdir)
         file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[-255:]
@@ -625,12 +593,10 @@ class TestHTML:
     def test_environment(self, testdir):
         content = str(random.random())
         testdir.makeconftest(
-            """
+            f"""
             def pytest_configure(config):
-                config._metadata['content'] = '{}'
-        """.format(
-                content
-            )
+                config._metadata['content'] = '{content}'
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
@@ -641,13 +607,11 @@ class TestHTML:
     def test_environment_xdist(self, testdir):
         content = str(random.random())
         testdir.makeconftest(
-            """
+            f"""
             def pytest_configure(config):
                 for i in range(2):
-                    config._metadata['content'] = '{}'
-        """.format(
-                content
-            )
+                    config._metadata['content'] = '{content}'
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir, "report.html", "-n", "1")
@@ -658,13 +622,11 @@ class TestHTML:
     def test_environment_xdist_reruns(self, testdir):
         content = str(random.random())
         testdir.makeconftest(
-            """
+            f"""
             def pytest_configure(config):
                 for i in range(2):
-                    config._metadata['content'] = '{}'
-        """.format(
-                content
-            )
+                    config._metadata['content'] = '{content}'
+        """
         )
         testdir.makepyfile("def test_fail(): assert False")
         result, html = run(testdir, "report.html", "-n", "1", "--reruns", "1")
@@ -678,13 +640,11 @@ class TestHTML:
         expected_content = ", ".join(str(i) for i in content)
         expected_html_re = fr"<td>content</td>\n\s+<td>{expected_content}</td>"
         testdir.makeconftest(
-            """
+            f"""
             def pytest_configure(config):
                 for i in range(2):
-                    config._metadata['content'] = {}
-        """.format(
-                content
-            )
+                    config._metadata['content'] = {content}
+        """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
@@ -765,17 +725,15 @@ class TestHTML:
     @pytest.mark.parametrize("content", [("'foo'"), ("u'\u0081'")])
     def test_utf8_longrepr(self, testdir, content):
         testdir.makeconftest(
-            """
+            f"""
             import pytest
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
                 if report.when == 'call':
-                    report.longrepr = 'utf8 longrepr: ' + {}
-        """.format(
-                content
-            )
+                    report.longrepr = 'utf8 longrepr: ' + {content}
+        """
         )
         testdir.makepyfile(
             """

@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**2.0.0 (2019-09-09)**
+
+* Drop support for Python 2.7. We will continue to accept patches to ``1.22.x`` for the time being.
+
+  * Thanks to `@hugovk <https://github.com/hugovk>`_ for the PR
+
 **1.22.0 (2019-08-06)**
 
 * Refactor assets naming to be more readable and OS safe.

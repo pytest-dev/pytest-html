@@ -68,7 +68,7 @@ def pytest_configure(config):
     htmlpath = config.getoption("htmlpath")
     if htmlpath:
         for csspath in config.getoption("css"):
-            open(csspath)
+            open(csspath).close()
         if not hasattr(config, "slaveinput"):
             # prevent opening htmlpath on slave nodes (xdist)
             config._html = HTMLReport(htmlpath, config)

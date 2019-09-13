@@ -69,7 +69,7 @@ def pytest_configure(config):
     if htmlpath:
         for csspath in config.getoption("css"):
             if not os.path.exists(csspath):
-                raise IOError("No such file or directory: '{}'".format(csspath))
+                raise IOError(f"No such file or directory: '{csspath}'")
         if not hasattr(config, "slaveinput"):
             # prevent opening htmlpath on slave nodes (xdist)
             config._html = HTMLReport(htmlpath, config)

@@ -1,6 +1,20 @@
 Release Notes
 -------------
 
+**1.22.1 (2019-10-05)**
+
+* Properly check for presence of CSS file. (`#246 <https://github.com/pytest-dev/pytest-html/issues/246>`_)
+
+    * Thanks to `@wanam <https://github.com/wanam>`_ for reporting, and `@krzysztof-pawlik-gat <https://github.com/krzysztof-pawlik-gat>`_ for the fix
+
+* Added support for UTF-8 display. (`#244 <https://github.com/pytest-dev/pytest-html/pull/244>`_)
+
+    * Thanks to `@Izhu666 <https://github.com/lzhu666>`_ for the PR
+
+* Fix initial sort on column. (`#247 <https://github.com/pytest-dev/pytest-html/issues/247>`_)
+
+    * Thanks to `@wanam <https://github.com/wanam>`_ for reporting and fixing
+
 **1.22.0 (2019-08-06)**
 
 * Refactor assets naming to be more readable and OS safe.

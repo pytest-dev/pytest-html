@@ -1,3 +1,4 @@
+# coding: utf-8
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -816,7 +817,7 @@ class TestHTML:
         assert re.search(regex_error, html) is not None
 
     @pytest.mark.parametrize("colors", [(["red"]), (["green", "blue"])])
-    def test_css(self, testdir, colors):
+    def test_css(self, testdir, recwarn, colors):
         testdir.makepyfile("def test_pass(): pass")
         css = {}
         cssargs = []
@@ -827,17 +828,33 @@ class TestHTML:
             cssargs.extend(["--css", path])
         result, html = run(testdir, "report.html", "--self-contained-html", *cssargs)
         assert result.ret == 0
+        assert len(recwarn) == 0
         for k, v in css.items():
             assert str(v["path"]) in html
             assert v["style"] in html
 
-    def test_css_invalid(self, testdir):
+    def test_css_invalid(self, testdir, recwarn):
         testdir.makepyfile("def test_pass(): pass")
         result = testdir.runpytest("--html", "report.html", "--css", "style.css")
         assert result.ret
+        assert len(recwarn) == 0
         assert "No such file or directory: 'style.css'" in result.stderr.str()
 
     def test_css_invalid_no_html(self, testdir):
         testdir.makepyfile("def test_pass(): pass")
         result = testdir.runpytest("--css", "style.css")
         assert result.ret == 0
+
+    def test_report_display_utf8(self, testdir):
+        testdir.makepyfile(
+            """
+            # coding: utf-8
+            import pytest
+            @pytest.mark.parametrize("utf8", [("测试用例名称")])
+            def test_pass(utf8):
+                assert True
+        """
+        )
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert r"\u6d4b\u8bd5\u7528\u4f8b\u540d\u79f0" not in html

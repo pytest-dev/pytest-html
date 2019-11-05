@@ -111,7 +111,7 @@ function init () {
 
     show_filters();
 
-    toggle_sort_states(find('.initial-sort'));
+    sort_column(find('.initial-sort'));
 
     find_all('.sortable').forEach(function(elem) {
         elem.addEventListener("click",

@@ -68,7 +68,8 @@ def pytest_configure(config):
     htmlpath = config.getoption("htmlpath")
     if htmlpath:
         for csspath in config.getoption("css"):
-            open(csspath)
+            if not os.path.exists(csspath):
+                raise IOError(f"No such file or directory: '{csspath}'")
         if not hasattr(config, "slaveinput"):
             # prevent opening htmlpath on slave nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
@@ -103,7 +104,7 @@ class HTMLReport:
 
     class TestResult:
         def __init__(self, outcome, report, logfile, config):
-            self.test_id = report.nodeid
+            self.test_id = report.nodeid.encode("utf-8").decode("unicode_escape")
             if getattr(report, "when", "call") != "call":
                 self.test_id = "::".join([report.nodeid, report.when])
             self.time = getattr(report, "duration", 0.0)

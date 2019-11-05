@@ -786,3 +786,16 @@ class TestHTML:
         testdir.makepyfile("def test_pass(): pass")
         result = testdir.runpytest("--css", "style.css")
         assert result.ret == 0
+        
+    def test_report_display_utf8(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            @pytest.mark.parametrize("caseName,input,expected", [('测试用例名称', '6*6', 36)])
+            def test_eval(caseName, input, expected):
+                assert eval(input) == expected
+        """
+        )
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert r'\u6d4b\u8bd5\u7528\u4f8b\u540d\u79f0' not in html

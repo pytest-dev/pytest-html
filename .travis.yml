@@ -17,6 +17,7 @@ jobs:
         directories:
           - $HOME/.cache/pre-commit
 
+    -
       python: 3.6
       env: TOXENV=py36
 

@@ -7,6 +7,7 @@ FORMAT_IMAGE = "image"
 FORMAT_JSON = "json"
 FORMAT_TEXT = "text"
 FORMAT_URL = "url"
+FORMAT_VIDEO = "video"
 
 
 def extra(content, format, name=None, mime_type=None, extension=None):
@@ -49,3 +50,11 @@ def text(content, name="Text"):
 
 def url(content, name="URL"):
     return extra(content, FORMAT_URL, name)
+
+
+def video(content, name="Video", mime_type="video/mp4", extension="mp4"):
+    return extra(content, FORMAT_VIDEO, name, mime_type, extension)
+
+
+def mp4(content, name="Video"):
+    return video(content, name)

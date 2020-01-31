@@ -235,6 +235,40 @@ class HTMLReport:
             elif extra.get("format") == extras.FORMAT_URL:
                 href = extra.get("content")
 
+            elif extra.get("format") == extras.FORMAT_VIDEO:
+                video_base = (
+                    '<video controls>\n<source src={} type="video/mp4">\n</video>'
+                )
+                content = extra.get("content")
+                try:
+                    is_uri_or_path = content.startswith(("file", "http")) or isfile(
+                        content
+                    )
+                except ValueError:
+                    # On Windows, os.path.isfile throws this exception when
+                    # passed a b64 encoded image.
+                    is_uri_or_path = False
+                if is_uri_or_path:
+                    if self.self_contained:
+                        warnings.warn(
+                            "Self-contained HTML report "
+                            "includes link to external "
+                            "resource: {}".format(content)
+                        )
+
+                    html_div = html.div(raw(video_base.format(extra.get("content"))))
+                elif self.self_contained:
+                    src = "data:{};base64,{}".format(extra.get("mime_type"), content)
+                    html_div = html.div(raw(video_base.format(src)))
+                else:
+                    content = b64decode(content.encode("utf-8"))
+                    href = src = self.create_asset(
+                        content, extra_index, test_index, extra.get("extension"), "wb"
+                    )
+
+                    html_div = html.a(video_base.format(src), href=href)
+                self.additional_html.append(html.div(html_div, class_="video"))
+
             if href is not None:
                 self.links_html.append(
                     html.a(

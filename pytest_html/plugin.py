@@ -510,7 +510,8 @@ class HTMLReport:
                 key_value_list = [f"'{k}': {value[k]}" for k in sorted(value)]
                 value = ", ".join(key_value_list)
                 value = "{" + value + "}"
-            rows.append(html.tr(html.td(key), html.td(raw(value))))
+            raw_value_string = raw(str(value))
+            rows.append(html.tr(html.td(key), html.td(raw_value_string)))
 
         environment.append(html.table(rows, id="environment"))
         return environment

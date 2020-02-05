@@ -419,6 +419,37 @@ class TestHTML:
         assert mock_isfile.call_count == 1
 
     @pytest.mark.parametrize(
+        "mime_type, extension", [("video/mp4", "mp4")],
+    )
+    def test_extra_video(self, testdir, mime_type, extension):
+        content = str(random.random())
+        testdir.makeconftest(
+            f"""
+            import pytest
+            @pytest.hookimpl(hookwrapper=True)
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                if report.when == 'call':
+                    from pytest_html import extras
+                    report.extra = [extras.{extension}('{content}')]
+        """
+        )
+        testdir.makepyfile("def test_pass(): pass")
+        result, html = run(testdir, "report.html", "--self-contained-html")
+        assert result.ret == 0
+        src = f"data:{mime_type};base64,{content}"
+        assert (
+            f'<video controls><source src="{src}" type="{mime_type}"></video>' in html
+        )
+
+    def test_extra_video_windows(self, mocker, testdir):
+        mock_isfile = mocker.patch("pytest_html.plugin.isfile")
+        mock_isfile.side_effect = ValueError("stat: path too long for Windows")
+        self.test_extra_video(testdir, "video/mp4", "mp4")
+        assert mock_isfile.call_count == 1
+
+    @pytest.mark.parametrize(
         "content", [("u'\u0081'"), ("'foo'"), ("b'\\xe2\\x80\\x93'")]
     )
     def test_extra_text_separated(self, testdir, content):

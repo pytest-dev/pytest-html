@@ -530,9 +530,8 @@ class HTMLReport:
             elif isinstance(value, (list, tuple, set)):
                 value = ", ".join(str(i) for i in sorted(map(str, value)))
             elif isinstance(value, dict):
-                key_value_list = [f"'{k}': {value[k]}" for k in sorted(value)]
-                value = ", ".join(key_value_list)
-                value = "{" + value + "}"
+                sorted_dict = {k: value[k] for k in sorted(value)}
+                value = json.dumps(sorted_dict)
             raw_value_string = raw(str(value))
             rows.append(html.tr(html.td(key), html.td(raw_value_string)))
 

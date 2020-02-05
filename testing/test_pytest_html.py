@@ -695,18 +695,36 @@ class TestHTML:
         assert len(re.findall(expected_html_re, html)) == 1, html
 
     _unordered_dict = {k: len(k) for k in _unsorted_tuples[0]}
+    _unordered_dict_expected = (
+        r'<td>content</td>\n\s+<td>{"123Go": 5, "Hello": 5, '
+        r'"fzWZP6vKRv": 10, "garAge": 6, "hello": 5}</td>'
+    )
+    _unordered_dict_with_html = {
+        "First Link": r'<a href="https://www.w3schools.com">W3Schools</a>',
+        "Second Link": r'<a href="https://www.w3schools.com">W2Schools</a>',
+        "Third Link": r'<a href="https://www.w3schools.com">W4Schools</a>',
+    }
+    _unordered_dict_with_html_expected = (
+        r"<td>content</td>\n\s+<td>{"
+        r'"First Link": "<a href=\\"https://www.w3schools.com\\">W3Schools</a>", '
+        r'"Second Link": "<a href=\\"https://www.w3schools.com\\">W2Schools</a>", '
+        r'"Third Link": "<a href=\\"https://www.w3schools.com\\">W4Schools</a>"}</td>'
+    )
 
-    @pytest.mark.parametrize("unordered_dict", [_unordered_dict])
-    def test_environment_unordered_dict_value(self, testdir, unordered_dict):
-        expected_html_re = (
-            r"<td>content</td>\n\s+<td>{'123Go': 5, 'Hello': 5, "
-            r"'fzWZP6vKRv': 10, 'garAge': 6, 'hello': 5}</td>"
-        )
+    @pytest.mark.parametrize(
+        "unordered_dict,expected_output",
+        [
+            (_unordered_dict, _unordered_dict_expected),
+            (_unordered_dict_with_html, _unordered_dict_with_html_expected),
+        ],
+    )
+    def test_environment_unordered_dict_value(
+        self, testdir, unordered_dict, expected_output
+    ):
         testdir.makeconftest(
-            """
+            f"""
             def pytest_configure(config):
-                values = dict({'Hello': 5, 'fzWZP6vKRv': 10, 'garAge': 6, 'hello': 5,
-                               '123Go': 5})
+                values = dict({json.dumps(unordered_dict)})
                 config._metadata['content'] = values
         """
         )
@@ -714,7 +732,7 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert "Environment" in html
-        assert len(re.findall(expected_html_re, html)) == 1, html
+        assert len(re.findall(expected_output, html)) == 1, html
 
     def test_environment_ordered(self, testdir):
         testdir.makeconftest(

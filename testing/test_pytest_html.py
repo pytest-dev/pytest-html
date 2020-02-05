@@ -633,10 +633,22 @@ class TestHTML:
         assert "Environment" in html
         assert len(re.findall(content, html)) == 1
 
-    def test_environment_list_value(self, testdir):
-        content = tuple(str(random.random()) for i in range(10))
-        content += tuple(random.random() for i in range(10))
-        expected_content = ", ".join(str(i) for i in content)
+    _unsorted_tuples = [
+        ("Hello", "fzWZP6vKRv", "hello", "garAge", "123Go"),
+        (2, 4, 2, 1, 54),
+        ("Yes", 400, "5.4"),
+    ]
+    _sorted_tuples = [
+        "123Go, Hello, fzWZP6vKRv, garAge, hello",
+        "1, 2, 2, 4, 54",
+        "400, 5.4, Yes",
+    ]
+    _test_environment_list_value_data_set = zip(_unsorted_tuples, _sorted_tuples)
+
+    @pytest.mark.parametrize(
+        "content,expected_content", _test_environment_list_value_data_set
+    )
+    def test_environment_list_value(self, testdir, content, expected_content):
         expected_html_re = fr"<td>content</td>\n\s+<td>{expected_content}</td>"
         testdir.makeconftest(
             f"""
@@ -649,7 +661,29 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert "Environment" in html
-        assert len(re.findall(expected_html_re, html)) == 1
+        assert len(re.findall(expected_html_re, html)) == 1, html
+
+    _unordered_dict = {k: len(k) for k in _unsorted_tuples[0]}
+
+    @pytest.mark.parametrize("unordered_dict", [_unordered_dict])
+    def test_environment_unordered_dict_value(self, testdir, unordered_dict):
+        expected_html_re = (
+            r"<td>content</td>\n\s+<td>{'123Go': 5, 'Hello': 5, "
+            r"'fzWZP6vKRv': 10, 'garAge': 6, 'hello': 5}</td>"
+        )
+        testdir.makeconftest(
+            """
+            def pytest_configure(config):
+                values = dict({'Hello': 5, 'fzWZP6vKRv': 10, 'garAge': 6, 'hello': 5,
+                               '123Go': 5})
+                config._metadata['content'] = values
+        """
+        )
+        testdir.makepyfile("def test_pass(): pass")
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert "Environment" in html
+        assert len(re.findall(expected_html_re, html)) == 1, html
 
     def test_environment_ordered(self, testdir):
         testdir.makeconftest(

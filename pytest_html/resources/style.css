@@ -113,6 +113,19 @@ div.image {
 div.image img {
 	width: 320px
 }
+div.video {
+	border: 1px solid #e6e6e6;
+	float: right;
+	height: 240px;
+	margin-left: 5px;
+	overflow: hidden;
+	width: 320px
+}
+div.video video {
+	overflow: hidden;
+	width: 320px;
+    height: 240px;
+}
 .collapsed {
 	display: none;
 }

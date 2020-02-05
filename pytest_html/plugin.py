@@ -181,33 +181,7 @@ class HTMLReport:
         def append_extra_html(self, extra, extra_index, test_index):
             href = None
             if extra.get("format") == extras.FORMAT_IMAGE:
-                content = extra.get("content")
-                try:
-                    is_uri_or_path = content.startswith(("file", "http")) or isfile(
-                        content
-                    )
-                except ValueError:
-                    # On Windows, os.path.isfile throws this exception when
-                    # passed a b64 encoded image.
-                    is_uri_or_path = False
-                if is_uri_or_path:
-                    if self.self_contained:
-                        warnings.warn(
-                            "Self-contained HTML report "
-                            "includes link to external "
-                            "resource: {}".format(content)
-                        )
-                    html_div = html.a(html.img(src=content), href=content)
-                elif self.self_contained:
-                    src = "data:{};base64,{}".format(extra.get("mime_type"), content)
-                    html_div = html.img(src=src)
-                else:
-                    content = b64decode(content.encode("utf-8"))
-                    href = src = self.create_asset(
-                        content, extra_index, test_index, extra.get("extension"), "wb"
-                    )
-                    html_div = html.a(html.img(src=src), href=href)
-                self.additional_html.append(html.div(html_div, class_="image"))
+                self._append_image(extra, extra_index, test_index)
 
             elif extra.get("format") == extras.FORMAT_HTML:
                 self.additional_html.append(html.div(raw(extra.get("content"))))
@@ -234,6 +208,9 @@ class HTMLReport:
 
             elif extra.get("format") == extras.FORMAT_URL:
                 href = extra.get("content")
+
+            elif extra.get("format") == extras.FORMAT_VIDEO:
+                self._append_video(extra, extra_index, test_index)
 
             if href is not None:
                 self.links_html.append(
@@ -275,6 +252,52 @@ class HTMLReport:
                 log = html.div(class_="empty log")
                 log.append("No log output captured.")
             additional_html.append(log)
+
+        def _make_media_html_div(
+            self, extra, extra_index, test_index, base_extra_string, base_extra_class
+        ):
+            content = extra.get("content")
+            try:
+                is_uri_or_path = content.startswith(("file", "http")) or isfile(content)
+            except ValueError:
+                # On Windows, os.path.isfile throws this exception when
+                # passed a b64 encoded image.
+                is_uri_or_path = False
+            if is_uri_or_path:
+                if self.self_contained:
+                    warnings.warn(
+                        "Self-contained HTML report "
+                        "includes link to external "
+                        f"resource: {content}"
+                    )
+
+                html_div = html.a(
+                    raw(base_extra_string.format(extra.get("content"))), href=content
+                )
+            elif self.self_contained:
+                src = f"data:{extra.get('mime_type')};base64,{content}"
+                html_div = raw(base_extra_string.format(src))
+            else:
+                content = b64decode(content.encode("utf-8"))
+                href = src = self.create_asset(
+                    content, extra_index, test_index, extra.get("extension"), "wb"
+                )
+                html_div = html.a(class_=base_extra_class, target="_blank", href=href)
+            return html_div
+
+        def _append_image(self, extra, extra_index, test_index):
+            image_base = '<img src="{}"/>'
+            html_div = self._make_media_html_div(
+                extra, extra_index, test_index, image_base, "image"
+            )
+            self.additional_html.append(html.div(html_div, class_="image"))
+
+        def _append_video(self, extra, extra_index, test_index):
+            video_base = '<video controls><source src="{}" type="video/mp4"></video>'
+            html_div = self._make_media_html_div(
+                extra, extra_index, test_index, video_base, "video"
+            )
+            self.additional_html.append(html.div(html_div, class_="video"))
 
     def _appendrow(self, outcome, report):
         result = self.TestResult(outcome, report, self.logfile, self.config)

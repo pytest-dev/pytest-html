@@ -664,10 +664,22 @@ class TestHTML:
         assert "Environment" in html
         assert len(re.findall(content, html)) == 1
 
-    def test_environment_list_value(self, testdir):
-        content = tuple(str(random.random()) for i in range(10))
-        content += tuple(random.random() for i in range(10))
-        expected_content = ", ".join(str(i) for i in content)
+    _unsorted_tuples = [
+        ("Hello", "fzWZP6vKRv", "hello", "garAge", "123Go"),
+        (2, 4, 2, 1, 54),
+        ("Yes", 400, "5.4"),
+    ]
+    _sorted_tuples = [
+        "123Go, Hello, fzWZP6vKRv, garAge, hello",
+        "1, 2, 2, 4, 54",
+        "400, 5.4, Yes",
+    ]
+    _test_environment_list_value_data_set = zip(_unsorted_tuples, _sorted_tuples)
+
+    @pytest.mark.parametrize(
+        "content,expected_content", _test_environment_list_value_data_set
+    )
+    def test_environment_list_value(self, testdir, content, expected_content):
         expected_html_re = fr"<td>content</td>\n\s+<td>{expected_content}</td>"
         testdir.makeconftest(
             f"""
@@ -681,6 +693,46 @@ class TestHTML:
         assert result.ret == 0
         assert "Environment" in html
         assert len(re.findall(expected_html_re, html)) == 1
+
+    _unordered_dict = {k: len(k) for k in _unsorted_tuples[0]}
+    _unordered_dict_expected = (
+        r'<td>content</td>\n\s+<td>{"123Go": 5, "Hello": 5, '
+        r'"fzWZP6vKRv": 10, "garAge": 6, "hello": 5}</td>'
+    )
+    _unordered_dict_with_html = {
+        "First Link": r'<a href="https://www.w3schools.com">W3Schools</a>',
+        "Second Link": r'<a href="https://www.w3schools.com">W2Schools</a>',
+        "Third Link": r'<a href="https://www.w3schools.com">W4Schools</a>',
+    }
+    _unordered_dict_with_html_expected = (
+        r"<td>content</td>\n\s+<td>{"
+        r'"First Link": "<a href=\\"https://www.w3schools.com\\">W3Schools</a>", '
+        r'"Second Link": "<a href=\\"https://www.w3schools.com\\">W2Schools</a>", '
+        r'"Third Link": "<a href=\\"https://www.w3schools.com\\">W4Schools</a>"}</td>'
+    )
+
+    @pytest.mark.parametrize(
+        "unordered_dict,expected_output",
+        [
+            (_unordered_dict, _unordered_dict_expected),
+            (_unordered_dict_with_html, _unordered_dict_with_html_expected),
+        ],
+    )
+    def test_environment_unordered_dict_value(
+        self, testdir, unordered_dict, expected_output
+    ):
+        testdir.makeconftest(
+            f"""
+            def pytest_configure(config):
+                values = dict({json.dumps(unordered_dict)})
+                config._metadata['content'] = values
+        """
+        )
+        testdir.makepyfile("def test_pass(): pass")
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert "Environment" in html
+        assert len(re.findall(expected_output, html)) == 1
 
     def test_environment_ordered(self, testdir):
         testdir.makeconftest(

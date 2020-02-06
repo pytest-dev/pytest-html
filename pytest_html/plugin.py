@@ -528,8 +528,12 @@ class HTMLReport:
             if isinstance(value, str) and value.startswith("http"):
                 value = html.a(value, href=value, target="_blank")
             elif isinstance(value, (list, tuple, set)):
-                value = ", ".join(str(i) for i in value)
-            rows.append(html.tr(html.td(key), html.td(value)))
+                value = ", ".join(str(i) for i in sorted(map(str, value)))
+            elif isinstance(value, dict):
+                sorted_dict = {k: value[k] for k in sorted(value)}
+                value = json.dumps(sorted_dict)
+            raw_value_string = raw(str(value))
+            rows.append(html.tr(html.td(key), html.td(raw_value_string)))
 
         environment.append(html.table(rows, id="environment"))
         return environment

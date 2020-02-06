@@ -692,7 +692,7 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert "Environment" in html
-        assert len(re.findall(expected_html_re, html)) == 1, html
+        assert len(re.findall(expected_html_re, html)) == 1
 
     _unordered_dict = {k: len(k) for k in _unsorted_tuples[0]}
     _unordered_dict_expected = (
@@ -732,7 +732,7 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert "Environment" in html
-        assert len(re.findall(expected_output, html)) == 1, html
+        assert len(re.findall(expected_output, html)) == 1
 
     def test_environment_ordered(self, testdir):
         testdir.makeconftest(

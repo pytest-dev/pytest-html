@@ -62,6 +62,13 @@ def pytest_addoption(parser):
         default=[],
         help="append given css file content to report style file.",
     )
+    group.addoption(
+        "--js",
+        action="store",
+        metavar="path",
+        default="",
+        help="replace the default main.js with the selected file.",
+    )
 
 
 def pytest_configure(config):
@@ -70,6 +77,11 @@ def pytest_configure(config):
         for csspath in config.getoption("css"):
             if not os.path.exists(csspath):
                 raise IOError(f"No such file or directory: '{csspath}'")
+        if config.getoption("js"):
+            jspath = config.getoption("js")
+            if not os.path.exists(config.getoption("js")):
+                raise IOError(f"No such file or directory: '{jspath}'")
+
         if not hasattr(config, "slaveinput"):
             # prevent opening htmlpath on slave nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
@@ -479,6 +491,12 @@ class HTMLReport:
         main_js = pkg_resources.resource_string(
             __name__, os.path.join("resources", "main.js")
         ).decode("utf-8")
+
+        # Add user-provided JS
+        custom_js = self.config.getoption("js")
+        if self.config.getoption("js"):
+            with open(custom_js, "r") as f:
+                main_js += f.read()
 
         body = html.body(
             html.script(raw(main_js)),

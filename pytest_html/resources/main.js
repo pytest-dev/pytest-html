@@ -105,6 +105,8 @@ function get_query_parameter(name) {
 }
 
 function init () {
+    pre_init()
+
     reset_sort_headers();
 
     add_collapse();
@@ -120,7 +122,18 @@ function init () {
                               }, false)
     });
 
+    post_init()
 };
+
+function pre_init() {
+    // To be overridden by the user
+    // with pre_init = function() { foo(); }
+}
+
+function post_init() {
+    // To be overridden by the user
+    // with post_init = function() { bar(); }
+}
 
 function sort_table(clicked, key_func) {
     var rows = find_all('.results-table-row');

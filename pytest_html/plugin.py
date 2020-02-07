@@ -64,9 +64,9 @@ def pytest_addoption(parser):
     )
     group.addoption(
         "--js",
-        action="store",
+        action="append",
         metavar="path",
-        default="",
+        default=[],
         help="replace the default main.js with the selected file.",
     )
 
@@ -77,9 +77,8 @@ def pytest_configure(config):
         for csspath in config.getoption("css"):
             if not os.path.exists(csspath):
                 raise IOError(f"No such file or directory: '{csspath}'")
-        if config.getoption("js"):
-            jspath = config.getoption("js")
-            if not os.path.exists(config.getoption("js")):
+        for jspath in config.getoption("js"):
+            if not os.path.exists(jspath):
                 raise IOError(f"No such file or directory: '{jspath}'")
 
         if not hasattr(config, "slaveinput"):
@@ -492,10 +491,12 @@ class HTMLReport:
             __name__, os.path.join("resources", "main.js")
         ).decode("utf-8")
 
-        # Add user-provided JS
-        custom_js = self.config.getoption("js")
-        if self.config.getoption("js"):
-            with open(custom_js, "r") as f:
+        for path in self.config.getoption("js"):
+            main_js += "\n/******************************"
+            main_js += "\n * CUSTOM JS"
+            main_js += f"\n * {path}"
+            main_js += "\n ******************************/\n\n"
+            with open(path, "r") as f:
                 main_js += f.read()
 
         body = html.body(

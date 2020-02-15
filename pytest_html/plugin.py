@@ -62,6 +62,12 @@ def pytest_addoption(parser):
         default=[],
         help="append given css file content to report style file.",
     )
+    parser.addini(
+        "render_collapsed",
+        type="bool",
+        default=False,
+        help="Open the report with all rows collapsed. Useful for very large reports",
+    )
 
 
 def pytest_configure(config):
@@ -137,9 +143,12 @@ class HTMLReport:
             )
 
             if len(cells) > 0:
+                td_class = "extra"
+                if self.config.getini("render_collapsed"):
+                    td_class += " collapsed"
                 self.row_table = html.tr(cells)
                 self.row_extra = html.tr(
-                    html.td(self.additional_html, class_="extra", colspan=len(cells))
+                    html.td(self.additional_html, class_=td_class, colspan=len(cells))
                 )
 
         def __lt__(self, other):

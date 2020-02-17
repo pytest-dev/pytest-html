@@ -418,9 +418,7 @@ class TestHTML:
         self.test_extra_image(testdir, "image/png", "png")
         assert mock_isfile.call_count == 1
 
-    @pytest.mark.parametrize(
-        "mime_type, extension", [("video/mp4", "mp4")],
-    )
+    @pytest.mark.parametrize("mime_type, extension", [("video/mp4", "mp4")])
     def test_extra_video(self, testdir, mime_type, extension):
         content = str(random.random())
         testdir.makeconftest(
@@ -882,3 +880,21 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert r"\u6d4b\u8bd5\u7528\u4f8b\u540d\u79f0" not in html
+
+    @pytest.mark.parametrize("collapsed", [True, False])
+    def test_collapsed_ini(self, testdir, collapsed):
+        td_class = "extra"
+        if collapsed:
+            td_class += " collapsed"
+        expected_html = f'<td class="{td_class}" colspan="4">'
+        testdir.makeini(
+            f"""
+            [pytest]
+            render_collapsed = {collapsed}
+        """
+        )
+        testdir.makepyfile("def test_fail(): assert False")
+        result, html = run(testdir)
+        assert result.ret == 1
+        assert expected_html in html
+        assert_results(html, tests=1, passed=0, failed=1)

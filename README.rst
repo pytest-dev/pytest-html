@@ -246,10 +246,10 @@ or by setting the :code:`render_collapsed` in a configuration file (pytest.ini, 
 .. code-block:: ini
 
   [pytest]
-  render_collapsed = True
+  render_collapsed = True
 
 **NOTE:** Setting :code:`render_collapsed` will, unlike the query parameter, affect all statuses.
-
+
 Screenshots
 -----------
 

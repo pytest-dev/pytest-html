@@ -881,20 +881,26 @@ class TestHTML:
         assert result.ret == 0
         assert r"\u6d4b\u8bd5\u7528\u4f8b\u540d\u79f0" not in html
 
-    @pytest.mark.parametrize("collapsed", [True, False])
-    def test_collapsed_ini(self, testdir, collapsed):
-        td_class = "extra"
-        if collapsed:
-            td_class += " collapsed"
-        expected_html = f'<td class="{td_class}" colspan="4">'
+    @pytest.mark.parametrize("is_collapsed", [True, False])
+    def test_collapsed(self, testdir, is_collapsed):
+        collapsed_html = '<tr class="collapsed">'
+        expected_count = 2 if is_collapsed else 0
         testdir.makeini(
             f"""
             [pytest]
-            render_collapsed = {collapsed}
+            render_collapsed = {is_collapsed}
         """
         )
-        testdir.makepyfile("def test_fail(): assert False")
+        testdir.makepyfile(
+            """
+            def test_fail():
+                assert False
+
+            def test_pass():
+                assert True
+        """
+        )
         result, html = run(testdir)
         assert result.ret == 1
-        assert expected_html in html
-        assert_results(html, tests=1, passed=0, failed=1)
+        assert len(re.findall(collapsed_html, html)) == expected_count
+        assert_results(html, tests=2, passed=1, failed=1)

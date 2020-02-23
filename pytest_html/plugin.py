@@ -15,6 +15,7 @@ import warnings
 import re
 
 from html import escape
+import pytest
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -87,6 +88,29 @@ def pytest_unconfigure(config):
     if html:
         del config._html
         config.pluginmanager.unregister(html)
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+    if report.when == "call":
+        fixture_extras = item.funcargs.get("extra", [])
+        plugin_extras = getattr(report, "extra", [])
+        report.extra = fixture_extras + plugin_extras
+
+
+@pytest.fixture
+def extra():
+    """Add details to the HTML reports.
+
+    .. code-block:: python
+
+        import pytest_html
+        def test_foo(extra):
+            extra.append(pytest_html.extras.url('http://www.example.com/'))
+    """
+    return []
 
 
 def data_uri(content, mime_type="text/plain", charset="utf-8"):

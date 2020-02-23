@@ -192,6 +192,17 @@ created hyper link:
 
     extra.append(pytest_html.extras.text('some string', name='Different title'))
 
+It is also possible to use the fixture :code:`extra` to add content directly
+in a test function without implementing hooks. These will generally end up
+before any extras added by plugins.
+
+.. code-block:: python
+
+   from pytest_html import extras
+
+   def test_extra(extra):
+      extra.append(extras.text('some string'))
+
 
 Modifying the results table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

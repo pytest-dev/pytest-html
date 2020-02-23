@@ -583,6 +583,20 @@ class TestHTML:
         assert link in html
         assert os.path.exists(src)
 
+    def test_extra_fixture(self, testdir):
+        content = b64encode(b"foo").decode("ascii")
+        testdir.makepyfile(
+            f"""
+            def test_pass(extra):
+                from pytest_html import extras
+                extra.append(extras.png('{content}'))
+        """
+        )
+        result, html = run(testdir, "report.html", "--self-contained-html")
+        assert result.ret == 0
+        src = f"data:image/png;base64,{content}"
+        assert f'<img src="{src}"/>' in html
+
     def test_no_invalid_characters_in_filename(self, testdir):
         testdir.makeconftest(
             """

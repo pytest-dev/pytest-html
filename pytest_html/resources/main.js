@@ -81,7 +81,9 @@ function add_collapse() {
         var collapsed = get_query_parameter('collapsed') || 'Passed';
         var extras = elem.parentNode.nextElementSibling;
         var expandcollapse = document.createElement("span");
-        if (collapsed.includes(elem.innerHTML)) {
+        if (extras.classList.contains("collapsed")) {
+            expandcollapse.classList.add("expander")
+        } else if (collapsed.includes(elem.innerHTML)) {
             extras.classList.add("collapsed");
             expandcollapse.classList.add("expander");
         } else {

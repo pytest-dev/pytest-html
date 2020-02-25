@@ -143,12 +143,13 @@ class HTMLReport:
             )
 
             if len(cells) > 0:
-                td_class = "extra"
+                tr_class = None
                 if self.config.getini("render_collapsed"):
-                    td_class += " collapsed"
+                    tr_class = "collapsed"
                 self.row_table = html.tr(cells)
                 self.row_extra = html.tr(
-                    html.td(self.additional_html, class_=td_class, colspan=len(cells))
+                    html.td(self.additional_html, class_="extra", colspan=len(cells)),
+                    class_=tr_class,
                 )
 
         def __lt__(self, other):

@@ -904,3 +904,19 @@ class TestHTML:
         assert result.ret == 1
         assert len(re.findall(collapsed_html, html)) == expected_count
         assert_results(html, tests=2, passed=1, failed=1)
+
+    def test_custom_content_report_title(self, testdir):
+        content_report_title = str(random.random())
+        testdir.makeconftest(
+            f"""
+            import pytest
+            from py.xml import html
+
+            def pytest_html_report_title(report):
+                report.title = "title is {content_report_title}"
+        """
+        )
+        testdir.makepyfile("def test_pass(): pass")
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert len(re.findall(content_report_title, html)) == 1

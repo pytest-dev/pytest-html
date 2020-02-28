@@ -99,6 +99,7 @@ class HTMLReport:
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
+        self.title = os.path.basename(self.logfile)
         self.results = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
@@ -490,9 +491,11 @@ class HTMLReport:
             __name__, os.path.join("resources", "main.js")
         ).decode("utf-8")
 
+        session.config.hook.pytest_html_report_title(report=self)
+
         body = html.body(
             html.script(raw(main_js)),
-            html.h1(os.path.basename(self.logfile)),
+            html.h1(self.title),
             html.p(
                 "Report generated on {} at {} by ".format(
                     generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")

@@ -87,6 +87,19 @@ be used to change the appearance of the report.
 
   $ pytest --html=report.html --css=highcontrast.css --css=accessible.css
 
+Report Title
+~~~~~~~~~~~~
+
+By default report title will be the filename of the report, you can edit it by using the :code: `pytest_html_report_title` hook:
+
+.. code-block:: python
+
+   import pytest
+   from py.xml import html
+
+   def pytest_html_report_title(report)
+      report.title = "My very own title!"
+
 Environment
 ~~~~~~~~~~~
 

@@ -8,14 +8,15 @@ from os.path import isfile
 import datetime
 import json
 import os
-import pkg_resources
 import time
 import bisect
 import warnings
 import re
+import sys
 
 from html import escape
 import pytest
+import pytest_html.resources
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -29,6 +30,21 @@ from py.xml import html, raw
 
 from . import extras
 from . import __version__, __pypi_url__
+
+
+def _load_resource(resource_name):
+    """Load resource using either importlib or setuptools,
+     depending on python version."""
+    if sys.version_info >= (3, 7):
+        from importlib import resources
+
+        return resources.read_text(pytest_html.resources, resource_name)
+    else:
+        import pkg_resources
+
+        return pkg_resources.resource_string(
+            __name__, os.path.join("resources", resource_name)
+        ).decode("utf-8")
 
 
 def pytest_addhooks(pluginmanager):
@@ -388,9 +404,7 @@ class HTMLReport:
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
-        self.style_css = pkg_resources.resource_string(
-            __name__, os.path.join("resources", "style.css")
-        ).decode("utf-8")
+        self.style_css = _load_resource("style.css")
 
         if ANSI:
             ansi_css = [
@@ -511,9 +525,7 @@ class HTMLReport:
             ),
         ]
 
-        main_js = pkg_resources.resource_string(
-            __name__, os.path.join("resources", "main.js")
-        ).decode("utf-8")
+        main_js = _load_resource("style.css")
 
         session.config.hook.pytest_html_report_title(report=self)
 

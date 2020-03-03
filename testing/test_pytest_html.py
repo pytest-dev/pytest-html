@@ -510,7 +510,9 @@ class TestHTML:
         assert result.ret == 0
         src = f"assets/test_extra_image_separated.py__test_pass_0_0.{file_extension}"
         link = f'<a class="image" href="{src}" target="_blank">'
+        img = f'<img src="{src}"/>'
         assert link in html
+        assert img in html
         assert os.path.exists(src)
 
     @pytest.mark.parametrize(
@@ -544,8 +546,10 @@ class TestHTML:
             asset_name = "test_extra_image_separated_rerun.py__test_fail"
             src = f"assets/{asset_name}_0_{i}.{file_extension}"
             link = f'<a class="image" href="{src}" target="_blank">'
+            img = f'<img src="{src}"/>'
             assert result.ret
             assert link in html
+            assert img in html
             assert os.path.exists(src)
 
     @pytest.mark.parametrize("src_type", ["https://", "file://", "image.png"])

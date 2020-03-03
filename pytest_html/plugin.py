@@ -319,7 +319,12 @@ class HTMLReport:
                 href = src = self.create_asset(
                     content, extra_index, test_index, extra.get("extension"), "wb"
                 )
-                html_div = html.a(class_=base_extra_class, target="_blank", href=href)
+                html_div = html.a(
+                    raw(base_extra_string.format(src)),
+                    class_=base_extra_class,
+                    target="_blank",
+                    href=href,
+                )
             return html_div
 
         def _append_image(self, extra, extra_index, test_index):

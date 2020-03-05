@@ -258,7 +258,7 @@ class HTMLReport:
                         class_=extra.get("format"),
                         href=href,
                         target="_blank",
-                        download=download
+                        download=download,
                     )
                 )
                 self.links_html.append(" ")

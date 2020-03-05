@@ -215,6 +215,8 @@ class HTMLReport:
 
         def append_extra_html(self, extra, extra_index, test_index):
             href = None
+            download = None
+
             if extra.get("format") == extras.FORMAT_IMAGE:
                 self._append_image(extra, extra_index, test_index)
 
@@ -225,6 +227,7 @@ class HTMLReport:
                 content = json.dumps(extra.get("content"))
                 if self.self_contained:
                     href = data_uri(content, mime_type=extra.get("mime_type"))
+                    download = extra.get("name")
                 else:
                     href = self.create_asset(
                         content, extra_index, test_index, extra.get("extension")
@@ -236,6 +239,7 @@ class HTMLReport:
                     content = content.decode("utf-8")
                 if self.self_contained:
                     href = data_uri(content)
+                    download = extra.get("name")
                 else:
                     href = self.create_asset(
                         content, extra_index, test_index, extra.get("extension")
@@ -254,6 +258,7 @@ class HTMLReport:
                         class_=extra.get("format"),
                         href=href,
                         target="_blank",
+                        download=download
                     )
                 )
                 self.links_html.append(" ")

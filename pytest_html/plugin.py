@@ -227,7 +227,7 @@ class HTMLReport:
                 content = json.dumps(extra.get("content"))
                 if self.self_contained:
                     href = data_uri(content, mime_type=extra.get("mime_type"))
-                    download = extra.get("name")
+                    download = extra.get("name") + '.json'
                 else:
                     href = self.create_asset(
                         content, extra_index, test_index, extra.get("extension")
@@ -239,7 +239,7 @@ class HTMLReport:
                     content = content.decode("utf-8")
                 if self.self_contained:
                     href = data_uri(content)
-                    download = extra.get("name")
+                    download = extra.get("name") + '.txt'
                 else:
                     href = self.create_asset(
                         content, extra_index, test_index, extra.get("extension")
@@ -252,13 +252,19 @@ class HTMLReport:
                 self._append_video(extra, extra_index, test_index)
 
             if href is not None:
+                kwargs = {
+                    "class_" : extra.get("format"),
+                    "href" : href,
+                    "target" : "_blank",
+                }
+
+                if download:
+                    kwargs['download'] = download
+
                 self.links_html.append(
                     html.a(
                         extra.get("name"),
-                        class_=extra.get("format"),
-                        href=href,
-                        target="_blank",
-                        download=download,
+                        **kwargs
                     )
                 )
                 self.links_html.append(" ")

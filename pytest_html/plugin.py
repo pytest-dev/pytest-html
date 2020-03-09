@@ -227,7 +227,7 @@ class HTMLReport:
                 content = json.dumps(extra.get("content"))
                 if self.self_contained:
                     href = data_uri(content, mime_type=extra.get("mime_type"))
-                    download = extra.get("name") + '.json'
+                    download = extra.get("name") + ".json"
                 else:
                     href = self.create_asset(
                         content, extra_index, test_index, extra.get("extension")
@@ -239,7 +239,7 @@ class HTMLReport:
                     content = content.decode("utf-8")
                 if self.self_contained:
                     href = data_uri(content)
-                    download = extra.get("name") + '.txt'
+                    download = extra.get("name") + ".txt"
                 else:
                     href = self.create_asset(
                         content, extra_index, test_index, extra.get("extension")

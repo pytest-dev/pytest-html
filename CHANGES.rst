@@ -1,19 +1,41 @@
 Release Notes
 -------------
 
+**2.1.0 (2020-03-09)**
+
+* Added support for MP4 video format. (`#260 <https://github.com/pytest-dev/pytest-html/pull/260>`_)
+
+  * Thanks to `@ExaltedBagel <https://github.com/ExaltedBagel>`_ for the PR
+
+* Added support for sorting metadata by key. (`#245 <https://github.com/pytest-dev/pytest-html/issues/245>`_)
+
+  * Thanks to `@ssbarnea <https://github.com/ssbarnea>`_ for reporting and `@ExaltedBagel <https://github.com/ExaltedBagel>`_ for the fix
+
+* Added support for rendering reports collapsed (`#239 <https://github.com/pytest-dev/pytest-html/issues/239>`_)
+
+  * Thanks to `@Wramberg <https://github.com/Wramberg>`_ for suggesting this enhancement
+
+* Added `extra` fixture (`#269 <https://github.com/pytest-dev/pytest-html/pull/269>`_)
+
+  * Thanks to `@christiansandberg <https://github.com/christiansandberg>`_ for the PR
+
+* Added ability to change report title using hook (`#270 <https://github.com/pytest-dev/pytest-html/pull/270>`_)
+
+  * Thanks to `@werdeil <https://github.com/werdeil>`_ for the PR
+
 **2.0.1 (2019-10-05)**
 
 * Properly check for presence of CSS file. (`#246 <https://github.com/pytest-dev/pytest-html/issues/246>`_)
 
-    * Thanks to `@wanam <https://github.com/wanam>`_ for reporting, and `@krzysztof-pawlik-gat <https://github.com/krzysztof-pawlik-gat>`_ for the fix
+  * Thanks to `@wanam <https://github.com/wanam>`_ for reporting, and `@krzysztof-pawlik-gat <https://github.com/krzysztof-pawlik-gat>`_ for the fix
 
 * Added support for UTF-8 display. (`#244 <https://github.com/pytest-dev/pytest-html/pull/244>`_)
 
-    * Thanks to `@Izhu666 <https://github.com/lzhu666>`_ for the PR
+  * Thanks to `@Izhu666 <https://github.com/lzhu666>`_ for the PR
 
 * Fix initial sort on column. (`#247 <https://github.com/pytest-dev/pytest-html/issues/247>`_)
 
-    * Thanks to `@wanam <https://github.com/wanam>`_ for reporting and fixing
+  * Thanks to `@wanam <https://github.com/wanam>`_ for reporting and fixing
 
 **2.0.0 (2019-09-09)**
 

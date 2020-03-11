@@ -337,7 +337,8 @@ class TestHTML:
         result, html = run(testdir, "report.html", "--self-contained-html")
         assert result.ret == 0
         href = f"data:text/plain;charset=utf-8;base64,{encoded}"
-        link = f'<a class="text" download="Text.txt" href="{href}" target="_blank">Text</a>'
+        link = f'<a class="text" download="Text.txt" \
+href="{href}" target="_blank">Text</a>'
         assert link in html
 
     def test_extra_json(self, testdir):
@@ -360,7 +361,8 @@ class TestHTML:
         content_str = json.dumps(content)
         data = b64encode(content_str.encode("utf-8")).decode("ascii")
         href = f"data:application/json;charset=utf-8;base64,{data}"
-        link = f'<a class="json" download="JSON.json" href="{href}" target="_blank">JSON</a>'
+        link = f'<a class="json" download="JSON.json" \
+href="{href}" target="_blank">JSON</a>'
         assert link in html
 
     def test_extra_url(self, testdir):

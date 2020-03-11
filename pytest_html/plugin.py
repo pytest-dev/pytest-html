@@ -253,20 +253,15 @@ class HTMLReport:
 
             if href is not None:
                 kwargs = {
-                    "class_" : extra.get("format"),
-                    "href" : href,
-                    "target" : "_blank",
+                    "class_": extra.get("format"),
+                    "href": href,
+                    "target": "_blank",
                 }
 
                 if download:
-                    kwargs['download'] = download
+                    kwargs["download"] = download
 
-                self.links_html.append(
-                    html.a(
-                        extra.get("name"),
-                        **kwargs
-                    )
-                )
+                self.links_html.append(html.a(extra.get("name"), **kwargs))
                 self.links_html.append(" ")
 
         def append_log_html(self, report, additional_html):

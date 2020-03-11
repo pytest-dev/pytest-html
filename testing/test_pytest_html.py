@@ -936,3 +936,27 @@ href="{href}" target="_blank">JSON</a>'
         result, html = run(testdir)
         assert result.ret == 0
         assert len(re.findall(content_report_title, html)) == 1
+
+    def test_custom_self_contained_text_file_name(self, testdir):
+        testdir.makepyfile(
+            """
+            from pytest_html import extras
+            def test_pass(extra):
+                extra.append(extras.text("Hello Text!", "TextFileName"))
+        """
+        )
+        result, html = run(testdir, "report.html", "--self-contained-html")
+        assert result.ret == 0
+        assert "download=\"TextFileName.txt\""in html
+
+    def test_custom_self_contained_json_file_name(self, testdir):
+        testdir.makepyfile(
+            """
+            from pytest_html import extras
+            def test_pass(extra):
+                extra.append(extras.json(dict(), "JsonFileName"))
+        """
+        )
+        result, html = run(testdir, "report.html", "--self-contained-html")
+        assert result.ret == 0
+        assert "download=\"JsonFileName.json\""in html

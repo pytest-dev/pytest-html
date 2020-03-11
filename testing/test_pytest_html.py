@@ -947,7 +947,7 @@ href="{href}" target="_blank">JSON</a>'
         )
         result, html = run(testdir, "report.html", "--self-contained-html")
         assert result.ret == 0
-        assert "download=\"TextFileName.txt\""in html
+        assert 'download="TextFileName.txt"' in html
 
     def test_custom_self_contained_json_file_name(self, testdir):
         testdir.makepyfile(
@@ -959,4 +959,4 @@ href="{href}" target="_blank">JSON</a>'
         )
         result, html = run(testdir, "report.html", "--self-contained-html")
         assert result.ret == 0
-        assert "download=\"JsonFileName.json\""in html
+        assert 'download="JsonFileName.json"' in html

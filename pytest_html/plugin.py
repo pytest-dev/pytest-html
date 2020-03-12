@@ -31,6 +31,9 @@ from . import extras
 from . import __version__, __pypi_url__
 
 
+fixture_extras = []
+
+
 def pytest_addhooks(pluginmanager):
     from . import hooks
 
@@ -95,7 +98,6 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     if report.when == "call":
-        fixture_extras = item.funcargs.get("extra", [])
         plugin_extras = getattr(report, "extra", [])
         report.extra = fixture_extras + plugin_extras
 
@@ -110,7 +112,8 @@ def extra():
         def test_foo(extra):
             extra.append(pytest_html.extras.url('http://www.example.com/'))
     """
-    return []
+    del fixture_extras[:]
+    return fixture_extras
 
 
 def data_uri(content, mime_type="text/plain", charset="utf-8"):

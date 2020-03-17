@@ -98,12 +98,13 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     if report.when == "call":
+        fixture_extras = getattr(item.config, "extras", [])
         plugin_extras = getattr(report, "extra", [])
         report.extra = fixture_extras + plugin_extras
 
 
 @pytest.fixture
-def extra():
+def extra(pytestconfig):
     """Add details to the HTML reports.
 
     .. code-block:: python
@@ -112,8 +113,9 @@ def extra():
         def test_foo(extra):
             extra.append(pytest_html.extras.url('http://www.example.com/'))
     """
-    del fixture_extras[:]
-    return fixture_extras
+    pytestconfig.extras = []
+    yield pytestconfig.extras
+    del pytestconfig.extras[:]
 
 
 def data_uri(content, mime_type="text/plain", charset="utf-8"):

@@ -31,9 +31,6 @@ from . import extras
 from . import __version__, __pypi_url__
 
 
-fixture_extras = []
-
-
 def pytest_addhooks(pluginmanager):
     from . import hooks
 

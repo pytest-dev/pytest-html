@@ -14,7 +14,20 @@ import pytest
 pytest_plugins = ("pytester",)
 
 
+def handle_tr_writer_deprecation():
+    # Remove this function when they've fixed
+    # https://github.com/pytest-dev/pytest/issues/6936
+    import warnings
+    from _pytest.warnings import _setoption
+
+    arg = "ignore:TerminalReporter.writer:pytest.PytestDeprecationWarning"
+    _setoption(warnings, arg)
+
+
 def run(testdir, path="report.html", *args):
+    # TODO: Temporary hack until they fix
+    # https://github.com/pytest-dev/pytest/issues/6936
+    handle_tr_writer_deprecation()  # TODO: Temporary hack
     path = testdir.tmpdir.join(path)
     result = testdir.runpytest("--html", path, *args)
     return result, read_html(path)
@@ -219,6 +232,9 @@ class TestHTML:
         assert report_title in html
 
     def test_report_title_addopts_env_var(self, testdir, monkeypatch):
+        # TODO: Temporary hack until they fix
+        # https://github.com/pytest-dev/pytest/issues/6936
+        handle_tr_writer_deprecation()
         report_location = "REPORT_LOCATION"
         report_name = "MuhReport"
         monkeypatch.setenv(report_location, report_name)
@@ -878,6 +894,9 @@ class TestHTML:
         assert "No such file or directory: 'style.css'" in result.stderr.str()
 
     def test_css_invalid_no_html(self, testdir):
+        # TODO: Temporary hack until they fix
+        # https://github.com/pytest-dev/pytest/issues/6936
+        handle_tr_writer_deprecation()
         testdir.makepyfile("def test_pass(): pass")
         result = testdir.runpytest("--css", "style.css")
         assert result.ret == 0

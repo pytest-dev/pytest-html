@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**2.1.1 (2020-03-18)**
+
+* Fix issue with funcargs causing failures. (`#282 <https://github.com/pytest-dev/pytest-html/issues/282>`_)
+
+  * Thanks to `@ssbarnea <https://github.com/ssbarnea>`_ for reporting and `@christiansandberg <https://github.com/christiansandberg>`_ for the fix
+
 **2.1.0 (2020-03-09)**
 
 * Added support for MP4 video format. (`#260 <https://github.com/pytest-dev/pytest-html/pull/260>`_)

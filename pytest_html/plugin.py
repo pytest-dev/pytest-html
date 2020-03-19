@@ -25,7 +25,7 @@ except ImportError:
     # ansi2html is not installed
     ANSI = False
 
-from py.xml import html, raw, Tag
+from py.xml import html, raw
 
 from . import extras
 from . import __version__, __pypi_url__
@@ -566,7 +566,7 @@ class HTMLReport:
             value = metadata[key]
             if isinstance(value, str) and value.startswith("http"):
                 value = html.a(value, href=value, target="_blank")
-            elif isinstance(value, (list, tuple, set)) and not isinstance(value, Tag):
+            elif isinstance(value, (list, tuple, set)):
                 value = ", ".join(str(i) for i in sorted(map(str, value)))
             elif isinstance(value, dict):
                 sorted_dict = {k: value[k] for k in sorted(value)}

@@ -521,26 +521,36 @@ class HTMLReport:
 
         body = html.body(
             html.script(raw(main_js)),
-            html.h1(self.title),
-            html.p(
-                "Report generated on {} at {} by ".format(
-                    generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")
+            html.div(
+                html.h1(self.title),
+                html.p(
+                    "Report generated on {} at {} by ".format(
+                        generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")
+                    ),
+                    html.a("pytest-html", href=__pypi_url__),
+                    f" v{__version__}",
                 ),
-                html.a("pytest-html", href=__pypi_url__),
-                f" v{__version__}",
+                id="title-div",
             ),
             onLoad="init()",
         )
 
-        body.extend(self._generate_environment(session.config))
+        body.append(
+            html.div(self._generate_environment(session.config), id="environment-div")
+        )
 
         summary_prefix, summary_postfix = [], []
         session.config.hook.pytest_html_results_summary(
             prefix=summary_prefix, summary=summary, postfix=summary_postfix
         )
-        body.extend([html.h2("Summary")] + summary_prefix + summary + summary_postfix)
+        body.append(
+            html.div(
+                [html.h2("Summary")] + summary_prefix + summary + summary_postfix,
+                id="summary-div",
+            )
+        )
 
-        body.extend(results)
+        body.append(html.div(results, id="results-div"))
 
         doc = html.html(head, body)
 

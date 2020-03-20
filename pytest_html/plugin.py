@@ -25,7 +25,7 @@ except ImportError:
     # ansi2html is not installed
     ANSI = False
 
-from py.xml import html, raw, Tag
+from py.xml import html, raw
 
 from . import extras
 from . import __version__, __pypi_url__
@@ -341,6 +341,38 @@ class HTMLReport:
             )
             self.additional_html.append(html.div(html_div, class_="video"))
 
+    class EnvironmentTable:
+        def __init__(self, config):
+            self.metadata = getattr(config, "_metadata", [])
+            self.config = config
+            self.environment_table = []
+
+            rows = []
+
+            header_cells = [html.th("Key"), html.th("Value")]
+            self.config.hook.pytest_html_environment_table_header(cells=header_cells)
+            rows.append(header_cells)
+            if self.metadata:
+                keys = [k for k in self.metadata.keys()]
+                if not isinstance(self.metadata, OrderedDict):
+                    keys.sort()
+
+                for key in keys:
+                    value = self.metadata[key]
+                    if isinstance(value, str) and value.startswith("http"):
+                        value = html.a(value, href=value, target="_blank")
+                    elif isinstance(value, (list, tuple, set)):
+                        value = ", ".join(str(i) for i in sorted(map(str, value)))
+                    elif isinstance(value, dict):
+                        sorted_dict = {k: value[k] for k in sorted(value)}
+                        value = json.dumps(sorted_dict)
+                    raw_value_string = raw(str(value))
+                    row_cells = html.tr(html.td(key), html.td(raw_value_string))
+                    self.config.hook.pytest_html_environment_table_row(cells=row_cells)
+                    rows.append(row_cells)
+
+                self.environment_table.append(html.table(rows, id="environment"))
+
     def _appendrow(self, outcome, report):
         result = self.TestResult(outcome, report, self.logfile, self.config)
         if result.row_table is not None:
@@ -556,30 +588,12 @@ class HTMLReport:
         return unicode_doc.decode("utf-8")
 
     def _generate_environment(self, config):
-        if not hasattr(config, "_metadata") or config._metadata is None:
-            return []
-
-        metadata = config._metadata
-        environment = [html.h2("Environment")]
-        rows = []
-
-        keys = [k for k in metadata.keys()]
-        if not isinstance(metadata, OrderedDict):
-            keys.sort()
-
-        for key in keys:
-            value = metadata[key]
-            if isinstance(value, str) and value.startswith("http"):
-                value = html.a(value, href=value, target="_blank")
-            elif isinstance(value, (list, tuple, set)) and not isinstance(value, Tag):
-                value = ", ".join(str(i) for i in sorted(map(str, value)))
-            elif isinstance(value, dict):
-                sorted_dict = {k: value[k] for k in sorted(value)}
-                value = json.dumps(sorted_dict)
-            raw_value_string = raw(str(value))
-            rows.append(html.tr(html.td(key), html.td(raw_value_string)))
-
-        environment.append(html.table(rows, id="environment"))
+        environment_table = self.EnvironmentTable(config).environment_table
+        if environment_table:
+            environment = [html.h2("Environment")]
+            environment.append(environment_table)
+        else:
+            environment = []
         return environment
 
     def _save_report(self, report_content):

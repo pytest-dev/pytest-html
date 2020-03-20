@@ -7,6 +7,14 @@ def pytest_html_report_title(report):
     """ Called before adding the title to the report """
 
 
+def pytest_html_environment_table_header(cells):
+    """ Called after building environment table header. """
+
+
+def pytest_html_environment_table_row(cells):
+    """ Called after building environment table row. """
+
+
 def pytest_html_results_summary(prefix, summary, postfix):
     """ Called before adding the summary section to the report """
 

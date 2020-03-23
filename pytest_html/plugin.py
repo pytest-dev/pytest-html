@@ -341,37 +341,52 @@ class HTMLReport:
             )
             self.additional_html.append(html.div(html_div, class_="video"))
 
-    class EnvironmentTable:
+    class EnvironmentSection:
         def __init__(self, config):
             self.metadata = getattr(config, "_metadata", [])
             self.config = config
+            self.environment = []
             self.environment_table = []
 
-            rows = []
-
-            header_cells = [html.th("Key"), html.th("Value")]
-            self.config.hook.pytest_html_environment_table_header(cells=header_cells)
-            rows.append(header_cells)
             if self.metadata:
+                self.rows = []
+                self._generate_environment_header()
+
                 keys = [k for k in self.metadata.keys()]
                 if not isinstance(self.metadata, OrderedDict):
                     keys.sort()
 
                 for key in keys:
-                    value = self.metadata[key]
-                    if isinstance(value, str) and value.startswith("http"):
-                        value = html.a(value, href=value, target="_blank")
-                    elif isinstance(value, (list, tuple, set)):
-                        value = ", ".join(str(i) for i in sorted(map(str, value)))
-                    elif isinstance(value, dict):
-                        sorted_dict = {k: value[k] for k in sorted(value)}
-                        value = json.dumps(sorted_dict)
-                    raw_value_string = raw(str(value))
-                    row_cells = html.tr(html.td(key), html.td(raw_value_string))
-                    self.config.hook.pytest_html_environment_table_row(cells=row_cells)
-                    rows.append(row_cells)
+                    self._generate_environment_row(key)
 
-                self.environment_table.append(html.table(rows, id="environment"))
+            self._generate_environment_section()
+
+        def _generate_environment_header(self):
+            header_cells = [html.th("Key"), html.th("Value")]
+            self.config.hook.pytest_html_environment_table_header(cells=header_cells)
+            self.rows.append(header_cells)
+
+        def _generate_environment_row(self, key):
+            value = self.metadata[key]
+            if isinstance(value, str) and value.startswith("http"):
+                value = html.a(value, href=value, target="_blank")
+            elif isinstance(value, (list, tuple, set)):
+                value = ", ".join(str(i) for i in sorted(map(str, value)))
+            elif isinstance(value, dict):
+                sorted_dict = {k: value[k] for k in sorted(value)}
+                value = json.dumps(sorted_dict)
+            raw_value_string = raw(str(value))
+            row_cells = html.tr(html.td(key), html.td(raw_value_string))
+            self.config.hook.pytest_html_environment_table_row(cells=row_cells)
+            self.rows.append(row_cells)
+
+        def _generate_environment_table(self):
+            self.environment_table.append(html.table(self.rows, id="environment"))
+
+        def _generate_environment_section(self):
+            if self.environment_table:
+                self.environment = [html.h2("Environment")]
+                self.environment.append(self.environment_table)
 
     def _appendrow(self, outcome, report):
         result = self.TestResult(outcome, report, self.logfile, self.config)
@@ -569,7 +584,7 @@ class HTMLReport:
             onLoad="init()",
         )
 
-        body.extend(self._generate_environment(session.config))
+        body.extend(self.EnvironmentSection(session.config).environment_table)
 
         summary_prefix, summary_postfix = [], []
         session.config.hook.pytest_html_results_summary(
@@ -586,15 +601,6 @@ class HTMLReport:
         # Fix encoding issues, e.g. with surrogates
         unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
         return unicode_doc.decode("utf-8")
-
-    def _generate_environment(self, config):
-        environment_table = self.EnvironmentTable(config).environment_table
-        if environment_table:
-            environment = [html.h2("Environment")]
-            environment.append(environment_table)
-        else:
-            environment = []
-        return environment
 
     def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)

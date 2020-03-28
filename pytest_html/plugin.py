@@ -321,7 +321,9 @@ class HTMLReport:
                 )
                 html_div = html.a(
                     raw(base_extra_string.format(href)),
-                    class_=base_extra_class, target="_blank", href=href
+                    class_=base_extra_class, 
+                    target="_blank", 
+                    href=href
                 )
             return html_div
 

@@ -591,8 +591,10 @@ class TestHTML:
         file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[-255:]
         src = "assets/" + file_name
         link = f'<a class="image" href="{src}" target="_blank">'
+        img = f'<img src="{src}"/>'
         assert result.ret
         assert link in html
+        assert img in html
         assert os.path.exists(src)
 
     def test_extra_fixture(self, testdir):

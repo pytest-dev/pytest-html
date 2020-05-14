@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**2.1.2 (unreleased)**
+
+* Fix issue with missing image or video in extras. (`#265 <https://github.com/pytest-dev/pytest-html/issues/265>`_ and `pytest-selenium#237 <https://github.com/pytest-dev/pytest-selenium/issues/237>`_)
+
+  * Thanks to `@p00j4 <https://github.com/p00j4>`_ and `@anothermattbrown <https://github.com/anothermattbrown>`_ for reporting and `@christiansandberg <https://github.com/christiansandberg>`_ and `@superdodd <https://github.com/superdodd>`_ and `@dhalperi <https://github.com/dhalperi>`_ for the fix
+
 **2.1.1 (2020-03-18)**
 
 * Fix issue with funcargs causing failures. (`#282 <https://github.com/pytest-dev/pytest-html/issues/282>`_)

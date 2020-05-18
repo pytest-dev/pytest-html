@@ -347,9 +347,9 @@ class HTMLReport:
             self.config = config
             self.environment = []
             self.environment_table = []
+            self.rows = []
 
             if self.metadata:
-                self.rows = []
                 self._generate_environment_header()
 
                 keys = [k for k in self.metadata.keys()]
@@ -380,11 +380,9 @@ class HTMLReport:
             self.config.hook.pytest_html_environment_table_row(cells=row_cells)
             self.rows.append(row_cells)
 
-        def _generate_environment_table(self):
-            self.environment_table.append(html.table(self.rows, id="environment"))
-
         def _generate_environment_section(self):
-            if self.environment_table:
+            if self.rows:
+                self.environment_table.append(html.table(self.rows, id="environment"))
                 self.environment = [html.h2("Environment")]
                 self.environment.append(self.environment_table)
 
@@ -584,7 +582,7 @@ class HTMLReport:
             onLoad="init()",
         )
 
-        body.extend(self.EnvironmentSection(session.config).environment_table)
+        body.extend(self.EnvironmentSection(session.config).environment)
 
         summary_prefix, summary_postfix = [], []
         session.config.hook.pytest_html_results_summary(

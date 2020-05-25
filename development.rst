@@ -38,7 +38,7 @@ You can do this with `git commit --allow-empty`
 Running Tests
 -------------
 
-You will need `Tox <http://tox.testrun.org/>`_ installed to run the tests
+You will need `Tox <https://tox.readthedocs.io>`_ installed to run the tests
 against the supported Python versions. If you're using `Pipenv`_ it will be
 installed for you.
 

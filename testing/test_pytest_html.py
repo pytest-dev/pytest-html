@@ -774,7 +774,7 @@ class TestHTML:
         assert "Environment" in html
         assert len(re.findall("ZZZ.+AAA", html, re.DOTALL)) == 1
 
-    def test_xdist_crashing_slave(self, testdir):
+    def test_xdist_crashing_worker(self, testdir):
         """https://github.com/pytest-dev/pytest-html/issues/21"""
         testdir.makepyfile(
             """

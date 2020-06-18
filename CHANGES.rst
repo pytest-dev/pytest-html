@@ -7,6 +7,10 @@ Release Notes
 
   * Thanks to `@p00j4 <https://github.com/p00j4>`_ and `@anothermattbrown <https://github.com/anothermattbrown>`_ for reporting and `@christiansandberg <https://github.com/christiansandberg>`_ and `@superdodd <https://github.com/superdodd>`_ and `@dhalperi <https://github.com/dhalperi>`_ for the fix
 
+* Fix attribute name for compatibility with ``pytest-xdist`` 2. (`#305 <https://github.com/pytest-dev/pytest-html/issues/305>`_)
+
+  * Thanks to `@Zac-HD <https://github.com/Zac-HD>`_ for the fix
+
 **2.1.1 (2020-03-18)**
 
 * Fix issue with funcargs causing failures. (`#282 <https://github.com/pytest-dev/pytest-html/issues/282>`_)
@@ -264,7 +268,7 @@ Release Notes
 
 **1.7 (2015-10-19)**
 
-* Fixed INTERNALERROR when an xdist slave crashes
+* Fixed INTERNALERROR when an xdist worker crashes
   (`@The-Compiler <https://github.com/The-Compiler>`_)
 * Added report sections including stdout and stderr to log
 

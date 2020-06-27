@@ -524,28 +524,37 @@ class HTMLReport:
 
         session.config.hook.pytest_html_report_title(report=self)
 
-        body = html.body(
-            html.script(raw(main_js)),
-            html.h1(self.title),
-            html.p(
-                "Report generated on {} at {} by ".format(
-                    generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")
-                ),
-                html.a("pytest-html", href=__pypi_url__),
-                f" v{__version__}",
-            ),
-            onLoad="init()",
-        )
-
-        body.extend(self._generate_environment(session.config))
-
         summary_prefix, summary_postfix = [], []
         session.config.hook.pytest_html_results_summary(
             prefix=summary_prefix, summary=summary, postfix=summary_postfix
         )
-        body.extend([html.h2("Summary")] + summary_prefix + summary + summary_postfix)
+        summary = [html.h2("Summary"), *summary_prefix, *summary, *summary_postfix]
 
-        body.extend(results)
+        body = html.body(
+            html.script(raw(main_js)),
+            html.div(
+                html.div(
+                    html.h1(self.title),
+                    html.p(
+                        "Report generated on {} at {} by ".format(
+                            generated.strftime("%d-%b-%Y"),
+                            generated.strftime("%H:%M:%S"),
+                        ),
+                        html.a("pytest-html", href=__pypi_url__),
+                        f" v{__version__}",
+                    ),
+                    html.div(
+                        *self._generate_environment(session.config),
+                        class_="content-environment",
+                    ),
+                    html.div(*summary, class_="content-summary"),
+                    class_="content-header",
+                ),
+                html.div(*results, class_="content-results", id="results-container"),
+                class_="content",
+            ),
+            onLoad="init()",
+        )
 
         doc = html.html(head, body)
 

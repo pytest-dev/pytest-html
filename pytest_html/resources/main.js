@@ -139,7 +139,7 @@ function sort_table(clicked, key_func) {
     sorted_rows.forEach(function(elem) {
         parent.appendChild(elem);
     });
-    document.getElementsByTagName("BODY")[0].appendChild(parent);
+    document.getElementById("results-container").appendChild(parent);
 }
 
 function sort(items, key_func, reversed) {

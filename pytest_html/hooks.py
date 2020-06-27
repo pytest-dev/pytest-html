@@ -2,8 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from py.xml import html
-
 
 def pytest_html_report_title(report):
     """ Called before adding the title to the report """
@@ -25,5 +23,5 @@ def pytest_html_results_table_html(report, data):
     """ Called after building results table additional HTML. """
 
 
-def pytest_html_report_final_dom(document: html.html):
+def pytest_html_report_final_dom(document):
     """ Called after the entire document has been created. """

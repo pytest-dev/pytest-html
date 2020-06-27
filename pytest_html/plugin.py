@@ -558,6 +558,8 @@ class HTMLReport:
 
         doc = html.html(head, body)
 
+        session.config.hook.pytest_html_report_final_dom(document=doc)
+
         unicode_doc = "<!DOCTYPE html>\n{}".format(doc.unicode(indent=2))
 
         # Fix encoding issues, e.g. with surrogates

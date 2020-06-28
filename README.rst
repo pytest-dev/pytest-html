@@ -259,6 +259,27 @@ additional HTML and log output with a notice that the log is empty:
           del data[:]
           data.append(html.div('No log output captured.', class_='empty log'))
 
+Modifying the whole test document
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, for major customizations, you may manipulate and update the resulting
+html document prior to finalization by hooking :code:`pytest_html_report_final_dom`.
+
+.. code-block:: python
+
+  import pytest
+
+  def pytest_html_report_final_dom(document):
+      from importlib.resources import read_text
+      js = read_text(".", "fancy.js")
+      for node in list(iter(document)):
+          if isinstance(node, html.head):
+             node.extend([html.script(raw(js), type="text/javascript")])
+
+
+
+
+
 Display options
 ---------------
 

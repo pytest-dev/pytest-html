@@ -23,5 +23,5 @@ def pytest_html_results_table_html(report, data):
     """ Called after building results table additional HTML. """
 
 
-def pytest_html_report_final_dom(document):
+def pytest_html_report_final_dom(session, document):
     """ Called after the entire document has been created. """

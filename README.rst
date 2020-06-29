@@ -269,7 +269,8 @@ html document prior to finalization by hooking :code:`pytest_html_report_final_d
 
   import pytest
 
-  def pytest_html_report_final_dom(document):
+  def pytest_html_report_final_dom(session, document):
+      # session is a `_pytest.main.Session` object
       from importlib.resources import read_text
       js = read_text(".", "fancy.js")
       for node in list(iter(document)):

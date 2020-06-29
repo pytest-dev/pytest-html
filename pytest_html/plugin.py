@@ -558,7 +558,7 @@ class HTMLReport:
 
         doc = html.html(head, body)
 
-        session.config.hook.pytest_html_report_final_dom(document=doc)
+        session.config.hook.pytest_html_report_final_dom(session=session, document=doc)
 
         unicode_doc = "<!DOCTYPE html>\n{}".format(doc.unicode(indent=2))
 

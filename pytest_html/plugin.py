@@ -69,6 +69,12 @@ def pytest_addoption(parser):
         default=False,
         help="Open the report with all rows collapsed. Useful for very large reports",
     )
+    parser.addini(
+        "max_asset_filename_length",
+        default=255,
+        help="set the maximum filename length for assets "
+        "attached to the html report.",
+    )
 
 
 def pytest_configure(config):
@@ -145,6 +151,9 @@ class HTMLReport:
             self.additional_html = []
             self.links_html = []
             self.self_contained = config.getoption("self_contained_html")
+            self.max_asset_filename_length = int(
+                config.getini("max_asset_filename_length")
+            )
             self.logfile = logfile
             self.config = config
             self.row_table = self.row_extra = None
@@ -194,13 +203,12 @@ class HTMLReport:
         def create_asset(
             self, content, extra_index, test_index, file_extension, mode="w"
         ):
-            # 255 is the common max filename length on various filesystems
             asset_file_name = "{}_{}_{}.{}".format(
                 re.sub(r"[^\w\.]", "_", self.test_id),
                 str(extra_index),
                 str(test_index),
                 file_extension,
-            )[-255:]
+            )[-self.max_asset_filename_length :]
             asset_path = os.path.join(
                 os.path.dirname(self.logfile), "assets", asset_file_name
             )

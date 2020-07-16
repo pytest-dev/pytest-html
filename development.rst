@@ -68,3 +68,5 @@ Follow these steps to release a new version of the project:
 6. Tag the release with the new release version (``git tag v<new tag>``)
 7. Push the tag (``git push upstream --tags``)
 8. Done. You can monitor the progress on `Travis <https://travis-ci.org/pytest-dev/pytest-html/>`_
+
+.. _Pipenv: https://pipenv.pypa.io/en/latest/

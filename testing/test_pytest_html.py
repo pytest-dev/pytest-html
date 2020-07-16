@@ -830,6 +830,29 @@ class TestHTML:
             else:
                 assert content not in html
 
+    def test_ansi_escape_sequence_removed(self, testdir):
+        testdir.makeini(
+            r"""
+            [pytest]
+            log_cli = 1
+            log_cli_level = INFO
+        """
+        )
+        testdir.makepyfile(
+            r"""
+            import logging
+            logging.basicConfig()
+            LOGGER = logging.getLogger()
+            def test_ansi():
+                LOGGER.info("ANSI removed")
+        """
+        )
+        result, html = run(
+            testdir, "report.html", "--self-contained-html", "--color=yes"
+        )
+        assert result.ret == 0
+        assert not re.search(r"\[[\d;]+m", html)
+
     @pytest.mark.parametrize("content", [("'foo'"), ("u'\u0081'")])
     def test_utf8_longrepr(self, testdir, content):
         testdir.makeconftest(

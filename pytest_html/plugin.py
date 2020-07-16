@@ -30,6 +30,8 @@ from py.xml import html, raw
 from . import extras
 from . import __version__, __pypi_url__
 
+from _pytest.logging import _remove_ansi_escape_sequences
+
 
 def pytest_addhooks(pluginmanager):
     from . import hooks
@@ -279,9 +281,13 @@ class HTMLReport:
                 header, content = map(escape, section)
                 log.append(f" {header:-^80} ")
                 log.append(html.br())
+
                 if ANSI:
                     converter = Ansi2HTMLConverter(inline=False, escaped=False)
                     content = converter.convert(content, full=False)
+                else:
+                    content = _remove_ansi_escape_sequences(content)
+
                 log.append(raw(content))
                 log.append(html.br())
 

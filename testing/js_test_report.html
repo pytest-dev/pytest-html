@@ -20,7 +20,7 @@
           <th class="sortable result initial-sort" col="result">Result</th>
           <th class="sortable" col="name">Test</th>
           <th class="sortable numeric" col="duration">Duration</th>
-          <th class="sortable" col=links">Links</th></tr>
+          <th class="sortable links" col="links">Links</th></tr>
         <tr hidden="true" id="not-found-message">
           <th colspan="5">No results found. Try to check the filters</th>
         </tr>
@@ -30,7 +30,7 @@
           <td class="col-result">Rerun</td>
           <td class="test-1 col-name">rerun.py::test_rexample_1</td>
           <td class="col-duration">1.00</td>
-          <td class="col-links"></td></tr>
+          <td class="col-links"><a class="url" href="http://www.google.com/" target="_blank">URL</a> </td></tr>
         <tr>
           <td class="extra" colspan="5">
             <div class="log">@pytest.mark.flaky(reruns=5)<br/>    def test_example():<br/>        import random<br/>&gt;       assert random.choice([True, False])<br/><span class="error">E       assert False</span><br/><span class="error">E        +  where False = &lt;bound method Random.choice of &lt;random.Random object at 0x7fe80b85f420&gt;&gt;([True, False])</span><br/><span class="error">E        +    where &lt;bound method Random.choice of &lt;random.Random object at 0x7fe80b85f420&gt;&gt; = &lt;module 'random' from '/usr/local/Cellar/python/2.7.12/Frameworks/Python.framework/Versions/2.7/lib/python2.7/random.pyc'&gt;.choice</span><br/><br/>rerun.py:6: AssertionError<br/></div></td></tr></tbody>

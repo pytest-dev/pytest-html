@@ -566,7 +566,8 @@ class TestHTML:
         assert result.ret == 0
         assert '<a href="{0}"><img src="{0}"/>'.format(content) in html
 
-    def test_very_long_test_name(self, testdir):
+    @pytest.mark.parametrize("max_asset_filename_length", [10, 100])
+    def test_very_long_test_name(self, testdir, max_asset_filename_length):
         testdir.makeconftest(
             """
             import pytest
@@ -587,8 +588,16 @@ class TestHTML:
                 assert False
         """
         )
-        result, html = run(testdir)
-        file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[-255:]
+        testdir.makeini(
+            f"""
+            [pytest]
+            max_asset_filename_length = {max_asset_filename_length}
+        """
+        )
+        result, html = run(testdir, "report.html")
+        file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[
+            -max_asset_filename_length:
+        ]
         src = "assets/" + file_name
         link = f'<a class="image" href="{src}" target="_blank">'
         img = f'<img src="{src}"/>'

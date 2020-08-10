@@ -33,7 +33,6 @@ jobs:
 
     -
       python: 3.8
-      dist: xenial
       env: TOXENV=py38
 
     -
@@ -44,7 +43,6 @@ jobs:
 
     -
       python: 3.8
-      dist: xenial
       env: TOXENV=py38-ansi2html
 
     -

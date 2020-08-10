@@ -498,7 +498,7 @@ class HTMLReport:
             html.th("Result", class_="sortable result initial-sort", col="result"),
             html.th("Test", class_="sortable", col="name"),
             html.th("Duration", class_="sortable numeric", col="duration"),
-            html.th("Links"),
+            html.th("Links", class_="sortable links", col="links"),
         ]
         session.config.hook.pytest_html_results_table_header(cells=cells)
 

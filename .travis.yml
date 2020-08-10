@@ -38,6 +38,10 @@ jobs:
       env: TOXENV=py37
 
     -
+      python: 3.8
+      env: TOXENV=py38
+
+    -
       python: 3.7
       dist: xenial
       sudo: required
@@ -47,6 +51,10 @@ jobs:
       python: 3.8
       dist: xenial
       env: TOXENV=devel
+
+    -
+      python: 3.8
+      env: TOXENV=py38-ansi2html
 
     -
       python: pypy3

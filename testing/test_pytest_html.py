@@ -809,14 +809,14 @@ class TestHTML:
         assert result.ret == 0
         assert_results(html, passed=1)
 
-    def test_ansi_color(self, testdir):
-        try:
-            import ansi2html  # NOQA
+    @pytest.mark.parametrize(
+        "with_ansi", [True, False],
+    )
+    def test_ansi_color(self, testdir, mocker, with_ansi):
+        if not with_ansi:
+            mock_ansi_support = mocker.patch("pytest_html.plugin.ansi_support")
+            mock_ansi_support.return_value = None
 
-            ANSI = True
-        except ImportError:
-            # ansi2html is not installed
-            ANSI = False
         pass_content = [
             '<span class="ansi31">RCOLOR',
             '<span class="ansi32">GCOLOR',
@@ -834,7 +834,7 @@ class TestHTML:
         result, html = run(testdir, "report.html", "--self-contained-html")
         assert result.ret == 0
         for content in pass_content:
-            if ANSI:
+            if with_ansi:
                 assert content in html
             else:
                 assert content not in html

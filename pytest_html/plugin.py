@@ -30,6 +30,8 @@ from py.xml import html, raw
 from . import extras
 from . import __version__, __pypi_url__
 
+from _pytest.logging import _remove_ansi_escape_sequences
+
 
 def pytest_addhooks(pluginmanager):
     from . import hooks
@@ -69,6 +71,12 @@ def pytest_addoption(parser):
         default=False,
         help="Open the report with all rows collapsed. Useful for very large reports",
     )
+    parser.addini(
+        "max_asset_filename_length",
+        default=255,
+        help="set the maximum filename length for assets "
+        "attached to the html report.",
+    )
 
 
 def pytest_configure(config):
@@ -77,8 +85,8 @@ def pytest_configure(config):
         for csspath in config.getoption("css"):
             if not os.path.exists(csspath):
                 raise IOError(f"No such file or directory: '{csspath}'")
-        if not hasattr(config, "slaveinput"):
-            # prevent opening htmlpath on slave nodes (xdist)
+        if not hasattr(config, "workerinput"):
+            # prevent opening htmlpath on worker nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
             config.pluginmanager.register(config._html)
 
@@ -145,6 +153,9 @@ class HTMLReport:
             self.additional_html = []
             self.links_html = []
             self.self_contained = config.getoption("self_contained_html")
+            self.max_asset_filename_length = int(
+                config.getini("max_asset_filename_length")
+            )
             self.logfile = logfile
             self.config = config
             self.row_table = self.row_extra = None
@@ -194,13 +205,12 @@ class HTMLReport:
         def create_asset(
             self, content, extra_index, test_index, file_extension, mode="w"
         ):
-            # 255 is the common max filename length on various filesystems
             asset_file_name = "{}_{}_{}.{}".format(
                 re.sub(r"[^\w\.]", "_", self.test_id),
                 str(extra_index),
                 str(test_index),
                 file_extension,
-            )[-255:]
+            )[-self.max_asset_filename_length :]
             asset_path = os.path.join(
                 os.path.dirname(self.logfile), "assets", asset_file_name
             )
@@ -279,9 +289,13 @@ class HTMLReport:
                 header, content = map(escape, section)
                 log.append(f" {header:-^80} ")
                 log.append(html.br())
+
                 if ANSI:
                     converter = Ansi2HTMLConverter(inline=False, escaped=False)
                     content = converter.convert(content, full=False)
+                else:
+                    content = _remove_ansi_escape_sequences(content)
+
                 log.append(raw(content))
                 log.append(html.br())
 
@@ -535,7 +549,7 @@ class HTMLReport:
             html.th("Result", class_="sortable result initial-sort", col="result"),
             html.th("Test", class_="sortable", col="name"),
             html.th("Duration", class_="sortable numeric", col="duration"),
-            html.th("Links"),
+            html.th("Links", class_="sortable links", col="links"),
         ]
         session.config.hook.pytest_html_results_table_header(cells=cells)
 

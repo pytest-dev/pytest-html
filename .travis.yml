@@ -1,5 +1,11 @@
 language: python
 jobs:
+  allow_failures:
+    - name: devel
+      python: 3.8
+      dist: xenial
+      env: TOXENV=devel
+
   include:
     - stage: tests
       language: node_js
@@ -32,10 +38,23 @@ jobs:
       env: TOXENV=py37
 
     -
+      python: 3.8
+      env: TOXENV=py38
+
+    -
       python: 3.7
       dist: xenial
       sudo: required
       env: TOXENV=py37-ansi2html
+
+    - name: devel
+      python: 3.8
+      dist: xenial
+      env: TOXENV=devel
+
+    -
+      python: 3.8
+      env: TOXENV=py38-ansi2html
 
     -
       python: pypy3

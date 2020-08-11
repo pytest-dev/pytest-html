@@ -566,7 +566,8 @@ class TestHTML:
         assert result.ret == 0
         assert '<a href="{0}"><img src="{0}"/>'.format(content) in html
 
-    def test_very_long_test_name(self, testdir):
+    @pytest.mark.parametrize("max_asset_filename_length", [10, 100])
+    def test_very_long_test_name(self, testdir, max_asset_filename_length):
         testdir.makeconftest(
             """
             import pytest
@@ -587,8 +588,16 @@ class TestHTML:
                 assert False
         """
         )
-        result, html = run(testdir)
-        file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[-255:]
+        testdir.makeini(
+            f"""
+            [pytest]
+            max_asset_filename_length = {max_asset_filename_length}
+        """
+        )
+        result, html = run(testdir, "report.html")
+        file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[
+            -max_asset_filename_length:
+        ]
         src = "assets/" + file_name
         link = f'<a class="image" href="{src}" target="_blank">'
         img = f'<img src="{src}"/>'
@@ -774,7 +783,7 @@ class TestHTML:
         assert "Environment" in html
         assert len(re.findall("ZZZ.+AAA", html, re.DOTALL)) == 1
 
-    def test_xdist_crashing_slave(self, testdir):
+    def test_xdist_crashing_worker(self, testdir):
         """https://github.com/pytest-dev/pytest-html/issues/21"""
         testdir.makepyfile(
             """
@@ -829,6 +838,29 @@ class TestHTML:
                 assert content in html
             else:
                 assert content not in html
+
+    def test_ansi_escape_sequence_removed(self, testdir):
+        testdir.makeini(
+            r"""
+            [pytest]
+            log_cli = 1
+            log_cli_level = INFO
+        """
+        )
+        testdir.makepyfile(
+            r"""
+            import logging
+            logging.basicConfig()
+            LOGGER = logging.getLogger()
+            def test_ansi():
+                LOGGER.info("ANSI removed")
+        """
+        )
+        result, html = run(
+            testdir, "report.html", "--self-contained-html", "--color=yes"
+        )
+        assert result.ret == 0
+        assert not re.search(r"\[[\d;]+m", html)
 
     @pytest.mark.parametrize("content", [("'foo'"), ("u'\u0081'")])
     def test_utf8_longrepr(self, testdir, content):

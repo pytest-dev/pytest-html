@@ -4,6 +4,8 @@
 
 from base64 import b64encode, b64decode
 from collections import OrderedDict
+from functools import lru_cache
+import importlib
 from os.path import isfile
 import datetime
 import json
@@ -17,20 +19,22 @@ import re
 from html import escape
 import pytest
 
-try:
-    from ansi2html import Ansi2HTMLConverter, style
-
-    ANSI = True
-except ImportError:
-    # ansi2html is not installed
-    ANSI = False
-
 from py.xml import html, raw
 
 from . import extras
 from . import __version__, __pypi_url__
 
 from _pytest.logging import _remove_ansi_escape_sequences
+
+
+@lru_cache()
+def ansi_support():
+    try:
+        # from ansi2html import Ansi2HTMLConverter, style  # NOQA
+        return importlib.import_module("ansi2html")
+    except ImportError:
+        # ansi2html is not installed
+        pass
 
 
 def pytest_addhooks(pluginmanager):
@@ -290,8 +294,10 @@ class HTMLReport:
                 log.append(f" {header:-^80} ")
                 log.append(html.br())
 
-                if ANSI:
-                    converter = Ansi2HTMLConverter(inline=False, escaped=False)
+                if ansi_support():
+                    converter = ansi_support().Ansi2HTMLConverter(
+                        inline=False, escaped=False
+                    )
                     content = converter.convert(content, full=False)
                 else:
                     content = _remove_ansi_escape_sequences(content)
@@ -413,13 +419,13 @@ class HTMLReport:
             __name__, os.path.join("resources", "style.css")
         ).decode("utf-8")
 
-        if ANSI:
+        if ansi_support():
             ansi_css = [
                 "\n/******************************",
                 " * ANSI2HTML STYLES",
                 " ******************************/\n",
             ]
-            ansi_css.extend([str(r) for r in style.get_styles()])
+            ansi_css.extend([str(r) for r in ansi_support().style.get_styles()])
             self.style_css += "\n".join(ansi_css)
 
         # <DF> Add user-provided CSS

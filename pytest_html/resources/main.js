@@ -32,6 +32,8 @@ function sort_column(elem) {
         key = key_num;
     } else if (elem.classList.contains('result')) {
         key = key_result;
+    } else if (elem.classList.contains('links')) {
+        key = key_link;
     } else {
         key = key_alpha;
     }
@@ -175,6 +177,13 @@ function key_alpha(col_index) {
 function key_num(col_index) {
     return function(elem) {
         return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_link(col_index) {
+    return function(elem) {
+        dataCell = elem.childNodes[1].childNodes[col_index].firstChild
+        return dataCell == null ? "" : dataCell.innerText.toLowerCase();
     };
 }
 

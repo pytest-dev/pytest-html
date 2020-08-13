@@ -1,0 +1,43 @@
+name: gh
+
+on:
+  create:  # is used for publishing to PyPI and TestPyPI
+    tags:  # any tag regardless of its name, no branches
+  push:  # only publishes pushes to the main branch to TestPyPI
+    branches:  # any branch but not tag
+    - >-
+      **
+    tags-ignore:
+    - >-
+      **
+  pull_request:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          - name: linting
+            python-version: 3.6
+          - name: py36
+            python-version: 3.6
+          - name: py37
+            python-version: 3.7
+          - name: py38
+            python-version: 3.8
+          - name: pypy3
+            python-version: pypy3
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix['python-version'] }}
+    - name: Install tox
+      run: |
+        python -m pip install --upgrade tox
+    - name: Test with tox
+      run: |
+        python -m tox -e ${{ matrix.name }}

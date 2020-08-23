@@ -48,6 +48,12 @@
                     'rerun results-table-row', 'passed results-table-row');
    sort_column_test('[col=duration]',
                     'passed results-table-row', 'rerun results-table-row');
+
+   //links
+   sort_column_test('[col=links]',
+                    'rerun results-table-row', 'passed results-table-row');
+   sort_column_test('[col=links]',
+                    'passed results-table-row', 'rerun results-table-row');
  });
 
 QUnit.test('filter_table', function(assert){
@@ -123,6 +129,6 @@ QUnit.test('find', function (assert) {
 });
 
 QUnit.test('find_all', function(assert) {
-  assert.equal(find_all('.sortable').length, 3);
+  assert.equal(find_all('.sortable').length, 4);
   assert.equal(find_all('.not-in-table').length, 0);
 });

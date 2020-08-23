@@ -4,6 +4,8 @@
 
 from base64 import b64encode, b64decode
 from collections import OrderedDict
+from functools import lru_cache
+import importlib
 from os.path import isfile
 import datetime
 import json
@@ -18,18 +20,22 @@ from html import escape
 import pytest
 import pytest_html.resources
 
-try:
-    from ansi2html import Ansi2HTMLConverter, style
-
-    ANSI = True
-except ImportError:
-    # ansi2html is not installed
-    ANSI = False
-
 from py.xml import html, raw
 
 from . import extras
 from . import __version__, __pypi_url__
+
+from _pytest.logging import _remove_ansi_escape_sequences
+
+
+@lru_cache()
+def ansi_support():
+    try:
+        # from ansi2html import Ansi2HTMLConverter, style  # NOQA
+        return importlib.import_module("ansi2html")
+    except ImportError:
+        # ansi2html is not installed
+        pass
 
 
 def _load_resource(resource_name):
@@ -85,6 +91,12 @@ def pytest_addoption(parser):
         default=False,
         help="Open the report with all rows collapsed. Useful for very large reports",
     )
+    parser.addini(
+        "max_asset_filename_length",
+        default=255,
+        help="set the maximum filename length for assets "
+        "attached to the html report.",
+    )
 
 
 def pytest_configure(config):
@@ -93,8 +105,8 @@ def pytest_configure(config):
         for csspath in config.getoption("css"):
             if not os.path.exists(csspath):
                 raise IOError(f"No such file or directory: '{csspath}'")
-        if not hasattr(config, "slaveinput"):
-            # prevent opening htmlpath on slave nodes (xdist)
+        if not hasattr(config, "workerinput"):
+            # prevent opening htmlpath on worker nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
             config.pluginmanager.register(config._html)
 
@@ -111,13 +123,13 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     if report.when == "call":
-        fixture_extras = item.funcargs.get("extra", [])
+        fixture_extras = getattr(item.config, "extras", [])
         plugin_extras = getattr(report, "extra", [])
         report.extra = fixture_extras + plugin_extras
 
 
 @pytest.fixture
-def extra():
+def extra(pytestconfig):
     """Add details to the HTML reports.
 
     .. code-block:: python
@@ -126,7 +138,9 @@ def extra():
         def test_foo(extra):
             extra.append(pytest_html.extras.url('http://www.example.com/'))
     """
-    return []
+    pytestconfig.extras = []
+    yield pytestconfig.extras
+    del pytestconfig.extras[:]
 
 
 def data_uri(content, mime_type="text/plain", charset="utf-8"):
@@ -159,6 +173,9 @@ class HTMLReport:
             self.additional_html = []
             self.links_html = []
             self.self_contained = config.getoption("self_contained_html")
+            self.max_asset_filename_length = int(
+                config.getini("max_asset_filename_length")
+            )
             self.logfile = logfile
             self.config = config
             self.row_table = self.row_extra = None
@@ -208,13 +225,12 @@ class HTMLReport:
         def create_asset(
             self, content, extra_index, test_index, file_extension, mode="w"
         ):
-            # 255 is the common max filename length on various filesystems
             asset_file_name = "{}_{}_{}.{}".format(
                 re.sub(r"[^\w\.]", "_", self.test_id),
                 str(extra_index),
                 str(test_index),
                 file_extension,
-            )[-255:]
+            )[-self.max_asset_filename_length :]
             asset_path = os.path.join(
                 os.path.dirname(self.logfile), "assets", asset_file_name
             )
@@ -293,9 +309,15 @@ class HTMLReport:
                 header, content = map(escape, section)
                 log.append(f" {header:-^80} ")
                 log.append(html.br())
-                if ANSI:
-                    converter = Ansi2HTMLConverter(inline=False, escaped=False)
+
+                if ansi_support():
+                    converter = ansi_support().Ansi2HTMLConverter(
+                        inline=False, escaped=False
+                    )
                     content = converter.convert(content, full=False)
+                else:
+                    content = _remove_ansi_escape_sequences(content)
+
                 log.append(raw(content))
                 log.append(html.br())
 
@@ -333,7 +355,12 @@ class HTMLReport:
                 href = src = self.create_asset(
                     content, extra_index, test_index, extra.get("extension"), "wb"
                 )
-                html_div = html.a(class_=base_extra_class, target="_blank", href=href)
+                html_div = html.a(
+                    raw(base_extra_string.format(src)),
+                    class_=base_extra_class,
+                    target="_blank",
+                    href=href,
+                )
             return html_div
 
         def _append_image(self, extra, extra_index, test_index):
@@ -406,13 +433,13 @@ class HTMLReport:
 
         self.style_css = _load_resource("style.css")
 
-        if ANSI:
+        if ansi_support():
             ansi_css = [
                 "\n/******************************",
                 " * ANSI2HTML STYLES",
                 " ******************************/\n",
             ]
-            ansi_css.extend([str(r) for r in style.get_styles()])
+            ansi_css.extend([str(r) for r in ansi_support().style.get_styles()])
             self.style_css += "\n".join(ansi_css)
 
         # <DF> Add user-provided CSS
@@ -497,7 +524,7 @@ class HTMLReport:
             html.th("Result", class_="sortable result initial-sort", col="result"),
             html.th("Test", class_="sortable", col="name"),
             html.th("Duration", class_="sortable numeric", col="duration"),
-            html.th("Links"),
+            html.th("Links", class_="sortable links", col="links"),
         ]
         session.config.hook.pytest_html_results_table_header(cells=cells)
 

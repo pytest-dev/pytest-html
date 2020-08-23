@@ -38,7 +38,7 @@ You can do this with `git commit --allow-empty`
 Running Tests
 -------------
 
-You will need `Tox <http://tox.testrun.org/>`_ installed to run the tests
+You will need `Tox <https://tox.readthedocs.io>`_ installed to run the tests
 against the supported Python versions. If you're using `Pipenv`_ it will be
 installed for you.
 
@@ -68,3 +68,5 @@ Follow these steps to release a new version of the project:
 6. Tag the release with the new release version (``git tag v<new tag>``)
 7. Push the tag (``git push upstream --tags``)
 8. Done. You can monitor the progress on `Travis <https://travis-ci.org/pytest-dev/pytest-html/>`_
+
+.. _Pipenv: https://pipenv.pypa.io/en/latest/

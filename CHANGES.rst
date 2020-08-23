@@ -1,19 +1,61 @@
 Release Notes
 -------------
 
+**2.1.2 (unreleased)**
+
+* Make the ``Results`` table ``Links`` column sortable (`#242 <https://github.com/pytest-dev/pytest-html/issues/242>`_)
+
+  * Thanks to `@vashirov <https://github.com/vashirov>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the fix
+
+* Fix issue with missing image or video in extras. (`#265 <https://github.com/pytest-dev/pytest-html/issues/265>`_ and `pytest-selenium#237 <https://github.com/pytest-dev/pytest-selenium/issues/237>`_)
+
+  * Thanks to `@p00j4 <https://github.com/p00j4>`_ and `@anothermattbrown <https://github.com/anothermattbrown>`_ for reporting and `@christiansandberg <https://github.com/christiansandberg>`_ and `@superdodd <https://github.com/superdodd>`_ and `@dhalperi <https://github.com/dhalperi>`_ for the fix
+
+* Fix attribute name for compatibility with ``pytest-xdist`` 2. (`#305 <https://github.com/pytest-dev/pytest-html/issues/305>`_)
+
+  * Thanks to `@Zac-HD <https://github.com/Zac-HD>`_ for the fix
+
+**2.1.1 (2020-03-18)**
+
+* Fix issue with funcargs causing failures. (`#282 <https://github.com/pytest-dev/pytest-html/issues/282>`_)
+
+  * Thanks to `@ssbarnea <https://github.com/ssbarnea>`_ for reporting and `@christiansandberg <https://github.com/christiansandberg>`_ for the fix
+
+**2.1.0 (2020-03-09)**
+
+* Added support for MP4 video format. (`#260 <https://github.com/pytest-dev/pytest-html/pull/260>`_)
+
+  * Thanks to `@ExaltedBagel <https://github.com/ExaltedBagel>`_ for the PR
+
+* Added support for sorting metadata by key. (`#245 <https://github.com/pytest-dev/pytest-html/issues/245>`_)
+
+  * Thanks to `@ssbarnea <https://github.com/ssbarnea>`_ for reporting and `@ExaltedBagel <https://github.com/ExaltedBagel>`_ for the fix
+
+* Added support for rendering reports collapsed (`#239 <https://github.com/pytest-dev/pytest-html/issues/239>`_)
+
+  * Thanks to `@Wramberg <https://github.com/Wramberg>`_ for suggesting this enhancement
+
+* Added `extra` fixture (`#269 <https://github.com/pytest-dev/pytest-html/pull/269>`_)
+
+  * Thanks to `@christiansandberg <https://github.com/christiansandberg>`_ for the PR
+
+* Added ability to change report title using hook (`#270 <https://github.com/pytest-dev/pytest-html/pull/270>`_)
+
+  * Thanks to `@werdeil <https://github.com/werdeil>`_ for the PR
+
 **2.0.1 (2019-10-05)**
 
 * Properly check for presence of CSS file. (`#246 <https://github.com/pytest-dev/pytest-html/issues/246>`_)
 
-    * Thanks to `@wanam <https://github.com/wanam>`_ for reporting, and `@krzysztof-pawlik-gat <https://github.com/krzysztof-pawlik-gat>`_ for the fix
+  * Thanks to `@wanam <https://github.com/wanam>`_ for reporting, and `@krzysztof-pawlik-gat <https://github.com/krzysztof-pawlik-gat>`_ for the fix
 
 * Added support for UTF-8 display. (`#244 <https://github.com/pytest-dev/pytest-html/pull/244>`_)
 
-    * Thanks to `@Izhu666 <https://github.com/lzhu666>`_ for the PR
+  * Thanks to `@Izhu666 <https://github.com/lzhu666>`_ for the PR
 
 * Fix initial sort on column. (`#247 <https://github.com/pytest-dev/pytest-html/issues/247>`_)
 
-    * Thanks to `@wanam <https://github.com/wanam>`_ for reporting and fixing
+  * Thanks to `@wanam <https://github.com/wanam>`_ for reporting and fixing
 
 **2.0.0 (2019-09-09)**
 
@@ -230,7 +272,7 @@ Release Notes
 
 **1.7 (2015-10-19)**
 
-* Fixed INTERNALERROR when an xdist slave crashes
+* Fixed INTERNALERROR when an xdist worker crashes
   (`@The-Compiler <https://github.com/The-Compiler>`_)
 * Added report sections including stdout and stderr to log
 

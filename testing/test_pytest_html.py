@@ -14,6 +14,14 @@ import pytest
 pytest_plugins = ("pytester",)
 
 
+def remove_deprecation_from_recwarn(recwarn):
+    # TODO: Temporary hack until they fix
+    # https://github.com/pytest-dev/pytest/issues/6936
+    return [
+        item for item in recwarn if "TerminalReporter.writer" not in repr(item.message)
+    ]
+
+
 def run(testdir, path="report.html", *args):
     path = testdir.tmpdir.join(path)
     result = testdir.runpytest("--html", path, *args)
@@ -494,7 +502,9 @@ class TestHTML:
         assert result.ret == 0
         src = f"assets/test_extra_image_separated.py__test_pass_0_0.{file_extension}"
         link = f'<a class="image" href="{src}" target="_blank">'
+        img = f'<img src="{src}"/>'
         assert link in html
+        assert img in html
         assert os.path.exists(src)
 
     @pytest.mark.parametrize(
@@ -528,8 +538,10 @@ class TestHTML:
             asset_name = "test_extra_image_separated_rerun.py__test_fail"
             src = f"assets/{asset_name}_0_{i}.{file_extension}"
             link = f'<a class="image" href="{src}" target="_blank">'
+            img = f'<img src="{src}"/>'
             assert result.ret
             assert link in html
+            assert img in html
             assert os.path.exists(src)
 
     @pytest.mark.parametrize("src_type", ["https://", "file://", "image.png"])
@@ -554,7 +566,8 @@ class TestHTML:
         assert result.ret == 0
         assert '<a href="{0}"><img src="{0}"/>'.format(content) in html
 
-    def test_very_long_test_name(self, testdir):
+    @pytest.mark.parametrize("max_asset_filename_length", [10, 100])
+    def test_very_long_test_name(self, testdir, max_asset_filename_length):
         testdir.makeconftest(
             """
             import pytest
@@ -575,12 +588,22 @@ class TestHTML:
                 assert False
         """
         )
-        result, html = run(testdir)
-        file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[-255:]
+        testdir.makeini(
+            f"""
+            [pytest]
+            max_asset_filename_length = {max_asset_filename_length}
+        """
+        )
+        result, html = run(testdir, "report.html")
+        file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[
+            -max_asset_filename_length:
+        ]
         src = "assets/" + file_name
         link = f'<a class="image" href="{src}" target="_blank">'
+        img = f'<img src="{src}"/>'
         assert result.ret
         assert link in html
+        assert img in html
         assert os.path.exists(src)
 
     def test_extra_fixture(self, testdir):
@@ -760,7 +783,7 @@ class TestHTML:
         assert "Environment" in html
         assert len(re.findall("ZZZ.+AAA", html, re.DOTALL)) == 1
 
-    def test_xdist_crashing_slave(self, testdir):
+    def test_xdist_crashing_worker(self, testdir):
         """https://github.com/pytest-dev/pytest-html/issues/21"""
         testdir.makepyfile(
             """
@@ -786,14 +809,14 @@ class TestHTML:
         assert result.ret == 0
         assert_results(html, passed=1)
 
-    def test_ansi_color(self, testdir):
-        try:
-            import ansi2html  # NOQA
+    @pytest.mark.parametrize(
+        "with_ansi", [True, False],
+    )
+    def test_ansi_color(self, testdir, mocker, with_ansi):
+        if not with_ansi:
+            mock_ansi_support = mocker.patch("pytest_html.plugin.ansi_support")
+            mock_ansi_support.return_value = None
 
-            ANSI = True
-        except ImportError:
-            # ansi2html is not installed
-            ANSI = False
         pass_content = [
             '<span class="ansi31">RCOLOR',
             '<span class="ansi32">GCOLOR',
@@ -811,10 +834,33 @@ class TestHTML:
         result, html = run(testdir, "report.html", "--self-contained-html")
         assert result.ret == 0
         for content in pass_content:
-            if ANSI:
+            if with_ansi:
                 assert content in html
             else:
                 assert content not in html
+
+    def test_ansi_escape_sequence_removed(self, testdir):
+        testdir.makeini(
+            r"""
+            [pytest]
+            log_cli = 1
+            log_cli_level = INFO
+        """
+        )
+        testdir.makepyfile(
+            r"""
+            import logging
+            logging.basicConfig()
+            LOGGER = logging.getLogger()
+            def test_ansi():
+                LOGGER.info("ANSI removed")
+        """
+        )
+        result, html = run(
+            testdir, "report.html", "--self-contained-html", "--color=yes"
+        )
+        assert result.ret == 0
+        assert not re.search(r"\[[\d;]+m", html)
 
     @pytest.mark.parametrize("content", [("'foo'"), ("u'\u0081'")])
     def test_utf8_longrepr(self, testdir, content):
@@ -865,7 +911,8 @@ class TestHTML:
             cssargs.extend(["--css", path])
         result, html = run(testdir, "report.html", "--self-contained-html", *cssargs)
         assert result.ret == 0
-        assert len(recwarn) == 0
+        warnings = remove_deprecation_from_recwarn(recwarn)
+        assert len(warnings) == 0
         for k, v in css.items():
             assert str(v["path"]) in html
             assert v["style"] in html

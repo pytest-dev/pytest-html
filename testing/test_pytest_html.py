@@ -1,14 +1,13 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-from base64 import b64encode
 import json
 import os
-import pkg_resources
 import random
 import re
+from base64 import b64encode
 
+import pkg_resources
 import pytest
 
 pytest_plugins = ("pytester",)

@@ -15,6 +15,10 @@ Release Notes
 
   * Thanks to `@Zac-HD <https://github.com/Zac-HD>`_ for the fix
 
+* Post process HTML generation to allow teardown to appear in the HTML output. (`#131 <https://github.com/pytest-dev/pytest-html/issues/131>`_)
+
+  * Thanks to `@iwanb <https://github.com/iwanb>`_ for reporting and `@csm10495 <https://github.com/csm10495>`_ for the fix
+
 **2.1.1 (2020-03-18)**
 
 * Fix issue with funcargs causing failures. (`#282 <https://github.com/pytest-dev/pytest-html/issues/282>`_)

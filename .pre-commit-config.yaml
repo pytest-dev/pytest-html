@@ -18,7 +18,6 @@ repos:
         args: [--remove]
     -   id: check-yaml
     -   id: debug-statements
-        exclude: _pytest/(debugging|hookspec).py
         language_version: python3
 -   repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.2
@@ -31,7 +30,7 @@ repos:
     rev: v2.3.0
     hooks:
     -   id: reorder-python-imports
-        args: ['--application-directories=.:src', --py3-plus]
+        args: ['--application-directories=.:pytest_html:testing', --py3-plus]
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.4.4
     hooks:
@@ -42,28 +41,6 @@ repos:
     -   id: rst
         name: rst
         entry: rst-lint --encoding utf-8
-        files: ^(RELEASING.rst|README.rst|TIDELIFT.rst)$
+        files: ^(CHANGES.rst|development.rst|README.rst)$
         language: python
         additional_dependencies: [pygments, restructuredtext_lint]
-    -   id: changelogs-rst
-        name: changelog filenames
-        language: fail
-        entry: 'changelog files must be named ####.(breaking|bugfix|deprecation|doc|feature|improvement|trivial|vendor).rst'
-        exclude: changelog/(\d+\.(breaking|bugfix|deprecation|doc|feature|improvement|trivial|vendor).rst|README.rst|_template.rst)
-        files: ^changelog/
-    -   id: py-deprecated
-        name: py library is deprecated
-        language: pygrep
-        entry: >
-            (?x)\bpy\.(
-                _code\.|
-                builtin\.|
-                code\.|
-                io\.|
-                path\.local\.sysfind|
-                process\.|
-                std\.|
-                error\.|
-                xml\.
-            )
-        types: [python]

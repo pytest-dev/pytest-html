@@ -97,8 +97,9 @@ By default report title will be the filename of the report, you can edit it by u
    import pytest
    from py.xml import html
 
-   def pytest_html_report_title(report)
-      report.title = "My very own title!"
+
+   def pytest_html_report_title(report):
+       report.title = "My very own title!"
 
 Environment
 ~~~~~~~~~~~
@@ -110,7 +111,7 @@ via the :code:`pytest_configure` hook:
 .. code-block:: python
 
   def pytest_configure(config):
-      config._metadata['foo'] = 'bar'
+      config._metadata["foo"] = "bar"
 
 The generated table will be sorted alphabetically unless the metadata is a
 :code:`collections.OrderedDict`.
@@ -124,6 +125,7 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 
    import pytest
    from py.xml import html
+
 
    def pytest_html_results_summary(prefix, summary, postfix):
        prefix.extend([html.p("foo: bar")])
@@ -170,19 +172,21 @@ conftest.py file:
 .. code-block:: python
 
   import pytest
+
+
   @pytest.hookimpl(hookwrapper=True)
   def pytest_runtest_makereport(item, call):
-      pytest_html = item.config.pluginmanager.getplugin('html')
+      pytest_html = item.config.pluginmanager.getplugin("html")
       outcome = yield
       report = outcome.get_result()
-      extra = getattr(report, 'extra', [])
-      if report.when == 'call':
+      extra = getattr(report, "extra", [])
+      if report.when == "call":
           # always add url to report
-          extra.append(pytest_html.extras.url('http://www.example.com/'))
-          xfail = hasattr(report, 'wasxfail')
+          extra.append(pytest_html.extras.url("http://www.example.com/"))
+          xfail = hasattr(report, "wasxfail")
           if (report.skipped and xfail) or (report.failed and not xfail):
               # only add additional html on failure
-              extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
+              extra.append(pytest_html.extras.html("<div>Additional HTML</div>"))
           report.extra = extra
 
 You can also specify the :code:`name` argument for all types other than :code:`html` which will change the title of the
@@ -190,7 +194,7 @@ created hyper link:
 
 .. code-block:: python
 
-    extra.append(pytest_html.extras.text('some string', name='Different title'))
+    extra.append(pytest_html.extras.text("some string", name="Different title"))
 
 It is also possible to use the fixture :code:`extra` to add content directly
 in a test function without implementing hooks. These will generally end up
@@ -200,8 +204,9 @@ before any extras added by plugins.
 
    from pytest_html import extras
 
+
    def test_extra(extra):
-      extra.append(extras.text('some string'))
+       extra.append(extras.text("some string"))
 
 
 Modifying the results table
@@ -218,15 +223,18 @@ column:
   from py.xml import html
   import pytest
 
+
   def pytest_html_results_table_header(cells):
-      cells.insert(2, html.th('Description'))
-      cells.insert(1, html.th('Time', class_='sortable time', col='time'))
+      cells.insert(2, html.th("Description"))
+      cells.insert(1, html.th("Time", class_="sortable time", col="time"))
       cells.pop()
+
 
   def pytest_html_results_table_row(report, cells):
       cells.insert(2, html.td(report.description))
-      cells.insert(1, html.td(datetime.utcnow(), class_='col-time'))
+      cells.insert(1, html.td(datetime.utcnow(), class_="col-time"))
       cells.pop()
+
 
   @pytest.hookimpl(hookwrapper=True)
   def pytest_runtest_makereport(item, call):
@@ -242,9 +250,10 @@ following example removes all passed results from the report:
 
   import pytest
 
+
   def pytest_html_results_table_row(report, cells):
       if report.passed:
-        del cells[:]
+          del cells[:]
 
 The log output and additional HTML can be modified by implementing the
 :code:`pytest_html_results_html` hook. The following example replaces all
@@ -254,10 +263,11 @@ additional HTML and log output with a notice that the log is empty:
 
   import pytest
 
+
   def pytest_html_results_table_html(report, data):
       if report.passed:
           del data[:]
-          data.append(html.div('No log output captured.', class_='empty log'))
+          data.append(html.div("No log output captured.", class_="empty log"))
 
 Display options
 ---------------

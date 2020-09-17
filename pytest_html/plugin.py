@@ -1,30 +1,30 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-from base64 import b64encode, b64decode
-from collections import OrderedDict
-from functools import lru_cache
-import importlib
-from os.path import isfile
+import bisect
 import datetime
+import importlib
 import json
 import os
-import pkg_resources
-import time
-import bisect
-import warnings
 import re
-
+import time
+import warnings
+from base64 import b64decode
+from base64 import b64encode
+from collections import OrderedDict
+from functools import lru_cache
 from html import escape
+from os.path import isfile
+
+import pkg_resources
 import pytest
-
-from py.xml import html, raw
-
-from . import extras
-from . import __version__, __pypi_url__
-
 from _pytest.logging import _remove_ansi_escape_sequences
+from py.xml import html
+from py.xml import raw
+
+from . import __pypi_url__
+from . import __version__
+from . import extras
 
 
 @lru_cache()
@@ -88,7 +88,7 @@ def pytest_configure(config):
     if htmlpath:
         for csspath in config.getoption("css"):
             if not os.path.exists(csspath):
-                raise IOError(f"No such file or directory: '{csspath}'")
+                raise OSError(f"No such file or directory: '{csspath}'")
         if not hasattr(config, "workerinput"):
             # prevent opening htmlpath on worker nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
@@ -119,8 +119,10 @@ def extra(pytestconfig):
     .. code-block:: python
 
         import pytest_html
+
+
         def test_foo(extra):
-            extra.append(pytest_html.extras.url('http://www.example.com/'))
+            extra.append(pytest_html.extras.url("http://www.example.com/"))
     """
     pytestconfig.extras = []
     yield pytestconfig.extras
@@ -434,7 +436,7 @@ class HTMLReport:
             self.style_css += "\n * CUSTOM CSS"
             self.style_css += f"\n * {path}"
             self.style_css += "\n ******************************/\n\n"
-            with open(path, "r") as f:
+            with open(path) as f:
                 self.style_css += f.read()
 
         css_href = "assets/style.css"

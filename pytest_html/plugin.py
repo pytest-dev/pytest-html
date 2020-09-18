@@ -11,6 +11,7 @@ import time
 import warnings
 from base64 import b64decode
 from base64 import b64encode
+from collections import defaultdict
 from collections import OrderedDict
 from functools import lru_cache
 from html import escape
@@ -148,6 +149,7 @@ class HTMLReport:
         self.rerun = 0 if has_rerun else None
         self.self_contained = config.getoption("self_contained_html")
         self.config = config
+        self.reports = defaultdict(list)
 
     class TestResult:
         def __init__(self, outcome, report, logfile, config):
@@ -279,7 +281,12 @@ class HTMLReport:
         def append_log_html(self, report, additional_html):
             log = html.div(class_="log")
             if report.longrepr:
-                for line in report.longreprtext.splitlines():
+                # longreprtext is only filled out on failure by pytest
+                #    otherwise will be None.
+                #  Use full_text if longreprtext is None-ish
+                #   we added full_text elsewhere in this file.
+                text = report.longreprtext or report.full_text
+                for line in text.splitlines():
                     separator = line.startswith("_ " * 10)
                     if separator:
                         log.append(line[:80])
@@ -620,15 +627,66 @@ class HTMLReport:
             with open(style_path, "w", encoding="utf-8") as f:
                 f.write(self.style_css)
 
+    def _post_process_reports(self):
+        for test_name, test_reports in self.reports.items():
+            outcome = "passed"
+            wasxfail = False
+            failure_when = None
+            full_text = ""
+            extras = []
+            duration = 0.0
+
+            # in theory the last one should have all logs so we just go
+            #  through them all to figure out the outcome, xfail, duration,
+            #    extras, and when it swapped from pass
+            for test_report in test_reports:
+                full_text += test_report.longreprtext
+                extras.extend(getattr(test_report, "extra", []))
+                duration += getattr(test_report, "duration", 0.0)
+
+                if (
+                    test_report.outcome not in ("passed", "rerun")
+                    and outcome == "passed"
+                ):
+                    outcome = test_report.outcome
+                    failure_when = test_report.when
+
+                if hasattr(test_report, "wasxfail"):
+                    wasxfail = True
+
+                if test_report.outcome == "rerun":
+                    self.append_other(test_report)
+
+            # the following test_report.<X> = settings come at the end of us
+            #  looping through all test_reports that make up a single
+            #    case.
+
+            # outcome on the right comes from the outcome of the various
+            #  test_reports that make up this test case
+            #    we are just carrying it over to the final report.
+            test_report.outcome = outcome
+            test_report.when = "call"
+            test_report.nodeid = test_name
+            test_report.longrepr = full_text
+            test_report.extra = extras
+            test_report.duration = duration
+
+            if wasxfail:
+                test_report.wasxfail = True
+
+            if test_report.outcome == "passed":
+                self.append_passed(test_report)
+            elif test_report.outcome == "skipped":
+                self.append_skipped(test_report)
+            elif test_report.outcome == "failed":
+                test_report.when = failure_when
+                self.append_failed(test_report)
+
+            # we don't append other here since the only case supported
+            #  for append_other is rerun, which is handled in the loop above
+
     def pytest_runtest_logreport(self, report):
-        if report.passed:
-            self.append_passed(report)
-        elif report.failed:
-            self.append_failed(report)
-        elif report.skipped:
-            self.append_skipped(report)
-        else:
-            self.append_other(report)
+        self.reports[report.nodeid].append(report)
 
     def pytest_collectreport(self, report):
         if report.failed:
@@ -638,6 +696,7 @@ class HTMLReport:
         self.suite_start_time = time.time()
 
     def pytest_sessionfinish(self, session):
+        self._post_process_reports()
         report_content = self._generate_report(session)
         self._save_report(report_content)
 

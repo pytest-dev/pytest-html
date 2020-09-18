@@ -980,3 +980,59 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert len(re.findall(content_report_title, html)) == 1
+
+    def test_setup_and_teardown_in_html(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            @pytest.fixture(scope="function")
+            def setupAndTeardown():
+                print ("this is setup")
+                yield
+                print ("this is teardown")
+
+            def test_setup_and_teardown(setupAndTeardown):
+                print ("this is the test case")
+        """
+        )
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_results(html, tests=1, passed=1)
+        assert "this is setup" in html
+        assert "this is teardown" in html
+        assert "this is the test case" in html
+
+    def test_setup_failures_are_errors(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            @pytest.fixture(scope="function")
+            def setup():
+                assert 0, "failure!"
+
+            def test_setup(setup):
+                print ("this is the test case")
+        """
+        )
+        result, html = run(testdir)
+        assert result.ret == 1
+        assert_results(html, tests=0, passed=0, errors=1)
+        assert "this is the test case" not in html
+
+    def test_teardown_failures_are_errors(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            @pytest.fixture(scope="function")
+            def teardown():
+                yield
+                assert 0, "failure!"
+
+            def test_setup(teardown):
+                print ("this is the test case")
+        """
+        )
+        result, html = run(testdir)
+        assert result.ret == 1
+        assert_results(html, tests=0, passed=0, errors=1)
+        assert "this is the test case" in html

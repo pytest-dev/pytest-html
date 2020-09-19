@@ -15,21 +15,65 @@ on:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: ubuntu-18.04
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          - name: linting
+          - os: ubuntu-18.04
+            name: linting-ubuntu
             python-version: 3.6
-          - name: py36
+
+          - os: ubuntu-18.04
+            name: py36-ubuntu
             python-version: 3.6
-          - name: py37
+
+          - os: windows-latest
+            name: py36-windows
+            python-version: 3.6
+
+          - os: macOS-latest
+            name: py36-mac
+            python-version: 3.6
+
+          - os: ubuntu-18.04
+            name: py37-ubuntu
             python-version: 3.7
-          - name: py38
+
+          - os: windows-latest
+            name: py37-windows
+            python-version: 3.7
+
+          - os: macOS-latest
+            name: py37-mac
+            python-version: 3.7
+
+          - os: ubuntu-18.04
+            name: py38-ubuntu
             python-version: 3.8
-          - name: pypy3
+
+          - os: windows-latest
+            name: py38-windows
+            python-version: 3.8
+
+          - os: macOS-latest
+            name: py38-mac
+            python-version: 3.8
+
+          - os: ubuntu-18.04
+            name: pypy3-ubuntu
+            python-version: pypy3
+
+          - os: windows-latest
+            name: pypy3-windows
+            python-version: pypy3
+
+          - os: macOS-latest
+            name: pypy3-mac
             python-version: pypy3
     steps:
+    - name: Set Newline Behavior
+      run : |
+        git config --global core.autocrlf false
     - uses: actions/checkout@master
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -38,6 +82,12 @@ jobs:
     - name: Install tox
       run: |
         python -m pip install --upgrade tox
+    - name: Get Tox Environment Name From Matrix Name
+      uses: rishabhgupta/split-by@v1
+      id: split
+      with:
+        string: '${{ matrix.name }}'
+        split-by: '-'
     - name: Test with tox
       run: |
-        python -m tox -e ${{ matrix.name }}
+        python -m tox -e ${{ steps.split.outputs._0}}

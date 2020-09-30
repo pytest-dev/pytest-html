@@ -1,4 +1,4 @@
-pytest-html
+Welcome to the amazing Project (pytest-html)
 ===========
 
 pytest-html is a plugin for `pytest <http://pytest.org>`_ that generates a

@@ -4,9 +4,10 @@ on:
   create:  # is used for publishing to PyPI and TestPyPI
     tags:  # any tag regardless of its name, no branches
   push:  # only publishes pushes to the main branch to TestPyPI
-    branches:  # any branch but not tag
-    - >-
-      **
+    branches:  # any maintenance branch but not tag
+      # avoid generic ** as it duplicates builds from temporary branches
+      - "master"
+      - "stable/**"
     tags-ignore:
     - >-
       **
@@ -29,6 +30,8 @@ jobs:
             python-version: 3.8
           - name: py39
             python-version: 3.9
+          - name: devel
+            python-version: 3.8
           - name: pypy3
             python-version: pypy3
     steps:

@@ -27,6 +27,8 @@ jobs:
             python-version: 3.7
           - name: py38
             python-version: 3.8
+          - name: devel
+            python-version: 3.8
           - name: pypy3
             python-version: pypy3
     steps:

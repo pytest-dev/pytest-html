@@ -10,10 +10,10 @@ FORMAT_URL = "url"
 FORMAT_VIDEO = "video"
 
 
-def extra(content, format, name=None, mime_type=None, extension=None):
+def extra(content, format_type, name=None, mime_type=None, extension=None):
     return {
         "name": name,
-        "format": format,
+        "format_type": format_type,
         "content": content,
         "mime_type": mime_type,
         "extension": extension,

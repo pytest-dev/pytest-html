@@ -235,13 +235,13 @@ class HTMLReport:
 
         def append_extra_html(self, extra, extra_index, test_index):
             href = None
-            if extra.get("format") == extras.FORMAT_IMAGE:
+            if extra.get("format_type") == extras.FORMAT_IMAGE:
                 self._append_image(extra, extra_index, test_index)
 
-            elif extra.get("format") == extras.FORMAT_HTML:
+            elif extra.get("format_type") == extras.FORMAT_HTML:
                 self.additional_html.append(html.div(raw(extra.get("content"))))
 
-            elif extra.get("format") == extras.FORMAT_JSON:
+            elif extra.get("format_type") == extras.FORMAT_JSON:
                 content = json.dumps(extra.get("content"))
                 if self.self_contained:
                     href = data_uri(content, mime_type=extra.get("mime_type"))
@@ -250,7 +250,7 @@ class HTMLReport:
                         content, extra_index, test_index, extra.get("extension")
                     )
 
-            elif extra.get("format") == extras.FORMAT_TEXT:
+            elif extra.get("format_type") == extras.FORMAT_TEXT:
                 content = extra.get("content")
                 if isinstance(content, bytes):
                     content = content.decode("utf-8")
@@ -261,17 +261,17 @@ class HTMLReport:
                         content, extra_index, test_index, extra.get("extension")
                     )
 
-            elif extra.get("format") == extras.FORMAT_URL:
+            elif extra.get("format_type") == extras.FORMAT_URL:
                 href = extra.get("content")
 
-            elif extra.get("format") == extras.FORMAT_VIDEO:
+            elif extra.get("format_type") == extras.FORMAT_VIDEO:
                 self._append_video(extra, extra_index, test_index)
 
             if href is not None:
                 self.links_html.append(
                     html.a(
                         extra.get("name"),
-                        class_=extra.get("format"),
+                        class_=extra.get("format_type"),
                         href=href,
                         target="_blank",
                     )

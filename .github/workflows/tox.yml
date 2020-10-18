@@ -14,7 +14,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  build_python:
     name: ${{ matrix.name }}
     runs-on: ubuntu-18.04
     strategy:
@@ -46,3 +46,20 @@ jobs:
     - name: Test with tox
       run: |
         python -m tox -e ${{ matrix.name }}
+  build_javascript:
+    name: javascript
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - name: Install Dependencies
+      run: |
+        npm install phantomjs-prebuilt@2.1.15 grunt-cli grunt grunt-contrib-qunit
+    - name: QUnit Tests
+      run: |
+        grunt test
+      env:
+        CI: true

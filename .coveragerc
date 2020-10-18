@@ -1,0 +1,15 @@
+[paths]
+source =
+    ../pytest_html
+    */site-packages/pytest_html
+
+[run]
+branch = true
+parallel = true
+source =
+    pytest_html
+    .
+
+[report]
+show_missing = true
+precision = 2

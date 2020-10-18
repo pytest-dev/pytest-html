@@ -47,7 +47,7 @@ jobs:
       run: |
         python -m tox -e ${{ matrix.name }}
   build_javascript:
-    name: javascript
+    name: grunt
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2

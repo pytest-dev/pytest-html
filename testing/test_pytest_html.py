@@ -1036,3 +1036,33 @@ class TestHTML:
         assert result.ret == 1
         assert_results(html, tests=0, passed=0, errors=1)
         assert "this is the test case" in html
+
+    @pytest.mark.parametrize(
+        "capture_flag, should_capture",
+        [("-s", False), ("--capture=no", False), ("--capture=sys", True)],
+    )
+    def test_logcapturing_respects_capture_no(
+        self, testdir, capture_flag, should_capture
+    ):
+        testdir.makepyfile(
+            """
+            import logging
+            import sys
+            def test_logcapture():
+                print("stdout print line")
+                print("stderr print line", file=sys.stderr)
+        """
+        )
+
+        result, html = run(testdir, "report.html", capture_flag)
+        assert result.ret == 0
+        assert_results(html)
+
+        extra_log_div_regex = re.compile(
+            '<div class="log"> -+Captured stdout call-+ <br/>stdout print line\n<br/> '
+            "-+Captured stderr call-+ <br/>stderr print line\n<br/></div>"
+        )
+        if should_capture:
+            assert extra_log_div_regex.search(html) is not None
+        else:
+            assert extra_log_div_regex.search(html) is None

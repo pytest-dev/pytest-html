@@ -173,7 +173,7 @@ class HTMLReport:
             for extra_index, extra in enumerate(getattr(report, "extra", [])):
                 self.append_extra_html(extra, extra_index, test_index)
 
-            self.append_log_html(report, self.additional_html)
+            self.append_log_html(report, self.additional_html, config.option.capture)
 
             cells = [
                 html.td(self.outcome, class_="col-result"),
@@ -278,41 +278,43 @@ class HTMLReport:
                 )
                 self.links_html.append(" ")
 
-        def append_log_html(self, report, additional_html):
+        def append_log_html(self, report, additional_html, capture_value):
             log = html.div(class_="log")
-            if report.longrepr:
-                # longreprtext is only filled out on failure by pytest
-                #    otherwise will be None.
-                #  Use full_text if longreprtext is None-ish
-                #   we added full_text elsewhere in this file.
-                text = report.longreprtext or report.full_text
-                for line in text.splitlines():
-                    separator = line.startswith("_ " * 10)
-                    if separator:
-                        log.append(line[:80])
-                    else:
-                        exception = line.startswith("E   ")
-                        if exception:
-                            log.append(html.span(raw(escape(line)), class_="error"))
+
+            if capture_value != "no":
+                if report.longrepr:
+                    # longreprtext is only filled out on failure by pytest
+                    #    otherwise will be None.
+                    #  Use full_text if longreprtext is None-ish
+                    #   we added full_text elsewhere in this file.
+                    text = report.longreprtext or report.full_text
+                    for line in text.splitlines():
+                        separator = line.startswith("_ " * 10)
+                        if separator:
+                            log.append(line[:80])
                         else:
-                            log.append(raw(escape(line)))
+                            exception = line.startswith("E   ")
+                            if exception:
+                                log.append(html.span(raw(escape(line)), class_="error"))
+                            else:
+                                log.append(raw(escape(line)))
+                        log.append(html.br())
+
+                for section in report.sections:
+                    header, content = map(escape, section)
+                    log.append(f" {header:-^80} ")
                     log.append(html.br())
 
-            for section in report.sections:
-                header, content = map(escape, section)
-                log.append(f" {header:-^80} ")
-                log.append(html.br())
+                    if ansi_support():
+                        converter = ansi_support().Ansi2HTMLConverter(
+                            inline=False, escaped=False
+                        )
+                        content = converter.convert(content, full=False)
+                    else:
+                        content = _remove_ansi_escape_sequences(content)
 
-                if ansi_support():
-                    converter = ansi_support().Ansi2HTMLConverter(
-                        inline=False, escaped=False
-                    )
-                    content = converter.convert(content, full=False)
-                else:
-                    content = _remove_ansi_escape_sequences(content)
-
-                log.append(raw(content))
-                log.append(html.br())
+                    log.append(raw(content))
+                    log.append(html.br())
 
             if len(log) == 0:
                 log = html.div(class_="empty log")

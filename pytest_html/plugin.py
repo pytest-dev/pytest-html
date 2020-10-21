@@ -278,10 +278,10 @@ class HTMLReport:
                 )
                 self.links_html.append(" ")
 
-        def append_log_html(self, report, additional_html, capture_value):
+        def append_log_html(self, report, additional_html, pytest_capture_value):
             log = html.div(class_="log")
 
-            if capture_value != "no":
+            if pytest_capture_value != "no":
                 if report.longrepr:
                     # longreprtext is only filled out on failure by pytest
                     #    otherwise will be None.

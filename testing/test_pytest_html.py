@@ -1041,7 +1041,7 @@ class TestHTML:
         "capture_flag, should_capture",
         [("-s", False), ("--capture=no", False), ("--capture=sys", True)],
     )
-    def test_logcapturing_respects_capture_no(
+    def test_extra_log_reporting_respects_capture_no(
         self, testdir, capture_flag, should_capture
     ):
         testdir.makepyfile(

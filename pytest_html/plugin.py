@@ -223,8 +223,7 @@ class HTMLReport:
                 os.path.dirname(self.logfile), "assets", asset_file_name
             )
 
-            if not os.path.exists(os.path.dirname(asset_path)):
-                os.makedirs(os.path.dirname(asset_path))
+            os.makedirs(os.path.dirname(asset_path), exist_ok=True)
 
             relative_path = f"assets/{asset_file_name}"
 
@@ -615,10 +614,9 @@ class HTMLReport:
         dir_name = os.path.dirname(self.logfile)
         assets_dir = os.path.join(dir_name, "assets")
 
-        if not os.path.exists(dir_name):
-            os.makedirs(dir_name)
-        if not self.self_contained and not os.path.exists(assets_dir):
-            os.makedirs(assets_dir)
+        os.makedirs(dir_name, exist_ok=True)
+        if not self.self_contained:
+            os.makedirs(assets_dir, exist_ok=True)
 
         with open(self.logfile, "w", encoding="utf-8") as f:
             f.write(report_content)

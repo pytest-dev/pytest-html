@@ -13,19 +13,17 @@ import pytest
 
 pytest_plugins = ("pytester",)
 
-if os.name == 'nt':
+if os.name == "nt":
     # Force a utf-8 encoding on file io (since by default windows does not). See
     # https://github.com/pytest-dev/pytest-html/issues/336
     #  If we drop support for Python 3.6 and earlier could use python -X utf8 instead.
     _real_open = builtins.open
-
 
     def _open(file, mode="r", buffering=-1, encoding=None, *args, **kwargs):
         if mode in ("r", "w") and encoding is None:
             encoding = "utf-8"
 
         return _real_open(file, mode, buffering, encoding, *args, **kwargs)
-
 
     builtins.open = _open
 

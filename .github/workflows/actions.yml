@@ -103,13 +103,13 @@ jobs:
         python -m pip install --upgrade tox
     - name: Get Tox Environment Name From Matrix Name
       uses: rishabhgupta/split-by@v1
-      id: split
+      id: split-matrix-name
       with:
         string: '${{ matrix.name }}'
         split-by: '-'
     - name: Test with tox
       run: |
-        python -m tox -e ${{ steps.split.outputs._0}}
+        python -m tox -e ${{ steps.split-matrix-name.outputs._0}}
   build_javascript:
     name: grunt
     runs-on: ubuntu-18.04

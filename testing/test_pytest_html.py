@@ -1070,14 +1070,13 @@ class TestHTML:
         "show_capture_flag, should_capture",
         [("--show-capture=no", False), ("--show-capture=all", True)],
     )
-    def test_extra_log_reporting_respects_show_capture_no_gleb(
+    def test_extra_log_reporting_respects_show_capture_no(
         self, testdir, show_capture_flag, should_capture
     ):
         testdir.makepyfile(
             """
-            import logging
             import sys
-            def test_logcapture():
+            def test_show_capture_no():
                 print("stdout print line")
                 print("stderr print line", file=sys.stderr)
                 assert False

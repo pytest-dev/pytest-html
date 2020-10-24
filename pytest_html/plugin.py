@@ -173,7 +173,12 @@ class HTMLReport:
             for extra_index, extra in enumerate(getattr(report, "extra", [])):
                 self.append_extra_html(extra, extra_index, test_index)
 
-            self.append_log_html(report, self.additional_html, config.option.capture)
+            self.append_log_html(
+                report,
+                self.additional_html,
+                config.option.capture,
+                config.option.showcapture,
+            )
 
             cells = [
                 html.td(self.outcome, class_="col-result"),
@@ -277,47 +282,60 @@ class HTMLReport:
                 )
                 self.links_html.append(" ")
 
-        def append_log_html(self, report, additional_html, pytest_capture_value):
+        def _populate_html_log_div(self, log, report):
+            if report.longrepr:
+                # longreprtext is only filled out on failure by pytest
+                #    otherwise will be None.
+                #  Use full_text if longreprtext is None-ish
+                #   we added full_text elsewhere in this file.
+                text = report.longreprtext or report.full_text
+                for line in text.splitlines():
+                    separator = line.startswith("_ " * 10)
+                    if separator:
+                        log.append(line[:80])
+                    else:
+                        exception = line.startswith("E   ")
+                        if exception:
+                            log.append(html.span(raw(escape(line)), class_="error"))
+                        else:
+                            log.append(raw(escape(line)))
+                    log.append(html.br())
+
+            for section in report.sections:
+                header, content = map(escape, section)
+                log.append(f" {header:-^80} ")
+                log.append(html.br())
+
+                if ansi_support():
+                    converter = ansi_support().Ansi2HTMLConverter(
+                        inline=False, escaped=False
+                    )
+                    content = converter.convert(content, full=False)
+                else:
+                    content = _remove_ansi_escape_sequences(content)
+
+                log.append(raw(content))
+                log.append(html.br())
+
+        def append_log_html(
+            self,
+            report,
+            additional_html,
+            pytest_capture_value,
+            pytest_show_capture_value,
+        ):
             log = html.div(class_="log")
 
-            if pytest_capture_value != "no":
-                if report.longrepr:
-                    # longreprtext is only filled out on failure by pytest
-                    #    otherwise will be None.
-                    #  Use full_text if longreprtext is None-ish
-                    #   we added full_text elsewhere in this file.
-                    text = report.longreprtext or report.full_text
-                    for line in text.splitlines():
-                        separator = line.startswith("_ " * 10)
-                        if separator:
-                            log.append(line[:80])
-                        else:
-                            exception = line.startswith("E   ")
-                            if exception:
-                                log.append(html.span(raw(escape(line)), class_="error"))
-                            else:
-                                log.append(raw(escape(line)))
-                        log.append(html.br())
-
-                for section in report.sections:
-                    header, content = map(escape, section)
-                    log.append(f" {header:-^80} ")
-                    log.append(html.br())
-
-                    if ansi_support():
-                        converter = ansi_support().Ansi2HTMLConverter(
-                            inline=False, escaped=False
-                        )
-                        content = converter.convert(content, full=False)
-                    else:
-                        content = _remove_ansi_escape_sequences(content)
-
-                    log.append(raw(content))
-                    log.append(html.br())
+            should_skip_captured_output = pytest_capture_value == "no"
+            if report.outcome == "failed" and not should_skip_captured_output:
+                should_skip_captured_output = pytest_show_capture_value == "no"
+            if not should_skip_captured_output:
+                self._populate_html_log_div(log, report)
 
             if len(log) == 0:
                 log = html.div(class_="empty log")
                 log.append("No log output captured.")
+
             additional_html.append(log)
 
         def _make_media_html_div(

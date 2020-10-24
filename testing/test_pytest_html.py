@@ -1046,9 +1046,8 @@ class TestHTML:
     ):
         testdir.makepyfile(
             """
-            import logging
             import sys
-            def test_logcapture():
+            def test_capture_no():
                 print("stdout print line")
                 print("stderr print line", file=sys.stderr)
         """
@@ -1060,6 +1059,37 @@ class TestHTML:
 
         extra_log_div_regex = re.compile(
             '<div class="log"> -+Captured stdout call-+ <br/>stdout print line\n<br/> '
+            "-+Captured stderr call-+ <br/>stderr print line\n<br/></div>"
+        )
+        if should_capture:
+            assert extra_log_div_regex.search(html) is not None
+        else:
+            assert extra_log_div_regex.search(html) is None
+
+    @pytest.mark.parametrize(
+        "show_capture_flag, should_capture",
+        [("--show-capture=no", False), ("--show-capture=all", True)],
+    )
+    def test_extra_log_reporting_respects_show_capture_no_gleb(
+        self, testdir, show_capture_flag, should_capture
+    ):
+        testdir.makepyfile(
+            """
+            import logging
+            import sys
+            def test_logcapture():
+                print("stdout print line")
+                print("stderr print line", file=sys.stderr)
+                assert False
+        """
+        )
+
+        result, html = run(testdir, "report.html", show_capture_flag)
+        assert result.ret == 1
+        assert_results(html, passed=0, failed=1)
+
+        extra_log_div_regex = re.compile(
+            '<div class="log">.*-+Captured stdout call-+ <br/>stdout print line\n<br/> '
             "-+Captured stderr call-+ <br/>stderr print line\n<br/></div>"
         )
         if should_capture:

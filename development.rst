@@ -23,15 +23,12 @@ If you're not using `Pipenv`_, to install `pre-commit`, run:
 Automated Testing
 -----------------
 
-All pull requests and merges are tested in `Travis CI <https://travis-ci.org/>`_
-based on the ``.travis.yml`` file.
+All pull requests and merges are tested in `GitHub Actions <https://github.com/pytest-dev/pytest-html/actions>`_
+which are defined inside ``.github`` folder.
 
-Usually, a link to your specific travis build appears in pull requests, but if
-not, you can find it on the
-`pull requests page <https://travis-ci.org/pytest-dev/pytest-html/pull_requests>`_
-
-The only way to trigger Travis CI to run again for a pull request, is to submit
-another change to the pull branch.
+To retrigger CI to run again for a pull request, you either use dropdown
+option, close and reopen pull-request or to just update the branch containing
+it.
 
 You can do this with `git commit --allow-empty`
 
@@ -67,6 +64,6 @@ Follow these steps to release a new version of the project:
 5. Once merged, update your local master again (``git pull --rebase upstream master``)
 6. Tag the release with the new release version (``git tag v<new tag>``)
 7. Push the tag (``git push upstream --tags``)
-8. Done. You can monitor the progress on `Travis <https://travis-ci.org/pytest-dev/pytest-html/>`_
+8. Done. Check `CI <https://github.com/pytest-dev/pytest-html/actions>`_ for release progress.
 
 .. _Pipenv: https://pipenv.pypa.io/en/latest/

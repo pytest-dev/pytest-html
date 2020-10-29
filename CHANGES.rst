@@ -1,9 +1,9 @@
 Release Notes
 -------------
 
-**3.0.0 (2020-10-25)**
+**3.0.0 (2020-10-28)**
 
-* Respect ``--capture=no`` and ``-s`` pytest flags (`#171 <https://github.com/pytest-dev/pytest-html/issues/171>`_)
+* Respect ``--capture=no``, ``--show-capture=no``, and ``-s`` pytest flags (`#171 <https://github.com/pytest-dev/pytest-html/issues/171>`_)
 
   * Thanks to `@bigunyak <https://github.com/bigunyak>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the fix
 

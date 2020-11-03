@@ -13,9 +13,9 @@ HTML report for the test results.
 .. image:: https://img.shields.io/conda/vn/conda-forge/pytest-html.svg
    :target: https://anaconda.org/conda-forge/pytest-html
    :alt: Conda Forge
-.. image:: https://img.shields.io/travis/pytest-dev/pytest-html.svg
-   :target: https://travis-ci.org/pytest-dev/pytest-html/
-   :alt: Travis
+.. image:: https://github.com/pytest-dev/pytest-html/workflows/gh/badge.svg
+   :target: https://github.com/pytest-dev/pytest-html/actions
+   :alt: CI
 .. image:: https://img.shields.io/github/issues-raw/pytest-dev/pytest-html.svg
    :target: https://github.com/pytest-dev/pytest-html/issues
    :alt: Issues

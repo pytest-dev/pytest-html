@@ -1,7 +1,4 @@
 {
-  "name": "pytest-html",
-  "version": "3.0.0",
-  "description": "Plugin for generating HTML reports for pytest results.",
   "main": "Gruntfile.js",
   "dependencies": {
     "grunt": "^1.3.0",
@@ -12,21 +9,5 @@
   "devDependencies": {},
   "scripts": {
     "test": "grunt test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pytest-dev/pytest-html.git"
-  },
-  "keywords": [
-    "py.test",
-    "pytest",
-    "html",
-    "report"
-  ],
-  "author": "Dave Hunt",
-  "license": "MPL-2.0",
-  "bugs": {
-    "url": "https://github.com/pytest-dev/pytest-html/issues"
-  },
-  "homepage": "https://github.com/pytest-dev/pytest-html#readme"
+  }
 }

@@ -7,12 +7,12 @@ categories:
       - 'feature'  # 006b75
       - 'enhancement'  # ededed
       - 'performance'  # 555555
+      - 'docs'  # 4071a5
   - title: 'Bugfixes'
     labels:
       - 'fix'
       - 'bugfix'
       - 'bug'  # fbca04
-      - 'docs'  # 4071a5
       - 'packaging'  # 4071a5
       - 'test'  # #0e8a16
   - title: 'Deprecations'

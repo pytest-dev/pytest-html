@@ -123,10 +123,10 @@ jobs:
         node-version: '12.x'
     - name: Install Dependencies
       run: |
-        npm install phantomjs-prebuilt@2.1.15 grunt-cli grunt grunt-contrib-qunit
+        npm install
     - name: QUnit Tests
       run: |
-        grunt test
+        npm test
       env:
         CI: true
   publish:

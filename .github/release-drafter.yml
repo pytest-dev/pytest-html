@@ -14,7 +14,7 @@ categories:
       - 'bugfix'
       - 'bug'  # fbca04
       - 'packaging'  # 4071a5
-      - 'test'  # #0e8a16
+      - 'test'  # 0e8a16
   - title: 'Deprecations'
     labels:
       - 'deprecated'  # fef2c0

@@ -28,7 +28,7 @@ function sort_column(elem) {
     toggle_sort_states(elem);
     var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
     var key;
-    if (elem.classList.contains("numeric")) {
+    if (elem.classList.contains('numeric')) {
         key = key_num;
     } else if (elem.classList.contains('result')) {
         key = key_result;

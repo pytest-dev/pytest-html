@@ -10,7 +10,7 @@ function toArray(iter) {
     return Array.prototype.slice.call(iter);
 }
 
-function find(selector, elem) {
+function find(selector, elem) { // eslint-disable-line no-redeclare
     if (!elem) {
         elem = document;
     }
@@ -40,28 +40,28 @@ function sort_column(elem) {
     sort_table(elem, key(colIndex));
 }
 
-function show_all_extras() {
+function show_all_extras() { // eslint-disable-line no-unused-vars
     find_all('.col-result').forEach(show_extras);
 }
 
-function hide_all_extras() {
+function hide_all_extras() { // eslint-disable-line no-unused-vars
     find_all('.col-result').forEach(hide_extras);
 }
 
 function show_extras(colresult_elem) {
     var extras = colresult_elem.parentNode.nextElementSibling;
     var expandcollapse = colresult_elem.firstElementChild;
-    extras.classList.remove("collapsed");
-    expandcollapse.classList.remove("expander");
-    expandcollapse.classList.add("collapser");
+    extras.classList.remove('collapsed');
+    expandcollapse.classList.remove('expander');
+    expandcollapse.classList.add('collapser');
 }
 
 function hide_extras(colresult_elem) {
     var extras = colresult_elem.parentNode.nextElementSibling;
     var expandcollapse = colresult_elem.firstElementChild;
-    extras.classList.add("collapsed");
-    expandcollapse.classList.remove("collapser");
-    expandcollapse.classList.add("expander");
+    extras.classList.add('collapsed');
+    expandcollapse.classList.remove('collapser');
+    expandcollapse.classList.add('expander');
 }
 
 function show_filters() {
@@ -73,7 +73,7 @@ function show_filters() {
 function add_collapse() {
     // Add links for show/hide all
     var resulttable = find('table#results-table');
-    var showhideall = document.createElement("p");
+    var showhideall = document.createElement('p');
     showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
                             '<a href="javascript:hide_all_extras()">Hide all details</a>';
     resulttable.parentElement.insertBefore(showhideall, resulttable);
@@ -82,25 +82,25 @@ function add_collapse() {
     find_all('.col-result').forEach(function(elem) {
         var collapsed = get_query_parameter('collapsed') || 'Passed';
         var extras = elem.parentNode.nextElementSibling;
-        var expandcollapse = document.createElement("span");
-        if (extras.classList.contains("collapsed")) {
-            expandcollapse.classList.add("expander")
+        var expandcollapse = document.createElement('span');
+        if (extras.classList.contains('collapsed')) {
+            expandcollapse.classList.add('expander');
         } else if (collapsed.includes(elem.innerHTML)) {
-            extras.classList.add("collapsed");
-            expandcollapse.classList.add("expander");
+            extras.classList.add('collapsed');
+            expandcollapse.classList.add('expander');
         } else {
-            expandcollapse.classList.add("collapser");
+            expandcollapse.classList.add('collapser');
         }
         elem.appendChild(expandcollapse);
 
-        elem.addEventListener("click", function(event) {
-            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+        elem.addEventListener('click', function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains('collapsed')) {
                 show_extras(event.currentTarget);
             } else {
                 hide_extras(event.currentTarget);
             }
         });
-    })
+    });
 }
 
 function get_query_parameter(name) {
@@ -108,7 +108,7 @@ function get_query_parameter(name) {
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
 
-function init () {
+function init () { // eslint-disable-line no-unused-vars
     reset_sort_headers();
 
     add_collapse();
@@ -118,13 +118,12 @@ function init () {
     sort_column(find('.initial-sort'));
 
     find_all('.sortable').forEach(function(elem) {
-        elem.addEventListener("click",
-                              function(event) {
-                                  sort_column(elem);
-                              }, false)
+        elem.addEventListener('click',
+            function() {
+                sort_column(elem);
+            }, false);
     });
-
-};
+}
 
 function sort_table(clicked, key_func) {
     var rows = find_all('.results-table-row');
@@ -133,15 +132,15 @@ function sort_table(clicked, key_func) {
     /* Whole table is removed here because browsers acts much slower
      * when appending existing elements.
      */
-    var thead = document.getElementById("results-table-head");
+    var thead = document.getElementById('results-table-head');
     document.getElementById('results-table').remove();
-    var parent = document.createElement("table");
-    parent.id = "results-table";
+    var parent = document.createElement('table');
+    parent.id = 'results-table';
     parent.appendChild(thead);
     sorted_rows.forEach(function(elem) {
         parent.appendChild(elem);
     });
-    document.getElementsByTagName("BODY")[0].appendChild(parent);
+    document.getElementsByTagName('BODY')[0].appendChild(parent);
 }
 
 function sort(items, key_func, reversed) {
@@ -182,15 +181,15 @@ function key_num(col_index) {
 
 function key_link(col_index) {
     return function(elem) {
-        dataCell = elem.childNodes[1].childNodes[col_index].firstChild
-        return dataCell == null ? "" : dataCell.innerText.toLowerCase();
+        var dataCell = elem.childNodes[1].childNodes[col_index].firstChild;
+        return dataCell == null ? '' : dataCell.innerText.toLowerCase();
     };
 }
 
 function key_result(col_index) {
     return function(elem) {
         var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
-                       'Skipped', 'Passed'];
+            'Skipped', 'Passed'];
         return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
     };
 }
@@ -200,12 +199,12 @@ function reset_sort_headers() {
         elem.parentNode.removeChild(elem);
     });
     find_all('.sortable').forEach(function(elem) {
-        var icon = document.createElement("div");
-        icon.className = "sort-icon";
-        icon.textContent = "vvv";
+        var icon = document.createElement('div');
+        icon.className = 'sort-icon';
+        icon.textContent = 'vvv';
         elem.insertBefore(icon, elem.firstChild);
-        elem.classList.remove("desc", "active");
-        elem.classList.add("asc", "inactive");
+        elem.classList.remove('desc', 'active');
+        elem.classList.add('asc', 'inactive');
     });
 }
 
@@ -225,13 +224,13 @@ function toggle_sort_states(elem) {
 }
 
 function is_all_rows_hidden(value) {
-  return value.hidden == false;
+    return value.hidden == false;
 }
 
-function filter_table(elem) {
-    var outcome_att = "data-test-result";
+function filter_table(elem) { // eslint-disable-line no-unused-vars
+    var outcome_att = 'data-test-result';
     var outcome = elem.getAttribute(outcome_att);
-    class_outcome = outcome + " results-table-row";
+    var class_outcome = outcome + ' results-table-row';
     var outcome_rows = document.getElementsByClassName(class_outcome);
 
     for(var i = 0; i < outcome_rows.length; i++){
@@ -240,6 +239,6 @@ function filter_table(elem) {
 
     var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
     var all_rows_hidden = rows.length == 0 ? true : false;
-    var not_found_message = document.getElementById("not-found-message");
+    var not_found_message = document.getElementById('not-found-message');
     not_found_message.hidden = !all_rows_hidden;
 }

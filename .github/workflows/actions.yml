@@ -124,9 +124,12 @@ jobs:
     - name: Install Dependencies
       run: |
         npm install
+    - name: Run ESLint
+      run: |
+        npm run lint
     - name: QUnit Tests
       run: |
-        npm test
+        npm run test
       env:
         CI: true
   publish:

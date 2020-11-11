@@ -113,7 +113,7 @@ jobs:
       run: |
         python -m tox -e ${{ steps.split-matrix-name.outputs._0}}
   build_javascript:
-    name: grunt
+    name: JavaScript
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2

@@ -6,11 +6,8 @@
     "grunt-contrib-qunit": "^4.0.0",
     "phantomjs-prebuilt": "2.1.15"
   },
-  "devDependencies": {
-    "eslint": "^7.13.0"
-  },
+  "devDependencies": {},
   "scripts": {
-    "test": "grunt test",
-    "lint": "eslint pytest_html"
+    "test": "grunt test"
   }
 }

@@ -26,8 +26,8 @@ function find_all(selector, elem) {
 
 function sort_column(elem) {
     toggle_sort_states(elem);
-    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
-    var key;
+    const colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    let key;
     if (elem.classList.contains('numeric')) {
         key = key_num;
     } else if (elem.classList.contains('result')) {
@@ -49,40 +49,40 @@ function hide_all_extras() { // eslint-disable-line no-unused-vars
 }
 
 function show_extras(colresult_elem) {
-    var extras = colresult_elem.parentNode.nextElementSibling;
-    var expandcollapse = colresult_elem.firstElementChild;
+    const extras = colresult_elem.parentNode.nextElementSibling;
+    const expandcollapse = colresult_elem.firstElementChild;
     extras.classList.remove('collapsed');
     expandcollapse.classList.remove('expander');
     expandcollapse.classList.add('collapser');
 }
 
 function hide_extras(colresult_elem) {
-    var extras = colresult_elem.parentNode.nextElementSibling;
-    var expandcollapse = colresult_elem.firstElementChild;
+    const extras = colresult_elem.parentNode.nextElementSibling;
+    const expandcollapse = colresult_elem.firstElementChild;
     extras.classList.add('collapsed');
     expandcollapse.classList.remove('collapser');
     expandcollapse.classList.add('expander');
 }
 
 function show_filters() {
-    var filter_items = document.getElementsByClassName('filter');
-    for (var i = 0; i < filter_items.length; i++)
+    const filter_items = document.getElementsByClassName('filter');
+    for (let i = 0; i < filter_items.length; i++)
         filter_items[i].hidden = false;
 }
 
 function add_collapse() {
     // Add links for show/hide all
-    var resulttable = find('table#results-table');
-    var showhideall = document.createElement('p');
+    const resulttable = find('table#results-table');
+    const showhideall = document.createElement('p');
     showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
                             '<a href="javascript:hide_all_extras()">Hide all details</a>';
     resulttable.parentElement.insertBefore(showhideall, resulttable);
 
     // Add show/hide link to each result
     find_all('.col-result').forEach(function(elem) {
-        var collapsed = get_query_parameter('collapsed') || 'Passed';
-        var extras = elem.parentNode.nextElementSibling;
-        var expandcollapse = document.createElement('span');
+        const collapsed = get_query_parameter('collapsed') || 'Passed';
+        const extras = elem.parentNode.nextElementSibling;
+        const expandcollapse = document.createElement('span');
         if (extras.classList.contains('collapsed')) {
             expandcollapse.classList.add('expander');
         } else if (collapsed.includes(elem.innerHTML)) {
@@ -104,7 +104,7 @@ function add_collapse() {
 }
 
 function get_query_parameter(name) {
-    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
 
@@ -126,15 +126,15 @@ function init () { // eslint-disable-line no-unused-vars
 }
 
 function sort_table(clicked, key_func) {
-    var rows = find_all('.results-table-row');
-    var reversed = !clicked.classList.contains('asc');
-    var sorted_rows = sort(rows, key_func, reversed);
+    const rows = find_all('.results-table-row');
+    const reversed = !clicked.classList.contains('asc');
+    const sorted_rows = sort(rows, key_func, reversed);
     /* Whole table is removed here because browsers acts much slower
      * when appending existing elements.
      */
-    var thead = document.getElementById('results-table-head');
+    const thead = document.getElementById('results-table-head');
     document.getElementById('results-table').remove();
-    var parent = document.createElement('table');
+    const parent = document.createElement('table');
     parent.id = 'results-table';
     parent.appendChild(thead);
     sorted_rows.forEach(function(elem) {
@@ -144,25 +144,25 @@ function sort_table(clicked, key_func) {
 }
 
 function sort(items, key_func, reversed) {
-    var sort_array = items.map(function(item, i) {
+    const sort_array = items.map(function(item, i) {
         return [key_func(item), i];
     });
 
     sort_array.sort(function(a, b) {
-        var key_a = a[0];
-        var key_b = b[0];
+        const key_a = a[0];
+        const key_b = b[0];
 
         if (key_a == key_b) return 0;
 
         if (reversed) {
-            return (key_a < key_b ? 1 : -1);
+            return key_a < key_b ? 1 : -1;
         } else {
-            return (key_a > key_b ? 1 : -1);
+            return key_a > key_b ? 1 : -1;
         }
     });
 
     return sort_array.map(function(item) {
-        var index = item[1];
+        const index = item[1];
         return items[index];
     });
 }
@@ -181,14 +181,14 @@ function key_num(col_index) {
 
 function key_link(col_index) {
     return function(elem) {
-        var dataCell = elem.childNodes[1].childNodes[col_index].firstChild;
+        const dataCell = elem.childNodes[1].childNodes[col_index].firstChild;
         return dataCell == null ? '' : dataCell.innerText.toLowerCase();
     };
 }
 
 function key_result(col_index) {
     return function(elem) {
-        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+        const strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
             'Skipped', 'Passed'];
         return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
     };
@@ -199,7 +199,7 @@ function reset_sort_headers() {
         elem.parentNode.removeChild(elem);
     });
     find_all('.sortable').forEach(function(elem) {
-        var icon = document.createElement('div');
+        const icon = document.createElement('div');
         icon.className = 'sort-icon';
         icon.textContent = 'vvv';
         elem.insertBefore(icon, elem.firstChild);
@@ -228,17 +228,17 @@ function is_all_rows_hidden(value) {
 }
 
 function filter_table(elem) { // eslint-disable-line no-unused-vars
-    var outcome_att = 'data-test-result';
-    var outcome = elem.getAttribute(outcome_att);
-    var class_outcome = outcome + ' results-table-row';
-    var outcome_rows = document.getElementsByClassName(class_outcome);
+    const outcome_att = 'data-test-result';
+    const outcome = elem.getAttribute(outcome_att);
+    const class_outcome = outcome + ' results-table-row';
+    const outcome_rows = document.getElementsByClassName(class_outcome);
 
-    for(var i = 0; i < outcome_rows.length; i++){
+    for(let i = 0; i < outcome_rows.length; i++){
         outcome_rows[i].hidden = !elem.checked;
     }
 
-    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
-    var all_rows_hidden = rows.length == 0 ? true : false;
-    var not_found_message = document.getElementById('not-found-message');
+    const rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    const all_rows_hidden = rows.length == 0 ? true : false;
+    const not_found_message = document.getElementById('not-found-message');
     not_found_message.hidden = !all_rows_hidden;
 }

@@ -113,7 +113,7 @@ jobs:
       run: |
         python -m tox -e ${{ steps.split-matrix-name.outputs._0}}
   build_javascript:
-    name: JavaScript
+    name: grunt
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
@@ -124,12 +124,9 @@ jobs:
     - name: Install Dependencies
       run: |
         npm install
-    - name: Run ESLint
-      run: |
-        npm run lint
     - name: QUnit Tests
       run: |
-        npm run test
+        npm test
       env:
         CI: true
   publish:

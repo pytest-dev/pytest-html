@@ -9,6 +9,9 @@ dist
 *.egg-info
 *.pyc
 
+# Codecov
+.coverage
+
 # IDE Specific files
 ### Pycharm IDE - Jetbrains
 .idea/*

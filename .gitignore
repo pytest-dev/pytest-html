@@ -1,34 +1,46 @@
 __pycache__
-.DS_Store
 .cache
 .eggs
-.pytest_cache
-.tox
-build
-dist
 *.egg-info
 *.pyc
+build
+dist
 
-# IDE Specific files
-### Pycharm IDE - Jetbrains
+# IDE Specific files/folders
+## Pycharm IDE - Jetbrains
 .idea/*
 .vscode/*
 
-### PyDev IDE - Eclipse
-.metadata
-tmp/
-*.tmp
-*.bak
-local.properties
+## PyDev IDE - Eclipse
 .settings/
 .loadpath
+.metadata
+tmp/
+*.bak
 *.project
 *.pydevproject
+*.tmp
+local.properties
 
-### YouCompleteMe - VIM plugin
+## Vim
+*.swp
+
+### YouCompleteMe
 .ycm_extra_conf.py
 
-##Tests JS
+# JS files/folders
+## node / npm
 node_modules/
+package-lock.json
 
+# MacOS files
+.DS_Store
+
+# Pipenv files
 Pipfile.lock
+
+# pytest folders
+.pytest_cache
+
+# tox folders
+.tox

@@ -1,0 +1,63 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 12
+    },
+    "rules": {
+        "array-bracket-spacing": "error",
+        "block-scoped-var": "error",
+        "block-spacing": "error",
+        "brace-style": "error",
+        "class-methods-use-this": "error",
+        "consistent-return": "error",
+        "default-case": "error",
+        "default-case-last": "error",
+        "default-param-last": "error",
+        "grouped-accessor-pairs": "error",
+        "indent": [
+            "error",
+            4
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "no-caller": "error",
+        "no-console": "error",
+        "no-empty-function": "error",
+        "no-eval": "error",
+        "no-extra-parens": "error",
+        "no-labels": "error",
+        "no-new": "error",
+        "no-new-func": "error",
+        "no-new-wrappers": "error",
+        "no-return-await": "error",
+        "no-script-url": "error",
+        "no-self-compare": "error",
+        "no-shadow": "error",
+        "no-throw-literal": "error",
+        "no-undefined": "error",
+        "no-unreachable-loop": "error",
+        "no-unused-expressions": "error",
+        "no-useless-backreference": "error",
+        "no-useless-concat": "error",
+        "no-var": "error",
+        "prefer-const": "error",
+        "prefer-promise-reject-errors": "error",
+        "require-atomic-updates": "error",
+        "require-await": "error",
+        "semi": [
+            "error",
+            "always"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "yoda": "error"
+    }
+}

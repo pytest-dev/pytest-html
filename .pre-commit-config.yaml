@@ -37,6 +37,13 @@ repos:
     hooks:
     -   id: pyupgrade
         args: [--py3-plus]
+-   repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v7.13.0
+    hooks:
+    -   id: eslint
+        additional_dependencies:
+        - eslint@7.13.0
+        args: [pytest_html]
 -   repo: local
     hooks:
     -   id: rst

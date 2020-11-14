@@ -8,6 +8,7 @@ dist
 
 # Codecov
 .coverage
+coverage.xml
 
 # IDE Specific files/folders
 ## Pycharm IDE - Jetbrains

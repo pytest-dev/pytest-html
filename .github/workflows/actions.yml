@@ -107,7 +107,7 @@ jobs:
         split-by: '-'
     - name: Test with tox
       run: |
-        python -m tox -e ${{ steps.split-matrix-name.outputs._0}}
+        python -m tox -e ${{ steps.split-matrix-name.outputs._0}}-cov
     - name: Upload coverage to codecov
       uses: codecov/codecov-action@v1
       with:

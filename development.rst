@@ -75,15 +75,14 @@ Releasing a new version
 
 Follow these steps to release a new version of the project:
 
-1.  Update your local master with the upstream master (``git pull --rebase upstream master``)
-2.  Create a new branch
-3.  Update ``CHANGES.rst`` with the new version, today's date, and all changes/new features
-4.  Update the ``version`` field in  ``package.json`` with the new version
-5.  Commit and push the new branch and then create a new pull request
-6.  Wait for tests and reviews and then merge the branch
-7.  Once merged, update your local master again (``git pull --rebase upstream master``)
-8.  Tag the release with the new release version (``git tag v<new tag>``)
-9.  Push the tag (``git push upstream --tags``)
-10. Done. Check `CI <https://github.com/pytest-dev/pytest-html/actions>`_ for release progress.
+#.  Update your local master with the upstream master (``git pull --rebase upstream master``)
+#.  Create a new branch
+#.  Update ``CHANGES.rst`` with the new version, today's date, and all changes/new features
+#.  Commit and push the new branch and then create a new pull request
+#.  Wait for tests and reviews and then merge the branch
+#.  Once merged, update your local master again (``git pull --rebase upstream master``)
+#.  Tag the release with the new release version (``git tag v<new tag>``)
+#.  Push the tag (``git push upstream --tags``)
+#. Done. Check `CI <https://github.com/pytest-dev/pytest-html/actions>`_ for release progress.
 
 .. _Pipenv: https://pipenv.pypa.io/en/latest/

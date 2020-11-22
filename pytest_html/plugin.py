@@ -183,7 +183,7 @@ class HTMLReport:
             cells = [
                 html.td(self.outcome, class_="col-result"),
                 html.td(self.test_id, class_="col-name"),
-                html.td(f"{self.time:.2f}", class_="col-duration"),
+                html.td(self.time, class_="col-duration"),
                 html.td(self.links_html, class_="col-links"),
             ]
 
@@ -603,6 +603,11 @@ class HTMLReport:
         unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
         return unicode_doc.decode("utf-8")
 
+    def _format_duration(self, report, duration):
+        duration_as_gmtime = time.gmtime(duration)
+        duration_formatter = getattr(report, "duration_formatter", "%S")
+        return time.strftime(duration_formatter, duration_as_gmtime)
+
     def _generate_environment(self, config):
         if not hasattr(config, "_metadata") or config._metadata is None:
             return []
@@ -687,7 +692,7 @@ class HTMLReport:
             test_report.nodeid = test_name
             test_report.longrepr = full_text
             test_report.extra = extras
-            test_report.duration = duration
+            test_report.duration = self._format_duration(test_report, duration)
 
             if wasxfail:
                 test_report.wasxfail = True

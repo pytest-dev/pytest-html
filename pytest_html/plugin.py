@@ -157,6 +157,7 @@ class HTMLReport:
             if getattr(report, "when", "call") != "call":
                 self.test_id = "::".join([report.nodeid, report.when])
             self.time = getattr(report, "duration", 0.0)
+            self.formatted_time = getattr(report, "formatted_duration", 0.0)
             self.outcome = outcome
             self.additional_html = []
             self.links_html = []
@@ -183,7 +184,7 @@ class HTMLReport:
             cells = [
                 html.td(self.outcome, class_="col-result"),
                 html.td(self.test_id, class_="col-name"),
-                html.td(self.time, class_="col-duration"),
+                html.td(self.formatted_time, class_="col-duration"),
                 html.td(self.links_html, class_="col-links"),
             ]
 
@@ -537,7 +538,7 @@ class HTMLReport:
         cells = [
             html.th("Result", class_="sortable result initial-sort", col="result"),
             html.th("Test", class_="sortable", col="name"),
-            html.th("Duration", class_="sortable numeric", col="duration"),
+            html.th("Duration", class_="sortable", col="duration"),
             html.th("Links", class_="sortable links", col="links"),
         ]
         session.config.hook.pytest_html_results_table_header(cells=cells)
@@ -603,10 +604,25 @@ class HTMLReport:
         unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
         return unicode_doc.decode("utf-8")
 
-    def _format_duration(self, report, duration):
-        duration_as_gmtime = time.gmtime(duration)
-        duration_formatter = getattr(report, "duration_formatter", "%S")
-        return time.strftime(duration_formatter, duration_as_gmtime)
+    def _format_duration(self, report):
+        # parse the report duration into its display version and return it to the caller
+        duration_formatter = getattr(report, "duration_formatter", None)
+        if duration_formatter is None:
+            return str(report.duration)
+        else:
+            # support %f, since time.strftime doesn't support it out of the box
+            # keep a precision of 2 for legacy reasons
+            formatted_milliseconds = "00"
+            string_duration = str(report.duration)
+            if "." in string_duration:
+                milliseconds = string_duration.split(".")[1]
+                formatted_milliseconds = milliseconds[0:2]
+
+            duration_formatter = duration_formatter.replace(
+                "%f", formatted_milliseconds
+            )
+            duration_as_gmtime = time.gmtime(report.duration)
+            return time.strftime(duration_formatter, duration_as_gmtime)
 
     def _generate_environment(self, config):
         if not hasattr(config, "_metadata") or config._metadata is None:
@@ -692,7 +708,8 @@ class HTMLReport:
             test_report.nodeid = test_name
             test_report.longrepr = full_text
             test_report.extra = extras
-            test_report.duration = self._format_duration(test_report, duration)
+            test_report.duration = duration
+            test_report.formatted_duration = self._format_duration(test_report)
 
             if wasxfail:
                 test_report.wasxfail = True

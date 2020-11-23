@@ -607,13 +607,19 @@ class HTMLReport:
     def _format_duration(self, report):
         # parse the report duration into its display version and return it to the caller
         duration_formatter = getattr(report, "duration_formatter", None)
+        string_duration = str(report.duration)
         if duration_formatter is None:
-            return str(report.duration)
+            if "." in string_duration:
+                split_duration = string_duration.split(".")
+                split_duration[1] = split_duration[1][0:2]
+
+                string_duration = ".".join(split_duration)
+
+            return string_duration
         else:
             # support %f, since time.strftime doesn't support it out of the box
             # keep a precision of 2 for legacy reasons
             formatted_milliseconds = "00"
-            string_duration = str(report.duration)
             if "." in string_duration:
                 milliseconds = string_duration.split(".")[1]
                 formatted_milliseconds = milliseconds[0:2]

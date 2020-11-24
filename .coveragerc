@@ -1,0 +1,3 @@
+[coverage:report]
+precision = 2
+show_missing = true

@@ -22,6 +22,9 @@ HTML report for the test results.
 .. image:: https://img.shields.io/requires/github/pytest-dev/pytest-html.svg
    :target: https://requires.io/github/pytest-dev/pytest-html/requirements/?branch=master
    :alt: Requirements
+.. image:: https://codecov.io/gh/pytest-dev/pytest-html/branch/master/graph/badge.svg?token=Y0myNKkdbi
+   :target: https://codecov.io/gh/pytest-dev/pytest-html
+   :alt: Codecov
 
 Requirements
 ------------

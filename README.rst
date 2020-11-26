@@ -287,7 +287,7 @@ or by setting the :code:`render_collapsed` in a configuration file (pytest.ini, 
 The formatting of the timestamp used in the :code:`Durations` column can be modified by setting :code:`duration_formatter`
 on the :code:`report` attribute. All `time.strftime`_ formatting directives are supported. In addition, it is possible
 to supply :code:`%f` to get duration milliseconds. If this value is not set, the values in the :code:`Durations` column are
-displayed in :code:`%S.%f` format.
+displayed in :code:`%S.%f` format where :code:`%S` is the total number of seconds a test ran for.
 
 Below is an example of a :code:`conftest.py` file setting :code:`duration_formatter`:
 

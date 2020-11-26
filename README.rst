@@ -295,11 +295,12 @@ Below is an example of a :code:`conftest.py` file setting :code:`duration_format
 
    import pytest
 
+
    @pytest.hookimpl(hookwrapper=True)
    def pytest_runtest_makereport(item, call):
-      outcome = yield
-      report = outcome.get_result()
-      setattr(report, "duration_formatter", "%H:%M:%S.%f")
+       outcome = yield
+       report = outcome.get_result()
+       setattr(report, "duration_formatter", "%H:%M:%S.%f")
 
 **NOTE**: Milliseconds are always displayed with a precision of 2
 
@@ -326,4 +327,4 @@ Resources
 
 
 .. _JSON: http://json.org/
-.. _time.strftime: https://docs.python.org/3/library/time.html#time.strftime 
+.. _time.strftime: https://docs.python.org/3/library/time.html#time.strftime

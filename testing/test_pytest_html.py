@@ -116,19 +116,17 @@ class TestHTML:
         assert float(m.group(1)) >= sleep
 
     @pytest.mark.parametrize(
-        "duration_formatter,expected_match_regex",
+        "duration_formatter,expected_report_content",
         [
-            ("%f", r'<td class="col-duration">\d{2}</td>'),
-            ("%S.%f", r'<td class="col-duration">\d{2}\.\d{2}</td>'),
-            (
-                "ABC%H  %M %S123",
-                r'<td class="col-duration">ABC\d{2}  \d{2} \d{2}123</td>',
-            ),
+            ("%f", '<td class="col-duration">40</td>'),
+            ("%S.%f", '<td class="col-duration">00.40</td>'),
+            ("ABC%H  %M %S123", '<td class="col-duration">ABC00  00 00123</td>',),
         ],
     )
     def test_can_format_duration_column(
-        self, testdir, duration_formatter, expected_match_regex
+        self, testdir, duration_formatter, expected_report_content
     ):
+
         testdir.makeconftest(
             f"""
             import pytest
@@ -154,8 +152,7 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 0
         assert_results(html, duration=sleep)
-        regex = re.compile(expected_match_regex)
-        assert regex.match(html)
+        assert expected_report_content in html, str(html)
 
     def test_pass(self, testdir):
         testdir.makepyfile("def test_pass(): pass")

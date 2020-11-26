@@ -8,6 +8,7 @@ setup(
     author="Dave Hunt",
     author_email="dhunt@mozilla.com",
     url="https://github.com/pytest-dev/pytest-html",
+    package_dir={"": "src"},
     packages=["pytest_html"],
     package_data={"pytest_html": ["resources/*"]},
     entry_points={"pytest11": ["html = pytest_html.plugin"]},

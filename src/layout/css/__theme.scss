@@ -1,0 +1,153 @@
+@mixin apply(
+  $text,
+  $link,
+  $text-arbitrary,
+  $background,
+  $background-alt,
+  $border,
+  $expander,
+  $result-ok,
+  $result-warn,
+  $result-error,
+  $log-bg,
+  $log-fg,
+) {
+
+
+  /******************************
+   * COLORS: Light Theme
+   *
+   * 1. Summary Information
+   * 2. Test Result
+   * 3. Results Table
+   * 3.1. Table Layout
+   * 3.2. Extra
+   * 3.3. Sorting items
+   *
+   ******************************/
+
+  body {
+    background-color: $background;
+    color: $text-arbitrary;
+  }
+
+  h1,
+  h2,
+  p {
+    color: $text;
+  }
+
+  a {
+    color: $link;
+  }
+
+  /*------------------
+   * 1. Summary Information
+   *------------------*/
+
+  #environment td {
+    border-color: $border;
+  }
+
+  #environment tr:nth-child(odd) {
+    background-color: $background-alt;
+  }
+
+  /*------------------
+   * 2. Test Result
+   *------------------*/
+
+  span {
+    &.passed {
+      color: $result-ok;
+    }
+
+    &.skipped,
+    &.xfailed,
+    &.rerun {
+      color: $result-warn;
+    }
+
+    &.error,
+    &.failed,
+    &.xpassed {
+      color: $result-error;
+    }
+  }
+
+  .passed {
+    .col-result {
+      color: $result-ok;
+    }
+  }
+
+  .skipped,
+  .xfailed,
+  .rerun {
+    .col-result {
+      color: $result-warn;
+    }
+  }
+
+  .error,
+  .failed,
+  .xpassed {
+    .col-result {
+      color: $result-error;
+    }
+  }
+
+
+  /*------------------
+   * 3.1. Table Layout
+   *------------------*/
+
+  #results-table {
+    border-color: $border;
+    color: $text-arbitrary;
+  }
+
+  #results-table th,
+  #results-table td {
+    border-color: $border;
+  }
+
+  /*------------------
+   * 3.2. Extra
+   *------------------*/
+
+  .log {
+    background-color: $log-bg;
+    border-color: $log-bg;
+    color: $log-fg;
+  }
+
+  div.image {
+    border-color: $border;
+  }
+
+  div.video {
+    border-color: $border;
+  }
+
+  .expander::after,
+  .collapser::after {
+    color: $expander;
+  }
+
+  /*------------------
+   * 3.3. Sorting items
+   *------------------*/
+
+  .inactive .sort-icon {
+    border-top-color: $border;
+  }
+
+  .asc.active .sort-icon {
+    border-bottom-color: $text-arbitrary;
+  }
+
+  .desc.active .sort-icon {
+    border-top-color: $text-arbitrary;
+  }
+}

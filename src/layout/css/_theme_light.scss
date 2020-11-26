@@ -1,0 +1,21 @@
+@use '_theme';
+
+@include theme-apply(
+  $background: white,
+  $background-alt: #f6f6f6,
+
+  $text: black,
+  $link: #999,
+  $text-arbitrary: #999,
+
+  $border: #e6e6e6,
+
+  $expander: #bbb,
+
+  $result-ok: green,
+  $result-warn: orange,
+  $result-error: red,
+
+  $log-bg: #e6e6e6,
+  $log-fg: black,
+);

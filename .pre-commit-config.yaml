@@ -31,7 +31,7 @@ repos:
     rev: v2.3.0
     hooks:
     -   id: reorder-python-imports
-        args: ['--application-directories=.:pytest_html:testing', --py3-plus]
+        args: ['--application-directories=.:src:testing', --py3-plus]
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.4.4
     hooks:
@@ -43,7 +43,7 @@ repos:
     -   id: eslint
         additional_dependencies:
         - eslint@7.13.0
-        args: [pytest_html]
+        args: [src]
 -   repo: local
     hooks:
     -   id: rst
@@ -52,3 +52,7 @@ repos:
         files: ^(CHANGES.rst|development.rst|README.rst)$
         language: python
         additional_dependencies: [pygments, restructuredtext_lint]
+-   repo: https://github.com/elidupuis/mirrors-sass-lint
+    rev: '5cc45653263b423398e4af2561fae362903dd45d'
+    hooks:
+    -   id: sass-lint

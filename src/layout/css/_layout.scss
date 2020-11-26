@@ -1,0 +1,214 @@
+$font-size-text: 12px;
+$font-size-h1: 2*$font-size-text;
+$font-size-h2: round(1.3 * $font-size-text);
+
+$border-width: 1px;
+
+$spacing: 5px;
+
+
+
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: $font-size-text;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+}
+
+h1 {
+  font-size: $font-size-h1;
+}
+
+h2 {
+  font-size: $font-size-h2;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+
+#environment td {
+  padding: $spacing;
+  border-width: $border-width;
+  border-style: solid;
+}
+
+/******************************
+ * TEST RESULT
+ ******************************/
+
+span {
+
+  &.passed,
+  &.error,
+  &.failed,
+  &.xpassed,
+  &.skipped,
+  &.xfailed,
+  &.rerun {
+    font-weight: bold;
+  }
+}
+
+.col-result {
+  font-weight: bold;
+
+  .expander,
+  .collapser {
+    font-weight: normal;
+  }
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+
+#results-table {
+  border-width: $border-width;
+  border-style: solid;
+  font-size: $font-size-text;
+  width: 100%;
+
+  th,
+  td {
+    padding: $spacing;
+    border-width: $border-width;
+    border-style: solid;
+    text-align: left;
+  }
+
+  th {
+    font-weight: bold;
+  }
+
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+
+$extra-spacing: $spacing;
+$extra-height: 240px;
+$extra-media-ratio: 4 / 3;
+$extra-media-width: round($extra-height * $extra-media-ratio);
+
+.log {
+  border-width: $border-width;
+  border-style: solid;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  height: $extra-height - 2 * $extra-spacing;
+  overflow-y: scroll;
+  padding: $extra-spacing;
+  white-space: pre-wrap;
+
+  &:only-child {
+    height: inherit;
+  }
+}
+
+div.image {
+  border-width: $border-width;
+  border-style: solid;
+  float: right;
+  width: $extra-media-width;
+  height: $extra-height;
+  margin-left: $extra-spacing;
+  overflow: hidden;
+
+  img {
+    width: $extra-media-width;
+  }
+}
+
+div.video {
+  border-width: $border-width;
+  border-style: solid;
+  float: right;
+  width: $extra-media-width;
+  height: $extra-height;
+  margin-left: $extra-spacing;
+  overflow: hidden;
+
+  video {
+    overflow: hidden;
+    width: $extra-media-width;
+    height: $extra-height;
+  }
+}
+
+.collapsed {
+  display: none;
+}
+
+.expander,
+.collapser {
+  font-style: italic;
+  cursor: pointer;
+}
+
+.expander::after {
+  content: " (show details)";
+}
+
+.collapser::after {
+  content: " (hide details)";
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+
+.sortable {
+  cursor: pointer;
+}
+
+.sort-icon {
+  font-size: 0;
+  float: left;
+  margin-right: $spacing;
+  margin-top: $spacing;
+
+  /*triangle*/
+  $triangle-width: 8px;
+  width: 0;
+  height: 0;
+  border-left-width: $triangle-width;
+  border-right-width: $triangle-width;
+  border-left-style: solid;
+  border-right-style: solid;
+
+  .inactive {
+    /*finish triangle*/
+    border-top-width: $triangle-width;
+    border-top-style: solid;
+  }
+
+  .asc.active {
+    /*finish triangle*/
+    border-bottom-width: $triangle-width;
+    border-bottom-style: solid;
+  }
+
+  .desc.active {
+    /*finish triangle*/
+    border-top-width: $triangle-width;
+    border-top-style: solid;
+  }
+
+}

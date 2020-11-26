@@ -35,6 +35,8 @@ local.properties
 # JS files/folders
 ## node / npm
 node_modules/
+# @XXX its recommended to not ignore these, to have reproducible builds.
+#   use https://dependabot.com/github-actions/ to stay up to date!
 package-lock.json
 
 # MacOS files

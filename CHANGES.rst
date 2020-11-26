@@ -2,6 +2,9 @@ Release Notes
 -------------
 
 **3.1.0 (unreleased)**
+* Make the ``style.css`` generated via SASS/SCSS (`#383 <https://github.com/pytest-dev/pytest-html/issues/383>`_)
+
+  * Thanks to `@jkowalleck <https://github.com/jkowalleck>`_ for the PR
 
 * Support for dark mode (`#381 <https://github.com/pytest-dev/pytest-html/issues/381>`_)
 

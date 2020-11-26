@@ -16,12 +16,12 @@ HTML report for the test results.
 .. image:: https://github.com/pytest-dev/pytest-html/workflows/gh/badge.svg
    :target: https://github.com/pytest-dev/pytest-html/actions
    :alt: CI
-.. image:: https://img.shields.io/github/issues-raw/pytest-dev/pytest-html.svg
-   :target: https://github.com/pytest-dev/pytest-html/issues
-   :alt: Issues
 .. image:: https://img.shields.io/requires/github/pytest-dev/pytest-html.svg
    :target: https://requires.io/github/pytest-dev/pytest-html/requirements/?branch=master
    :alt: Requirements
+.. image:: https://codecov.io/gh/pytest-dev/pytest-html/branch/master/graph/badge.svg?token=Y0myNKkdbi
+   :target: https://codecov.io/gh/pytest-dev/pytest-html
+   :alt: Codecov
 
 Requirements
 ------------

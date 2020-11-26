@@ -118,9 +118,9 @@ class TestHTML:
     @pytest.mark.parametrize(
         "duration_formatter,expected_report_content",
         [
-            ("%f", '<td class="col-duration">40</td>'),
-            ("%S.%f", '<td class="col-duration">00.40</td>'),
-            ("ABC%H  %M %S123", '<td class="col-duration">ABC00  00 00123</td>',),
+            ("%f", '<td class="col-duration">20</td>'),
+            ("%S.%f", '<td class="col-duration">00.20</td>'),
+            ("ABC%H  %M %S123", '<td class="col-duration">ABC00  00 00123</td>'),
         ],
     )
     def test_can_format_duration_column(
@@ -146,7 +146,7 @@ class TestHTML:
             def test_sleep():
                 time.sleep({:f})
         """.format(
-                sleep * 2
+                sleep
             )
         )
         result, html = run(testdir)

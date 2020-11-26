@@ -116,6 +116,21 @@ via the :code:`pytest_configure` hook:
 The generated table will be sorted alphabetically unless the metadata is a
 :code:`collections.OrderedDict`.
 
+You can edit the environment table header and row by using the :code:`pytest_html_environment_table_header` and `pytest_html_environment_table_row` hooks:
+
+.. code-block:: python
+
+   import pytest
+
+   DESCRIPTION_DICT = {"Packages": "Version of pytest packages", "Python": "Version of Python"}
+
+   def pytest_html_environment_table_header(cells):
+      cells.insert(2, html.th('Description'))
+
+   def pytest_html_environment_table_row(cells):
+      cells.insert(2, html.td(description_dict.get(cells[0], '')))
+
+
 Additional summary information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

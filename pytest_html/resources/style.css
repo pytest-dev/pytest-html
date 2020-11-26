@@ -3,6 +3,7 @@ body {
 	font-size: 12px;
 	/* do not increase min-width as some may use split screens */
 	min-width: 800px;
+	background-color: white;
 	color: #999;
 }
 
@@ -28,6 +29,25 @@ table {
 	border-collapse: collapse;
 }
 
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: #222;
+		color: #aaa;
+	}
+	h1 {
+		 color: #ccc;
+	}
+	h2 {
+		color: #ccc;
+	}
+	p {
+		color: #ccc;
+	}
+	a {
+		color: #c6c2ab;
+	}
+}
+
 /******************************
  * SUMMARY INFORMATION
  ******************************/
@@ -39,6 +59,15 @@ table {
 
 #environment tr:nth-child(odd) {
 	background-color: #f6f6f6;
+}
+
+@media (prefers-color-scheme: dark) {
+	#environment td {
+		border-color: #333;
+	}
+	#environment tr:nth-child(odd) {
+		background-color: #292929;
+	}
 }
 
 /******************************
@@ -54,6 +83,20 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
 	color: red;
 }
 
+@media (prefers-color-scheme: dark) {
+	span.passed, .passed .col-result {
+		color: #4E9A06;
+		font-weight: bold;
+	}
+	span.skipped, span.xfailed, span.rerun, .skipped .col-result, .xfailed .col-result, .rerun .col-result {
+		color: #C4A000;
+		font-weight: bold;
+	}
+	span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, .xpassed .col-result  {
+		color: #CC0000;
+		font-weight: bold;
+	}
+}
 
 /******************************
  * RESULTS TABLE
@@ -82,6 +125,16 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
 }
 #results-table th {
 	font-weight: bold
+}
+
+@media (prefers-color-scheme: dark) {
+	#results-table {
+		border-color: #333;
+		color: #aaa;
+	}
+	#results-table th, #results-table td {
+		border-color: #333;
+	}
 }
 
 /*------------------
@@ -142,9 +195,32 @@ div.video video {
 	cursor: pointer;
 }
 
+@media (prefers-color-scheme: dark) {
+	.log {
+		background-color: #0c0c0d;
+		border-color: #333;
+		color: #8c8c8c;
+	}
+	div.image {
+		border-color: #333;
+	}
+	div.video {
+		border-color: #333;
+	}
+	.expander::after {
+		color: #c6c2ab;
+		font-weight: normal;
+	}
+	.collapser::after {
+		color: #c6c2ab;
+		font-weight: normal;
+	}
+}
+
 /*------------------
  * 3. Sorting items
  *------------------*/
+
 .sortable {
 	cursor: pointer;
 }
@@ -174,4 +250,16 @@ div.video video {
 .desc.active .sort-icon {
 	/*finish triangle*/
 	border-top: 8px solid #999;
+}
+
+@media (prefers-color-scheme: dark) {
+	.inactive .sort-icon {
+		border-top-color: #333;
+	}
+	.asc.active .sort-icon {
+		border-bottom-color: #aaa;
+	}
+	.desc.active .sort-icon {
+		border-top-color: #aaa;
+	}
 }

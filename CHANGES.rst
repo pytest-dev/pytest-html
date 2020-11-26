@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**3.1.0 (unreleased)**
+
+* Support for dark mode (`#381 <https://github.com/pytest-dev/pytest-html/issues/381>`_)
+
+  * Thanks to `@jkowalleck <https://github.com/jkowalleck>`_ for the PR
+
 **3.0.0 (2020-10-28)**
 
 * Respect ``--capture=no``, ``--show-capture=no``, and ``-s`` pytest flags (`#171 <https://github.com/pytest-dev/pytest-html/issues/171>`_)

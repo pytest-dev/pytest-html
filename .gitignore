@@ -6,6 +6,10 @@ __pycache__
 build
 dist
 
+# Codecov
+.coverage
+coverage.xml
+
 # IDE Specific files/folders
 ## Pycharm IDE - Jetbrains
 .idea/*

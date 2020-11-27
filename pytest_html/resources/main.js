@@ -28,9 +28,7 @@ function sort_column(elem) {
     toggle_sort_states(elem);
     const colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
     let key;
-    if (elem.classList.contains('numeric')) {
-        key = key_num;
-    } else if (elem.classList.contains('result')) {
+    if (elem.classList.contains('result')) {
         key = key_result;
     } else if (elem.classList.contains('links')) {
         key = key_link;
@@ -170,12 +168,6 @@ function sort(items, key_func, reversed) {
 function key_alpha(col_index) {
     return function(elem) {
         return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
-    };
-}
-
-function key_num(col_index) {
-    return function(elem) {
-        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
     };
 }
 

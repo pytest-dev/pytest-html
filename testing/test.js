@@ -43,7 +43,7 @@
    sort_column_test('[col=name]',
                     'passed results-table-row', 'rerun results-table-row');
 
-   //numeric
+   //duration
    sort_column_test('[col=duration]',
                     'rerun results-table-row', 'passed results-table-row');
    sort_column_test('[col=duration]',

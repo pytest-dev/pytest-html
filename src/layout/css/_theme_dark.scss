@@ -1,0 +1,23 @@
+@use '_theme';
+
+@media (prefers-color-scheme: dark) {
+  @include theme-apply(
+    $background: #222,
+    $background-alt: #292929,
+
+    $text: #ccc,
+    $link: #c6c2ab,
+    $text-arbitrary: #aaa,
+
+    $border: #333,
+
+    $expander: #c6c2ab,
+
+    $result-ok: #4e9a06,
+    $result-warn: #c4a000,
+    $result-error: #cc0000,
+
+    $log-bg: #0c0c0d,
+    $log-fg: #8c8c8c,
+  );
+}

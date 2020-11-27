@@ -115,6 +115,50 @@ class TestHTML:
         m = p.search(html)
         assert float(m.group(1)) >= sleep
 
+    @pytest.mark.parametrize(
+        "duration_formatter,expected_report_content",
+        [
+            ("%f", r'<td class="col-duration">\d{2}</td>'),
+            ("%S.%f", r'<td class="col-duration">\d{2}\.\d{2}</td>'),
+            (
+                "ABC%H  %M %S123",
+                r'<td class="col-duration">ABC\d{2}  \d{2} \d{2}123</td>',
+            ),
+        ],
+    )
+    def test_can_format_duration_column(
+        self, testdir, duration_formatter, expected_report_content
+    ):
+
+        testdir.makeconftest(
+            f"""
+            import pytest
+
+            @pytest.hookimpl(hookwrapper=True)
+            def pytest_runtest_makereport(item, call):
+                outcome = yield
+                report = outcome.get_result()
+                setattr(report, "duration_formatter", "{duration_formatter}")
+        """
+        )
+
+        sleep = float(0.2)
+        testdir.makepyfile(
+            """
+            import time
+            def test_sleep():
+                time.sleep({:f})
+        """.format(
+                sleep
+            )
+        )
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_results(html, duration=sleep)
+
+        compiled_regex = re.compile(expected_report_content)
+        assert compiled_regex.search(html)
+
     def test_pass(self, testdir):
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)

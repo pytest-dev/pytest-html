@@ -3,6 +3,10 @@ Release Notes
 
 **3.1.0 (unreleased)**
 
+* Stop attaching test reruns to final test report entries (`#374 <https://github.com/pytest-dev/pytest-html/issues/374>`_)
+
+  * Thanks to `@VladimirPodolyan <https://github.com/VladimirPodolyan>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the fix
+
 * Allow for report duration formatting (`#376 <https://github.com/pytest-dev/pytest-html/issues/376>`_)
 
   * Thanks to `@brettnolan <https://github.com/brettnolan>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the fix

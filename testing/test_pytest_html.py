@@ -227,7 +227,7 @@ class TestHTML:
             r'<td class="col-links"><a class="url" href="http://www.example.com/" '
             'target="_blank">URL</a> </td>'
         )
-        assert len(re.findall(expected_report_extras, html)) == 3, str(html)
+        assert len(re.findall(expected_report_extras, html)) == 3
 
     def test_no_rerun(self, testdir):
         testdir.makepyfile("def test_pass(): pass")

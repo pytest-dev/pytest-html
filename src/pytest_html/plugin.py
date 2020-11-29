@@ -690,7 +690,7 @@ class HTMLReport:
             #    extras, and when it swapped from pass
             for test_report in test_reports:
                 if test_report.outcome == "rerun":
-                    # reruns are seperate test runs for all intensive purposes
+                    # reruns are separate test runs for all intensive purposes
                     self.append_rerun(test_report)
                 else:
                     full_text += test_report.longreprtext

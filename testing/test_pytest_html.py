@@ -220,7 +220,7 @@ class TestHTML:
         assert result.ret
         assert_results(html, passed=0, failed=1, rerun=2)
 
-        expected_report_durations = r'<td class="col-duration">1.00</td>'
+        expected_report_durations = r'<td class="col-duration">1.\d{2}</td>'
         assert len(re.findall(expected_report_durations, html)) == 3
 
         expected_report_extras = (

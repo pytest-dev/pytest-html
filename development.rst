@@ -70,6 +70,24 @@ Run the following to execute the tests:
 
   $ npm test
 
+SASS/SCSS/CSS
+-------------
+
+You will need `npm <https://www.npmjs.com>`_ installed to compile the CSS,
+which is generated via `SASS/SCSS <https://sass-lang.com/>`_.
+
+Once ``npm`` is installed, you can install all needed dependencies by running:
+
+.. code-block:: bash
+
+  $ npm install
+
+Run the following to generate the CSS:
+
+.. code-block:: bash
+
+  $ npm run build:css
+
 Releasing a new version
 -----------------------
 

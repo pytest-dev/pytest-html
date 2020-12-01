@@ -187,17 +187,47 @@ class TestHTML:
         assert "AssertionError" in html
 
     def test_rerun(self, testdir):
+        testdir.makeconftest(
+            """
+            import pytest
+
+            @pytest.hookimpl(hookwrapper=True)
+            def pytest_runtest_makereport(item, call):
+                pytest_html = item.config.pluginmanager.getplugin("html")
+                outcome = yield
+                report = outcome.get_result()
+
+                extra = getattr(report, "extra", [])
+                if report.when == "call":
+                    extra.append(pytest_html.extras.url("http://www.example.com/"))
+                report.extra = extra
+        """
+        )
+
         testdir.makepyfile(
             """
             import pytest
-            @pytest.mark.flaky(reruns=5)
+            import time
+
+            @pytest.mark.flaky(reruns=2)
             def test_example():
+                time.sleep(1)
                 assert False
         """
         )
+
         result, html = run(testdir)
         assert result.ret
-        assert_results(html, passed=0, failed=1, rerun=5)
+        assert_results(html, passed=0, failed=1, rerun=2)
+
+        expected_report_durations = r'<td class="col-duration">1.\d{2}</td>'
+        assert len(re.findall(expected_report_durations, html)) == 3
+
+        expected_report_extras = (
+            r'<td class="col-links"><a class="url" href="http://www.example.com/" '
+            'target="_blank">URL</a> </td>'
+        )
+        assert len(re.findall(expected_report_extras, html)) == 3
 
     def test_no_rerun(self, testdir):
         testdir.makepyfile("def test_pass(): pass")

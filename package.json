@@ -6,8 +6,11 @@
     "grunt-contrib-qunit": "^4.0.0",
     "phantomjs-prebuilt": "2.1.15"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "sass": "^1.29.0"
+  },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "build:css": "sass --no-source-map --no-error-css src/layout/css/style.scss src/pytest_html/resources/style.css"
   }
 }

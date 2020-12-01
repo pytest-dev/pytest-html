@@ -157,7 +157,7 @@ class HTMLReport:
             if getattr(report, "when", "call") != "call":
                 self.test_id = "::".join([report.nodeid, report.when])
             self.time = getattr(report, "duration", 0.0)
-            self.formatted_time = getattr(report, "formatted_duration", 0.0)
+            self.formatted_time = self._format_time(report)
             self.outcome = outcome
             self.additional_html = []
             self.links_html = []
@@ -282,6 +282,37 @@ class HTMLReport:
                     )
                 )
                 self.links_html.append(" ")
+
+        def _format_time(self, report):
+            # parse the report duration into its display version and return
+            # it to the caller
+            duration = getattr(report, "duration", None)
+            if duration is None:
+                return ""
+
+            duration_formatter = getattr(report, "duration_formatter", None)
+            string_duration = str(duration)
+            if duration_formatter is None:
+                if "." in string_duration:
+                    split_duration = string_duration.split(".")
+                    split_duration[1] = split_duration[1][0:2]
+
+                    string_duration = ".".join(split_duration)
+
+                return string_duration
+            else:
+                # support %f, since time.strftime doesn't support it out of the box
+                # keep a precision of 2 for legacy reasons
+                formatted_milliseconds = "00"
+                if "." in string_duration:
+                    milliseconds = string_duration.split(".")[1]
+                    formatted_milliseconds = milliseconds[0:2]
+
+                duration_formatter = duration_formatter.replace(
+                    "%f", formatted_milliseconds
+                )
+                duration_as_gmtime = time.gmtime(report.duration)
+                return time.strftime(duration_formatter, duration_as_gmtime)
 
         def _populate_html_log_div(self, log, report):
             if report.longrepr:
@@ -425,6 +456,10 @@ class HTMLReport:
             self.errors += 1
             self._appendrow("Error", report)
 
+    def append_rerun(self, report):
+        self.rerun += 1
+        self._appendrow("Rerun", report)
+
     def append_skipped(self, report):
         if hasattr(report, "wasxfail"):
             self.xfailed += 1
@@ -432,11 +467,6 @@ class HTMLReport:
         else:
             self.skipped += 1
             self._appendrow("Skipped", report)
-
-    def append_other(self, report):
-        # For now, the only "other" the plugin give support is rerun
-        self.rerun += 1
-        self._appendrow("Rerun", report)
 
     def _generate_report(self, session):
         suite_stop_time = time.time()
@@ -604,32 +634,6 @@ class HTMLReport:
         unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
         return unicode_doc.decode("utf-8")
 
-    def _format_duration(self, report):
-        # parse the report duration into its display version and return it to the caller
-        duration_formatter = getattr(report, "duration_formatter", None)
-        string_duration = str(report.duration)
-        if duration_formatter is None:
-            if "." in string_duration:
-                split_duration = string_duration.split(".")
-                split_duration[1] = split_duration[1][0:2]
-
-                string_duration = ".".join(split_duration)
-
-            return string_duration
-        else:
-            # support %f, since time.strftime doesn't support it out of the box
-            # keep a precision of 2 for legacy reasons
-            formatted_milliseconds = "00"
-            if "." in string_duration:
-                milliseconds = string_duration.split(".")[1]
-                formatted_milliseconds = milliseconds[0:2]
-
-            duration_formatter = duration_formatter.replace(
-                "%f", formatted_milliseconds
-            )
-            duration_as_gmtime = time.gmtime(report.duration)
-            return time.strftime(duration_formatter, duration_as_gmtime)
-
     def _generate_environment(self, config):
         if not hasattr(config, "_metadata") or config._metadata is None:
             return []
@@ -685,22 +689,23 @@ class HTMLReport:
             #  through them all to figure out the outcome, xfail, duration,
             #    extras, and when it swapped from pass
             for test_report in test_reports:
-                full_text += test_report.longreprtext
-                extras.extend(getattr(test_report, "extra", []))
-                duration += getattr(test_report, "duration", 0.0)
-
-                if (
-                    test_report.outcome not in ("passed", "rerun")
-                    and outcome == "passed"
-                ):
-                    outcome = test_report.outcome
-                    failure_when = test_report.when
-
-                if hasattr(test_report, "wasxfail"):
-                    wasxfail = True
-
                 if test_report.outcome == "rerun":
-                    self.append_other(test_report)
+                    # reruns are separate test runs for all intensive purposes
+                    self.append_rerun(test_report)
+                else:
+                    full_text += test_report.longreprtext
+                    extras.extend(getattr(test_report, "extra", []))
+                    duration += getattr(test_report, "duration", 0.0)
+
+                    if (
+                        test_report.outcome not in ("passed", "rerun")
+                        and outcome == "passed"
+                    ):
+                        outcome = test_report.outcome
+                        failure_when = test_report.when
+
+                    if hasattr(test_report, "wasxfail"):
+                        wasxfail = True
 
             # the following test_report.<X> = settings come at the end of us
             #  looping through all test_reports that make up a single
@@ -715,7 +720,6 @@ class HTMLReport:
             test_report.longrepr = full_text
             test_report.extra = extras
             test_report.duration = duration
-            test_report.formatted_duration = self._format_duration(test_report)
 
             if wasxfail:
                 test_report.wasxfail = True
@@ -727,9 +731,6 @@ class HTMLReport:
             elif test_report.outcome == "failed":
                 test_report.when = failure_when
                 self.append_failed(test_report)
-
-            # we don't append other here since the only case supported
-            #  for append_other is rerun, which is handled in the loop above
 
     def pytest_runtest_logreport(self, report):
         self.reports[report.nodeid].append(report)

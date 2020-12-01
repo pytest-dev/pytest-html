@@ -35,7 +35,6 @@ table {
   padding: 5px;
   border: 1px solid #E6E6E6;
 }
-
 #environment tr:nth-child(odd) {
   background-color: #f6f6f6;
 }
@@ -43,15 +42,26 @@ table {
 /******************************
  * TEST RESULT COLORS
  ******************************/
-span.passed, .passed .col-result {
+span.passed,
+.passed .col-result {
   color: green;
 }
 
-span.skipped, span.xfailed, span.rerun, .skipped .col-result, .xfailed .col-result, .rerun .col-result {
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
   color: orange;
 }
 
-span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, .xpassed .col-result {
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
   color: red;
 }
 
@@ -72,13 +82,12 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
   font-size: 12px;
   width: 100%;
 }
-
-#results-table th, #results-table td {
+#results-table th,
+#results-table td {
   padding: 5px;
   border: 1px solid #E6E6E6;
   text-align: left;
 }
-
 #results-table th {
   font-weight: bold;
 }
@@ -86,10 +95,6 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
 /*------------------
  * 2. Extra
  *------------------*/
-.log:only-child {
-  height: inherit;
-}
-
 .log {
   background-color: #e6e6e6;
   border: 1px solid #e6e6e6;
@@ -101,6 +106,9 @@ span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, 
   padding: 5px;
   white-space: pre-wrap;
 }
+.log:only-child {
+  height: inherit;
+}
 
 div.image {
   border: 1px solid #e6e6e6;
@@ -110,7 +118,6 @@ div.image {
   overflow: hidden;
   width: 320px;
 }
-
 div.image img {
   width: 320px;
 }
@@ -123,7 +130,6 @@ div.video {
   overflow: hidden;
   width: 320px;
 }
-
 div.video video {
   overflow: hidden;
   width: 320px;
@@ -166,18 +172,15 @@ div.video video {
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
 }
-
-.inactive .sort-icon {
+.sort-icon .inactive {
   /*finish triangle*/
   border-top: 8px solid #E6E6E6;
 }
-
-.asc.active .sort-icon {
+.sort-icon .asc.active {
   /*finish triangle*/
   border-bottom: 8px solid #999;
 }
-
-.desc.active .sort-icon {
+.sort-icon .desc.active {
   /*finish triangle*/
   border-top: 8px solid #999;
 }

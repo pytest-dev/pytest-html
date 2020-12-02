@@ -17,7 +17,6 @@ from functools import lru_cache
 from html import escape
 from os.path import isfile
 
-import pkg_resources
 import pytest
 from _pytest.logging import _remove_ansi_escape_sequences
 from py.xml import html
@@ -474,9 +473,10 @@ class HTMLReport:
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
-        self.style_css = pkg_resources.resource_string(
-            __name__, os.path.join("resources", "style.css")
-        ).decode("utf-8")
+        with open(
+            os.path.join(os.path.dirname(__file__), "resources", "style.css")
+        ) as style_css_fp:
+            self.style_css = style_css_fp.read()
 
         if ansi_support():
             ansi_css = [
@@ -597,9 +597,10 @@ class HTMLReport:
             ),
         ]
 
-        main_js = pkg_resources.resource_string(
-            __name__, os.path.join("resources", "main.js")
-        ).decode("utf-8")
+        with open(
+            os.path.join(os.path.dirname(__file__), "resources", "main.js")
+        ) as main_js_fp:
+            main_js = main_js_fp.read()
 
         session.config.hook.pytest_html_report_title(report=self)
 

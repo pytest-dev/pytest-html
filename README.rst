@@ -254,8 +254,8 @@ additional HTML and log output with a notice that the log is empty:
 .. code-block:: python
 
   from py.xml import html
-  
-  
+
+
   def pytest_html_results_table_html(report, data):
       if report.passed:
           del data[:]

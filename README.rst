@@ -121,6 +121,7 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 
    from py.xml import html
 
+
    def pytest_html_results_summary(prefix, summary, postfix):
        prefix.extend([html.p("foo: bar")])
 

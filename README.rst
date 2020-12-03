@@ -90,13 +90,9 @@ be used to change the appearance of the report.
 Report Title
 ~~~~~~~~~~~~
 
-By default report title will be the filename of the report, you can edit it by using the :code: `pytest_html_report_title` hook:
+By default report title will be the filename of the report, you can edit it by using the :code:`pytest_html_report_title` hook:
 
 .. code-block:: python
-
-   import pytest
-   from py.xml import html
-
 
    def pytest_html_report_title(report):
        report.title = "My very own title!"
@@ -105,7 +101,7 @@ Environment
 ~~~~~~~~~~~
 
 The *Environment* section is provided by the `pytest-metadata
-<https://pypi.python.org/pypi/pytest-metadata/>`_, plugin, and can be accessed
+<https://pypi.python.org/pypi/pytest-metadata/>`_ plugin, and can be accessed
 via the :code:`pytest_configure` hook:
 
 .. code-block:: python
@@ -123,9 +119,7 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 
 .. code-block:: python
 
-   import pytest
    from py.xml import html
-
 
    def pytest_html_results_summary(prefix, summary, postfix):
        prefix.extend([html.p("foo: bar")])
@@ -248,9 +242,6 @@ following example removes all passed results from the report:
 
 .. code-block:: python
 
-  import pytest
-
-
   def pytest_html_results_table_row(report, cells):
       if report.passed:
           del cells[:]
@@ -261,9 +252,9 @@ additional HTML and log output with a notice that the log is empty:
 
 .. code-block:: python
 
-  import pytest
-
-
+  from py.xml import html
+  
+  
   def pytest_html_results_table_html(report, data):
       if report.passed:
           del data[:]

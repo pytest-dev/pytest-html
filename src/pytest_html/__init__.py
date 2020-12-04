@@ -1,11 +1,9 @@
-from pkg_resources import DistributionNotFound
-from pkg_resources import get_distribution
-
-
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
-    # package is not installed
+    from . import __version
+
+    __version__ = __version.version
+except ImportError:
+    # package is not built with setuptools_scm
     __version__ = "unknown"
 
 __pypi_url__ = "https://pypi.python.org/pypi/pytest-html"

@@ -1,7 +1,7 @@
 Release Notes
 -------------
 
-**3.1.0 (unreleased)**
+**3.1.0 (2020-12-2)**
 
 * Stop attaching test reruns to final test report entries (`#374 <https://github.com/pytest-dev/pytest-html/issues/374>`_)
 

@@ -119,7 +119,7 @@ To modify the *Environment* section **after** tests are run, use :code:`pytest_s
 
   @pytest.hookimpl(tryfirst=True)
   def pytest_sessionfinish(session, exitstatus):
-      session.config._metadata["Average Response Time"] = calculate_avg_response(session)
+      session.config._metadata["Average Response Time"] = calculate_avg_response_time(session)
 
 Note that in the above example `@pytest.hookimpl(tryfirst=True) <https://docs.pytest.org/en/stable/writing_plugins.html#hook-function-ordering-call-example>`_
 is important, as this ensures your :code:`pytest_sessionfinish` is run **before** any other plugins ( including :code:`pytest-html` and :code:`pytest-metadata` ) 

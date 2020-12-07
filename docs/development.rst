@@ -68,6 +68,20 @@ Run the following to execute the tests:
 
   $ npm test
 
+Documentation
+-------------
+
+Documentation is hosted on `Read the Docs`_, and is written in `RST`_. Remember to add any new files to the :code:`toctree`
+section in :code:`index.rst`.
+
+To build your documentation, run:
+
+.. code-block:: bash
+
+  $ tox -e docs
+
+You can then run a local webserver to verify your changes compiled correctly.
+
 SASS/SCSS/CSS
 -------------
 
@@ -106,5 +120,7 @@ Follow these steps to release a new version of the project:
 .. _Pipenv: https://pipenv.pypa.io/en/latest
 .. _pre-commit: https://pre-commit.com
 .. _QUnit: https://qunitjs.com
+.. _Read The Docs: https://readthedocs.com
+.. _RST: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 .. _SASS/SCSS: https://sass-lang.com
 .. _Tox: https://tox.readthedocs.io

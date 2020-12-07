@@ -48,3 +48,9 @@ Pipfile.lock
 
 # tox folders
 .tox
+
+# sphinx/read the docs
+docs/_build
+docs/_static
+docs/_templates
+docs/html

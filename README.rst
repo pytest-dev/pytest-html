@@ -1,7 +1,7 @@
 pytest-html
 ===========
 
-pytest-html is a plugin for `pytest <http://pytest.org>`_ that generates a HTML report for the test results.
+pytest-html is a plugin for `pytest <http://pytest.org>`_ that generates a HTML report for test results.
 
 .. image:: https://img.shields.io/badge/license-MPL%202.0-blue.svg
    :target: https://github.com/pytest-dev/pytest-html/blob/master/LICENSE

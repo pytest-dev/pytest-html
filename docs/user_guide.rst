@@ -1,24 +1,5 @@
-Requirements
-------------
-
-You will need the following prerequisites in order to use pytest-html:
-
-- Python 3.6+ or PyPy3
-
-Installation
-------------
-
-To install pytest-html:
-
-.. code-block:: bash
-
-  $ pip install pytest-html
-
-Then run your tests with:
-
-.. code-block:: bash
-
-  $ pytest --html=report.html
+User Guide
+==========
 
 ANSI codes
 ----------
@@ -41,7 +22,7 @@ This can be done in the following way:
    $ pytest --html=report.html --self-contained-html
 
 Images added as files or links are going to be linked as external resources,
-meaning that the standalone report HTML-file may not display these images
+meaning that the standalone report HTML file may not display these images
 as expected.
 
 The plugin will issue a warning when adding files or links to the standalone report.
@@ -63,7 +44,7 @@ be used to change the appearance of the report.
 Report Title
 ~~~~~~~~~~~~
 
-By default report title will be the filename of the report, you can edit it by using the :code:`pytest_html_report_title` hook:
+By default the report title will be the filename of the report, you can edit it by using the :code:`pytest_html_report_title` hook:
 
 .. code-block:: python
 
@@ -100,7 +81,7 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 Extra content
 ~~~~~~~~~~~~~
 
-You can add details to the HTML reports by creating an 'extra' list on the
+You can add details to the HTML report by creating an 'extra' list on the
 report object. Here are the types of extra content that can be added:
 
 ==========  ============================================
@@ -179,10 +160,9 @@ before any extras added by plugins.
 Modifying the results table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can modify the columns by implementing custom hooks for the header and
-rows. The following example :code:`conftest.py` adds a description column with
-the test function docstring, adds a sortable time column, and removes the links
-column:
+You can modify the columns of the report by implementing custom hooks for the header and rows.
+The following example :code:`conftest.py` adds a description column with the test function docstring,
+adds a sortable time column, and removes the links column:
 
 .. code-block:: python
 

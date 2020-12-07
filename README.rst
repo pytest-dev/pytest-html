@@ -35,7 +35,7 @@ Contributing
 
 We welcome contributions.
 
-To learn more, see `Development <https://github.com/pytest-dev/pytest-html/blob/master/development.rst>`_
+To learn more, see `Development <https://pytest-html.readthedocs.io/en/latest/development.rst>`_
 
 Screenshots
 -----------

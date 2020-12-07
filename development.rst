@@ -1,9 +1,8 @@
 Development
 ===========
 
-To contribute to `pytest-html` you can use `Pipenv`_ to manage
-a python virtual environment and `pre-commit <https://pre-commit.com/>`_ to help you with
-styling and formatting.
+To contribute to `pytest-html` you can use `Pipenv`_ to manage a python virtual environment and
+`pre-commit`_ to help you with styling and formatting.
 
 To setup the virtual environment and pre-commit, run:
 
@@ -12,7 +11,7 @@ To setup the virtual environment and pre-commit, run:
   $ pipenv install --dev
   $ pipenv run pre-commit install
 
-If you're not using `Pipenv`_, to install `pre-commit`, run:
+If you're not using `Pipenv`_, to install `pre-commit`_, run:
 
 .. code-block:: bash
 
@@ -23,21 +22,18 @@ If you're not using `Pipenv`_, to install `pre-commit`, run:
 Automated Testing
 -----------------
 
-All pull requests and merges are tested in `GitHub Actions <https://github.com/pytest-dev/pytest-html/actions>`_
-which are defined inside ``.github`` folder.
+All pull requests and merges are tested in `GitHub Actions`_ which are defined inside ``.github`` folder.
 
-To retrigger CI to run again for a pull request, you either use dropdown
-option, close and reopen pull-request or to just update the branch containing
-it.
+To retrigger CI to run again for a pull request, you either use dropdown option, close and reopen pull-request
+or to just update the branch containing it.
 
 You can do this with `git commit --allow-empty`
 
 Running Tests - Python
 ----------------------
 
-You will need `Tox <https://tox.readthedocs.io>`_ installed to run the tests
-against the supported Python versions. If you're using `Pipenv`_ it will be
-installed for you.
+You will need `Tox`_ installed to run the tests against the supported Python versions. If you're using `Pipenv`_
+it will be installed for you.
 
 With `Pipenv`_, run:
 
@@ -55,10 +51,9 @@ Otherwise, to install and run, do:
 Running Tests - JavaScript
 --------------------------
 
-You will need `npm <https://www.npmjs.com>`_ installed to run the JavaScript tests.
-Internally, we use `Grunt <https://gruntjs.com>`_ and `QUnit <https://qunitjs.com>`_ to run the tests.
+You will need `npm`_ installed to run the JavaScript tests. Internally, we use `Grunt`_ and `QUnit`_ to run the tests.
 
-Once ``npm`` is installed, you can install all needed dependencies by running:
+Once `npm`_ is installed, you can install all needed dependencies by running:
 
 .. code-block:: bash
 
@@ -73,10 +68,9 @@ Run the following to execute the tests:
 SASS/SCSS/CSS
 -------------
 
-You will need `npm <https://www.npmjs.com>`_ installed to compile the CSS,
-which is generated via `SASS/SCSS <https://sass-lang.com/>`_.
+You will need `npm`_ installed to compile the CSS, which is generated via `SASS/SCSS`_.
 
-Once ``npm`` is installed, you can install all needed dependencies by running:
+Once `npm`_ is installed, you can install all needed dependencies by running:
 
 .. code-block:: bash
 
@@ -101,6 +95,13 @@ Follow these steps to release a new version of the project:
 #.  Once merged, update your local master again (``git pull --rebase upstream master``)
 #.  Tag the release with the new release version (``git tag v<new tag>``)
 #.  Push the tag (``git push upstream --tags``)
-#. Done. Check `CI <https://github.com/pytest-dev/pytest-html/actions>`_ for release progress.
+#. Done. Check `Github Actions`_ for release progress.
 
-.. _Pipenv: https://pipenv.pypa.io/en/latest/
+.. _GitHub Actions: https://github.com/pytest-dev/pytest-html/actions
+.. _Grunt: https://gruntjs.com
+.. _npm: https://www.npmjs.com
+.. _Pipenv: https://pipenv.pypa.io/en/latest
+.. _pre-commit: https://pre-commit.com
+.. _QUnit: https://qunitjs.com
+.. _SASS/SCSS: https://sass-lang.com
+.. _Tox: https://tox.readthedocs.io

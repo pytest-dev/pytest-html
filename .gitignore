@@ -50,7 +50,4 @@ Pipfile.lock
 .tox
 
 # sphinx/read the docs
-docs/_build
-docs/_static
-docs/_templates
-docs/html
+docs/_build/

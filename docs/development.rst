@@ -29,8 +29,11 @@ or to just update the branch containing it.
 
 You can do this with `git commit --allow-empty`
 
-Running Tests - Python
-----------------------
+Running Tests
+-------------
+
+Python
+~~~~~~
 
 You will need `Tox`_ installed to run the tests against the supported Python versions. If you're using `Pipenv`_
 it will be installed for you.
@@ -48,8 +51,8 @@ Otherwise, to install and run, do:
   $ pip install tox
   $ tox
 
-Running Tests - JavaScript
---------------------------
+JavaScript
+~~~~~~~~~~
 
 You will need `npm`_ installed to run the JavaScript tests. Internally, we use `Grunt`_ and `QUnit`_ to run the tests.
 

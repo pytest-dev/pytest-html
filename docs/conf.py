@@ -40,6 +40,12 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "alabaster"
+html_theme_options = {
+    "github_user": "pytest-dev",
+    "github_repo": "pytest-html",
+    "github_banner": "true",
+    "github_type": "star",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

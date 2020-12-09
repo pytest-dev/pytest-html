@@ -102,32 +102,12 @@ Environment
 
 The *Environment* section is provided by the `pytest-metadata
 <https://pypi.python.org/pypi/pytest-metadata/>`_ plugin, and can be accessed
-via the :code:`pytest_configure` and :code:`pytest_sessionfinish` hooks:
-
-To modify the *Environment* section **before** tests are run, use :code:`pytest_configure`:
+via the :code:`pytest_configure` hook:
 
 .. code-block:: python
 
   def pytest_configure(config):
       config._metadata["foo"] = "bar"
-
-To modify the *Environment* section **after** tests are run, use :code:`pytest_sessionfinish`:
-
-.. code-block:: python
-
-  import pytest
-
-
-  @pytest.hookimpl(tryfirst=True)
-  def pytest_sessionfinish(session, exitstatus):
-      session.config._metadata["Average Response Time"] = calculate_avg_response_time(
-          session
-      )
-
-Note that in the above example `@pytest.hookimpl(tryfirst=True) <https://docs.pytest.org/en/stable/writing_plugins.html#hook-function-ordering-call-example>`_
-is important, as this ensures your :code:`pytest_sessionfinish` method is run **before** any other plugins ( including :code:`pytest-html` and
-:code:`pytest-metadata` ) run theirs. If this line is omitted, then the *Environment* table will **not** be updated since the :code:`pytest_sessionfinish` of the
-plugins will execute first, and thus not pick up your change.
 
 The generated table will be sorted alphabetically unless the metadata is a
 :code:`collections.OrderedDict`.

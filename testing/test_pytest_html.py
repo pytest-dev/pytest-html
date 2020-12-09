@@ -187,17 +187,47 @@ class TestHTML:
         assert "AssertionError" in html
 
     def test_rerun(self, testdir):
+        testdir.makeconftest(
+            """
+            import pytest
+
+            @pytest.hookimpl(hookwrapper=True)
+            def pytest_runtest_makereport(item, call):
+                pytest_html = item.config.pluginmanager.getplugin("html")
+                outcome = yield
+                report = outcome.get_result()
+
+                extra = getattr(report, "extra", [])
+                if report.when == "call":
+                    extra.append(pytest_html.extras.url("http://www.example.com/"))
+                report.extra = extra
+        """
+        )
+
         testdir.makepyfile(
             """
             import pytest
-            @pytest.mark.flaky(reruns=5)
+            import time
+
+            @pytest.mark.flaky(reruns=2)
             def test_example():
+                time.sleep(1)
                 assert False
         """
         )
+
         result, html = run(testdir)
         assert result.ret
-        assert_results(html, passed=0, failed=1, rerun=5)
+        assert_results(html, passed=0, failed=1, rerun=2)
+
+        expected_report_durations = r'<td class="col-duration">1.\d{2}</td>'
+        assert len(re.findall(expected_report_durations, html)) == 3
+
+        expected_report_extras = (
+            r'<td class="col-links"><a class="url" href="http://www.example.com/" '
+            'target="_blank">URL</a> </td>'
+        )
+        assert len(re.findall(expected_report_extras, html)) == 3
 
     def test_no_rerun(self, testdir):
         testdir.makepyfile("def test_pass(): pass")
@@ -975,12 +1005,31 @@ class TestHTML:
             assert str(v["path"]) in html
             assert v["style"] in html
 
-    def test_css_invalid(self, testdir, recwarn):
+    @pytest.mark.parametrize(
+        "files",
+        [
+            "style.css",
+            ["abc.css", "xyz.css"],
+            "testdir.makefile('.css', * {color: 'white'}",
+        ],
+    )
+    def test_css_invalid(self, testdir, recwarn, files):
         testdir.makepyfile("def test_pass(): pass")
-        result = testdir.runpytest("--html", "report.html", "--css", "style.css")
+        path = files
+        if isinstance(files, list):
+            file1 = files[0]
+            file2 = files[1]
+            result = testdir.runpytest(
+                "--html", "report.html", "--css", file1, "--css", file2
+            )
+        else:
+            result = testdir.runpytest("--html", "report.html", "--css", path)
         assert result.ret
         assert len(recwarn) == 0
-        assert "No such file or directory: 'style.css'" in result.stderr.str()
+        if isinstance(files, list):
+            assert files[0] in result.stderr.str() and files[1] in result.stderr.str()
+        else:
+            assert path in result.stderr.str()
 
     def test_css_invalid_no_html(self, testdir):
         testdir.makepyfile("def test_pass(): pass")

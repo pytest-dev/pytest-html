@@ -52,3 +52,7 @@ repos:
         files: ^(CHANGES.rst|development.rst|README.rst)$
         language: python
         additional_dependencies: [pygments, restructuredtext_lint]
+-   repo: https://github.com/elidupuis/mirrors-sass-lint
+    rev: '5cc45653263b423398e4af2561fae362903dd45d'
+    hooks:
+    -   id: sass-lint

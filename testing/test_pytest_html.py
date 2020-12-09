@@ -1005,12 +1005,31 @@ class TestHTML:
             assert str(v["path"]) in html
             assert v["style"] in html
 
-    def test_css_invalid(self, testdir, recwarn):
+    @pytest.mark.parametrize(
+        "files",
+        [
+            "style.css",
+            ["abc.css", "xyz.css"],
+            "testdir.makefile('.css', * {color: 'white'}",
+        ],
+    )
+    def test_css_invalid(self, testdir, recwarn, files):
         testdir.makepyfile("def test_pass(): pass")
-        result = testdir.runpytest("--html", "report.html", "--css", "style.css")
+        path = files
+        if isinstance(files, list):
+            file1 = files[0]
+            file2 = files[1]
+            result = testdir.runpytest(
+                "--html", "report.html", "--css", file1, "--css", file2
+            )
+        else:
+            result = testdir.runpytest("--html", "report.html", "--css", path)
         assert result.ret
         assert len(recwarn) == 0
-        assert "No such file or directory: 'style.css'" in result.stderr.str()
+        if isinstance(files, list):
+            assert files[0] in result.stderr.str() and files[1] in result.stderr.str()
+        else:
+            assert path in result.stderr.str()
 
     def test_css_invalid_no_html(self, testdir):
         testdir.makepyfile("def test_pass(): pass")

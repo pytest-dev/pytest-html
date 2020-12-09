@@ -86,9 +86,18 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     htmlpath = config.getoption("htmlpath")
     if htmlpath:
+        missing_css_files = []
         for csspath in config.getoption("css"):
             if not os.path.exists(csspath):
-                raise OSError(f"No such file or directory: '{csspath}'")
+                missing_css_files.append(csspath)
+
+        if missing_css_files:
+            oserror = (
+                f"Missing CSS file{'s' if len(missing_css_files) > 1 else ''}:"
+                f" {', '.join(missing_css_files)}"
+            )
+            raise OSError(oserror)
+
         if not hasattr(config, "workerinput"):
             # prevent opening htmlpath on worker nodes (xdist)
             config._html = HTMLReport(htmlpath, config)

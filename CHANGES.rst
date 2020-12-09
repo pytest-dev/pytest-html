@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**3.1.1 (unreleased)**
+
+* Fix issue with reporting of missing CSS files. (`#388 <https://github.com/pytest-dev/pytest-html/issues/388>`_)
+
+  * Thanks to `@prakhargurunani <https://github.com/prakhargurunani>`_ for reporting and fixing!
+
 **3.1.0 (2020-12-2)**
 
 * Stop attaching test reruns to final test report entries (`#374 <https://github.com/pytest-dev/pytest-html/issues/374>`_)

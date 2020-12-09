@@ -89,10 +89,9 @@ jobs:
             name: pypy3-ubuntu
             python-version: pypy3
 
-          # Disabling due to https://github.com/actions/setup-python/issues/151
-          # - os: windows-latest
-          #   name: pypy3-windows
-          #   python-version: pypy3
+          - os: windows-latest
+            name: pypy3-windows
+            python-version: pypy3
 
           - os: macOS-latest
             name: pypy3-mac

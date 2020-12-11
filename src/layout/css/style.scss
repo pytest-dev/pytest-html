@@ -200,17 +200,17 @@ div.video {
 	border-left: $triangle-width solid transparent;
 	border-right: $triangle-width solid transparent;
 
-	.inactive {
+	.inactive & {
 		/*finish triangle*/
 		border-top: $triangle-width solid #E6E6E6;
 	}
 
-	.asc.active {
+	.asc.active & {
 		/*finish triangle*/
 		border-bottom: $triangle-width solid #999;
 	}
 
-	.desc.active {
+	.desc.active & {
 		/*finish triangle*/
 		border-top: $triangle-width solid #999;
 	}

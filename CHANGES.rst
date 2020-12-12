@@ -1,7 +1,7 @@
 Release Notes
 -------------
 
-**3.1.1 (unreleased)**
+**3.1.1 (2020-12-13)**
 
 * Fix issue with reporting of missing CSS files. (`#388 <https://github.com/pytest-dev/pytest-html/issues/388>`_)
 

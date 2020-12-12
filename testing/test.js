@@ -14,112 +14,112 @@
     }
   });
 
- QUnit.test('sort_column', function(assert){
-   function sort_column_test(col_re, first_element_then, first_element_now) {
-     assert.equal(find_all('.results-table-row')[0].className, first_element_then);
+ QUnit.test('sortColumn', function(assert){
+   function sortColumnTest(col_re, first_element_then, first_element_now) {
+     assert.equal(findAll('.results-table-row')[0].className, first_element_then);
      var row_sort = find(col_re);
-     sort_column(row_sort);
-     assert.equal(find_all('.results-table-row')[0].className, first_element_now);
+     sortColumn(row_sort);
+     assert.equal(findAll('.results-table-row')[0].className, first_element_now);
    }
 
    //check col-name, tests should be in this order test-1 => (test-2 => test-3) on col-name
-   assert.equal(find_all('.col-name')[1].className, 'test-2 col-name');
+   assert.equal(findAll('.col-name')[1].className, 'test-2 col-name');
 
    //result
-   sort_column_test('[col=result]',
+   sortColumnTest('[col=result]',
                     'rerun results-table-row', 'passed results-table-row');
 
    //make sure sorting the result column does not change the tests order in the col-name
    //tests should be in this order (test-2 => test-3) => test1 on col-name
-   assert.equal(find_all('.col-name')[0].className, 'test-2 col-name');
+   assert.equal(findAll('.col-name')[0].className, 'test-2 col-name');
 
-   sort_column_test('[col=result]',
+   sortColumnTest('[col=result]',
                     'passed results-table-row', 'rerun results-table-row');
 
 
    //name
-   sort_column_test('[col=name]',
+   sortColumnTest('[col=name]',
                     'rerun results-table-row', 'passed results-table-row');
-   sort_column_test('[col=name]',
+   sortColumnTest('[col=name]',
                     'passed results-table-row', 'rerun results-table-row');
 
    //duration
-   sort_column_test('[col=duration]',
+   sortColumnTest('[col=duration]',
                     'rerun results-table-row', 'passed results-table-row');
-   sort_column_test('[col=duration]',
+   sortColumnTest('[col=duration]',
                     'passed results-table-row', 'rerun results-table-row');
 
    //links
-   sort_column_test('[col=links]',
+   sortColumnTest('[col=links]',
                     'rerun results-table-row', 'passed results-table-row');
-   sort_column_test('[col=links]',
+   sortColumnTest('[col=links]',
                     'passed results-table-row', 'rerun results-table-row');
  });
 
-QUnit.test('filter_table', function(assert){
-  function filter_table_test(outcome, checked) {
+QUnit.test('filterTable', function(assert){
+  function filterTableTest(outcome, checked) {
     var filter_input = document.createElement('input');
     filter_input.setAttribute('data-test-result', outcome);
     filter_input.checked = checked;
-    filter_table(filter_input);
+    filterTable(filter_input);
 
-    var outcomes = find_all('.' + outcome);
+    var outcomes = findAll('.' + outcome);
     for(var i = 0; i < outcomes.length; i++) {
       assert.equal(outcomes[i].hidden, !checked);
     }
   }
   assert.equal(find('#not-found-message').hidden, true);
 
-  filter_table_test('rerun', false);
-  filter_table_test('passed', false);
+  filterTableTest('rerun', false);
+  filterTableTest('passed', false);
   assert.equal(find('#not-found-message').hidden, false);
 
-  filter_table_test('rerun', true);
+  filterTableTest('rerun', true);
   assert.equal(find('#not-found-message').hidden, true);
 
-  filter_table_test('passed', true);
+  filterTableTest('passed', true);
 
 });
 
-QUnit.test('show_hide_extras', function(assert) {
-  function show_extras_test(element){
+QUnit.test('showHideExtras', function(assert) {
+  function showExtrasTest(element){
     assert.equal(element.parentNode.nextElementSibling.className, 'collapsed');
-    show_extras(element);
+    showExtras(element);
     assert.notEqual(element.parentNode.nextElementSibling.className, 'collapsed');
   }
 
-  function hide_extras_test(element){
+  function hideExtrasTest(element){
     assert.notEqual(element.parentNode.nextElementSibling.className, 'collapsed');
-    hide_extras(element);
+    hideExtras(element);
     assert.equal(element.parentNode.nextElementSibling.className, 'collapsed');
   }
   //Passed results have log collapsed by default
-  show_extras_test(find('.passed').firstElementChild.firstElementChild);
-  hide_extras_test(find('.passed').firstElementChild.firstElementChild);
+  showExtrasTest(find('.passed').firstElementChild.firstElementChild);
+  hideExtrasTest(find('.passed').firstElementChild.firstElementChild);
 
-  hide_extras_test(find('.rerun').firstElementChild.firstElementChild);
-  show_extras_test(find('.rerun').firstElementChild.firstElementChild);
+  hideExtrasTest(find('.rerun').firstElementChild.firstElementChild);
+  showExtrasTest(find('.rerun').firstElementChild.firstElementChild);
 });
 
-QUnit.test('show_hide_all_extras', function(assert) {
-  function show_all_extras_test(){
-    show_all_extras();
-    var extras = find_all('.extra');
+QUnit.test('showHideAllExtras', function(assert) {
+  function showAllExtrasTest(){
+    showAllExtras();
+    var extras = findAll('.extra');
     for (var i = 0; i < extras.length; i++) {
       assert.notEqual(extras[i].parentNode.className, 'collapsed');
     }
   }
 
-  function hide_all_extras_test(){
-    hide_all_extras();
-    var extras = find_all('.extra');
+  function hideAllExtrasTest(){
+    hideAllExtras();
+    var extras = findAll('.extra');
     for (var i = 0; i < extras.length; i++) {
       assert.equal(extras[i].parentNode.className, 'collapsed');
     }
   }
 
-  show_all_extras_test();
-  hide_all_extras_test();
+  showAllExtrasTest();
+  hideAllExtrasTest();
 });
 
 QUnit.test('find', function (assert) {
@@ -128,7 +128,7 @@ QUnit.test('find', function (assert) {
   assert.equal(find('.not-in-table'), null);
 });
 
-QUnit.test('find_all', function(assert) {
-  assert.equal(find_all('.sortable').length, 4);
-  assert.equal(find_all('.not-in-table').length, 0);
+QUnit.test('findAll', function(assert) {
+  assert.equal(findAll('.sortable').length, 4);
+  assert.equal(findAll('.not-in-table').length, 0);
 });

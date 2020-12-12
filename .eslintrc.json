@@ -12,6 +12,7 @@
         "block-scoped-var": "error",
         "block-spacing": "error",
         "brace-style": "error",
+        "camelcase": "error",
         "class-methods-use-this": "error",
         "consistent-return": "error",
         "default-case": "error",

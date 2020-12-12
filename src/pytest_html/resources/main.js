@@ -17,68 +17,68 @@ function find(selector, elem) { // eslint-disable-line no-redeclare
     return elem.querySelector(selector);
 }
 
-function find_all(selector, elem) {
+function findAll(selector, elem) {
     if (!elem) {
         elem = document;
     }
     return toArray(elem.querySelectorAll(selector));
 }
 
-function sort_column(elem) {
-    toggle_sort_states(elem);
+function sortColumn(elem) {
+    toggleSortStates(elem);
     const colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
     let key;
     if (elem.classList.contains('result')) {
-        key = key_result;
+        key = keyResult;
     } else if (elem.classList.contains('links')) {
-        key = key_link;
+        key = keyLink;
     } else {
-        key = key_alpha;
+        key = keyAlpha;
     }
-    sort_table(elem, key(colIndex));
+    sortTable(elem, key(colIndex));
 }
 
-function show_all_extras() { // eslint-disable-line no-unused-vars
-    find_all('.col-result').forEach(show_extras);
+function showAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(showExtras);
 }
 
-function hide_all_extras() { // eslint-disable-line no-unused-vars
-    find_all('.col-result').forEach(hide_extras);
+function hideAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(hideExtras);
 }
 
-function show_extras(colresult_elem) {
-    const extras = colresult_elem.parentNode.nextElementSibling;
-    const expandcollapse = colresult_elem.firstElementChild;
+function showExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
     extras.classList.remove('collapsed');
     expandcollapse.classList.remove('expander');
     expandcollapse.classList.add('collapser');
 }
 
-function hide_extras(colresult_elem) {
-    const extras = colresult_elem.parentNode.nextElementSibling;
-    const expandcollapse = colresult_elem.firstElementChild;
+function hideExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
     extras.classList.add('collapsed');
     expandcollapse.classList.remove('collapser');
     expandcollapse.classList.add('expander');
 }
 
-function show_filters() {
-    const filter_items = document.getElementsByClassName('filter');
-    for (let i = 0; i < filter_items.length; i++)
-        filter_items[i].hidden = false;
+function showFilters() {
+    const filterItems = document.getElementsByClassName('filter');
+    for (let i = 0; i < filterItems.length; i++)
+        filterItems[i].hidden = false;
 }
 
-function add_collapse() {
+function addCollapse() {
     // Add links for show/hide all
     const resulttable = find('table#results-table');
     const showhideall = document.createElement('p');
-    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
-                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    showhideall.innerHTML = '<a href="javascript:showAllExtras()">Show all details</a> / ' +
+                            '<a href="javascript:hideAllExtras()">Hide all details</a>';
     resulttable.parentElement.insertBefore(showhideall, resulttable);
 
     // Add show/hide link to each result
-    find_all('.col-result').forEach(function(elem) {
-        const collapsed = get_query_parameter('collapsed') || 'Passed';
+    findAll('.col-result').forEach(function(elem) {
+        const collapsed = getQueryParameter('collapsed') || 'Passed';
         const extras = elem.parentNode.nextElementSibling;
         const expandcollapse = document.createElement('span');
         if (extras.classList.contains('collapsed')) {
@@ -93,40 +93,40 @@ function add_collapse() {
 
         elem.addEventListener('click', function(event) {
             if (event.currentTarget.parentNode.nextElementSibling.classList.contains('collapsed')) {
-                show_extras(event.currentTarget);
+                showExtras(event.currentTarget);
             } else {
-                hide_extras(event.currentTarget);
+                hideExtras(event.currentTarget);
             }
         });
     });
 }
 
-function get_query_parameter(name) {
+function getQueryParameter(name) {
     const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
 
 function init () { // eslint-disable-line no-unused-vars
-    reset_sort_headers();
+    resetSortHeaders();
 
-    add_collapse();
+    addCollapse();
 
-    show_filters();
+    showFilters();
 
-    sort_column(find('.initial-sort'));
+    sortColumn(find('.initial-sort'));
 
-    find_all('.sortable').forEach(function(elem) {
+    findAll('.sortable').forEach(function(elem) {
         elem.addEventListener('click',
             function() {
-                sort_column(elem);
+                sortColumn(elem);
             }, false);
     });
 }
 
-function sort_table(clicked, key_func) {
-    const rows = find_all('.results-table-row');
+function sortTable(clicked, keyFunc) {
+    const rows = findAll('.results-table-row');
     const reversed = !clicked.classList.contains('asc');
-    const sorted_rows = sort(rows, key_func, reversed);
+    const sortedRows = sort(rows, keyFunc, reversed);
     /* Whole table is removed here because browsers acts much slower
      * when appending existing elements.
      */
@@ -135,62 +135,62 @@ function sort_table(clicked, key_func) {
     const parent = document.createElement('table');
     parent.id = 'results-table';
     parent.appendChild(thead);
-    sorted_rows.forEach(function(elem) {
+    sortedRows.forEach(function(elem) {
         parent.appendChild(elem);
     });
     document.getElementsByTagName('BODY')[0].appendChild(parent);
 }
 
-function sort(items, key_func, reversed) {
-    const sort_array = items.map(function(item, i) {
-        return [key_func(item), i];
+function sort(items, keyFunc, reversed) {
+    const sortArray = items.map(function(item, i) {
+        return [keyFunc(item), i];
     });
 
-    sort_array.sort(function(a, b) {
-        const key_a = a[0];
-        const key_b = b[0];
+    sortArray.sort(function(a, b) {
+        const keyA = a[0];
+        const keyB = b[0];
 
-        if (key_a == key_b) return 0;
+        if (keyA == keyB) return 0;
 
         if (reversed) {
-            return key_a < key_b ? 1 : -1;
+            return keyA < keyB ? 1 : -1;
         } else {
-            return key_a > key_b ? 1 : -1;
+            return keyA > keyB ? 1 : -1;
         }
     });
 
-    return sort_array.map(function(item) {
+    return sortArray.map(function(item) {
         const index = item[1];
         return items[index];
     });
 }
 
-function key_alpha(col_index) {
+function keyAlpha(colIndex) {
     return function(elem) {
-        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+        return elem.childNodes[1].childNodes[colIndex].firstChild.data.toLowerCase();
     };
 }
 
-function key_link(col_index) {
+function keyLink(colIndex) {
     return function(elem) {
-        const dataCell = elem.childNodes[1].childNodes[col_index].firstChild;
+        const dataCell = elem.childNodes[1].childNodes[colIndex].firstChild;
         return dataCell == null ? '' : dataCell.innerText.toLowerCase();
     };
 }
 
-function key_result(col_index) {
+function keyResult(colIndex) {
     return function(elem) {
         const strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
             'Skipped', 'Passed'];
-        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+        return strings.indexOf(elem.childNodes[1].childNodes[colIndex].firstChild.data);
     };
 }
 
-function reset_sort_headers() {
-    find_all('.sort-icon').forEach(function(elem) {
+function resetSortHeaders() {
+    findAll('.sort-icon').forEach(function(elem) {
         elem.parentNode.removeChild(elem);
     });
-    find_all('.sortable').forEach(function(elem) {
+    findAll('.sortable').forEach(function(elem) {
         const icon = document.createElement('div');
         icon.className = 'sort-icon';
         icon.textContent = 'vvv';
@@ -200,7 +200,7 @@ function reset_sort_headers() {
     });
 }
 
-function toggle_sort_states(elem) {
+function toggleSortStates(elem) {
     //if active, toggle between asc and desc
     if (elem.classList.contains('active')) {
         elem.classList.toggle('asc');
@@ -209,28 +209,28 @@ function toggle_sort_states(elem) {
 
     //if inactive, reset all other functions and add ascending active
     if (elem.classList.contains('inactive')) {
-        reset_sort_headers();
+        resetSortHeaders();
         elem.classList.remove('inactive');
         elem.classList.add('active');
     }
 }
 
-function is_all_rows_hidden(value) {
+function isAllRowsHidden(value) {
     return value.hidden == false;
 }
 
-function filter_table(elem) { // eslint-disable-line no-unused-vars
-    const outcome_att = 'data-test-result';
-    const outcome = elem.getAttribute(outcome_att);
-    const class_outcome = outcome + ' results-table-row';
-    const outcome_rows = document.getElementsByClassName(class_outcome);
+function filterTable(elem) { // eslint-disable-line no-unused-vars
+    const outcomeAtt = 'data-test-result';
+    const outcome = elem.getAttribute(outcomeAtt);
+    const classOutcome = outcome + ' results-table-row';
+    const outcomeRows = document.getElementsByClassName(classOutcome);
 
-    for(let i = 0; i < outcome_rows.length; i++){
-        outcome_rows[i].hidden = !elem.checked;
+    for(let i = 0; i < outcomeRows.length; i++){
+        outcomeRows[i].hidden = !elem.checked;
     }
 
-    const rows = find_all('.results-table-row').filter(is_all_rows_hidden);
-    const all_rows_hidden = rows.length == 0 ? true : false;
-    const not_found_message = document.getElementById('not-found-message');
-    not_found_message.hidden = !all_rows_hidden;
+    const rows = findAll('.results-table-row').filter(isAllRowsHidden);
+    const allRowsHidden = rows.length == 0 ? true : false;
+    const notFoundMessage = document.getElementById('not-found-message');
+    notFoundMessage.hidden = !allRowsHidden;
 }

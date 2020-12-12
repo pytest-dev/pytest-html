@@ -535,7 +535,7 @@ class HTMLReport:
                 self.checkbox = html.input(
                     type="checkbox",
                     checked="true",
-                    onChange="filter_table(this)",
+                    onChange="filterTable(this)",
                     name="filter_checkbox",
                     class_="filter",
                     hidden="true",

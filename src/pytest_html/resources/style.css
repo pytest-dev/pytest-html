@@ -172,15 +172,15 @@ div.video video {
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
 }
-.sort-icon .inactive {
+.inactive .sort-icon {
   /*finish triangle*/
   border-top: 8px solid #E6E6E6;
 }
-.sort-icon .asc.active {
+.asc.active .sort-icon {
   /*finish triangle*/
   border-bottom: 8px solid #999;
 }
-.sort-icon .desc.active {
+.desc.active .sort-icon {
   /*finish triangle*/
   border-top: 8px solid #999;
 }

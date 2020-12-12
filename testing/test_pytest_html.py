@@ -186,6 +186,7 @@ class TestHTML:
         assert_results(html, passed=0, failed=1)
         assert "AssertionError" in html
 
+    @pytest.mark.flaky(reruns=2)  # test is flaky on windows
     def test_rerun(self, testdir):
         testdir.makeconftest(
             """

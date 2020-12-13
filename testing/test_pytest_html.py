@@ -310,7 +310,8 @@ class TestHTML:
     def test_report_title(self, testdir, path, is_custom):
         testdir.makepyfile("def test_pass(): pass")
 
-        custom_report_title = "My Custom Report"
+        report_name = "report.html"
+        report_title = "My Custom Report" if is_custom else report_name
         if is_custom:
             testdir.makeconftest(
                 f"""
@@ -318,27 +319,18 @@ class TestHTML:
                 from py.xml import html
 
                 def pytest_html_report_title(report):
-                    report.title = "{custom_report_title}"
+                    report.title = "{report_title}"
             """
             )
 
-        report_name = "report.html"
         path = os.path.join(path, report_name)
         result, html = run(testdir, path)
         assert result.ret == 0
 
-        report_head_title_string = (
-            f"<title>{custom_report_title}</title>"
-            if is_custom
-            else f"<title>{report_name}</title>"
-        )
+        report_head_title_string = f"<title>{report_title}</title>"
         assert len(re.findall(report_head_title_string, html)) == 1, html
 
-        report_body_title_string = (
-            f"<h1>{custom_report_title}</h1>"
-            if is_custom
-            else f"<h1>{report_name}</h1>"
-        )
+        report_body_title_string = f"<h1>{report_title}</h1>"
         assert len(re.findall(report_body_title_string, html)) == 1, html
 
     def test_report_title_addopts_env_var(self, testdir, monkeypatch):

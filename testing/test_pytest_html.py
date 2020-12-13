@@ -186,6 +186,7 @@ class TestHTML:
         assert_results(html, passed=0, failed=1)
         assert "AssertionError" in html
 
+    @pytest.mark.flaky(reruns=2)  # test is flaky on windows
     def test_rerun(self, testdir):
         testdir.makeconftest(
             """
@@ -917,7 +918,8 @@ class TestHTML:
         assert_results(html, passed=1)
 
     @pytest.mark.parametrize(
-        "with_ansi", [True, False],
+        "with_ansi",
+        [True, False],
     )
     def test_ansi_color(self, testdir, mocker, with_ansi):
         if not with_ansi:

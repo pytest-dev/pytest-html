@@ -1,6 +1,12 @@
 Release Notes
 -------------
 
+**3.2.0 (unreleased)**
+
+* Make the report tab title reflect the report name. (`#412 <https://github.com/pytest-dev/pytest-html/issues/412>`_)
+
+  * Thanks to `@gnikonorov <https://github.com/gnikonorov>`_ for the PR
+
 **3.1.1 (2020-12-13)**
 
 * Fix issue with reporting of missing CSS files. (`#388 <https://github.com/pytest-dev/pytest-html/issues/388>`_)

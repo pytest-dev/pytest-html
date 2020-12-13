@@ -304,15 +304,34 @@ class TestHTML:
         assert result.ret == 0
         assert_results(html)
 
-    @pytest.mark.parametrize("path", ["", "directory"])
-    def test_report_title(self, testdir, path):
+    @pytest.mark.parametrize(
+        "path, is_custom", [("", False), ("", True), ("directory", False)]
+    )
+    def test_report_title(self, testdir, path, is_custom):
         testdir.makepyfile("def test_pass(): pass")
+
         report_name = "report.html"
+        report_title = "My Custom Report" if is_custom else report_name
+        if is_custom:
+            testdir.makeconftest(
+                f"""
+                import pytest
+                from py.xml import html
+
+                def pytest_html_report_title(report):
+                    report.title = "{report_title}"
+            """
+            )
+
         path = os.path.join(path, report_name)
         result, html = run(testdir, path)
         assert result.ret == 0
-        report_title = f"<h1>{report_name}</h1>"
-        assert report_title in html
+
+        report_head_title_string = f"<title>{report_title}</title>"
+        assert len(re.findall(report_head_title_string, html)) == 1, html
+
+        report_body_title_string = f"<h1>{report_title}</h1>"
+        assert len(re.findall(report_body_title_string, html)) == 1, html
 
     def test_report_title_addopts_env_var(self, testdir, monkeypatch):
         report_location = "REPORT_LOCATION"
@@ -1073,22 +1092,6 @@ class TestHTML:
         assert result.ret == 1
         assert len(re.findall(collapsed_html, html)) == expected_count
         assert_results(html, tests=2, passed=1, failed=1)
-
-    def test_custom_content_report_title(self, testdir):
-        content_report_title = str(random.random())
-        testdir.makeconftest(
-            f"""
-            import pytest
-            from py.xml import html
-
-            def pytest_html_report_title(report):
-                report.title = "title is {content_report_title}"
-        """
-        )
-        testdir.makepyfile("def test_pass(): pass")
-        result, html = run(testdir)
-        assert result.ret == 0
-        assert len(re.findall(content_report_title, html)) == 1
 
     def test_setup_and_teardown_in_html(self, testdir):
         testdir.makepyfile(

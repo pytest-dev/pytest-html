@@ -510,9 +510,9 @@ class HTMLReport:
         if self.self_contained:
             html_css = html.style(raw(self.style_css))
 
-        head = html.head(
-            html.meta(charset="utf-8"), html.title("Test Report"), html_css
-        )
+        session.config.hook.pytest_html_report_title(report=self)
+
+        head = html.head(html.meta(charset="utf-8"), html.title(self.title), html_css)
 
         class Outcome:
             def __init__(
@@ -610,8 +610,6 @@ class HTMLReport:
             os.path.join(os.path.dirname(__file__), "resources", "main.js")
         ) as main_js_fp:
             main_js = main_js_fp.read()
-
-        session.config.hook.pytest_html_report_title(report=self)
 
         body = html.body(
             html.script(raw(main_js)),

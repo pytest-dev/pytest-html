@@ -898,7 +898,8 @@ class TestHTML:
         assert_results(html, passed=1)
 
     @pytest.mark.parametrize(
-        "with_ansi", [True, False],
+        "with_ansi",
+        [True, False],
     )
     def test_ansi_color(self, testdir, mocker, with_ansi):
         if not with_ansi:

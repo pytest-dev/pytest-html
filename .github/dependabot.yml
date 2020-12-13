@@ -1,0 +1,18 @@
+version: 2
+updates:
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      # Same time as pre-commit is run (in UTC)
+      time: "18:00"
+    allow:
+      - dependency-name: "black"
+        dependency-type: "development"
+      - dependency-name: "flake8"
+        dependency-type: "development"
+    reviewers:
+      - "BeyondEvil"
+      - "gnikonorov"
+      - "ssbarnea"

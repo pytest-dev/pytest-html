@@ -9,6 +9,7 @@ tox = "*"
 flake8 = "==3.8.4" # also bump this in .pre-commit-config.yaml
 black = "==20.8b1" # also bump this in .pre-commit-config.yaml
 pre-commit = "*"
+pytest-rerunfailures = "*"
 
 [packages]
 pytest-html = {editable = true,path = "."}

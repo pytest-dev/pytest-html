@@ -7,7 +7,9 @@ import pytest
 
 from . import extras  # noqa: F401
 from .html_report import HTMLReport
+from .nextgen import NextGenReport
 
+from _pytest.pathlib import Path
 
 def pytest_addhooks(pluginmanager):
     from . import hooks
@@ -79,7 +81,8 @@ def pytest_configure(config):
         if not hasattr(config, "workerinput"):
             # prevent opening htmlpath on worker nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
-            config._next_gen = nextgen.NextGenReport(config, Path("nextgendata.js"))
+
+            config._next_gen = NextGenReport(config, Path("nextgendata.js"))
             config.pluginmanager.register(config._html)
             config.pluginmanager.register(config._next_gen)
 

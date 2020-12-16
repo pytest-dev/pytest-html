@@ -1,7 +1,23 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-from pathlib import Path
+import bisect
+import datetime
+import importlib
+import json
+import os
+import re
+import time
+import warnings
+from base64 import b64decode
+from base64 import b64encode
+from collections import defaultdict
+from collections import OrderedDict
+from functools import lru_cache
+from html import escape
+from os.path import isfile
+from typing import Any
+from typing import Dict
 
 import pytest
 from _pytest.logging import _remove_ansi_escape_sequences
@@ -763,8 +779,15 @@ class NextGenReport:
         self._data_file.parent.mkdir(parents=True, exist_ok=True)
 
     def _write(self):
+        try:
+            data = json.dumps(self._data)
+        except TypeError:
+            data = cleanup_unserializable(self._data)
+            data = json.dumps(data)
+
         with self._data_file.open("w", buffering=1, encoding="UTF-8") as f:
-            json.dump(self._data, f)
+            f.write("const jsonData = ")
+            f.write(data)
             f.write("\n")
 
     @pytest.hookimpl(trylast=True)
@@ -782,3 +805,15 @@ class NextGenReport:
         )
         self._data["tests"].append(data)
         self._write()
+
+
+def cleanup_unserializable(d: Dict[str, Any]) -> Dict[str, Any]:
+    """Return new dict with entries that are not json serializable by their str()."""
+    result = {}
+    for k, v in d.items():
+        try:
+            json.dumps({k: v})
+        except TypeError:
+            v = str(v)
+        result[k] = v
+    return result

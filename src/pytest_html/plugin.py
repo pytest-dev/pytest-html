@@ -19,6 +19,7 @@ from os.path import isfile
 
 import pytest
 from _pytest.logging import _remove_ansi_escape_sequences
+from _pytest.pathlib import Path
 from py.xml import html
 from py.xml import raw
 
@@ -101,7 +102,9 @@ def pytest_configure(config):
         if not hasattr(config, "workerinput"):
             # prevent opening htmlpath on worker nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
+            config._next_gen = NextGenReport(config, Path("nextgendata.json"))
             config.pluginmanager.register(config._html)
+            config.pluginmanager.register(config._next_gen)
 
 
 def pytest_unconfigure(config):
@@ -109,6 +112,11 @@ def pytest_unconfigure(config):
     if html:
         del config._html
         config.pluginmanager.unregister(html)
+
+    next_gen = getattr(config, "_next_gen", None)
+    if next_gen:
+        del config._next_gen
+        config.pluginmanager.unregister(next_gen)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -757,3 +765,39 @@ class HTMLReport:
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep("-", f"generated html file: file://{self.logfile}")
+
+
+class NextGenReport:
+    def __init__(self, config, data_file):
+        self._config = config
+        self._data_file = data_file
+
+        self._title = "Next Gen Report"
+        self._data = {
+            "title": self._title,
+            "environment": {},
+            "tests": [],
+        }
+
+        self._data_file.parent.mkdir(parents=True, exist_ok=True)
+
+    def _write(self):
+        with self._data_file.open("w", buffering=1, encoding="UTF-8") as f:
+            json.dump(self._data, f)
+            f.write("\n")
+
+    @pytest.hookimpl(trylast=True)
+    def pytest_sessionstart(self, session):
+        config = session.config
+        if hasattr(config, "_metadata") and config._metadata:
+            metadata = config._metadata
+            self._data["environment"] = metadata
+            self._write()
+
+    @pytest.hookimpl(trylast=True)
+    def pytest_runtest_logreport(self, report):
+        data = self._config.hook.pytest_report_to_serializable(
+            config=self._config, report=report
+        )
+        self._data["tests"].append(data)
+        self._write()

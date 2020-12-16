@@ -772,6 +772,7 @@ class NextGenReport:
         self._title = "Next Gen Report"
         self._data = {
             "title": self._title,
+            "collectedItems": 0,
             "environment": {},
             "tests": [],
         }
@@ -797,6 +798,11 @@ class NextGenReport:
             metadata = config._metadata
             self._data["environment"] = metadata
             self._write()
+
+    @pytest.hookimpl(trylast=True)
+    def pytest_collection_finish(self, session):
+        self._data["collectedItems"] = len(session.items)
+        self._write()
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):

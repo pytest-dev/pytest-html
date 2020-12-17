@@ -124,4 +124,3 @@ def extra(pytestconfig):
     pytestconfig.extras = []
     yield pytestconfig.extras
     del pytestconfig.extras[:]
-

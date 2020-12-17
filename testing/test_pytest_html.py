@@ -529,7 +529,7 @@ class TestHTML:
         assert f'<img src="{src}"/>' in html
 
     def test_extra_image_windows(self, mocker, testdir):
-        mock_isfile = mocker.patch("pytest_html.plugin.isfile")
+        mock_isfile = mocker.patch("pytest_html.result.isfile")
         mock_isfile.side_effect = ValueError("stat: path too long for Windows")
         self.test_extra_image(testdir, "image/png", "png")
         assert mock_isfile.call_count == 1
@@ -558,7 +558,7 @@ class TestHTML:
         )
 
     def test_extra_video_windows(self, mocker, testdir):
-        mock_isfile = mocker.patch("pytest_html.plugin.isfile")
+        mock_isfile = mocker.patch("pytest_html.result.isfile")
         mock_isfile.side_effect = ValueError("stat: path too long for Windows")
         self.test_extra_video(testdir, "video/mp4", "mp4")
         assert mock_isfile.call_count == 1
@@ -923,7 +923,8 @@ class TestHTML:
     )
     def test_ansi_color(self, testdir, mocker, with_ansi):
         if not with_ansi:
-            mock_ansi_support = mocker.patch("pytest_html.plugin.ansi_support")
+            mock_ansi_support = mocker.patch("pytest_html.html_report.ansi_support")
+            mock_ansi_support = mocker.patch("pytest_html.result.ansi_support")
             mock_ansi_support.return_value = None
 
         pass_content = [

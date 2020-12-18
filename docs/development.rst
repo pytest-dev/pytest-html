@@ -106,7 +106,7 @@ Follow these steps to release a new version of the project:
 
 #.  Update your local master with the upstream master (``git pull --rebase upstream master``)
 #.  Create a new branch
-#.  Update ``CHANGES.rst`` with the new version, today's date, and all changes/new features
+#.  Update `the changelog`_ with the new version, today's date, and all changes/new features
 #.  Commit and push the new branch and then create a new pull request
 #.  Wait for tests and reviews and then merge the branch
 #.  Once merged, update your local master again (``git pull --rebase upstream master``)
@@ -123,4 +123,5 @@ Follow these steps to release a new version of the project:
 .. _Read The Docs: https://readthedocs.com
 .. _RST: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 .. _SASS/SCSS: https://sass-lang.com
+.. _the changelog: https://pytest-html.readthedocs.io/en/latest/changelog.html
 .. _Tox: https://tox.readthedocs.io

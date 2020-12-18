@@ -26,7 +26,7 @@ Resources
 ---------
 
 - `Documentation <https://pytest-html.readthedocs.io/en/latest/>`_
-- `Release Notes <http://github.com/pytest-dev/pytest-html/blob/master/CHANGES.rst>`_
+- `Release Notes <https://pytest-html.readthedocs.io/en/latest/changelog.html>`_
 - `Issue Tracker <http://github.com/pytest-dev/pytest-html/issues>`_
 - `Code <http://github.com/pytest-dev/pytest-html/>`_
 

@@ -2,11 +2,9 @@ import bisect
 import datetime
 import json
 import os
-import re
 import time
 from collections import defaultdict
 from collections import OrderedDict
-from pathlib import Path
 
 from py.xml import html
 from py.xml import raw
@@ -20,10 +18,10 @@ from .util import ansi_support
 
 class HTMLReport:
     def __init__(self, logfile, config):
-        logfile = Path(os.path.expandvars(logfile)).expanduser()
-        self.logfile = logfile.absolute()
+        logfile = os.path.expanduser(os.path.expandvars(logfile))
+        self.logfile = os.path.abspath(logfile)
         self.test_logs = []
-        self.title = self.logfile.name
+        self.title = os.path.basename(self.logfile)
         self.results = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
@@ -87,8 +85,10 @@ class HTMLReport:
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
-        css_path = Path(__file__).parent / "resources" / "style.css"
-        self.style_css = css_path.read_text()
+        with open(
+            os.path.join(os.path.dirname(__file__), "resources", "style.css")
+        ) as style_css_fp:
+            self.style_css = style_css_fp.read()
 
         if ansi_support():
             ansi_css = [
@@ -105,7 +105,8 @@ class HTMLReport:
             self.style_css += "\n * CUSTOM CSS"
             self.style_css += f"\n * {path}"
             self.style_css += "\n ******************************/\n\n"
-            self.style_css += Path(path).read_text()
+            with open(path) as f:
+                self.style_css += f.read()
 
         css_href = "assets/style.css"
         html_css = html.link(href=css_href, rel="stylesheet", type="text/css")
@@ -175,8 +176,10 @@ class HTMLReport:
             ),
         ]
 
-        main_js_path = Path(__file__).parent / "resources" / "main.js"
-        main_js = main_js_path.read_text()
+        with open(
+            os.path.join(os.path.dirname(__file__), "resources", "main.js")
+        ) as main_js_fp:
+            main_js = main_js_fp.read()
 
         body = html.body(
             html.script(raw(main_js)),
@@ -223,10 +226,6 @@ class HTMLReport:
 
         for key in keys:
             value = metadata[key]
-            if self._is_redactable_environment_variable(key, config):
-                black_box_ascii_value = 0x2593
-                value = "".join(chr(black_box_ascii_value) for char in str(value))
-
             if isinstance(value, str) and value.startswith("http"):
                 value = html.a(value, href=value, target="_blank")
             elif isinstance(value, (list, tuple, set)):
@@ -240,26 +239,20 @@ class HTMLReport:
         environment.append(html.table(rows, id="environment"))
         return environment
 
-    def _is_redactable_environment_variable(self, environment_variable, config):
-        redactable_regexes = config.getini("environment_table_redact_list")
-        for redactable_regex in redactable_regexes:
-            if re.match(redactable_regex, environment_variable):
-                return True
-
-        return False
-
     def _save_report(self, report_content):
-        dir_name = self.logfile.parent
-        assets_dir = dir_name / "assets"
+        dir_name = os.path.dirname(self.logfile)
+        assets_dir = os.path.join(dir_name, "assets")
 
-        dir_name.mkdir(parents=True, exist_ok=True)
+        os.makedirs(dir_name, exist_ok=True)
         if not self.self_contained:
-            assets_dir.mkdir(parents=True, exist_ok=True)
+            os.makedirs(assets_dir, exist_ok=True)
 
-        self.logfile.write_text(report_content)
+        with open(self.logfile, "w", encoding="utf-8") as f:
+            f.write(report_content)
         if not self.self_contained:
-            style_path = assets_dir / "style.css"
-            style_path.write_text(self.style_css)
+            style_path = os.path.join(assets_dir, "style.css")
+            with open(style_path, "w", encoding="utf-8") as f:
+                f.write(self.style_css)
 
     def _post_process_reports(self):
         for test_name, test_reports in self.reports.items():
@@ -333,4 +326,4 @@ class HTMLReport:
         self._save_report(report_content)
 
     def pytest_terminal_summary(self, terminalreporter):
-        terminalreporter.write_sep("-", f"generated html file: {self.logfile.as_uri()}")
+        terminalreporter.write_sep("-", f"generated html file: file://{self.logfile}")

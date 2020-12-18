@@ -1,19 +1,27 @@
-Release Notes
--------------
+Changelog
+=========
 
-**3.2.0 (unreleased)**
+Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
+
+Version History
+---------------
+
+3.2.0 (unreleased)
+~~~~~~~~~~~~~~~~~~
 
 * Make the report tab title reflect the report name. (`#412 <https://github.com/pytest-dev/pytest-html/issues/412>`_)
 
   * Thanks to `@gnikonorov <https://github.com/gnikonorov>`_ for the PR
 
-**3.1.1 (2020-12-13)**
+3.1.1 (2020-12-13)
+~~~~~~~~~~~~~~~~~~
 
 * Fix issue with reporting of missing CSS files. (`#388 <https://github.com/pytest-dev/pytest-html/issues/388>`_)
 
   * Thanks to `@prakhargurunani <https://github.com/prakhargurunani>`_ for reporting and fixing!
 
-**3.1.0 (2020-12-2)**
+3.1.0 (2020-12-2)
+~~~~~~~~~~~~~~~~~
 
 * Stop attaching test reruns to final test report entries (`#374 <https://github.com/pytest-dev/pytest-html/issues/374>`_)
 
@@ -23,7 +31,8 @@ Release Notes
 
   * Thanks to `@brettnolan <https://github.com/brettnolan>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the fix
 
-**3.0.0 (2020-10-28)**
+3.0.0 (2020-10-28)
+~~~~~~~~~~~~~~~~~~
 
 * Respect ``--capture=no``, ``--show-capture=no``, and ``-s`` pytest flags (`#171 <https://github.com/pytest-dev/pytest-html/issues/171>`_)
 
@@ -45,13 +54,15 @@ Release Notes
 
   * Thanks to `@iwanb <https://github.com/iwanb>`_ for reporting and `@csm10495 <https://github.com/csm10495>`_ for the fix
 
-**2.1.1 (2020-03-18)**
+2.1.1 (2020-03-18)
+~~~~~~~~~~~~~~~~~~
 
 * Fix issue with funcargs causing failures. (`#282 <https://github.com/pytest-dev/pytest-html/issues/282>`_)
 
   * Thanks to `@ssbarnea <https://github.com/ssbarnea>`_ for reporting and `@christiansandberg <https://github.com/christiansandberg>`_ for the fix
 
-**2.1.0 (2020-03-09)**
+2.1.0 (2020-03-09)
+~~~~~~~~~~~~~~~~~~
 
 * Added support for MP4 video format. (`#260 <https://github.com/pytest-dev/pytest-html/pull/260>`_)
 
@@ -73,7 +84,8 @@ Release Notes
 
   * Thanks to `@werdeil <https://github.com/werdeil>`_ for the PR
 
-**2.0.1 (2019-10-05)**
+2.0.1 (2019-10-05)
+~~~~~~~~~~~~~~~~~~
 
 * Properly check for presence of CSS file. (`#246 <https://github.com/pytest-dev/pytest-html/issues/246>`_)
 
@@ -87,13 +99,15 @@ Release Notes
 
   * Thanks to `@wanam <https://github.com/wanam>`_ for reporting and fixing
 
-**2.0.0 (2019-09-09)**
+2.0.0 (2019-09-09)
+~~~~~~~~~~~~~~~~~~
 
 * Drop support for Python 2.7. We will continue to accept patches to ``1.22.x`` for the time being.
 
   * Thanks to `@hugovk <https://github.com/hugovk>`_ for the PR
 
-**1.22.0 (2019-08-06)**
+1.22.0 (2019-08-06)
+~~~~~~~~~~~~~~~~~~~
 
 * Refactor assets naming to be more readable and OS safe.
 
@@ -105,13 +119,15 @@ Release Notes
 
   * Thanks to `@borntyping <https://github.com/borntyping>`_ for reporting and fixing!
 
-**1.21.1 (2019-06-19)**
+1.21.1 (2019-06-19)
+~~~~~~~~~~~~~~~~~~~
 
 * Fix issue with assets filenames being too long.
 
   * Thanks to `@D3X <https://github.com/D3X>`_ for reporting and providing a fix
 
-**1.21.0 (2019-06-17)**
+1.21.0 (2019-06-17)
+~~~~~~~~~~~~~~~~~~~
 
 * Allow opening generated html report in browser (`@ssbarnea <https://github.com/ssbarnea>`_)
 
@@ -119,7 +135,8 @@ Release Notes
 
 * Change assets naming method (`@SunInJuly <https://github.com/SunInJuly>`_)
 
-**1.20.0 (2019-01-14)**
+1.20.0 (2019-01-14)
+~~~~~~~~~~~~~~~~~~~
 
 * Tests running with Pytest 4.0 and Python 3.7
 
@@ -134,7 +151,8 @@ Release Notes
 
 * Refactor css config code (`@crazymerlyn <http://github.com/crazymerlyn>`_)
 
-**1.19.0 (2018-06-01)**
+1.19.0 (2018-06-01)
+~~~~~~~~~~~~~~~~~~~
 
 * Allow collapsed outcomes to be configured by using a query parameter
 
@@ -142,14 +160,16 @@ Release Notes
     enhancement and to `@jacebrowning <https://github.com/jacebrowning>`_ for
     providing a patch
 
-**1.18.0 (2018-05-22)**
+1.18.0 (2018-05-22)
+~~~~~~~~~~~~~~~~~~~
 
 * Preserve the order if metadata is ``OrderedDict``
 
   * Thanks to `@jacebrowning <https://github.com/jacebrowning>`_ for suggesting
     this enhancement and providing a patch
 
-**1.17.0 (2018-04-05)**
+1.17.0 (2018-04-05)
+~~~~~~~~~~~~~~~~~~~
 
 * Add support for custom CSS (`#116 <https://github.com/pytest-dev/pytest-html/issues/116>`_)
 
@@ -173,7 +193,8 @@ Release Notes
   * Thanks to `@j19sch <https://github.com/j19sch>`_ for the PR
 
 
-**1.16.1 (2018-01-04)**
+1.16.1 (2018-01-04)
+~~~~~~~~~~~~~~~~~~~
 
 * Fix for including screenshots on Windows
   (`#124 <https://github.com/pytest-dev/pytest-html/issues/124>`_)
@@ -182,19 +203,22 @@ Release Notes
     issue and to `@pinkie1378 <https://github.com/pinkie1378>`_ for providing a
     fix
 
-**1.16.0 (2017-09-19)**
+1.16.0 (2017-09-19)
+~~~~~~~~~~~~~~~~~~~
 
 * Improve rendering of collections in metadata
   (`@rasmuspeders1 <https://github.com/rasmuspeders1>`_)
 
-**1.15.2 (2017-08-15)**
+1.15.2 (2017-08-15)
+~~~~~~~~~~~~~~~~~~~
 
 * Always decode byte string in extra text
 
   * Thanks to `@ch-t <https://github.com/ch-t>`_ for reporting the issue and
     providing a fix
 
-**1.15.1 (2017-06-12)**
+1.15.1 (2017-06-12)
+~~~~~~~~~~~~~~~~~~~
 
 * Fix pytest dependency to 3.0 or later
 
@@ -202,7 +226,8 @@ Release Notes
     issue and to `@nicoddemus <https://github.com/nicoddemus>`_ for providing a
     fix
 
-**1.15.0 (2017-06-09)**
+1.15.0 (2017-06-09)
+~~~~~~~~~~~~~~~~~~~
 
 * Fix encoding issue in longrepr values
 
@@ -213,7 +238,8 @@ Release Notes
 
   * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
 
-**1.14.2 (2017-03-10)**
+1.14.2 (2017-03-10)
+~~~~~~~~~~~~~~~~~~~
 
 * Always encode content for data URI
 
@@ -221,12 +247,14 @@ Release Notes
     `@BeyondEvil <https://github.com/BeyondEvil>`_ for reporting the issue and
     confirming the fix
 
-**1.14.1 (2017-02-28)**
+1.14.1 (2017-02-28)
+~~~~~~~~~~~~~~~~~~~
 
 * Present metadata without additional formatting to avoid issues due to
   unpredictable content types
 
-**1.14.0 (2017-02-27)**
+1.14.0 (2017-02-27)
+~~~~~~~~~~~~~~~~~~~
 
 * Add hooks for modifying the test results table
 * Replace environment section with values from
@@ -234,36 +262,42 @@ Release Notes
 * Fix encoding for asset files
 * Escape contents of log sections
 
-**1.13.0 (2016-12-19)**
+1.13.0 (2016-12-19)
+~~~~~~~~~~~~~~~~~~~
 
 * Disable ANSI codes support by default due to dependency on
   `ansi2html <https://pypi.python.org/pypi/ansi2html/>`_ package with less
   permissive licensing
 
-**1.12.0 (2016-11-30)**
+1.12.0 (2016-11-30)
+~~~~~~~~~~~~~~~~~~~
 
 * Add support for JPG and SVG images
   (`@bhzunami <https://github.com/bhzunami>`_)
 * Add version number and PyPI link to report header
   (`@denisra <https://github.com/denisra>`_)
 
-**1.11.1 (2016-11-25)**
+1.11.1 (2016-11-25)
+~~~~~~~~~~~~~~~~~~~
 
 * Fix title of checkbox disappearing when unchecked
   (`@vashirov <https://github.com/vashirov>`_)
 
-**1.11.0 (2016-11-08)**
+1.11.0 (2016-11-08)
+~~~~~~~~~~~~~~~~~~~
 
 * Add support for ANSI codes in logs
   (`@premkarat <https://github.com/premkarat>`_)
 
-**1.10.1 (2016-09-23)**
+1.10.1 (2016-09-23)
+~~~~~~~~~~~~~~~~~~~
 
 * Fix corrupt image asset files
 * Remove image links from self-contained report
 * Fix issue with unexpected passes not being reported in pytest 3.0
 
-**1.10.0 (2016-08-09)**
+1.10.0 (2016-08-09)
+~~~~~~~~~~~~~~~~~~~
 
 * Hide filter checkboxes when JavaScript is disabled
   (`@RibeiroAna <https://github.com/RibeiroAna>`_)
@@ -280,7 +314,8 @@ Release Notes
 * Allow visibility of extra details to be toggled
   (`@leitzler <https://github.com/leitzler>`_)
 
-**1.9.0 (2016-07-04)**
+1.9.0 (2016-07-04)
+~~~~~~~~~~~~~~~~~~
 
 * Split pytest_sessionfinish into generate and save methods
   (`@karandesai-96 <https://github.com/karandesai-96>`_)
@@ -289,63 +324,78 @@ Release Notes
 * Added a feature to filter tests by outcome
   (`@RibeiroAna <https://github.com/RibeiroAna>`_)
 
-**1.8.1 (2016-05-24)**
+1.8.1 (2016-05-24)
+~~~~~~~~~~~~~~~~~~
 
 * Include captured output for passing tests
 
-**1.8.0 (2016-02-24)**
+1.8.0 (2016-02-24)
+~~~~~~~~~~~~~~~~~~
 
 * Remove duplication from the environment section
 * Dropped support for Python 3.2
 * Indicated setup and teardown in report
 * Fixed colour of errors in report
 
-**1.7 (2015-10-19)**
+1.7 (2015-10-19)
+~~~~~~~~~~~~~~~~
 
 * Fixed INTERNALERROR when an xdist worker crashes
   (`@The-Compiler <https://github.com/The-Compiler>`_)
 * Added report sections including stdout and stderr to log
 
-**1.6 (2015-09-08)**
+1.6 (2015-09-08)
+~~~~~~~~~~~~~~~~
 
 * Fixed environment details when using pytest-xdist
 
-**1.5.1 (2015-08-18)**
+1.5.1 (2015-08-18)
+~~~~~~~~~~~~~~~~~~
 
 * Made environment fixture session scoped to avoid repeating content
 
-**1.5 (2015-08-18)**
+1.5 (2015-08-18)
+~~~~~~~~~~~~~~~~
 
 * Replaced custom hook for setting environemnt section with a fixture
 
-**1.4 (2015-08-12)**
+1.4 (2015-08-12)
+~~~~~~~~~~~~~~~~
 
 * Dropped support for pytest 2.6
 * Fixed unencodable strings for Python 3
   (`@The-Compiler <https://github.com/The-Compiler>`_)
 
-**1.3.2 (2015-07-27)**
+1.3.2 (2015-07-27)
+~~~~~~~~~~~~~~~~~~
 
 * Prevented additional row if log has no content or there is no extra HTML
 
-**1.3.1 (2015-05-26)**
+1.3.1 (2015-05-26)
+~~~~~~~~~~~~~~~~~~
 
 * Fixed encoding issue in Python 3
 
-**1.3 (2015-05-26)**
+1.3 (2015-05-26)
+~~~~~~~~~~~~~~~~
 
 * Show extra content regardless of test result
 * Added support for extra content in JSON format
 
-**1.2 (2015-05-20)**
+1.2 (2015-05-20)
+~~~~~~~~~~~~~~~~
 
 * Changed default sort order to test result
   (`@The-Compiler <https://github.com/The-Compiler>`_)
 
-**1.1 (2015-05-08)**
+1.1 (2015-05-08)
+~~~~~~~~~~~~~~~~
 
 * Added Python 3 support
 
-**1.0 (2015-04-20)**
+1.0 (2015-04-20)
+~~~~~~~~~~~~~~~~
 
 * Initial release
+
+.. _Semantic Versioning: https://semver.org

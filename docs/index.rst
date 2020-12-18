@@ -16,5 +16,6 @@ pytest-html is a plugin for `pytest`_ that generates a HTML report for test resu
    user_guide
    api_reference
    development
+   changelog
 
 .. _pytest: http://pytest.org

@@ -49,7 +49,7 @@ repos:
       - id: rst
         name: rst
         entry: rst-lint --encoding utf-8
-        files: ^(CHANGES.rst|development.rst|README.rst)$
+        files: ^(README.rst)$
         language: python
         additional_dependencies: [pygments, restructuredtext_lint]
   - repo: https://github.com/elidupuis/mirrors-sass-lint

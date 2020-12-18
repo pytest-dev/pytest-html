@@ -6,24 +6,12 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
-3.2.0 (2022-10-25)
+3.2.0 (unreleased)
 ~~~~~~~~~~~~~~~~~~
-
-* Explicitly add py.xml dependency.
-
-  * Thanks to `@smartEBL <https://github.com/smartEBL>`_ for the PR
-
-* Implement the ``visible`` URL query parameter to control visibility of test results on page load. (`#399 <https://github.com/pytest-dev/pytest-html/issues/399>`_)
-
-  * Thanks to `@TheCorp <https://github.com/TheCorp>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the fix
 
 * Make the report tab title reflect the report name. (`#412 <https://github.com/pytest-dev/pytest-html/issues/412>`_)
 
   * Thanks to `@gnikonorov <https://github.com/gnikonorov>`_ for the PR
-
-* Implement :code:`environment_table_redact_list` to allow for redaction of environment table values. (`#233 <https://github.com/pytest-dev/pytest-html/issues/233>`_)
-
-  * Thanks to `@fenchu <https://github.com/fenchu>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the PR
 
 3.1.1 (2020-12-13)
 ~~~~~~~~~~~~~~~~~~

@@ -22,7 +22,8 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Set up Python
-      uses: actions/setup-python@v2
+      # TODO: Use "v2" tag once https://github.com/actions/setup-python/issues/171 is resolved.
+      uses: actions/setup-python@v2.1.4
       with:
         python-version: 3.6
     - name: Install tox
@@ -107,7 +108,8 @@ jobs:
         git config --global core.autocrlf false
     - uses: actions/checkout@master
     - name: Set up Python
-      uses: actions/setup-python@v2
+      # TODO: Use "v2" tag once https://github.com/actions/setup-python/issues/171 is resolved.
+      uses: actions/setup-python@v2.1.4
       with:
         python-version: ${{ matrix['python-version'] }}
     - name: Install tox
@@ -153,7 +155,8 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Set up Python
-      uses: actions/setup-python@v2
+      # TODO: Use "v2" tag once https://github.com/actions/setup-python/issues/171 is resolved.
+      uses: actions/setup-python@v2.1.4
       with:
         python-version: 3.6
     - name: Install tox
@@ -175,7 +178,8 @@ jobs:
 
     steps:
       - name: Switch to using Python 3.6 by default
-        uses: actions/setup-python@v2
+        # TODO: Use "v2" tag once https://github.com/actions/setup-python/issues/171 is resolved.
+        uses: actions/setup-python@v2.1.4
         with:
           python-version: 3.6
       - name: Install tox

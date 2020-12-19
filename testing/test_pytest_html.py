@@ -1263,4 +1263,4 @@ class TestHTML:
             variable_value_regex = re.compile(
                 f"<tr>\n.*<td>{variable}</td>\n.*<td>{variable_value}</td></tr>"
             )
-            assert variable_value_regex.search(html) is not None, str(html)
+            assert variable_value_regex.search(html) is not None

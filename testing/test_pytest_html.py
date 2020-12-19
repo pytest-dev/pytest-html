@@ -1209,3 +1209,56 @@ class TestHTML:
             assert extra_log_div_regex.search(html) is not None
         else:
             assert extra_log_div_regex.search(html) is None
+
+    def test_environment_table_redact_list(self, testdir):
+        testdir.makeini(
+            """
+            [pytest]
+            environment_table_redact_list = foo$
+                .*redact.*
+                bar
+        """
+        )
+
+        testdir.makeconftest(
+            """
+            def pytest_configure(config):
+                config._metadata["foo"] = "will not appear a"
+                config._metadata["foos"] = "will appear"
+                config._metadata["redact"] = "will not appear ab"
+                config._metadata["will_redact"] = "will not appear abc"
+                config._metadata["redacted_item"] = "will not appear abcd"
+                config._metadata["unrelated_item"] = "will appear"
+                config._metadata["bar"] = "will not appear abcde"
+                config._metadata["bars"] = "will not appear abcdef"
+        """
+        )
+
+        testdir.makepyfile(
+            """
+            def test_pass():
+                assert True
+        """
+        )
+
+        result, html = run(testdir)
+        assert result.ret == 0
+        assert_results(html)
+
+        black_box_ascii_value = 0x2593
+        expected_environment_values = {
+            "foo": "".join(chr(black_box_ascii_value) for value in range(17)),
+            "foos": "will appear",
+            "redact": "".join(chr(black_box_ascii_value) for value in range(18)),
+            "will_redact": "".join(chr(black_box_ascii_value) for value in range(19)),
+            "redacted_item": "".join(chr(black_box_ascii_value) for value in range(20)),
+            "unrelated_item": "will appear",
+            "bar": "".join(chr(black_box_ascii_value) for value in range(21)),
+            "bars": "".join(chr(black_box_ascii_value) for value in range(22)),
+        }
+        for variable in expected_environment_values:
+            variable_value = expected_environment_values[variable]
+            variable_value_regex = re.compile(
+                f"<tr>\n.*<td>{variable}</td>\n.*<td>{variable_value}</td></tr>"
+            )
+            assert variable_value_regex.search(html) is not None, str(html)

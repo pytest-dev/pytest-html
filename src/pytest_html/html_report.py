@@ -2,6 +2,7 @@ import bisect
 import datetime
 import json
 import os
+import re
 import time
 from collections import defaultdict
 from collections import OrderedDict
@@ -226,6 +227,10 @@ class HTMLReport:
 
         for key in keys:
             value = metadata[key]
+            if self._is_redactable_environment_variable(key, config):
+                black_box_ascii_value = 0x2593
+                value = "".join(chr(black_box_ascii_value) for char in str(value))
+
             if isinstance(value, str) and value.startswith("http"):
                 value = html.a(value, href=value, target="_blank")
             elif isinstance(value, (list, tuple, set)):
@@ -238,6 +243,14 @@ class HTMLReport:
 
         environment.append(html.table(rows, id="environment"))
         return environment
+
+    def _is_redactable_environment_variable(self, environment_variable, config):
+        redactable_regexes = config.getini("environment_table_redact_list")
+        for redactable_regex in redactable_regexes:
+            if re.match(redactable_regex, environment_variable):
+                return True
+
+        return False
 
     def _save_report(self, report_content):
         dir_name = os.path.dirname(self.logfile)

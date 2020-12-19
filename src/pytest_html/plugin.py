@@ -53,6 +53,12 @@ def pytest_addoption(parser):
         help="set the maximum filename length for assets "
         "attached to the html report.",
     )
+    parser.addini(
+        "environment_table_redact_list",
+        type="linelist",
+        help="A list of regexes corresponding to environment "
+        "table keys whose values should be redacted from the report",
+    )
 
 
 def pytest_configure(config):

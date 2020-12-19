@@ -1214,7 +1214,7 @@ class TestHTML:
         testdir.makeini(
             """
             [pytest]
-            environment_table_redact_list = foo$
+            environment_table_redact_list = ^foo$
                 .*redact.*
                 bar
         """
@@ -1224,6 +1224,7 @@ class TestHTML:
             """
             def pytest_configure(config):
                 config._metadata["foo"] = "will not appear a"
+                config._metadata["afoo"] = "will appear"
                 config._metadata["foos"] = "will appear"
                 config._metadata["redact"] = "will not appear ab"
                 config._metadata["will_redact"] = "will not appear abc"
@@ -1248,6 +1249,7 @@ class TestHTML:
         black_box_ascii_value = 0x2593
         expected_environment_values = {
             "foo": "".join(chr(black_box_ascii_value) for value in range(17)),
+            "afoo": "will appear",
             "foos": "will appear",
             "redact": "".join(chr(black_box_ascii_value) for value in range(18)),
             "will_redact": "".join(chr(black_box_ascii_value) for value in range(19)),

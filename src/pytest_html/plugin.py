@@ -57,7 +57,7 @@ def pytest_addoption(parser):
         "environment_table_redact_list",
         type="linelist",
         help="A list of regexes corresponding to environment "
-        "table keys whose values should be redacted from the report",
+        "table variables whose values should be redacted from the report",
     )
 
 

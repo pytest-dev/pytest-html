@@ -82,11 +82,11 @@ and thus not pick up your change.
 
 The generated table will be sorted alphabetically unless the metadata is a :code:`collections.OrderedDict`.
 
-It is also possible to redact variables from the environment table. Redacted variables will have their keys displayed, but their values grayed out.
+It is possible to redact variables from the environment table. Redacted variables will have their names displayed, but their values grayed out.
 This can be achieved by setting :code:`environment_table_redact_list` in your INI configuration file (e.g.: :code:`pytest.ini`).
-:code:`environment_table_redact_list` is a :code:`linelist` of regexes. Any environment table key that matches a regex in this list has its value redacted.
+:code:`environment_table_redact_list` is a :code:`linelist` of regexes. Any environment table variable that matches a regex in this list has its value redacted.
 
-For example, the below will redact all environment table values whose keys match the regexes :code:`^foo$`, :code:`.*redact.*`, or :code:`bar`:
+For example, the following will redact all environment table variables that match the regexes :code:`^foo$`, :code:`.*redact.*`, or :code:`bar`:
 
 .. code-block:: ini
 

@@ -74,8 +74,7 @@ function showFilters() {
         if (visibleString != 'all') {
             filterItems[i].checked = checkedItems.includes(filterItems[i].getAttribute('data-test-result'));
             filterTable(filterItems[i]);
-        } else
-            filterItems[i].checked = true;
+        }
     }
 }
 

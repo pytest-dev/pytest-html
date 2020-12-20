@@ -9,6 +9,10 @@ Version History
 3.2.0 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
+* Implement the ``visible`` URL query parameter to control visiblity of test results on page load. (`#399 <https://github.com/pytest-dev/pytest-html/issues/399>`_)
+
+  * Thanks to `@TheCorp <https://github.com/TheCorp>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the fix
+
 * Make the report tab title reflect the report name. (`#412 <https://github.com/pytest-dev/pytest-html/issues/412>`_)
 
   * Thanks to `@gnikonorov <https://github.com/gnikonorov>`_ for the PR

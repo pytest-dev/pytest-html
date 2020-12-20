@@ -234,6 +234,9 @@ additional HTML and log output with a notice that the log is empty:
 Display options
 ---------------
 
+Auto Collapsing Table Rows
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 By default, all rows in the **Results** table will be expanded except those that have :code:`Passed`.
 
 This behavior can be customized either with a query parameter: :code:`?collapsed=Passed,XFailed,Skipped`
@@ -245,6 +248,29 @@ or by setting the :code:`render_collapsed` in a configuration file (pytest.ini, 
   render_collapsed = True
 
 **NOTE:** Setting :code:`render_collapsed` will, unlike the query parameter, affect all statuses.
+
+Controlling Test Result Visability Via Query Params
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, all tests are visible, regardless of their results. It is possible to control which tests are visible on
+page load by passing the :code:`visible` query parameter. To use this parameter, please pass a comma separated list
+of test results you wish to be visible. For exmaple, passing :code:`?visible=passed,skipped` will show only those
+tests in the report that have outcome :code:`passed`, or :code:`skipped`.
+
+Note that this match is case insenstive, so passing :code:`PASSED` and :code:`passed` has the same effect.
+
+The following query parameters may be passed:
+
+* :code:`passed`
+* :code:`skipped`
+* :code:`failed`
+* :code:`error`
+* :code:`xfailed`
+* :code:`xpassed`
+* :code:`rerun`
+
+Formatting the Duration Column
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The formatting of the timestamp used in the :code:`Durations` column can be modified by setting :code:`duration_formatter`
 on the :code:`report` attribute. All `time.strftime`_ formatting directives are supported. In addition, it is possible

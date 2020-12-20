@@ -249,15 +249,15 @@ or by setting the :code:`render_collapsed` in a configuration file (pytest.ini, 
 
 **NOTE:** Setting :code:`render_collapsed` will, unlike the query parameter, affect all statuses.
 
-Controlling Test Result Visability Via Query Params
+Controlling Test Result Visibility Via Query Params
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, all tests are visible, regardless of their results. It is possible to control which tests are visible on
 page load by passing the :code:`visible` query parameter. To use this parameter, please pass a comma separated list
-of test results you wish to be visible. For exmaple, passing :code:`?visible=passed,skipped` will show only those
-tests in the report that have outcome :code:`passed`, or :code:`skipped`.
+of test results you wish to be visible. For example, passing :code:`?visible=passed,skipped` will show only those
+tests in the report that have outcome :code:`passed` or :code:`skipped`.
 
-Note that this match is case insenstive, so passing :code:`PASSED` and :code:`passed` has the same effect.
+Note that this match is case insensitive, so passing :code:`PASSED` and :code:`passed` has the same effect.
 
 The following query parameters may be passed:
 

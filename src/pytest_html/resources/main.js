@@ -63,15 +63,16 @@ function hideExtras(colresultElem) {
 }
 
 function showFilters() {
-    let checked = getQueryParameter('visible') || 'all';
-    checked = checked.toLowerCase();
+    let visibleString = getQueryParameter('visible') || 'all';
+    visibleString = visibleString.toLowerCase();
+    const checkedItems = visibleString.split(',');
 
     const filterItems = document.getElementsByClassName('filter');
     for (let i = 0; i < filterItems.length; i++) {
         filterItems[i].hidden = false;
 
-        if (checked != 'all') {
-            filterItems[i].checked = checked.includes(filterItems[i].getAttribute('data-test-result'));
+        if (visibleString != 'all') {
+            filterItems[i].checked = checkedItems.includes(filterItems[i].getAttribute('data-test-result'));
             filterTable(filterItems[i]);
         } else
             filterItems[i].checked = true;

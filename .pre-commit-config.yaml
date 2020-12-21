@@ -44,6 +44,11 @@ repos:
         additional_dependencies:
           - eslint@7.13.0
         args: [src]
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.790
+    hooks:
+      - id: mypy
+        files: ^(src/pytest_html|testing)
   - repo: local
     hooks:
       - id: rst

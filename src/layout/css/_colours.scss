@@ -1,0 +1,192 @@
+@mixin apply(
+	$text,
+	$link,
+	$text-arbitrary,
+	$background,
+	$background-alt,
+	$border,
+	$expander,
+	$result-ok,
+	$result-warn,
+	$result-error,
+	$log-bg,
+	$log-fg
+) {
+
+	body {
+		background-color: $background;
+		color: $text-arbitrary;
+	}
+
+	h1 {
+		color: $text;
+	}
+	h2 {
+		color: $text;
+	}
+
+	p {
+		color: $text;
+	}
+
+	a {
+		color: $link;
+	}
+
+	/*------------------
+	 * SUMMARY INFORMATION
+	 *------------------*/
+
+	#environment {
+		td {
+			border-color: $border;
+		}
+
+		tr:nth-child(odd) {
+			background-color: $background-alt;
+		}
+	}
+
+	/*------------------
+	 * TEST RESULT TYPES
+	 *------------------*/
+	span.passed,
+	.passed .col-result {
+		color: $result-ok;
+	}
+
+	span.skipped,
+	span.xfailed,
+	span.rerun,
+	.skipped .col-result,
+	.xfailed .col-result,
+	.rerun .col-result {
+		color: $result-warn;
+	}
+
+	span.error,
+	span.failed,
+	span.xpassed,
+	.error .col-result,
+	.failed .col-result,
+	.xpassed .col-result {
+		color: $result-error;
+	}
+
+	/*------------------
+	 * RESULTS TABLE
+	 *
+	 * 1. Table Layout
+	 * 2. Extra
+	 * 3. Sorting items
+	 *
+	 *------------------*/
+
+	/*------------------
+	 * 1. Table Layout
+	 *------------------*/
+
+	#results-table {
+		border-color: $border;
+		color: $text-arbitrary;
+
+		th,
+		td {
+			border-color: $border;
+		}
+	}
+
+	/*------------------
+	 * 2. Extra
+	 *------------------*/
+
+	.log {
+		background-color: $log-bg;
+		border-color: $log-bg;
+		color: $log-fg;
+	}
+
+	div.image {
+		border-color: $border;
+	}
+
+	div.video {
+		border-color: $border;
+	}
+
+	.expander::after {
+		color: $expander;
+	}
+
+	.collapser::after {
+		color: $expander;
+	}
+
+	/*------------------
+	 * 3. Sorting items
+	 *------------------*/
+
+	.sort-icon {
+		.inactive & {
+			/*finish triangle*/
+			border-top-color: $border;
+		}
+
+		.asc.active & {
+			/*finish triangle*/
+			border-bottom-color: $text-arbitrary;
+		}
+
+		.desc.active & {
+			/*finish triangle*/
+			border-top-color: $text-arbitrary;
+		}
+	}
+}
+
+
+/******************************
+ * LIGHT COLOURS
+ ******************************/
+@include apply(
+	$background: white,
+	$background-alt: #f6f6f6,
+
+	$text: black,
+	$link: #999,
+	$text-arbitrary: #999,
+
+	$border: #e6e6e6,
+
+	$expander: #bbb,
+
+	$result-ok: green,
+	$result-warn: orange,
+	$result-error: red,
+	$log-bg: #e6e6e6,
+	$log-fg: black,
+);
+
+/******************************
+ * DARK COLOURS
+ ******************************/
+@media (prefers-color-scheme: dark) {
+	@include apply(
+		$background: #222,
+		$background-alt: #292929,
+
+		$text: #ccc,
+		$link: #c6c2ab,
+		$text-arbitrary: #aaa,
+
+		$border: #333,
+
+		$expander: #c6c2ab,
+
+		$result-ok: #4e9a06,
+		$result-warn: #c4a000,
+		$result-error: #cc0000,
+		$log-bg: #0c0c0d,
+		$log-fg: #8c8c8c,
+	);
+}

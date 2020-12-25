@@ -1,91 +1,77 @@
+/******************************
+ * LAYOUT
+ ******************************/
 body {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 12px;
   /* do not increase min-width as some may use split screens */
   min-width: 800px;
-  color: #999;
 }
 
 h1 {
   font-size: 24px;
-  color: black;
 }
 
 h2 {
   font-size: 16px;
-  color: black;
-}
-
-p {
-  color: black;
-}
-
-a {
-  color: #999;
 }
 
 table {
   border-collapse: collapse;
 }
 
-/******************************
+/*------------------
  * SUMMARY INFORMATION
- ******************************/
+ *------------------*/
 #environment td {
   padding: 5px;
-  border: 1px solid #E6E6E6;
-}
-#environment tr:nth-child(odd) {
-  background-color: #f6f6f6;
+  border-width: 1px;
+  border-style: solid;
 }
 
-/******************************
- * TEST RESULT COLORS
- ******************************/
+/*------------------
+ * TEST RESULT TYPES
+ *------------------*/
 span.passed,
-.passed .col-result {
-  color: green;
-}
-
 span.skipped,
 span.xfailed,
 span.rerun,
-.skipped .col-result,
-.xfailed .col-result,
-.rerun .col-result {
-  color: orange;
-}
-
 span.error,
 span.failed,
-span.xpassed,
-.error .col-result,
-.failed .col-result,
-.xpassed .col-result {
-  color: red;
+span.xpassed {
+  font-weight: bold;
 }
 
-/******************************
+.col-result {
+  font-weight: bold;
+}
+.col-result .expander,
+.col-result .collapser {
+  font-weight: normal;
+}
+
+/*------------------
  * RESULTS TABLE
  *
  * 1. Table Layout
  * 2. Extra
  * 3. Sorting items
  *
- ******************************/
+ *------------------*/
 /*------------------
  * 1. Table Layout
  *------------------*/
 #results-table {
-  border: 1px solid #e6e6e6;
-  color: #999;
+  border-width: 1px;
+  border-style: solid;
   font-size: 12px;
   width: 100%;
 }
 #results-table th,
 #results-table td {
   padding: 5px;
-  border: 1px solid #E6E6E6;
+  border-width: 1px;
+  border-style: solid;
   text-align: left;
 }
 #results-table th {
@@ -96,9 +82,8 @@ span.xpassed,
  * 2. Extra
  *------------------*/
 .log {
-  background-color: #e6e6e6;
-  border: 1px solid #e6e6e6;
-  color: black;
+  border-width: 1px;
+  border-style: solid;
   display: block;
   font-family: "Courier New", Courier, monospace;
   height: 230px;
@@ -111,7 +96,8 @@ span.xpassed,
 }
 
 div.image {
-  border: 1px solid #e6e6e6;
+  border-width: 1px;
+  border-style: solid;
   float: right;
   height: 240px;
   margin-left: 5px;
@@ -123,7 +109,8 @@ div.image img {
 }
 
 div.video {
-  border: 1px solid #e6e6e6;
+  border-width: 1px;
+  border-style: solid;
   float: right;
   height: 240px;
   margin-left: 5px;
@@ -142,14 +129,12 @@ div.video video {
 
 .expander::after {
   content: " (show details)";
-  color: #BBB;
   font-style: italic;
   cursor: pointer;
 }
 
 .collapser::after {
   content: " (hide details)";
-  color: #BBB;
   font-style: italic;
   cursor: pointer;
 }
@@ -174,13 +159,260 @@ div.video video {
 }
 .inactive .sort-icon {
   /*finish triangle*/
-  border-top: 8px solid #E6E6E6;
+  border-top-width: 8px;
+  border-top-style: solid;
 }
 .asc.active .sort-icon {
   /*finish triangle*/
-  border-bottom: 8px solid #999;
+  border-bottom-width: 8px;
+  border-bottom-style: solid;
 }
 .desc.active .sort-icon {
   /*finish triangle*/
-  border-top: 8px solid #999;
+  border-top-width: 8px;
+  border-top-style: solid;
+}
+
+/******************************
+ * LIGHT COLOURS
+ ******************************/
+body {
+  background-color: white;
+  color: #999;
+}
+
+h1 {
+  color: black;
+}
+
+h2 {
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+/*------------------
+ * SUMMARY INFORMATION
+ *------------------*/
+#environment td {
+  border-color: #e6e6e6;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+
+/*------------------
+ * TEST RESULT TYPES
+ *------------------*/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+/*------------------
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ *------------------*/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border-color: #e6e6e6;
+  color: #999;
+}
+#results-table th,
+#results-table td {
+  border-color: #e6e6e6;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.log {
+  background-color: #e6e6e6;
+  border-color: #e6e6e6;
+  color: black;
+}
+
+div.image {
+  border-color: #e6e6e6;
+}
+
+div.video {
+  border-color: #e6e6e6;
+}
+
+.expander::after {
+  color: #bbb;
+}
+
+.collapser::after {
+  color: #bbb;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.inactive .sort-icon {
+  /*finish triangle*/
+  border-top-color: #e6e6e6;
+}
+.asc.active .sort-icon {
+  /*finish triangle*/
+  border-bottom-color: #999;
+}
+.desc.active .sort-icon {
+  /*finish triangle*/
+  border-top-color: #999;
+}
+
+/******************************
+ * DARK COLOURS
+ ******************************/
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #222;
+    color: #aaa;
+  }
+
+  h1 {
+    color: #ccc;
+  }
+
+  h2 {
+    color: #ccc;
+  }
+
+  p {
+    color: #ccc;
+  }
+
+  a {
+    color: #c6c2ab;
+  }
+
+  /*------------------
+   * SUMMARY INFORMATION
+   *------------------*/
+  #environment td {
+    border-color: #333;
+  }
+  #environment tr:nth-child(odd) {
+    background-color: #292929;
+  }
+
+  /*------------------
+   * TEST RESULT TYPES
+   *------------------*/
+  span.passed,
+.passed .col-result {
+    color: #4e9a06;
+  }
+
+  span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+    color: #c4a000;
+  }
+
+  span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+    color: #cc0000;
+  }
+
+  /*------------------
+   * RESULTS TABLE
+   *
+   * 1. Table Layout
+   * 2. Extra
+   * 3. Sorting items
+   *
+   *------------------*/
+  /*------------------
+   * 1. Table Layout
+   *------------------*/
+  #results-table {
+    border-color: #333;
+    color: #aaa;
+  }
+  #results-table th,
+#results-table td {
+    border-color: #333;
+  }
+
+  /*------------------
+   * 2. Extra
+   *------------------*/
+  .log {
+    background-color: #0c0c0d;
+    border-color: #0c0c0d;
+    color: #8c8c8c;
+  }
+
+  div.image {
+    border-color: #333;
+  }
+
+  div.video {
+    border-color: #333;
+  }
+
+  .expander::after {
+    color: #c6c2ab;
+  }
+
+  .collapser::after {
+    color: #c6c2ab;
+  }
+
+  /*------------------
+   * 3. Sorting items
+   *------------------*/
+  .inactive .sort-icon {
+    /*finish triangle*/
+    border-top-color: #333;
+  }
+  .asc.active .sort-icon {
+    /*finish triangle*/
+    border-bottom-color: #aaa;
+  }
+  .desc.active .sort-icon {
+    /*finish triangle*/
+    border-top-color: #aaa;
+  }
 }

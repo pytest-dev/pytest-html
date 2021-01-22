@@ -128,7 +128,6 @@ class HTMLReport:
 
         if self.rerun is not None:
             outcomes.append(Outcome("rerun", self.rerun))
-
         summary = [
             html.p(f"{numtests} tests ran in {suite_time_delta:.2f} seconds. "),
             html.p(
@@ -181,8 +180,10 @@ class HTMLReport:
         ) as main_js_fp:
             main_js = main_js_fp.read()
 
+        pass_percent = int((self.passed / (self.passed + self.failed)) * 100)
         body = html.body(
             html.script(raw(main_js)),
+            html.script(raw('var data = [ {title: "pass %s", num: %d},{title: "failed %s", num: %d},]; ' % (str(int(pass_percent)) + "%", self.passed, str(100 - int(pass_percent)) + "%", self.failed))),
             html.h1(self.title),
             html.p(
                 "Report generated on {} at {} by ".format(
@@ -200,7 +201,7 @@ class HTMLReport:
         session.config.hook.pytest_html_results_summary(
             prefix=summary_prefix, summary=summary, postfix=summary_postfix
         )
-        body.extend([html.h2("Summary")] + summary_prefix + summary + summary_postfix)
+        body.extend([html.h2("Summary")] + [html.p(raw('<canvas width="550" height="350" style="border: 1px solid #ccc"></canvas>'))] + summary_prefix + summary + summary_postfix)
 
         body.extend(results)
 

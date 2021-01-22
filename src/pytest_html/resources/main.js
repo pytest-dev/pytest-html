@@ -131,6 +131,9 @@ function init () { // eslint-disable-line no-unused-vars
                 sortColumn(elem);
             }, false);
     });
+
+    var pieChart = new PieChart();
+    pieChart.init();
 }
 
 function sortTable(clicked, keyFunc) {
@@ -243,4 +246,84 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
     const allRowsHidden = rows.length == 0 ? true : false;
     const notFoundMessage = document.getElementById('not-found-message');
     notFoundMessage.hidden = !allRowsHidden;
+}
+
+var PieChart = function () {
+    this.ctx = document.querySelector("canvas").getContext("2d");
+    this.x0 = this.ctx.canvas.width / 2 + 60;
+    this.y0 = this.ctx.canvas.height / 2;
+    this.radius = 100;
+    this.outLine = 20;
+    this.spaceX=10;
+    this.spaceY=20;
+    this.smallW=30;
+    this.smallH=15;
+}
+
+PieChart.prototype.init = function () {
+    this.drawPie();
+}
+
+PieChart.prototype.drawPie = function () {
+    var angleList = this.drawAngle();
+    var start = 0;
+    var colors = 'green,orange'.split(',');
+    angleList.forEach(function (item, i) {
+        var end = item.angle + start;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.x0, this.y0);
+        this.ctx.arc(this.x0, this.y0, this.radius, start, end);
+        this.ctx.fillStyle = colors[i];
+        this.ctx.fill();
+        this.drawTitle(start, item, this.ctx.fillStyle);
+        this.drawInfo(i,item.title,this.ctx.fillStyle);
+        start = end;
+    }.bind(this));
+}
+PieChart.prototype.drawTitle = function (start, item, color) {
+    var edge = this.radius + this.outLine;
+    var edgeX = edge * Math.cos(start + item.angle / 2);
+    var edgeY = edge * Math.sin(start + item.angle / 2);
+    var outX = this.x0 + edgeX;
+    var outY = this.y0 + edgeY;
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.x0, this.y0);
+    this.ctx.lineTo(outX, outY);
+    this.ctx.strokeStyle = color;
+    this.ctx.stroke();
+
+    var align = outX > this.x0 ? "left" : "right";
+    this.ctx.font = "15px Helvetica";
+    this.ctx.textAlign = align;
+    this.ctx.textBaseline = "bottom";
+    this.ctx.fillStyle = color;
+    this.ctx.fillText(item.title, outX, outY);
+
+    var textW = this.ctx.measureText(item.title).width;
+    this.ctx.moveTo(outX, outY);
+    outX = outX > this.x0 ? outX + textW : outX - textW;
+    this.ctx.lineTo(outX, outY);
+    this.ctx.stroke();
+
+}
+
+PieChart.prototype.drawInfo = function (index,text,color) {
+    this.ctx.beginPath();
+    this.ctx.fillRect(this.spaceX,this.spaceY*index+this.smallH,this.smallW,this.smallH);
+    this.ctx.font = "12px Helvetica";
+    this.ctx.fillStyle = color;
+    this.ctx.textAlign="left";
+    this.ctx.fillText(text,this.spaceX*2+this.smallW,this.spaceY*index+this.smallH*2);
+}
+
+PieChart.prototype.drawAngle = function () {
+    var total = 0;
+    data.forEach(function (item, index) {
+        total += item.num;
+    });
+    data.forEach(function (item, index) {
+        var angle = item.num / total * Math.PI * 2;
+        item.angle = angle;
+    });
+    return data;
 }

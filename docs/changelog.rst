@@ -17,6 +17,10 @@ Version History
 
   * Thanks to `@gnikonorov <https://github.com/gnikonorov>`_ for the PR
 
+* Implement :code:`environment_table_redact_list` to allow for redaction of environment table values. (`#233 <https://github.com/pytest-dev/pytest-html/issues/233>`_)
+
+  * Thanks to `@fenchu <https://github.com/fenchu>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the PR
+
 3.1.1 (2020-12-13)
 ~~~~~~~~~~~~~~~~~~
 

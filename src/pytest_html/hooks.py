@@ -24,4 +24,4 @@ def pytest_html_results_table_html(report, data):
 
 
 def pytest_html_report_logo(report):
-    """ Called before adding the image to the report. """    
+    """ Called before adding the image to the report. """

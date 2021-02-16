@@ -182,11 +182,11 @@ class HTMLReport:
             os.path.join(os.path.dirname(__file__), "resources", "main.js")
         ) as main_js_fp:
             main_js = main_js_fp.read()
-            
+
         def image_visiblity_on_error():
             if self.img_path is None:
                 return "this.style.display='none'"
-  
+
         body = html.body(
             html.script(raw(main_js)),
             html.h1(self.title),

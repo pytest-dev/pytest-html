@@ -23,6 +23,7 @@ class HTMLReport:
         self.logfile = os.path.abspath(logfile)
         self.test_logs = []
         self.title = os.path.basename(self.logfile)
+        self.img_path = None
         self.results = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
@@ -181,10 +182,15 @@ class HTMLReport:
             os.path.join(os.path.dirname(__file__), "resources", "main.js")
         ) as main_js_fp:
             main_js = main_js_fp.read()
-
+            
+        def image_visiblity_on_error():
+            if self.img_path is None:
+                return "this.style.display='none'"
+  
         body = html.body(
             html.script(raw(main_js)),
             html.h1(self.title),
+            html.img(src=self.img_path, onerror=image_visiblity_on_error()),
             html.p(
                 "Report generated on {} at {} by ".format(
                     generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")

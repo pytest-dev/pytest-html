@@ -21,3 +21,7 @@ def pytest_html_results_table_row(report, cells):
 
 def pytest_html_results_table_html(report, data):
     """ Called after building results table additional HTML. """
+
+
+def pytest_html_report_logo(report):
+    """ Called before adding the image to the report. """    

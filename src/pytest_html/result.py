@@ -40,7 +40,6 @@ class TestResult:
         self.append_log_html(
             report,
             self.additional_html,
-            config.option.capture,
             config.option.showcapture,
         )
 
@@ -175,7 +174,7 @@ class TestResult:
             duration_as_gmtime = time.gmtime(report.duration)
             return time.strftime(duration_formatter, duration_as_gmtime)
 
-    def _populate_html_log_div(self, log, report):
+    def _populate_html_log_div(self, log, report, show_capture):
         if report.longrepr:
             # longreprtext is only filled out on failure by pytest
             #    otherwise will be None.
@@ -194,8 +193,13 @@ class TestResult:
                         log.append(raw(escape(line)))
                 log.append(html.br())
 
+        if show_capture == "no":
+            return
+
         for section in report.sections:
             header, content = map(escape, section)
+            if show_capture != "all" and show_capture not in header:
+                continue
             log.append(f" {header:-^80} ")
             log.append(html.br())
 
@@ -214,16 +218,11 @@ class TestResult:
         self,
         report,
         additional_html,
-        pytest_capture_value,
         pytest_show_capture_value,
     ):
         log = html.div(class_="log")
 
-        should_skip_captured_output = pytest_capture_value == "no"
-        if report.outcome == "failed" and not should_skip_captured_output:
-            should_skip_captured_output = pytest_show_capture_value == "no"
-        if not should_skip_captured_output:
-            self._populate_html_log_div(log, report)
+        self._populate_html_log_div(log, report, pytest_show_capture_value)
 
         if len(log) == 0:
             log = html.div(class_="empty log")

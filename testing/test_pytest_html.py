@@ -1152,35 +1152,6 @@ class TestHTML:
         assert "this is the test case" in html
 
     @pytest.mark.parametrize(
-        "capture_flag, should_capture",
-        [("-s", False), ("--capture=no", False), ("--capture=sys", True)],
-    )
-    def test_extra_log_reporting_respects_capture_no(
-        self, testdir, capture_flag, should_capture
-    ):
-        testdir.makepyfile(
-            """
-            import sys
-            def test_capture_no():
-                print("stdout print line")
-                print("stderr print line", file=sys.stderr)
-        """
-        )
-
-        result, html = run(testdir, "report.html", capture_flag)
-        assert result.ret == 0
-        assert_results(html)
-
-        extra_log_div_regex = re.compile(
-            '<div class="log"> -+Captured stdout call-+ <br/>stdout print line\n<br/> '
-            "-+Captured stderr call-+ <br/>stderr print line\n<br/></div>"
-        )
-        if should_capture:
-            assert extra_log_div_regex.search(html) is not None
-        else:
-            assert extra_log_div_regex.search(html) is None
-
-    @pytest.mark.parametrize(
         "show_capture_flag, should_capture",
         [("--show-capture=no", False), ("--show-capture=all", True)],
     )
@@ -1208,6 +1179,47 @@ class TestHTML:
         if should_capture:
             assert extra_log_div_regex.search(html) is not None
         else:
+            assert extra_log_div_regex.search(html) is None
+
+    @pytest.mark.parametrize(
+        "show_capture_flag, html_log",
+        [
+            ("--show-capture=no", []),
+            ("--show-capture=all", ["stdout", "stderr", "log"]),
+            ("--show-capture=stdout", ["stdout"]),
+            ("--show-capture=stderr", ["stderr"]),
+            ("--show-capture=log", ["log"]),
+        ],
+    )
+    def test_extra_log_reporting_respects_show_capture(
+        self, testdir, show_capture_flag, html_log
+    ):
+        testdir.makepyfile(
+            """
+            import sys
+            import logging
+            def test_show_capture():
+                print("stdout print line")
+                print("stderr print line", file=sys.stderr)
+                logging.warning("log print line")
+                assert False
+        """
+        )
+
+        result, html = run(testdir, "report.html", show_capture_flag)
+        assert result.ret == 1
+        assert_results(html, failed=1, passed=0)
+
+        for log_key in html_log:
+            extra_log_div_regex = re.compile(
+                f" -+Captured {log_key} call-+ <br/>.*{log_key} print line\n?<br/>"
+            )
+            assert extra_log_div_regex.search(html)
+
+        if not html_log:
+            extra_log_div_regex = re.compile(
+                " -+Captured \\w+ call-+ <br/>.* print line\n<br/>"
+            )
             assert extra_log_div_regex.search(html) is None
 
     def test_environment_table_redact_list(self, testdir):

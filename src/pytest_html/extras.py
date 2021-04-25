@@ -8,6 +8,7 @@ FORMAT_JSON = "json"
 FORMAT_TEXT = "text"
 FORMAT_URL = "url"
 FORMAT_VIDEO = "video"
+FORMAT_BINARY = "binary"
 
 
 def extra(content, format_type, name=None, mime_type=None, extension=None):

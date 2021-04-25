@@ -116,6 +116,15 @@ class TestResult:
                     content, extra_index, test_index, extra.get("extension")
                 )
 
+        elif extra.get("format_type") == extras.FORMAT_BINARY:
+            content = extra.get("content")
+            if self.self_contained:
+                href = self._data_uri(content, mime_type=extra.get("mime_type"))
+            else:
+                href = self.create_asset(
+                    content, extra_index, test_index, extra.get("extension"), "wb"
+                )
+
         elif extra.get("format_type") == extras.FORMAT_TEXT:
             content = extra.get("content")
             if isinstance(content, bytes):

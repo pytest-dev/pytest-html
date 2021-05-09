@@ -49,27 +49,11 @@ function showExtras(colresultElem) {
 }
 
 function hideExtras(colresultElem) {
-    const extras = colresultElem.parentNode.nextElementSibling;
-    const expandcollapse = colresultElem.firstElementChild;
-    extras.classList.add('collapsed');
-    expandcollapse.classList.remove('collapser');
-    expandcollapse.classList.add('expander');
-}
-
-function showFilters() {
-    let visibleString = getQueryParameter('visible') || 'all';
-    visibleString = visibleString.toLowerCase();
-    const checkedItems = visibleString.split(',');
-
-    const filterItems = document.getElementsByClassName('filter');
-    for (let i = 0; i < filterItems.length; i++) {
-        filterItems[i].hidden = false;
-
-        if (visibleString != 'all') {
-            filterItems[i].checked = checkedItems.includes(filterItems[i].getAttribute('data-test-result'));
-            filterTable(filterItems[i]);
-        }
-    }
+  const extras = colresultElem.parentNode.nextElementSibling;
+  const expandcollapse = colresultElem.firstElementChild;
+  extras.classList.add('collapsed');
+  expandcollapse.classList.remove('collapser');
+  expandcollapse.classList.add('expander');
 }
 
 function addCollapse() {

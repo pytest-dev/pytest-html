@@ -50,6 +50,12 @@ class NextGenReport:
         data = self._config.hook.pytest_report_to_serializable(
             config=self._config, report=report
         )
+        # rename to "extras" since list
+        if hasattr(report, "extra"):
+            for extra in report.extra:
+                print(extra)
+                if extra["mime_type"] is not None and "image" in extra["mime_type"]:
+                    data.update({"extras": extra})
         self._data["tests"].append(data)
         self._write()
 

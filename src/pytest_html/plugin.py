@@ -743,7 +743,6 @@ class HTMLReport:
             test_report.longrepr = full_text
             test_report.extra = extras
             test_report.duration = duration
-
             if wasxfail:
                 test_report.wasxfail = True
 

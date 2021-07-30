@@ -21,3 +21,16 @@ def pytest_html_results_table_row(report, cells):
 
 def pytest_html_results_table_html(report, data):
     """ Called after building results table additional HTML. """
+
+
+def pytest_html_modify_section(name, data):
+    """ Called after the html for each section is generated. """
+
+
+def pytest_html_modify_all_sections(sections):
+    """
+    Called before adding sections to the HTML body.
+
+    Sections list can be modified inplace.
+
+    """

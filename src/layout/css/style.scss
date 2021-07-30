@@ -93,7 +93,7 @@ span.xpassed,
  * 1. Table Layout
  *------------------*/
 
-#results-table {
+.results-table {
 	border: $border-width solid #e6e6e6;
 	color: #999;
 	font-size: $font-size-text;
@@ -109,6 +109,11 @@ span.xpassed,
 	th {
 		font-weight: bold;
 	}
+}
+
+.results-table-row > tr:nth-child(1):hover {
+    background-color: hsl(0deg 0% 93%);
+    cursor: pointer;
 }
 
 /*------------------
@@ -164,20 +169,6 @@ div.video {
 
 .collapsed {
 	display: none;
-}
-
-.expander::after {
-	content: " (show details)";
-	color: #BBB;
-	font-style: italic;
-	cursor: pointer;
-}
-
-.collapser::after {
-	content: " (hide details)";
-	color: #BBB;
-	font-style: italic;
-	cursor: pointer;
 }
 
 /*------------------

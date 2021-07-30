@@ -26,7 +26,9 @@ function findAll(selector, elem) {
 
 function sortColumn(elem) {
     toggleSortStates(elem);
+    const table = elem.parentNode.parentNode.parentNode;
     const colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+
     let key;
     if (elem.classList.contains('result')) {
         key = keyResult;
@@ -35,31 +37,26 @@ function sortColumn(elem) {
     } else {
         key = keyAlpha;
     }
-    sortTable(elem, key(colIndex));
+
+    sortTable(table, elem, key(colIndex));
 }
 
 function showAllExtras() { // eslint-disable-line no-unused-vars
-    findAll('.col-result').forEach(showExtras);
+    findAll('.results-table-row').forEach(showExtras);
 }
 
 function hideAllExtras() { // eslint-disable-line no-unused-vars
-    findAll('.col-result').forEach(hideExtras);
+    findAll('.results-table-row').forEach(hideExtras);
 }
 
-function showExtras(colresultElem) {
-    const extras = colresultElem.parentNode.nextElementSibling;
-    const expandcollapse = colresultElem.firstElementChild;
+function showExtras(resultsTableRowElem) {
+    const extras = resultsTableRowElem.lastElementChild;
     extras.classList.remove('collapsed');
-    expandcollapse.classList.remove('expander');
-    expandcollapse.classList.add('collapser');
 }
 
-function hideExtras(colresultElem) {
-    const extras = colresultElem.parentNode.nextElementSibling;
-    const expandcollapse = colresultElem.firstElementChild;
+function hideExtras(resultsTableRowElem) {
+    const extras = resultsTableRowElem.lastElementChild;
     extras.classList.add('collapsed');
-    expandcollapse.classList.remove('collapser');
-    expandcollapse.classList.add('expander');
 }
 
 function showFilters() {
@@ -80,35 +77,31 @@ function showFilters() {
 
 function addCollapse() {
     // Add links for show/hide all
-    const resulttable = find('table#results-table');
-    const showhideall = document.createElement('p');
-    showhideall.innerHTML = '<a href="javascript:showAllExtras()">Show all details</a> / ' +
-                            '<a href="javascript:hideAllExtras()">Hide all details</a>';
-    resulttable.parentElement.insertBefore(showhideall, resulttable);
+    findAll('.results-table').forEach(function(table) {
+        const showhideall = document.createElement('p');
+        showhideall.innerHTML = '<a href="javascript:showAllExtras()">Show all details</a> / ' +
+                                '<a href="javascript:hideAllExtras()">Hide all details</a>';
+        table.parentElement.insertBefore(showhideall, table);
+    });
 
     // Add show/hide link to each result
-    findAll('.col-result').forEach(function(elem) {
+    findAll('.results-table-row').forEach(function(elem) {
         const collapsed = getQueryParameter('collapsed') || 'Passed';
-        const extras = elem.parentNode.nextElementSibling;
-        const expandcollapse = document.createElement('span');
-        if (extras.classList.contains('collapsed')) {
-            expandcollapse.classList.add('expander');
-        } else if (collapsed.includes(elem.innerHTML)) {
-            extras.classList.add('collapsed');
-            expandcollapse.classList.add('expander');
-        } else {
-            expandcollapse.classList.add('collapser');
-        }
-        elem.appendChild(expandcollapse);
+        const extras = elem.lastElementChild;
 
-        elem.addEventListener('click', function(event) {
-            if (event.currentTarget.parentNode.nextElementSibling.classList.contains('collapsed')) {
-                showExtras(event.currentTarget);
+        if (elem.classList.contains(collapsed.toLowerCase())) {
+            extras.classList.add('collapsed');
+        }
+
+        elem.firstElementChild.addEventListener('click', function(event) {
+            if (event.currentTarget.parentNode.lastElementChild.classList.contains('collapsed')) {
+                showExtras(event.currentTarget.parentNode);
             } else {
-                hideExtras(event.currentTarget);
+                hideExtras(event.currentTarget.parentNode);
             }
         });
     });
+
 }
 
 function getQueryParameter(name) {
@@ -126,29 +119,30 @@ function init () { // eslint-disable-line no-unused-vars
     sortColumn(find('.initial-sort'));
 
     findAll('.sortable').forEach(function(elem) {
-        elem.addEventListener('click',
-            function() {
-                sortColumn(elem);
-            }, false);
+        elem.addEventListener('click', function() {
+            sortColumn(elem);
+        }, false);
     });
 }
 
-function sortTable(clicked, keyFunc) {
-    const rows = findAll('.results-table-row');
+function sortTable(table, clicked, keyFunc) {
+    const rows = findAll('.results-table-row', table);
     const reversed = !clicked.classList.contains('asc');
     const sortedRows = sort(rows, keyFunc, reversed);
-    /* Whole table is removed here because browsers acts much slower
-     * when appending existing elements.
-     */
-    const thead = document.getElementById('results-table-head');
-    document.getElementById('results-table').remove();
-    const parent = document.createElement('table');
-    parent.id = 'results-table';
-    parent.appendChild(thead);
+
+    const thead = find('.results-table-head', table);
+    const tableCopy = table.cloneNode(deep=true);
+    // Remove all rows except the header
+    while (tableCopy.firstChild) {
+        tableCopy.removeChild(tableCopy.lastChild);
+    }
+
+    tableCopy.appendChild(thead);
     sortedRows.forEach(function(elem) {
-        parent.appendChild(elem);
+        tableCopy.appendChild(elem);
     });
-    document.getElementsByTagName('BODY')[0].appendChild(parent);
+
+    table.replaceWith(tableCopy);
 }
 
 function sort(items, keyFunc, reversed) {
@@ -196,11 +190,11 @@ function keyResult(colIndex) {
     };
 }
 
-function resetSortHeaders() {
-    findAll('.sort-icon').forEach(function(elem) {
+function resetSortHeaders(table) {
+    findAll('.sort-icon', table).forEach(function(elem) {
         elem.parentNode.removeChild(elem);
     });
-    findAll('.sortable').forEach(function(elem) {
+    findAll('.sortable', table).forEach(function(elem) {
         const icon = document.createElement('div');
         icon.className = 'sort-icon';
         icon.textContent = 'vvv';
@@ -217,9 +211,11 @@ function toggleSortStates(elem) {
         elem.classList.toggle('desc');
     }
 
+    const table = elem.parentNode.parentNode.parentNode;
+
     //if inactive, reset all other functions and add ascending active
     if (elem.classList.contains('inactive')) {
-        resetSortHeaders();
+        resetSortHeaders(table);
         elem.classList.remove('inactive');
         elem.classList.add('active');
     }
@@ -239,8 +235,10 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         outcomeRows[i].hidden = !elem.checked;
     }
 
-    const rows = findAll('.results-table-row').filter(isAllRowsHidden);
-    const allRowsHidden = rows.length == 0 ? true : false;
-    const notFoundMessage = document.getElementById('not-found-message');
-    notFoundMessage.hidden = !allRowsHidden;
+    findAll('.results-table').forEach(function(table) {
+        const rows = findAll('.results-table-row', table).filter(isAllRowsHidden);
+        const allRowsHidden = rows.length == 0 ? true : false;
+        const notFoundMessage = find('.not-found-message', table);
+        notFoundMessage.hidden = !allRowsHidden;
+    });
 }

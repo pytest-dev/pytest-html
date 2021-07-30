@@ -4,8 +4,8 @@ import json
 import os
 import re
 import time
-from collections import defaultdict
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
+from copy import deepcopy
 
 from py.xml import html
 from py.xml import raw
@@ -21,9 +21,10 @@ class HTMLReport:
     def __init__(self, logfile, config):
         logfile = os.path.expanduser(os.path.expandvars(logfile))
         self.logfile = os.path.abspath(logfile)
-        self.test_logs = []
+        self.test_logs = defaultdict(list)
+        self.results = defaultdict(list)
+        self.test_logs_keys = []
         self.title = os.path.basename(self.logfile)
-        self.results = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
@@ -36,15 +37,20 @@ class HTMLReport:
     def _appendrow(self, outcome, report):
         result = TestResult(outcome, report, self.logfile, self.config)
         if result.row_table is not None:
-            index = bisect.bisect_right(self.results, result)
-            self.results.insert(index, result)
+            group = getattr(report, 'group', None)
+
+            if group not in self.results:
+                self.test_logs_keys.append(group)
+
+            index = bisect.bisect_right(self.results[group], result)
+            self.results[group].insert(index, result)
             tbody = html.tbody(
                 result.row_table,
                 class_="{} results-table-row".format(result.outcome.lower()),
             )
             if result.row_extra is not None:
                 tbody.append(result.row_extra)
-            self.test_logs.insert(index, tbody)
+            self.test_logs[group].insert(index, tbody)
 
     def append_passed(self, report):
         if report.when == "call":
@@ -130,6 +136,38 @@ class HTMLReport:
         if self.rerun is not None:
             outcomes.append(Outcome("rerun", self.rerun))
 
+        # Create each section of the HTML report
+        sections = []
+
+        #
+        # Header
+        #
+
+        header = [
+            html.h1(self.title),
+            html.p(
+                "Report generated on {} at {} by ".format(
+                    generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")
+                ),
+                html.a("pytest-html", href=__pypi_url__),
+                f" v{__version__}",
+            )
+        ]
+        sections.append(header)
+        session.config.hook.pytest_html_modify_section(name='header', data=header)
+
+        #
+        # Environment
+        #
+
+        environment = self._generate_environment(session.config)
+        sections.append(environment)
+        session.config.hook.pytest_html_modify_section(name='environment', data=environment)
+
+        #
+        # Summary
+        #
+
         summary = [
             html.p(f"{numtests} tests ran in {suite_time_delta:.2f} seconds. "),
             html.p(
@@ -145,6 +183,19 @@ class HTMLReport:
             if i < len(outcomes):
                 summary.append(", ")
 
+        summary_prefix, summary_postfix = [], []
+        session.config.hook.pytest_html_results_summary(
+            prefix=summary_prefix, summary=summary, postfix=summary_postfix
+        )
+
+        summary = [html.h2("Summary")] + summary_prefix + summary + summary_postfix
+        sections.append(summary)
+        session.config.hook.pytest_html_modify_section(name='summary', data=summary)
+
+        #
+        # Results
+        #
+
         cells = [
             html.th("Result", class_="sortable result initial-sort", col="result"),
             html.th("Test", class_="sortable", col="name"),
@@ -153,57 +204,49 @@ class HTMLReport:
         ]
         session.config.hook.pytest_html_results_table_header(cells=cells)
 
-        results = [
-            html.h2("Results"),
-            html.table(
-                [
-                    html.thead(
-                        html.tr(cells),
-                        html.tr(
-                            [
-                                html.th(
-                                    "No results found. Try to check the filters",
-                                    colspan=len(cells),
-                                )
-                            ],
-                            id="not-found-message",
-                            hidden="true",
+        results = [html.h2("Results")]
+        for group in self.test_logs_keys:
+            results += [
+                html.h3(group),
+                html.table(
+                    [
+                        html.thead(
+                            html.tr(deepcopy(cells)),
+                            html.tr(
+                                [
+                                    html.th(
+                                        "No results found. Try to check the filters",
+                                        colspan=len(cells),
+                                    )
+                                ],
+                                class_="not-found-message",
+                                hidden="true",
+                            ),
+                            class_="results-table-head",
                         ),
-                        id="results-table-head",
-                    ),
-                    self.test_logs,
-                ],
-                id="results-table",
-            ),
-        ]
+                        self.test_logs[group],
+                    ],
+                    class_="results-table",
+                )
 
+            ]
+
+        sections.append(results)
+        session.config.hook.pytest_html_modify_section(name='results', data=results)
+
+        # Put sections together to create the HTML document.
         with open(
             os.path.join(os.path.dirname(__file__), "resources", "main.js")
         ) as main_js_fp:
             main_js = main_js_fp.read()
 
-        body = html.body(
-            html.script(raw(main_js)),
-            html.h1(self.title),
-            html.p(
-                "Report generated on {} at {} by ".format(
-                    generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")
-                ),
-                html.a("pytest-html", href=__pypi_url__),
-                f" v{__version__}",
-            ),
-            onLoad="init()",
-        )
+        body = html.body(html.script(raw(main_js)), onLoad="init()")
 
-        body.extend(self._generate_environment(session.config))
+        # Give user chance to arbitrarily modify sections
+        session.config.hook.pytest_html_modify_all_sections(sections=sections)
 
-        summary_prefix, summary_postfix = [], []
-        session.config.hook.pytest_html_results_summary(
-            prefix=summary_prefix, summary=summary, postfix=summary_postfix
-        )
-        body.extend([html.h2("Summary")] + summary_prefix + summary + summary_postfix)
-
-        body.extend(results)
+        for section in sections:
+            body.extend(section)
 
         doc = html.html(head, body)
 

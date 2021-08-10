@@ -33,6 +33,7 @@ class HTMLReport:
         self.self_contained = config.getoption("self_contained_html")
         self.config = config
         self.reports = defaultdict(list)
+        self.extra_sections = []
 
     def _appendrow(self, outcome, report):
         result = TestResult(outcome, report, self.logfile, self.config)
@@ -85,6 +86,9 @@ class HTMLReport:
         else:
             self.skipped += 1
             self._appendrow("Skipped", report)
+
+    def add_section(self, data):
+        self.extra_sections.append(data)
 
     def _generate_report(self, session):
         suite_stop_time = time.time()
@@ -233,6 +237,8 @@ class HTMLReport:
 
         sections.append(results)
         session.config.hook.pytest_html_modify_section(name='results', data=results)
+
+        sections += self.extra_sections
 
         # Put sections together to create the HTML document.
         with open(

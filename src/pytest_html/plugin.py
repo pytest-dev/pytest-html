@@ -114,3 +114,14 @@ def extra(pytestconfig):
     pytestconfig.extras = []
     yield pytestconfig.extras
     del pytestconfig.extras[:]
+
+
+@pytest.fixture(scope='session')
+def add_section(pytestconfig):
+    """Add a section to the HTML report."""
+
+    html = getattr(pytestconfig, "_html", None)
+    if html:
+        return html.add_section
+    else:
+        return None

@@ -203,13 +203,13 @@ adds a sortable time column, and removes the links column:
 
   def pytest_html_results_table_header(cells):
       cells.insert(2, html.th("Description"))
-      cells.insert(1, html.th("Time", class_="sortable time", col="time"))
+      cells.insert(1, html.th("End Time", class_="sortable time", col="time"))
       cells.pop()
 
 
   def pytest_html_results_table_row(report, cells):
       cells.insert(2, html.td(report.description))
-      cells.insert(1, html.td(datetime.utcnow(), class_="col-time"))
+      cells.insert(1, html.td(report.test_end, class_="col-time"))
       cells.pop()
 
 
@@ -218,6 +218,7 @@ adds a sortable time column, and removes the links column:
       outcome = yield
       report = outcome.get_result()
       report.description = str(item.function.__doc__)
+      report.test_end = datetime.fromtimestamp(call.stop)
 
 You can also remove results by implementing the
 :code:`pytest_html_results_table_row` hook and removing all cells. The

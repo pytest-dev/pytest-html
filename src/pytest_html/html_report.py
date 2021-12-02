@@ -132,6 +132,7 @@ class HTMLReport:
 
         summary = [
             html.p(f"{numtests} tests ran in {suite_time_delta:.2f} seconds. "),
+            html.h2(f"{passtests / numtests * 100:.2f}% Passed ")
             html.p(
                 "(Un)check the boxes to filter the results.",
                 class_="filter",

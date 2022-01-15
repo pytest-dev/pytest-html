@@ -1,5 +1,11 @@
 import importlib
+import json
+import os
+
 from functools import lru_cache
+
+from typing import Any
+from typing import Dict
 
 
 @lru_cache()
@@ -10,3 +16,23 @@ def ansi_support():
     except ImportError:
         # ansi2html is not installed
         pass
+
+
+def cleanup_unserializable(d: Dict[str, Any]) -> Dict[str, Any]:
+    """Return new dict with entries that are not json serializable by their str()."""
+    result = {}
+    for k, v in d.items():
+        try:
+            json.dumps({k: v})
+        except TypeError:
+            v = str(v)
+        result[k] = v
+    return result
+
+
+def get_scripts(scripts_path):
+    return [
+        f
+        for f in os.listdir(scripts_path)
+        if os.path.isfile(os.path.join(scripts_path, f))
+    ]

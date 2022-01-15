@@ -81,10 +81,10 @@ def pytest_configure(config):
         if not hasattr(config, "workerinput"):
             # prevent opening htmlpath on worker nodes (xdist)
             config._html = HTMLReport(htmlpath, config)
-
-            config._next_gen = NextGenReport(config, Path("nextgendata.js"))
             config.pluginmanager.register(config._html)
-            config.pluginmanager.register(config._next_gen)
+
+            # config._next_gen = NextGenReport(htmlpath, config)
+            # config.pluginmanager.register(config._next_gen)
 
 
 def pytest_unconfigure(config):
@@ -93,10 +93,10 @@ def pytest_unconfigure(config):
         del config._html
         config.pluginmanager.unregister(html)
 
-    next_gen = getattr(config, "_next_gen", None)
-    if next_gen:
-        del config._next_gen
-        config.pluginmanager.unregister(next_gen)
+    # next_gen = getattr(config, "_next_gen", None)
+    # if next_gen:
+    #     del config._next_gen
+    #     config.pluginmanager.unregister(next_gen)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -105,8 +105,10 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
     if report.when == "call":
         fixture_extras = getattr(item.config, "extras", [])
-        plugin_extras = getattr(report, "extra", [])
-        report.extra = fixture_extras + plugin_extras
+        plugin_extras = getattr(report, "extras", [])
+        # print("fix: ", fixture_extras)
+        # print("plugin: ", plugin_extras)
+        report.extras = fixture_extras + plugin_extras
 
 
 @pytest.fixture

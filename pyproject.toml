@@ -1,3 +1,19 @@
+[tool.poetry]
+name = "pytest-html"
+description = "pytest plugin for generating HTML reports"
+version = "4.0.0-next"
+authors = ["Jim", "Victor"]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+Jinja2 = "^2.11.3"
+
+[tool.poetry.dev-dependencies]
+black = "20.8b1"
+flake8 = "3.8.4"
+tox = "^3.23.1"
+pytest = "^6.2.4"
+
 [build-system]
 requires = [
   "pip >= 19.3.1",

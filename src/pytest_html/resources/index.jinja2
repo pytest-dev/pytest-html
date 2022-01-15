@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>{{ title }}</title>
+    {% for style in styles %}
+        <link href="{{ style }}" rel="stylesheet" type="text/css"/>
+    {% endfor %}
+  </head>
+  <body onLoad="init()">
+    <h1 id="title">{{ title }}</h1>
+    <p>Report generated on {{ date }} at {{ time }} by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
+        v{{ version }}</p>
+    <h2>Environment</h2>
+    <table id="environment"></table>
+    <!-- TEMPLATES -->
+      <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+    <template id="template_a">
+      <a target="_blank"></a>
+    </template>
+    <template id="template_img">
+      <a target="_blank">
+        <img />
+      </a>
+    </template>
+
+    <template id="template_results-table__tbody">
+      <tbody class="results-table-row">
+        <tr>
+          <td class="col-result"></td>
+          <td class="col-name"></td>
+          <td class="col-duration"></td>
+          <td class="col-links"></td>
+        </tr>
+        <tr class="extras-row">
+          <td class="extra" colspan="4">
+            <div class="image"></div>
+            <div class="log"></div>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+    <template id="template_results-table__head">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable" data-column-type="outcome">Result</th>
+          <th class="sortable" data-column-type="nodeid">Test</th>
+          <th class="sortable" data-column-type="duration">Duration</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+    </template>
+    <template id="template_results-table__head--empty">
+      <tr id="not-found-message">
+        <th colspan="4">No results found. Try to check the filters</th>
+      </tr>
+    </template>
+    <!-- END TEMPLATES -->
+    <div class="summary">
+      <div class="summary__data">
+        <h2>Summary</h2>
+        <p class="run-count"></p>
+        <p class="filter">(Un)check the boxes to filter the results.</p>
+        
+        <input checked="true" class="filter" data-test-result="error" name="filter_checkbox" type="checkbox"/><span class="error"></span> 
+        <input checked="true" class="filter" data-test-result="failed" name="filter_checkbox" type="checkbox"/><span class="failed"></span>
+        <input checked="true" class="filter" data-test-result="rerun" name="filter_checkbox" type="checkbox"/><span class="rerun"></span>
+        <input checked="true" class="filter" data-test-result="xfailed" name="filter_checkbox" type="checkbox"/><span class="xfailed"></span> 
+        <input checked="true" class="filter" data-test-result="xpassed" name="filter_checkbox" type="checkbox"/><span class="xpassed"></span> 
+        <input checked="true" class="filter" data-test-result="passed" name="filter_checkbox" type="checkbox"/><span class="passed"></span>
+        <input checked="true" class="filter" data-test-result="skipped" name="filter_checkbox" type="checkbox"/><span class="skipped"></span>
+
+      </div>
+      <div class="summary__reload">
+        <div class="summary__reload__button" onclick="location.reload()">
+          <div>There are still tests running. <br />Reload this page to ge the latest results!</div>
+        </div>
+      </div>
+      <div class="summary__spacer">
+      </div>
+    </div>
+    <h2>Results</h2>
+    <table id="results-table">
+      
+    </table>
+  </body>
+  <footer>
+    <script src="assets/{{ data_file }}"></script>
+    {% for script in scripts %}
+      <script src="scripts/{{ script }}"></script>
+    {% endfor %}
+  </footer>
+</html>

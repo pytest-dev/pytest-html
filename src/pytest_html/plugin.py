@@ -8,7 +8,7 @@ from _pytest.pathlib import Path
 
 from . import extras  # noqa: F401
 from .html_report import HTMLReport
-from .nextgen import NextGenReport
+from .nextgen import NextGenReport, NextGenSelfContainedReport
 
 
 def pytest_addhooks(pluginmanager):
@@ -64,27 +64,31 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    htmlpath = config.getoption("htmlpath")
-    if htmlpath:
+    html_path = config.getoption("htmlpath")
+    if html_path:
         missing_css_files = []
-        for csspath in config.getoption("css"):
-            if not os.path.exists(csspath):
-                missing_css_files.append(csspath)
+        for css_path in config.getoption("css"):
+            if not os.path.exists(css_path):
+                missing_css_files.append(css_path)
 
         if missing_css_files:
-            oserror = (
+            os_error = (
                 f"Missing CSS file{'s' if len(missing_css_files) > 1 else ''}:"
                 f" {', '.join(missing_css_files)}"
             )
-            raise OSError(oserror)
+            raise OSError(os_error)
 
         if not hasattr(config, "workerinput"):
             # prevent opening htmlpath on worker nodes (xdist)
-            config._html = HTMLReport(htmlpath, config)
-            config.pluginmanager.register(config._html)
+            # config._html = HTMLReport(htmlpath, config)
+            # config.pluginmanager.register(config._html)
 
-            # config._next_gen = NextGenReport(htmlpath, config)
-            # config.pluginmanager.register(config._next_gen)
+            if config.getoption("self_contained_html"):
+                config._next_gen = NextGenSelfContainedReport(html_path, config)
+            else:
+                config._next_gen = NextGenReport(html_path, config)
+
+            config.pluginmanager.register(config._next_gen)
 
 
 def pytest_unconfigure(config):
@@ -93,10 +97,10 @@ def pytest_unconfigure(config):
         del config._html
         config.pluginmanager.unregister(html)
 
-    # next_gen = getattr(config, "_next_gen", None)
-    # if next_gen:
-    #     del config._next_gen
-    #     config.pluginmanager.unregister(next_gen)
+    next_gen = getattr(config, "_next_gen", None)
+    if next_gen:
+        del config._next_gen
+        config.pluginmanager.unregister(next_gen)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -106,8 +110,6 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call":
         fixture_extras = getattr(item.config, "extras", [])
         plugin_extras = getattr(report, "extras", [])
-        # print("fix: ", fixture_extras)
-        # print("plugin: ", plugin_extras)
         report.extras = fixture_extras + plugin_extras
 
 

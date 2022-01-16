@@ -4,9 +4,17 @@
   <head>
     <meta charset="utf-8"/>
     <title>{{ title }}</title>
-    {% for style in styles %}
-        <link href="{{ style }}" rel="stylesheet" type="text/css"/>
-    {% endfor %}
+    {% if self_contained %}
+      <style type="text/css">
+      {% for style in styles -%}
+        {% include style %}
+      {% endfor -%}
+      </style>
+    {% else %}
+    {% for style in styles -%}
+      <link href="{{ style }}" rel="stylesheet" type="text/css"/>
+    {% endfor -%}
+    {% endif %}
   </head>
   <body onLoad="init()">
     <h1 id="title">{{ title }}</h1>
@@ -29,7 +37,6 @@
         <img />
       </a>
     </template>
-
     <template id="template_results-table__tbody">
       <tbody class="results-table-row">
         <tr>
@@ -67,12 +74,12 @@
         <h2>Summary</h2>
         <p class="run-count"></p>
         <p class="filter">(Un)check the boxes to filter the results.</p>
-        
-        <input checked="true" class="filter" data-test-result="error" name="filter_checkbox" type="checkbox"/><span class="error"></span> 
+
+        <input checked="true" class="filter" data-test-result="error" name="filter_checkbox" type="checkbox"/><span class="error"></span>
         <input checked="true" class="filter" data-test-result="failed" name="filter_checkbox" type="checkbox"/><span class="failed"></span>
         <input checked="true" class="filter" data-test-result="rerun" name="filter_checkbox" type="checkbox"/><span class="rerun"></span>
-        <input checked="true" class="filter" data-test-result="xfailed" name="filter_checkbox" type="checkbox"/><span class="xfailed"></span> 
-        <input checked="true" class="filter" data-test-result="xpassed" name="filter_checkbox" type="checkbox"/><span class="xpassed"></span> 
+        <input checked="true" class="filter" data-test-result="xfailed" name="filter_checkbox" type="checkbox"/><span class="xfailed"></span>
+        <input checked="true" class="filter" data-test-result="xpassed" name="filter_checkbox" type="checkbox"/><span class="xpassed"></span>
         <input checked="true" class="filter" data-test-result="passed" name="filter_checkbox" type="checkbox"/><span class="passed"></span>
         <input checked="true" class="filter" data-test-result="skipped" name="filter_checkbox" type="checkbox"/><span class="skipped"></span>
 
@@ -87,13 +94,22 @@
     </div>
     <h2>Results</h2>
     <table id="results-table">
-      
+
     </table>
   </body>
   <footer>
-    <script src="assets/{{ data_file }}"></script>
+  {% if self_contained %}
+    <script>
+      const jsonData = {{ test_data|tojson }}
     {% for script in scripts %}
-      <script src="scripts/{{ script }}"></script>
+      {% include script %}
     {% endfor %}
+    </script>
+  {% else %}
+    <script src="assets/{{ data_file }}"></script>
+    {% for script in scripts -%}
+      <script src="scripts/{{ script }}"></script>
+    {% endfor -%}
+  {% endif %}
   </footer>
 </html>

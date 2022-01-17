@@ -13,7 +13,7 @@ on:
       **
   pull_request:
   schedule:
-    - cron: 1 0 * * *  # Run daily at 0:01 UTC
+    - cron: '1 0 * * *'  # Run daily at 0:01 UTC
 
 jobs:
   build_docs:
@@ -93,9 +93,10 @@ jobs:
             name: pypy3-windows
             python-version: pypy3
 
-          - os: macOS-latest
-            name: pypy3-mac
-            python-version: pypy3
+           # https://github.com/pytest-dev/pytest-html/issues/482
+#          - os: macOS-latest
+#            name: pypy3-mac
+#            python-version: pypy3
 
           - os: ubuntu-18.04
             name: devel-ubuntu
@@ -122,14 +123,16 @@ jobs:
     - name: Test with tox
       run: |
         python -m tox -e ${{ steps.split-matrix-name.outputs._0}}-cov
-    - name: Upload coverage to codecov
-      uses: codecov/codecov-action@v1
-      with:
-        fail_ci_if_error: true
-        file: ./coverage.xml
-        flags: tests
-        name: ${{ matrix.py }} - ${{ matrix.os }}
-        verbose: true
+     # TODO: https://github.com/pytest-dev/pytest-html/issues/481
+#    - name: Upload coverage to codecov
+#      if: github.event.schedule == ''
+#      uses: codecov/codecov-action@v2
+#      with:
+#        fail_ci_if_error: true
+#        file: ./coverage.xml
+#        flags: tests
+#        name: ${{ matrix.py }} - ${{ matrix.os }}
+#        verbose: true
   build_javascript:
     name: grunt
     runs-on: ubuntu-18.04

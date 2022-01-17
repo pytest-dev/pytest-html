@@ -1,4 +1,4 @@
-name: gh
+name: Main
 
 on:
   create:  # is used for publishing to PyPI and TestPyPI
@@ -12,13 +12,11 @@ on:
     - >-
       **
   pull_request:
-  schedule:
-    - cron: '1 0 * * *'  # Run daily at 0:01 UTC
 
 jobs:
   build_docs:
     name: Build Docs
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Set up Python

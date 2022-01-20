@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8"/>
-    <title>{{ title }}</title>
+    <title id="head-title"></title>
     {% if self_contained %}
       <style type="text/css">
       {% for style in styles -%}
@@ -17,7 +17,7 @@
     {% endif %}
   </head>
   <body onLoad="init()">
-    <h1 id="title">{{ title }}</h1>
+    <h1 id="title"></h1>
     <p>Report generated on {{ date }} at {{ time }} by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
         v{{ version }}</p>
     <h2>Environment</h2>

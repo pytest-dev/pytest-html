@@ -49,6 +49,7 @@ const getOutcome = ({ nodeid }, tests) => {
 
 const renderStatic = (obj) => {
   find('#title').innerText = obj.title;
+  find('#head-title').innerText =obj.title;
   const rows = Object.keys(obj.environment).map((key) =>
     dom.getStaticRow(key, obj.environment[key])
   );

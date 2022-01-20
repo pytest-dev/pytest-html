@@ -27,6 +27,7 @@ class BaseReport(object):
         self._template_filename = "index.jinja2"
 
         self._data = {
+            "title": "Test Report",
             "collectedItems": 0,
             "environment": {},
             "tests": [],
@@ -66,7 +67,6 @@ class BaseReport(object):
 
     def _render_html(
         self,
-        title,
         date,
         time,
         version,
@@ -77,7 +77,6 @@ class BaseReport(object):
         test_data=None,
     ):
         return self._template.render(
-            title=title,
             date=date,
             time=time,
             version=version,
@@ -149,7 +148,6 @@ class NextGenReport(BaseReport):
         generated = datetime.datetime.now()
         css_files = [new_css_path] + self._config.getoption("css")
         rendered_report = self._render_html(
-            "Test Report",
             generated.strftime("%d-%b-%Y"),
             generated.strftime("%H:%M:%S"),
             __version__,
@@ -184,7 +182,6 @@ class NextGenSelfContainedReport(BaseReport):
         generated = datetime.datetime.now()
         css_files = ["style.css"] + self._config.getoption("css")
         rendered_report = self._render_html(
-            "Test Report",
             generated.strftime("%d-%b-%Y"),
             generated.strftime("%H:%M:%S"),
             __version__,

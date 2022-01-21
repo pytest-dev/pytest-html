@@ -1,20 +1,20 @@
 import datetime
 import json
 import os
-
-import pytest
 import re
 import shutil
 
-from . import __version__
-from .util import cleanup_unserializable, get_scripts
-
-from jinja2 import Environment, FileSystemLoader
-
+import pytest
 from _pytest.pathlib import Path
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+
+from . import __version__
+from .util import cleanup_unserializable
+from .util import get_scripts
 
 
-class BaseReport(object):
+class BaseReport:
     def __init__(self, report_path, config):
         _plugin_path = os.path.dirname(__file__)
         self._report_absolute_path = Path(report_path).absolute()
@@ -124,7 +124,7 @@ class BaseReport(object):
 
 class NextGenReport(BaseReport):
     def __init__(self, report_path, config):
-        super(NextGenReport, self).__init__(report_path, config)
+        super().__init__(report_path, config)
         self._assets_path = Path(self._report_path, "assets")
         self._assets_path.mkdir(parents=True, exist_ok=True)
         self._scripts_dest_path = Path(self._report_path, "scripts")
@@ -172,7 +172,7 @@ class NextGenReport(BaseReport):
 
 class NextGenSelfContainedReport(BaseReport):
     def __init__(self, report_path, config):
-        super(NextGenSelfContainedReport, self).__init__(report_path, config)
+        super().__init__(report_path, config)
 
     def _generate_report(self):
         self._template = self._read_template(

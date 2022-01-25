@@ -1,0 +1,9 @@
+name: Nightly tests
+
+on:
+  schedule:
+    - cron: '1 0 * * *'  # Run daily at 0:01 UTC
+
+jobs:
+  tests:
+    uses: pytest-dev/pytest-html/.github/workflows/tests.yml@master

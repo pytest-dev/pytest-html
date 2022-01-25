@@ -11,6 +11,7 @@ from .nextgen import NextGenReport
 
 from _pytest.pathlib import Path
 
+
 def pytest_addhooks(pluginmanager):
     from . import hooks
 

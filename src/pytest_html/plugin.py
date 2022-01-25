@@ -8,8 +8,7 @@ from _pytest.pathlib import Path
 
 from . import extras  # noqa: F401
 from .html_report import HTMLReport
-from .nextgen import NextGenReport
-from .nextgen import NextGenSelfContainedReport
+from .nextgen import NextGenReport, NextGenSelfContainedReport
 
 
 def pytest_addhooks(pluginmanager):
@@ -43,6 +42,12 @@ def pytest_addoption(parser):
         metavar="path",
         default=[],
         help="append given css file content to report style file.",
+    )
+    group.addoption(
+        "--next-gen",
+        action="store_true",
+        default=False,
+        help="use next-gen report.",
     )
     parser.addini(
         "render_collapsed",
@@ -80,16 +85,17 @@ def pytest_configure(config):
             raise OSError(os_error)
 
         if not hasattr(config, "workerinput"):
-            # prevent opening htmlpath on worker nodes (xdist)
-            # config._html = HTMLReport(htmlpath, config)
-            # config.pluginmanager.register(config._html)
+            # prevent opening html_path on worker nodes (xdist)
 
-            if config.getoption("self_contained_html"):
-                config._next_gen = NextGenSelfContainedReport(html_path, config)
+            if not config.getoption("next_gen"):
+                config._html = HTMLReport(html_path, config)
             else:
-                config._next_gen = NextGenReport(html_path, config)
+                if config.getoption("self_contained_html"):
+                    config._html = NextGenSelfContainedReport(html_path, config)
+                else:
+                    config._html = NextGenReport(html_path, config)
 
-            config.pluginmanager.register(config._next_gen)
+            config.pluginmanager.register(config._html)
 
 
 def pytest_unconfigure(config):
@@ -97,11 +103,6 @@ def pytest_unconfigure(config):
     if html:
         del config._html
         config.pluginmanager.unregister(html)
-
-    next_gen = getattr(config, "_next_gen", None)
-    if next_gen:
-        del config._next_gen
-        config.pluginmanager.unregister(next_gen)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)

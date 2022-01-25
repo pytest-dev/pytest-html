@@ -8,7 +8,8 @@ from _pytest.pathlib import Path
 
 from . import extras  # noqa: F401
 from .html_report import HTMLReport
-from .nextgen import NextGenReport, NextGenSelfContainedReport
+from .nextgen import NextGenReport
+from .nextgen import NextGenSelfContainedReport
 
 
 def pytest_addhooks(pluginmanager):

@@ -4,12 +4,11 @@
 import os
 
 import pytest
+from _pytest.pathlib import Path
 
 from . import extras  # noqa: F401
 from .html_report import HTMLReport
 from .nextgen import NextGenReport
-
-from _pytest.pathlib import Path
 
 
 def pytest_addhooks(pluginmanager):

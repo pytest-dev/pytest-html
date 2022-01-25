@@ -56,29 +56,13 @@ function hideExtras(colresultElem) {
   expandcollapse.classList.add('expander');
 }
 
-function showFilters() {
-    let visibleString = getQueryParameter('visible') || 'all';
-    visibleString = visibleString.toLowerCase();
-    const checkedItems = visibleString.split(',');
-
-    const filterItems = document.getElementsByClassName('filter');
-    for (let i = 0; i < filterItems.length; i++) {
-        filterItems[i].hidden = false;
-
-        if (visibleString != 'all') {
-            filterItems[i].checked = checkedItems.includes(filterItems[i].getAttribute('data-test-result'));
-            filterTable(filterItems[i]);
-        }
-    }
-}
-
 function addCollapse() {
   // Add links for show/hide all
   const resulttable = find('table#results-table');
   const showhideall = document.createElement('p');
   showhideall.innerHTML =
-    '<a href="javascript:showAllExtras()">Show all details</a> / ' +
-    '<a href="javascript:hideAllExtras()">Hide all details</a>';
+      '<a href="javascript:showAllExtras()">Show all details</a> / ' +
+      '<a href="javascript:hideAllExtras()">Hide all details</a>';
   resulttable.parentElement.insertBefore(showhideall, resulttable);
 
   // Add show/hide link to each result
@@ -98,9 +82,9 @@ function addCollapse() {
 
     elem.addEventListener('click', function (event) {
       if (
-        event.currentTarget.parentNode.nextElementSibling.classList.contains(
-          'collapsed'
-        )
+          event.currentTarget.parentNode.nextElementSibling.classList.contains(
+              'collapsed'
+          )
       ) {
         showExtras(event.currentTarget);
       } else {

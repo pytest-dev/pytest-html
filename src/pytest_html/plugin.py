@@ -112,8 +112,8 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
     if report.when == "call":
         fixture_extras = getattr(item.config, "extras", [])
-        plugin_extras = getattr(report, "extras", [])
-        report.extras = fixture_extras + plugin_extras
+        plugin_extras = getattr(report, "extra", [])
+        report.extra = fixture_extras + plugin_extras
 
 
 @pytest.fixture
@@ -126,7 +126,7 @@ def extra(pytestconfig):
 
 
         def test_foo(extra):
-            extra.append(pytest_html.extras.url("http://www.example.com/"))
+            extra.append(pytest_html.extras.url("https://www.example.com/"))
     """
     pytestconfig.extras = []
     yield pytestconfig.extras

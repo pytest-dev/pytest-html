@@ -6,5 +6,4 @@ on:
 
 jobs:
   tests:
-    if: github.repository_owner == 'pytest-dev'
-    uses: ./.github/workflows/tests.yml
+    uses: pytest-dev/pytest-html/.github/workflows/tests.yml@master

@@ -8,4 +8,3 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
 write_to = "src/pytest_html/__version.py"
-

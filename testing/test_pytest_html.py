@@ -347,7 +347,7 @@ class TestHTML:
         assert result.ret == 0
 
         content = pkg_resources.resource_string(
-            "pytest_html", os.path.join("resources", "main.js")
+            "pytest_html", os.path.join("resources", "old_main.js")
         )
         content = content.decode("utf-8")
         assert content

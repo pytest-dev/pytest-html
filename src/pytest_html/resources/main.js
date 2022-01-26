@@ -61,8 +61,8 @@ function addCollapse() {
   const resulttable = find('table#results-table');
   const showhideall = document.createElement('p');
   showhideall.innerHTML =
-    '<a href="javascript:showAllExtras()">Show all details</a> / ' +
-    '<a href="javascript:hideAllExtras()">Hide all details</a>';
+      '<a href="javascript:showAllExtras()">Show all details</a> / ' +
+      '<a href="javascript:hideAllExtras()">Hide all details</a>';
   resulttable.parentElement.insertBefore(showhideall, resulttable);
 
   // Add show/hide link to each result
@@ -82,9 +82,9 @@ function addCollapse() {
 
     elem.addEventListener('click', function (event) {
       if (
-        event.currentTarget.parentNode.nextElementSibling.classList.contains(
-          'collapsed'
-        )
+          event.currentTarget.parentNode.nextElementSibling.classList.contains(
+              'collapsed'
+          )
       ) {
         showExtras(event.currentTarget);
       } else {

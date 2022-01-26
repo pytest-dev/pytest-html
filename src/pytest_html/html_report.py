@@ -178,7 +178,7 @@ class HTMLReport:
         ]
 
         with open(
-            os.path.join(os.path.dirname(__file__), "resources", "main.js")
+            os.path.join(os.path.dirname(__file__), "resources", "old_main.js")
         ) as main_js_fp:
             main_js = main_js_fp.read()
 

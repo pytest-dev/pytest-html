@@ -91,8 +91,13 @@ jobs:
         with:
           string: '${{ matrix.name }}'
           split-by: '-'
-      - name: Test with tox
+      - name: Test with coverage
+        if: "! contains(matrix.name, 'pypy3')"
         run: python -m tox -e ${{ steps.split-matrix-name.outputs._0}}-cov
+      - name: Test without coverage
+        if: "contains(matrix.name, 'pypy3')"
+        run: python -m tox -e ${{ steps.split-matrix-name.outputs._0}}
+
        # TODO: https://github.com/pytest-dev/pytest-html/issues/481
 #      - name: Upload coverage to codecov
 #        if: github.event.schedule == ''

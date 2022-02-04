@@ -228,6 +228,11 @@ div.video video {
   flex: 0 0 550px;
 }
 
-input.filter {
-  margin-left: 10px;
+.filters {
+  display: flex;
+  align-items: center;
+}
+
+.filter__label {
+  margin-right: 10px;
 }

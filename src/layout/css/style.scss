@@ -281,6 +281,10 @@ div.video {
   }
 }
 
-input.filter {
-  margin-left: 10px;
+.filters {
+  display: flex;
+  align-items: center;
+}
+.filter__label {
+  margin-right: 10px;
 }

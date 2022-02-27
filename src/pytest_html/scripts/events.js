@@ -17,7 +17,7 @@ document.addEventListener('sort', (e) => {
   const { type, ascending } = e.detail;
   const sortedList = genericSort(renderData.tests, type, ascending);
   renderData.tests = sortedList;
-  initRender();
+  redraw();
 });
 
 const doFilter = (type, apply) => {
@@ -42,5 +42,5 @@ const doFilter = (type, apply) => {
   } else {
     renderData.tests = jsonData.tests;
   }
-  initRender();
+  redraw();
 };

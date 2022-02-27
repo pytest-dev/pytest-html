@@ -249,7 +249,6 @@ div.video {
 }
 
 .summary {
-  display: flex;
   &__data {
     flex: 0 0 550px;
   }
@@ -280,7 +279,10 @@ div.video {
     flex: 0 0 550px;
   }
 }
-
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
 .filters {
   display: flex;
   align-items: center;

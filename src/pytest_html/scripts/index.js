@@ -3,24 +3,21 @@ function htmlToElements(html) {
   temp.innerHTML = html;
   return temp.content.childNodes;
 }
+
 const find = (selector, elem) => {
   if (!elem) {
     elem = document;
   }
   return elem.querySelector(selector);
 };
+
 const findAll = (selector, elem) => {
   if (!elem) {
     elem = document;
   }
-  return toArray(elem.querySelectorAll(selector));
+  return [...elem.querySelectorAll(selector)];
 };
-const templateEnvRow = find('#template_environment_row');
-const templateResult = find('#template_results-table__tbody');
-const aTag = find('#template_a');
-const aTagImg = find('#template_img');
-const listHeader = find('#template_results-table__head');
-const listHeaderEmpty = find('#template_results-table__head--empty');
+
 
 const removeChildren = (node) => {
   while (node.firstChild) {
@@ -133,3 +130,4 @@ const initRender = () => {
     bindEvents();
   }, 0);
 };
+const redraw = initRender;

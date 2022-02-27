@@ -74,28 +74,29 @@
         <h2>Summary</h2>
         <p class="run-count"></p>
         <p class="filter">(Un)check the boxes to filter the results.</p>
-
-        <input checked="true" class="filter" data-test-result="error" name="filter_checkbox" type="checkbox"/><span class="error"></span>
-        <input checked="true" class="filter" data-test-result="failed" name="filter_checkbox" type="checkbox"/><span class="failed"></span>
-        <input checked="true" class="filter" data-test-result="rerun" name="filter_checkbox" type="checkbox"/><span class="rerun"></span>
-        <input checked="true" class="filter" data-test-result="xfailed" name="filter_checkbox" type="checkbox"/><span class="xfailed"></span>
-        <input checked="true" class="filter" data-test-result="xpassed" name="filter_checkbox" type="checkbox"/><span class="xpassed"></span>
-        <input checked="true" class="filter" data-test-result="passed" name="filter_checkbox" type="checkbox"/><span class="passed"></span>
-        <input checked="true" class="filter" data-test-result="skipped" name="filter_checkbox" type="checkbox"/><span class="skipped"></span>
-
-      </div>
-      <div class="summary__reload">
-        <div class="summary__reload__button" onclick="location.reload()">
-          <div>There are still tests running. <br />Reload this page to ge the latest results!</div>
+        <div class="summary__reload">
+          <div class="summary__reload__button" onclick="location.reload()">
+            <div>There are still tests running. <br />Reload this page to ge the latest results!</div>
+          </div>
+        </div>
+        <div class="summary__spacer"></div>
+          <div class="controls">
+            <div class="filters apa">
+              <input checked="true" class="filter" data-test-result="error" name="filter_checkbox" type="checkbox"/><span class="error"></span>
+              <input checked="true" class="filter" data-test-result="failed" name="filter_checkbox" type="checkbox"/><span class="failed"></span>
+              <input checked="true" class="filter" data-test-result="rerun" name="filter_checkbox" type="checkbox"/><span class="rerun"></span>
+              <input checked="true" class="filter" data-test-result="xfailed" name="filter_checkbox" type="checkbox"/><span class="xfailed"></span>
+              <input checked="true" class="filter" data-test-result="xpassed" name="filter_checkbox" type="checkbox"/><span class="xpassed"></span>
+              <input checked="true" class="filter" data-test-result="passed" name="filter_checkbox" type="checkbox"/><span class="passed"></span>
+              <input checked="true" class="filter" data-test-result="skipped" name="filter_checkbox" type="checkbox"/><span class="skipped"></span>
+            </div>
+            <div class="filters">
+              <a href="javascript:showAllExtras()">Show all details</a>&nbsp;/&nbsp;<a href="javascript:hideAllExtras()">Hide all details</a>
+            <div>
+          </div>
         </div>
       </div>
-      <div class="summary__spacer">
-      </div>
-    </div>
-    <h2>Results</h2>
-    <table id="results-table">
-
-    </table>
+    <table id="results-table"></table>
   </body>
   <footer>
   {% if self_contained %}

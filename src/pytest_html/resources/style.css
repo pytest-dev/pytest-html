@@ -198,9 +198,6 @@ div.video video {
   display: none;
 }
 
-.summary {
-  display: flex;
-}
 .summary__data {
   flex: 0 0 550px;
 }
@@ -226,6 +223,11 @@ div.video video {
 }
 .summary__spacer {
   flex: 0 0 550px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
 }
 
 .filters {

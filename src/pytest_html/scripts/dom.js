@@ -1,11 +1,13 @@
-// const templateEnvRow = find('#template_environment_row');
-// const templateResult = find('#template_results-table__tbody');
-// const aTag = find('#template_a');
-// const aTagImg = find('#template_img');
-// const listHeader = find('#template_results-table__head');
+const templateEnvRow = find('#template_environment_row');
+const templateResult = find('#template_results-table__tbody');
+const aTag = find('#template_a');
+const aTagImg = find('#template_img');
+const listHeader = find('#template_results-table__head');
+const listHeaderEmpty = find('#template_results-table__head--empty');
+
 const dom = {
   getStaticRow: (key, value) => {
-    var envRow = templateEnvRow.content.cloneNode(true);
+    const envRow = templateEnvRow.content.cloneNode(true);
     const isObj = typeof value === 'object' && value !== null;
     const values = isObj
       ? Object.keys(value).map((k) => `${k}: ${value[k]}`)

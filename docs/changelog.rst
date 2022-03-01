@@ -5,6 +5,23 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 
 Version History
 ---------------
+3.2.1(2021-02-15)
+
+* Implement functionalitly to add/customize logo on Tests reports page.
+
+  * Report Logo
+
+  * By default the report logo will be None.
+
+  * you can edit it by using the pytest_html_report_logo hook
+
+  Usage:
+
+  def pytest_html_report_logo(report):
+    report.img_path = 'Path to Logo Image.'
+
+Version History
+---------------
 
 3.2.0 (unreleased)
 ~~~~~~~~~~~~~~~~~~

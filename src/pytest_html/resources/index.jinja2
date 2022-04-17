@@ -16,7 +16,7 @@
     {% endfor -%}
     {% endif %}
   </head>
-  <body onLoad="init()">
+  <body>
     <h1 id="title"></h1>
     <p>Report generated on {{ date }} at {{ time }} by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
         v{{ version }}</p>
@@ -81,7 +81,7 @@
         </div>
         <div class="summary__spacer"></div>
           <div class="controls">
-            <div class="filters apa">
+            <div class="filters">
               <input checked="true" class="filter" data-test-result="error" name="filter_checkbox" type="checkbox"/><span class="error"></span>
               <input checked="true" class="filter" data-test-result="failed" name="filter_checkbox" type="checkbox"/><span class="failed"></span>
               <input checked="true" class="filter" data-test-result="rerun" name="filter_checkbox" type="checkbox"/><span class="rerun"></span>
@@ -108,9 +108,7 @@
     </script>
   {% else %}
     <script src="assets/{{ data_file }}"></script>
-    {% for script in scripts -%}
-      <script src="scripts/{{ script }}"></script>
-    {% endfor -%}
+    <script src="scripts/app.js"></script>
   {% endif %}
   </footer>
 </html>

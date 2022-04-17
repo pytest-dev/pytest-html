@@ -1,9 +1,29 @@
-const templateEnvRow = find('#template_environment_row');
-const templateResult = find('#template_results-table__tbody');
-const aTag = find('#template_a');
-const aTagImg = find('#template_img');
-const listHeader = find('#template_results-table__head');
-const listHeaderEmpty = find('#template_results-table__head--empty');
+const templateEnvRow = document.querySelector('#template_environment_row');
+const templateResult = document.querySelector('#template_results-table__tbody');
+const aTag = document.querySelector('#template_a');
+const aTagImg = document.querySelector('#template_img');
+const listHeader = document.querySelector('#template_results-table__head');
+const listHeaderEmpty = document.querySelector('#template_results-table__head--empty');
+
+function htmlToElements(html) {
+  let temp = document.createElement('template');
+  temp.innerHTML = html;
+  return temp.content.childNodes;
+}
+
+const find = (selector, elem) => {
+  if (!elem) {
+    elem = document;
+  }
+  return elem.querySelector(selector);
+};
+
+const findAll = (selector, elem) => {
+  if (!elem) {
+    elem = document;
+  }
+  return [...elem.querySelectorAll(selector)];
+};
 
 const dom = {
   getStaticRow: (key, value) => {
@@ -32,7 +52,7 @@ const dom = {
 
     sortables.forEach((sortCol) => {
       if (sortCol === sortAttr) {
-        find(`[data-column-type="${sortCol}"]`, header).classList.add(
+        header.querySelector(`[data-column-type="${sortCol}"]`).classList.add(
           sortAsc ? 'desc' : 'asc'
         );
       }
@@ -42,27 +62,23 @@ const dom = {
   },
   getListHeaderEmpty: () => listHeaderEmpty.content.cloneNode(true),
   getResultTBody: ({ nodeid, longrepr, extras, duration }, outcome) => {
-    const isFail = outcome === 'failed';
     const resultBody = templateResult.content.cloneNode(true);
-    find('tbody', resultBody).classList.add(outcome);
-
-    find('.col-result', resultBody).innerText = outcome;
-    find('.col-name', resultBody).innerText = nodeid;
-    find('.col-duration', resultBody).innerText = `${(duration * 1000).toFixed(
-      2
-    )}s`;
-    if (isFail) {
-      find('.log', resultBody).innerText = longrepr
+    resultBody.querySelector('tbody').classList.add(outcome);
+    resultBody.querySelector('.col-result').innerText = outcome;
+    resultBody.querySelector('.col-name').innerText = nodeid;
+    resultBody.querySelector('.col-duration').innerText = `${(duration * 1000).toFixed(2)}s`;
+    if (outcome === 'failed') {
+      resultBody.querySelector('.log').innerText = longrepr
         ? longrepr.reprtraceback.reprentries[0].data.lines.join('\n')
         : '';
     } else {
-      find('.extras-row', resultBody).classList.add('hidden');
+      resultBody.querySelector('.extras-row').classList.add('hidden');
     }
 
     extras &&
       extras.forEach(({ name, format_type, content }) => {
         const extraLink = aTag.content.cloneNode(true);
-        const extraLinkItem = find('a', extraLink);
+        const extraLinkItem = document.querySelector('a', extraLink);
         const folderItems = ['image', 'video', 'text', 'html', 'json'];
 
         extraLinkItem.href = `${
@@ -70,15 +86,21 @@ const dom = {
         }${content}`;
         extraLinkItem.className = `col-links__extra ${format_type}`;
         extraLinkItem.innerText = name;
-        find('.col-links', resultBody).appendChild(extraLinkItem);
+        resultBody.querySelector('.col-links').appendChild(extraLinkItem);
+
         if (format_type === 'image') {
           const imgElTemp = aTagImg.content.cloneNode(true);
-          find('a', imgElTemp).href = `assets/${content}`;
-          find('img', imgElTemp).src = `assets/${content}`;
-          find('.extra .image', resultBody).appendChild(imgElTemp);
+          imgElTemp.querySelector('a').href = `assets/${content}`;
+          imgElTemp.querySelector('img').src = `assets/${content}`;
+          resultBody.querySelector('.extra .image').appendChild(imgElTemp);
         }
       });
 
     return resultBody;
   },
 };
+
+exports.dom = dom
+exports.htmlToElements = htmlToElements
+exports.find = find
+exports.findAll = findAll

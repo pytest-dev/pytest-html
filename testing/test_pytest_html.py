@@ -823,7 +823,7 @@ class TestHTML:
         "content,expected_content", _test_environment_list_value_data_set
     )
     def test_environment_list_value(self, testdir, content, expected_content):
-        expected_html_re = fr"<td>content</td>\n\s+<td>{expected_content}</td>"
+        expected_html_re = rf"<td>content</td>\n\s+<td>{expected_content}</td>"
         testdir.makeconftest(
             f"""
             def pytest_configure(config):

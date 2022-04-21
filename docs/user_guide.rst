@@ -261,6 +261,21 @@ or by setting the :code:`render_collapsed` in a configuration file (pytest.ini, 
 
 **NOTE:** Setting :code:`render_collapsed` will, unlike the query parameter, affect all statuses.
 
+
+Keep original test cases run order
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, all rows in the **Results** table will be sorted by category. Failed test cases will be placed at the top of the **Results** table.
+
+This behavior can be customized by setting the :code:`keep_original_order` in a configuration file (pytest.ini, setup.cfg, etc).
+
+.. code-block:: ini
+
+  [pytest]
+  keep_original_order = True
+
+**NOTE:** Setting :code:`keep_original_order` will turn off a possibility of changing order by table headers.
+
 Controlling Test Result Visibility Via Query Params
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -36,15 +36,20 @@ class HTMLReport:
     def _appendrow(self, outcome, report):
         result = TestResult(outcome, report, self.logfile, self.config)
         if result.row_table is not None:
-            index = bisect.bisect_right(self.results, result)
-            self.results.insert(index, result)
             tbody = html.tbody(
                 result.row_table,
                 class_="{} results-table-row".format(result.outcome.lower()),
             )
             if result.row_extra is not None:
                 tbody.append(result.row_extra)
-            self.test_logs.insert(index, tbody)
+
+            if self.config.getini("keep_original_order"):
+                self.results.append(result)
+                self.test_logs.append(tbody)
+            else:
+                index = bisect.bisect_right(self.results, result)
+                self.results.insert(index, result)
+                self.test_logs.insert(index, tbody)
 
     def append_passed(self, report):
         if report.when == "call":
@@ -145,11 +150,21 @@ class HTMLReport:
             if i < len(outcomes):
                 summary.append(", ")
 
+        sortable_class_attrib = "sortable"
+        initial_sort_class_attrib = "initial-sort"
+        if self.config.getini("keep_original_order"):
+            sortable_class_attrib = ""
+            initial_sort_class_attrib = ""
+
         cells = [
-            html.th("Result", class_="sortable result initial-sort", col="result"),
-            html.th("Test", class_="sortable", col="name"),
-            html.th("Duration", class_="sortable", col="duration"),
-            html.th("Links", class_="sortable links", col="links"),
+            html.th(
+                "Result",
+                class_=f"{sortable_class_attrib} result {initial_sort_class_attrib}",
+                col="result",
+            ),
+            html.th("Test", class_=f"{sortable_class_attrib}", col="name"),
+            html.th("Duration", class_=f"{sortable_class_attrib}", col="duration"),
+            html.th("Links", class_=f"{sortable_class_attrib} links", col="links"),
         ]
         session.config.hook.pytest_html_results_table_header(cells=cells)
 

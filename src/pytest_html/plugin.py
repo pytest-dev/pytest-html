@@ -59,6 +59,13 @@ def pytest_addoption(parser):
         help="A list of regexes corresponding to environment "
         "table variables whose values should be redacted from the report",
     )
+    parser.addini(
+        "keep_original_order",
+        type="bool",
+        default=False,
+        help="Keep original order of test cases run in report. "
+        "That option turns off a possibility of order rows by table headers.",
+    )
 
 
 def pytest_configure(config):

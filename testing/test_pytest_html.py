@@ -1095,6 +1095,126 @@ class TestHTML:
         assert len(re.findall(collapsed_html, html)) == expected_count
         assert_results(html, tests=2, passed=1, failed=1)
 
+    @pytest.mark.parametrize("keep_original_order, expected_table_header_tag", [
+        (
+                False,
+                [
+                    {
+                        'html_tag': '<th class=".*sortable.*">',
+                        'expected_count': 4
+                    },
+                    {
+                        'html_tag': '<th class=".*initial-sort.*">',
+                        'expected_count': 1
+                    }
+                ]
+        ),
+        (
+                True,
+                [
+                    {
+                        'html_tag': '<th class=".*sortable.*">',
+                        'expected_count': 0
+                    },
+                    {
+                        'html_tag': '<th class=".*initial-sort.*">',
+                        'expected_count': 0
+                    }
+                ]
+        )
+    ], ids=(
+        "keep_original_order option is not set",
+        "keep_original_order option is set",
+    ))
+    def test_keep_original_order_option_remove_any_sort_class_from_headers(
+            self, testdir, keep_original_order, expected_table_header_tag
+    ):
+        testdir.makeini(
+            f"""
+            [pytest]
+            keep_original_order = {keep_original_order}
+        """
+        )
+        testdir.makepyfile(
+            """
+            def test_pass1():
+                assert True
+
+            def test_fail1():
+                assert False
+
+            def test_pass2():
+                assert True
+
+            def test_fail2():
+                assert False
+        """
+        )
+        result, html = run(testdir)
+        assert result.ret == 1
+        for expect_element in expected_table_header_tag:
+            assert len(
+                re.findall(expect_element["html_tag"], html)
+            ) == expect_element["expected_count"]
+        assert_results(html, tests=4, passed=2, failed=2)
+
+    @pytest.mark.parametrize("keep_original_order, expected_order", [
+        (
+                False,
+                [
+                    "test_fail1",
+                    "test_fail2",
+                    "test_pass1",
+                    "test_pass2",
+                ]
+        ),
+        (
+                True,
+                [
+                    "test_pass1",
+                    "test_fail1",
+                    "test_pass2",
+                    "test_fail2",
+                ]
+        )
+    ], ids=(
+        "keep_original_order option is not set",
+        "keep_original_order option is set",
+    ))
+    def test_keep_original_order_option_hold_test_run_order(
+            self, testdir, keep_original_order, expected_order
+    ):
+        testdir.makeini(
+            f"""
+             [pytest]
+             keep_original_order = {keep_original_order}
+         """
+        )
+        testdir.makepyfile(
+            """
+            def test_pass1():
+                assert True
+
+            def test_fail1():
+                assert False
+
+            def test_pass2():
+                assert True
+
+            def test_fail2():
+                assert False
+        """
+        )
+        result, html = run(testdir)
+        assert result.ret == 1
+        result_report_test_order = re.findall('<td class="col-name">.*</td>', html)
+        assert len(result_report_test_order) == len(expected_order)
+        for expected_test_name, result_test_name in zip(
+                expected_order, result_report_test_order
+        ):
+            assert expected_test_name in result_test_name
+        assert_results(html, tests=4, passed=2, failed=2)
+
     def test_setup_and_teardown_in_html(self, testdir):
         testdir.makepyfile(
             """

@@ -1095,39 +1095,31 @@ class TestHTML:
         assert len(re.findall(collapsed_html, html)) == expected_count
         assert_results(html, tests=2, passed=1, failed=1)
 
-    @pytest.mark.parametrize("keep_original_order, expected_table_header_tag", [
-        (
+    @pytest.mark.parametrize(
+        "keep_original_order, expected_table_header_tag",
+        [
+            (
                 False,
                 [
-                    {
-                        'html_tag': '<th class=".*sortable.*">',
-                        'expected_count': 4
-                    },
-                    {
-                        'html_tag': '<th class=".*initial-sort.*">',
-                        'expected_count': 1
-                    }
-                ]
-        ),
-        (
+                    {"html_tag": '<th class=".*sortable.*">', "expected_count": 4},
+                    {"html_tag": '<th class=".*initial-sort.*">', "expected_count": 1},
+                ],
+            ),
+            (
                 True,
                 [
-                    {
-                        'html_tag': '<th class=".*sortable.*">',
-                        'expected_count': 0
-                    },
-                    {
-                        'html_tag': '<th class=".*initial-sort.*">',
-                        'expected_count': 0
-                    }
-                ]
-        )
-    ], ids=(
-        "keep_original_order option is not set",
-        "keep_original_order option is set",
-    ))
+                    {"html_tag": '<th class=".*sortable.*">', "expected_count": 0},
+                    {"html_tag": '<th class=".*initial-sort.*">', "expected_count": 0},
+                ],
+            ),
+        ],
+        ids=(
+            "keep_original_order option is not set",
+            "keep_original_order option is set",
+        ),
+    )
     def test_keep_original_order_option_remove_any_sort_class_from_headers(
-            self, testdir, keep_original_order, expected_table_header_tag
+        self, testdir, keep_original_order, expected_table_header_tag
     ):
         testdir.makeini(
             f"""
@@ -1153,36 +1145,41 @@ class TestHTML:
         result, html = run(testdir)
         assert result.ret == 1
         for expect_element in expected_table_header_tag:
-            assert len(
-                re.findall(expect_element["html_tag"], html)
-            ) == expect_element["expected_count"]
+            assert (
+                len(re.findall(expect_element["html_tag"], html))
+                == expect_element["expected_count"]
+            )
         assert_results(html, tests=4, passed=2, failed=2)
 
-    @pytest.mark.parametrize("keep_original_order, expected_order", [
-        (
+    @pytest.mark.parametrize(
+        "keep_original_order, expected_order",
+        [
+            (
                 False,
                 [
                     "test_fail1",
                     "test_fail2",
                     "test_pass1",
                     "test_pass2",
-                ]
-        ),
-        (
+                ],
+            ),
+            (
                 True,
                 [
                     "test_pass1",
                     "test_fail1",
                     "test_pass2",
                     "test_fail2",
-                ]
-        )
-    ], ids=(
-        "keep_original_order option is not set",
-        "keep_original_order option is set",
-    ))
+                ],
+            ),
+        ],
+        ids=(
+            "keep_original_order option is not set",
+            "keep_original_order option is set",
+        ),
+    )
     def test_keep_original_order_option_hold_test_run_order(
-            self, testdir, keep_original_order, expected_order
+        self, testdir, keep_original_order, expected_order
     ):
         testdir.makeini(
             f"""
@@ -1210,7 +1207,7 @@ class TestHTML:
         result_report_test_order = re.findall('<td class="col-name">.*</td>', html)
         assert len(result_report_test_order) == len(expected_order)
         for expected_test_name, result_test_name in zip(
-                expected_order, result_report_test_order
+            expected_order, result_report_test_order
         ):
             assert expected_test_name in result_test_name
         assert_results(html, tests=4, passed=2, failed=2)

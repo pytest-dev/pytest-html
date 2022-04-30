@@ -33,10 +33,10 @@ def pytest_addoption(parser):
         "--self-contained-html",
         action="store_true",
         help="create a self-contained html file containing all "
-             "necessary styles, scripts, and images - this means "
-             "that the report may not render or function where CSP "
-             "restrictions are in place (see "
-             "https://developer.mozilla.org/docs/Web/Security/CSP)",
+        "necessary styles, scripts, and images - this means "
+        "that the report may not render or function where CSP "
+        "restrictions are in place (see "
+        "https://developer.mozilla.org/docs/Web/Security/CSP)",
     )
     group.addoption(
         "--css",
@@ -55,13 +55,13 @@ def pytest_addoption(parser):
         "max_asset_filename_length",
         default=255,
         help="set the maximum filename length for assets "
-             "attached to the html report.",
+        "attached to the html report.",
     )
     parser.addini(
         "environment_table_redact_list",
         type="linelist",
         help="A list of regexes corresponding to environment "
-             "table variables whose values should be redacted from the report",
+        "table variables whose values should be redacted from the report",
     )
 
 

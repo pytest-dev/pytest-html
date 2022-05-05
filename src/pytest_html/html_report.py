@@ -87,9 +87,7 @@ class HTMLReport:
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
-        with open(
-            os.path.join(os.path.dirname(__file__), "resources", "style.css")
-        ) as style_css_fp:
+        with open(Path(__file__).parent / "resources" / "style.css") as style_css_fp:
             self.style_css = style_css_fp.read()
 
         if ansi_support():
@@ -178,9 +176,7 @@ class HTMLReport:
             ),
         ]
 
-        with open(
-            os.path.join(os.path.dirname(__file__), "resources", "main.js")
-        ) as main_js_fp:
+        with open(Path(__file__).parent / "resources" / "main.js") as main_js_fp:
             main_js = main_js_fp.read()
 
         body = html.body(

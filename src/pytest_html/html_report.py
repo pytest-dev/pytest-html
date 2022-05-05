@@ -6,6 +6,7 @@ import re
 import time
 from collections import defaultdict
 from collections import OrderedDict
+from pathlib import Path
 
 from py.xml import html
 from py.xml import raw
@@ -19,10 +20,10 @@ from .util import ansi_support
 
 class HTMLReport:
     def __init__(self, logfile, config):
-        logfile = os.path.expanduser(os.path.expandvars(logfile))
-        self.logfile = os.path.abspath(logfile)
+        logfile = Path(os.path.expandvars(logfile)).expanduser()
+        self.logfile = logfile.absolute()
         self.test_logs = []
-        self.title = os.path.basename(self.logfile)
+        self.title = self.logfile.name
         self.results = []
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
@@ -253,17 +254,17 @@ class HTMLReport:
         return False
 
     def _save_report(self, report_content):
-        dir_name = os.path.dirname(self.logfile)
-        assets_dir = os.path.join(dir_name, "assets")
+        dir_name = self.logfile.parent
+        assets_dir = dir_name / "assets"
 
-        os.makedirs(dir_name, exist_ok=True)
+        dir_name.mkdir(parents=True, exist_ok=True)
         if not self.self_contained:
-            os.makedirs(assets_dir, exist_ok=True)
+            assets_dir.mkdir(parents=True, exist_ok=True)
 
         with open(self.logfile, "w", encoding="utf-8") as f:
             f.write(report_content)
         if not self.self_contained:
-            style_path = os.path.join(assets_dir, "style.css")
+            style_path = assets_dir / "style.css"
             with open(style_path, "w", encoding="utf-8") as f:
                 f.write(self.style_css)
 
@@ -339,4 +340,4 @@ class HTMLReport:
         self._save_report(report_content)
 
     def pytest_terminal_summary(self, terminalreporter):
-        terminalreporter.write_sep("-", f"generated html file: file://{self.logfile}")
+        terminalreporter.write_sep("-", f"generated html file: {self.logfile.as_uri()}")

@@ -93,8 +93,9 @@ class TestResult:
         relative_path = f"assets/{asset_file_name}"
 
         kwargs = {"encoding": "utf-8"} if "b" not in mode else {}
-        with open(asset_path, mode, **kwargs) as f:
-            f.write(content)
+        func = asset_path.write_bytes if "b" in mode else asset_path.write_text
+        func(content, **kwargs)
+
         return relative_path
 
     def append_extra_html(self, extra, extra_index, test_index):

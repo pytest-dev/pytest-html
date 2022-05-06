@@ -87,8 +87,8 @@ class HTMLReport:
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
 
-        with open(Path(__file__).parent / "resources" / "style.css") as style_css_fp:
-            self.style_css = style_css_fp.read()
+        css_path = Path(__file__).parent / "resources" / "style.css"
+        self.style_css = css_path.read_text()
 
         if ansi_support():
             ansi_css = [
@@ -105,8 +105,7 @@ class HTMLReport:
             self.style_css += "\n * CUSTOM CSS"
             self.style_css += f"\n * {path}"
             self.style_css += "\n ******************************/\n\n"
-            with open(path) as f:
-                self.style_css += f.read()
+            self.style_css += Path(path).read_text()
 
         css_href = "assets/style.css"
         html_css = html.link(href=css_href, rel="stylesheet", type="text/css")
@@ -176,8 +175,8 @@ class HTMLReport:
             ),
         ]
 
-        with open(Path(__file__).parent / "resources" / "main.js") as main_js_fp:
-            main_js = main_js_fp.read()
+        main_js_path = Path(__file__).parent / "resources" / "main.js"
+        main_js = main_js_path.read_text()
 
         body = html.body(
             html.script(raw(main_js)),
@@ -257,12 +256,10 @@ class HTMLReport:
         if not self.self_contained:
             assets_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(self.logfile, "w", encoding="utf-8") as f:
-            f.write(report_content)
+        self.logfile.write_text(report_content)
         if not self.self_contained:
             style_path = assets_dir / "style.css"
-            with open(style_path, "w", encoding="utf-8") as f:
-                f.write(self.style_css)
+            style_path.write_text(self.style_css)
 
     def _post_process_reports(self):
         for test_name, test_reports in self.reports.items():

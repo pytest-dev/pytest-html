@@ -20,16 +20,16 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
-        python-version: 3.6
+        python-version: 3.9
     - name: Install tox
       run: python -m pip install --upgrade tox
     - name: Build docs with tox
       run: python -m tox -e docs
 
   tests:
-    uses: pytest-dev/pytest-html/.github/workflows/tests.yml@master
+    uses: ./.github/workflows/tests.yml
 
   publish:
     name: Publish to PyPI registry
@@ -41,14 +41,13 @@ jobs:
       TOXENV: packaging
 
     steps:
-      - name: Switch to using Python 3.6 by default
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v3
         with:
-          python-version: 3.6
+          python-version: 3.9
       - name: Install tox
         run: python -m pip install --user tox
       - name: Check out src from Git
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           # Get shallow Git history (default) for tag creation events
           # but have a complete clone for any other workflows.

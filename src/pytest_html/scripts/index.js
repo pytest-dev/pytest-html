@@ -5,7 +5,7 @@ const { manager } = require('./datamanager.js')
 
 function init() {
     doInitFilter()
-    doInitSort() 
+    doInitSort()
     redraw();
 }
 

@@ -19,8 +19,8 @@ const setSortDirection = (ascending) => {
     localStorage.setItem('sortAsc', ascending)
 }
 
-module.exports = { 
-    getFilter, 
+module.exports = {
+    getFilter,
     setFilter,
     getSort,
     getSortDirection,

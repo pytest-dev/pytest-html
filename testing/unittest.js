@@ -55,7 +55,7 @@ describe('Sort tests', () => {
     describe('doInitSort', () =>  {
         let managerSpy, sortMock, sortDirectionMock
         beforeEach(() => dataModule.manager.resetRender())
-    
+
         afterEach(() => [sortMock,sortDirectionMock,managerSpy].forEach(fn => fn.restore()))
         it("has no stored sort", () => {
             sortMock = sinon.stub(localStorageModule, 'getSort').returns(null)
@@ -64,7 +64,7 @@ describe('Sort tests', () => {
 
             doInitSort()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])            
+            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])
         })
         it("has stored sort preference", () => {
             sortMock = sinon.stub(localStorageModule, 'getSort').returns('outcome')
@@ -78,7 +78,7 @@ describe('Sort tests', () => {
     })
     describe('doSort', () => {
         let getSortMock, setSortMock, getSortDirectionMock, setSortDirection, managerSpy
-        
+
         afterEach(() => [getSortMock, setSortMock, getSortDirectionMock, setSortDirection, managerSpy].forEach(fn => fn.restore()))
         it("sort on outcome", () => {
             getSortMock = sinon.stub(localStorageModule, 'getSort').returns(null)

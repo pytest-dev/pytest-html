@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -99,15 +98,16 @@
     <table id="results-table"></table>
   </body>
   <footer>
-  {% if self_contained %}
     <script>
       const jsonData = {{ test_data|tojson }}
+    </script>
+  {% if self_contained %}
+    <script>
     {% for script in scripts %}
       {% include script %}
     {% endfor %}
     </script>
   {% else %}
-    <script src="assets/{{ data_file }}"></script>
     <script src="scripts/app.js"></script>
   {% endif %}
   </footer>

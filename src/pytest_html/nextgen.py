@@ -33,9 +33,6 @@ class BaseReport:
             "tests": [],
         }
 
-    def _write_test_data(self):
-        pass
-
     def _generate_report(self):
         pass
 
@@ -96,14 +93,12 @@ class BaseReport:
         config = session.config
         if hasattr(config, "_metadata") and config._metadata:
             self._data["environment"] = self._generate_environment()
-            self._write_test_data()
 
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
         self._data["collectedItems"] = len(session.items)
-        self._write_test_data()
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
@@ -118,7 +113,6 @@ class BaseReport:
         #             data.update({"extras": extra})
 
         self._data["tests"].append(data)
-        self._write_test_data()
         self._generate_report()
 
 
@@ -130,7 +124,6 @@ class NextGenReport(BaseReport):
         self._scripts_dest_path = Path(self._report_path, "scripts")
         self._scripts_dest_path.mkdir(parents=True, exist_ok=True)
         self._default_css_path = Path(self._resources_path, "style.css")
-        self._data_file = Path(self._assets_path, "test_data.js")
 
     def _generate_report(self):
         self._template = self._read_template(
@@ -154,20 +147,9 @@ class NextGenReport(BaseReport):
             css_files,
             get_scripts(scripts_dest),
             self_contained=False,
-            data_file=self._data_file.name,
         )
 
         self._write_report(rendered_report)
-
-    def _write_test_data(self):
-        try:
-            data = json.dumps(self._data)
-        except TypeError:
-            data = cleanup_unserializable(self._data)
-            data = json.dumps(data)
-
-        with self._data_file.open("w", buffering=1, encoding="UTF-8") as f:
-            f.write(f"const jsonData = {data}\n")
 
 
 class NextGenSelfContainedReport(BaseReport):

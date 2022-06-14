@@ -111,6 +111,12 @@ jobs:
         if: "contains(matrix.name, 'pypy3')"
         run: python -m tox -e ${{ steps.split-matrix-name.outputs._0}}
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: upload pytest timing reports as json
+          path: |
+            ./report-*.json
+
        # TODO: https://github.com/pytest-dev/pytest-html/issues/481
 #      - name: Upload coverage to codecov
 #        if: github.event.schedule == ''

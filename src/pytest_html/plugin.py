@@ -89,20 +89,19 @@ def pytest_configure(config):
             # prevent opening html_path on worker nodes (xdist)
 
             if not config.getoption("next_gen"):
-                config._html = HTMLReport(html_path, config)
+                html = HTMLReport(html_path, config)
             else:
                 if config.getoption("self_contained_html"):
-                    config._html = NextGenSelfContainedReport(html_path, config)
+                    html = NextGenSelfContainedReport(html_path, config)
                 else:
-                    config._html = NextGenReport(html_path, config)
+                    html = NextGenReport(html_path, config)
 
-            config.pluginmanager.register(config._html)
+            config.pluginmanager.register(html)
 
 
 def pytest_unconfigure(config):
-    html = getattr(config, "_html", None)
+    html = config.pluginmanager.get(html)
     if html:
-        del config._html
         config.pluginmanager.unregister(html)
 
 

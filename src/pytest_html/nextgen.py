@@ -70,8 +70,7 @@ class BaseReport:
         styles,
         scripts,
         self_contained,
-        data_file=None,
-        test_data=None,
+        test_data,
     ):
         return self._template.render(
             date=date,
@@ -80,8 +79,7 @@ class BaseReport:
             styles=styles,
             scripts=scripts,
             self_contained=self_contained,
-            data_file=data_file,
-            test_data=test_data,
+            test_data=json.dumps(test_data),
         )
 
     def _write_report(self, rendered_report):
@@ -147,6 +145,7 @@ class NextGenReport(BaseReport):
             css_files,
             get_scripts(scripts_dest),
             self_contained=False,
+            test_data=cleanup_unserializable(self._data),
         )
 
         self._write_report(rendered_report)

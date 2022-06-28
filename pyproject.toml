@@ -1,28 +1,61 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "pytest-html"
 description = "pytest plugin for generating HTML reports"
-version = "4.0.0-next"
-authors = ["Jim", "Victor"]
+version = "4.0.0-rc0"
+license = "MPL-2.0"
+authors = [
+    "Dave Hunt <dhunt@mozilla.com>",
+    "Jim Brännlund <jimbrannlund@fastmail.com>"
+]
+readme = "README.rst"
+homepage = "https://github.com/pytest-dev/pytest-html"
+repository = "https://github.com/pytest-dev/pytest-html"
+keywords = [
+    "pytest",
+    "html",
+    "report",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Utilities",
+]
+packages = [
+    { include = "pytest_html", from = "src" },
+]
+include = [
+    { path = "testing", format = "sdist" },
+    { path = "docs", format = "sdist" },
+    "src/pytest_html/resources",
+    "src/pytest_html/scripts",
+]
 
 [tool.poetry.dependencies]
-python = ">=3.6"
-Jinja2 = "^2.11.3"
+python = "^3.7"
+pytest = "^6.0.0"
+Jinja2 = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
-black = "20.8b1"
-flake8 = "3.8.4"
-tox = "^3.23.1"
-pytest = "^6.2.4"
+black = "^22.1.0"
+flake8 = "^4.0.1"
+tox = "^3.24.5"
+pre-commit = "^2.17.0"
+pytest-localserver = "^0.5.0"
+pytest-xdist = "^2.4.0"
+pytest-mock = "^3.7.0"
 
-[build-system]
-requires = [
-  "pip >= 19.3.1",
-  "setuptools >= 42",
-  "setuptools_scm[toml] >= 3.5.0",
-  "setuptools_scm_git_archive >= 1.1",
-  "wheel >= 0.33.6",
-]
-build-backend = "setuptools.build_meta"
+[tool.poetry.plugins.pytest11]
+html = "pytest_html.plugin"
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"

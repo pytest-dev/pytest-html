@@ -1,10 +1,9 @@
-const { jsonData } = require('./test_data.js')
-
 class DataManager {
     constructor(data){
         this.data = { ...data }
         this.renderData = { ...data }
     }
+
     getRawObject() {
         return { ...this.data }
     }
@@ -32,5 +31,5 @@ class DataManager {
 }
 
 module.exports = {
-    manager: new DataManager(jsonData)
+    manager: new DataManager(JSON.parse(document.querySelector('#data-container').dataset.jsonblob))
 }

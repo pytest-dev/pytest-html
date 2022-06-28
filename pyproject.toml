@@ -37,7 +37,6 @@ include = [
     { path = "testing", format = "sdist" },
     { path = "docs", format = "sdist" },
     "src/pytest_html/resources",
-    "src/pytest_html/scripts",
 ]
 
 [tool.poetry.dependencies]

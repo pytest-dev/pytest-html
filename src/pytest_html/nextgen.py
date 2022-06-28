@@ -11,30 +11,56 @@ from jinja2 import FileSystemLoader
 
 from . import __version__
 from .util import cleanup_unserializable
-from .util import get_scripts
 
 
-class BaseReport:
+class BaseReport(object):
+    class Report(object):
+        def __init__(self, title):
+            self._data = {
+                "title": title,
+                "collectedItems": 0,
+                "environment": {},
+                "tests": [],
+            }
+
+        @property
+        def data(self):
+            return self._data
+
+        @property
+        def title(self):
+            return self._data["title"]
+
+        @title.setter
+        def title(self, title):
+            self._data["title"] = title
+
     def __init__(self, report_path, config):
         _plugin_path = os.path.dirname(__file__)
-        self._report_absolute_path = Path(report_path).absolute()
-        self._report_path = self._report_absolute_path.parent
-        self._report_path.mkdir(parents=True, exist_ok=True)
-        self._scripts_src_path = Path(_plugin_path, "scripts")
+        self._report_path = Path(report_path).resolve()
+        self._report_path.parent.mkdir(parents=True, exist_ok=True)
+
         self._resources_path = Path(_plugin_path, "resources")
+
         self._config = config
+        self._css = None
         self._template = None
         self._template_filename = "index.jinja2"
 
-        self._data = {
-            "title": "Test Report",
-            "collectedItems": 0,
-            "environment": {},
-            "tests": [],
-        }
+        self._report = self.Report(self._report_path.name)
 
-    def _generate_report(self):
-        pass
+    def _generate_report(self, self_contained=False):
+        generated = datetime.datetime.now()
+        rendered_report = self._render_html(
+            generated.strftime("%d-%b-%Y"),
+            generated.strftime("%H:%M:%S"),
+            __version__,
+            self._css,
+            self_contained=self_contained,
+            test_data=cleanup_unserializable(self._report.data),
+        )
+
+        self._write_report(rendered_report)
 
     def _generate_environment(self):
         metadata = self._config._metadata
@@ -68,7 +94,6 @@ class BaseReport:
         time,
         version,
         styles,
-        scripts,
         self_contained,
         test_data,
     ):
@@ -77,26 +102,26 @@ class BaseReport:
             time=time,
             version=version,
             styles=styles,
-            scripts=scripts,
             self_contained=self_contained,
             test_data=json.dumps(test_data),
         )
 
     def _write_report(self, rendered_report):
-        with self._report_absolute_path.open("w", encoding="utf-8") as f:
+        with self._report_path.open("w", encoding="utf-8") as f:
             f.write(rendered_report)
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionstart(self, session):
         config = session.config
         if hasattr(config, "_metadata") and config._metadata:
-            self._data["environment"] = self._generate_environment()
+            self._report.data["environment"] = self._generate_environment()
 
         self._generate_report()
+        session.config.hook.pytest_html_report_title(report=self._report)
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
-        self._data["collectedItems"] = len(session.items)
+        self._report.data["collectedItems"] = len(session.items)
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
@@ -110,66 +135,34 @@ class BaseReport:
         #         if extra["mime_type"] is not None and "image" in extra["mime_type"]:
         #             data.update({"extras": extra})
 
-        self._data["tests"].append(data)
+        self._report.data["tests"].append(data)
         self._generate_report()
 
 
 class NextGenReport(BaseReport):
     def __init__(self, report_path, config):
         super().__init__(report_path, config)
-        self._assets_path = Path(self._report_path, "assets")
+        self._assets_path = Path(self._report_path.parent, "assets")
         self._assets_path.mkdir(parents=True, exist_ok=True)
-        self._scripts_dest_path = Path(self._report_path, "scripts")
-        self._scripts_dest_path.mkdir(parents=True, exist_ok=True)
         self._default_css_path = Path(self._resources_path, "style.css")
 
-    def _generate_report(self):
         self._template = self._read_template(
-            [self._scripts_src_path, self._resources_path, self._assets_path]
-        )
-
-        # Copy scripts
-        scripts_dest = shutil.copytree(
-            self._scripts_src_path, self._scripts_dest_path, dirs_exist_ok=True
+            [self._resources_path, self._assets_path]
         )
 
         # Copy default css file (style.css) to assets directory
         new_css_path = shutil.copy(self._default_css_path, self._assets_path)
-
-        generated = datetime.datetime.now()
-        css_files = [new_css_path] + self._config.getoption("css")
-        rendered_report = self._render_html(
-            generated.strftime("%d-%b-%Y"),
-            generated.strftime("%H:%M:%S"),
-            __version__,
-            css_files,
-            get_scripts(scripts_dest),
-            self_contained=False,
-            test_data=cleanup_unserializable(self._data),
-        )
-
-        self._write_report(rendered_report)
+        self._css = [new_css_path] + self._config.getoption("css")
 
 
 class NextGenSelfContainedReport(BaseReport):
     def __init__(self, report_path, config):
         super().__init__(report_path, config)
-
-    def _generate_report(self):
         self._template = self._read_template(
-            [self._scripts_src_path, self._resources_path]
+            [self._resources_path]
         )
 
-        generated = datetime.datetime.now()
-        css_files = ["style.css"] + self._config.getoption("css")
-        rendered_report = self._render_html(
-            generated.strftime("%d-%b-%Y"),
-            generated.strftime("%H:%M:%S"),
-            __version__,
-            css_files,
-            get_scripts(self._scripts_src_path),
-            self_contained=True,
-            test_data=cleanup_unserializable(self._data),
-        )
+        self._css = ["style.css"] + self._config.getoption("css")
 
-        self._write_report(rendered_report)
+    def _generate_report(self, *args, **kwargs):
+        super()._generate_report(self_contained=True)

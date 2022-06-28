@@ -10,9 +10,9 @@
       {% endfor -%}
       </style>
     {% else %}
-    {% for style in styles -%}
-      <link href="{{ style }}" rel="stylesheet" type="text/css"/>
-    {% endfor -%}
+      {% for style in styles -%}
+        <link href="{{ style }}" rel="stylesheet" type="text/css"/>
+      {% endfor -%}
     {% endif %}
   </head>
   <body>
@@ -99,14 +99,8 @@
   </body>
   <footer>
     <div id="data-container" data-jsonblob="{{ test_data }}"></div>
-  {% if self_contained %}
     <script>
-    {% for script in scripts %}
-      {% include script %}
-    {% endfor %}
+      {% include "app.js" %}
     </script>
-  {% else %}
-    <script src="scripts/app.js"></script>
-  {% endif %}
   </footer>
 </html>

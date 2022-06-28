@@ -1,5 +1,4 @@
 class DataManager {
-    constructor(){}
     setManager(data){
         this.data = { ...data }
         this.renderData = { ...data }

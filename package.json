@@ -10,7 +10,6 @@
     "unit": "mocha testing/**/unittest.js",
     "build:css": "sass --no-source-map --no-error-css src/layout/css/style.scss src/pytest_html/resources/style.css",
     "build:jsapp": "browserify ./src/pytest_html/scripts/index.js > ./src/pytest_html/scripts/app.js",
-    "build": "npm run unit && npm run build:css && npm run build:jsapp",
-    "justbuild": "npm run build:css && npm run build:jsapp"
+    "build": "npm run unit && npm run build:css && npm run build:jsapp"
   }
 }

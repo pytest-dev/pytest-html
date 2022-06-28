@@ -100,7 +100,7 @@ def pytest_configure(config):
 
 
 def pytest_unconfigure(config):
-    html = config.pluginmanager.get(html)
+    html = config.pluginmanager.getplugin("html")
     if html:
         config.pluginmanager.unregister(html)
 

@@ -6,14 +6,44 @@ const dataModule = require('../src/pytest_html/scripts/datamanager.js')
 const localStorageModule = require('../src/pytest_html/scripts/localstorage_utils.js')
 
 
-describe('Filter tests', function () {
+
+describe('Filter tests', () => {
     let getFilterMock, managerSpy
-    beforeEach(() => dataModule.manager.resetRender())
-    this.afterEach(() => [getFilterMock, managerSpy].forEach( fn => fn.restore()))
-    describe('doInitFilter', () =>  {
+    before(() => {
+        const jsonDatan = {
+            "tests": 
+                [
+                    {
+                        "outcome": "passed",
+                    },
+                    {
+                        "outcome": "failed",
+                    },
+                    {
+                        "outcome": "passed",
+                    },
+                    {
+                        "outcome": "passed",
+                    },
+                    {
+                        "outcome": "passed",
+                    },
+                    {
+                        "outcome": "passed",
+                    }
+                ]
+        }
+        dataModule.manager.setManager(jsonDatan)
+    })
+    afterEach(() => [getFilterMock, managerSpy].forEach( fn => fn.restore()))
+    after(() => dataModule.manager.setManager({}))
+    describe('doInitFilter', () => {
+
+
         it("has no stored filters", () => {
             getFilterMock = sinon.stub(localStorageModule, 'getFilter').returns([])
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
+
             doInitFilter()
             expect(managerSpy.callCount).to.eql(1)
             expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])
@@ -21,6 +51,7 @@ describe('Filter tests', function () {
         it("exclude passed", () => {
             getFilterMock = sinon.stub(localStorageModule, 'getFilter').returns(['passed'])
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
+
             doInitFilter()
             expect(managerSpy.callCount).to.eql(1)
             expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'failed' ])
@@ -52,6 +83,33 @@ describe('Filter tests', function () {
 
 
 describe('Sort tests', () => {
+    before(() => {
+        const jsonDatan = {
+            "tests": 
+                [
+                    {
+                        "outcome": "passed",
+                    },
+                    {
+                        "outcome": "failed",
+                    },
+                    {
+                        "outcome": "passed",
+                    },
+                    {
+                        "outcome": "passed",
+                    },
+                    {
+                        "outcome": "passed",
+                    },
+                    {
+                        "outcome": "passed",
+                    }
+                ]
+        }
+        dataModule.manager.setManager(jsonDatan)
+    })
+    after(() => dataModule.manager.setManager({}))
     describe('doInitSort', () =>  {
         let managerSpy, sortMock, sortDirectionMock
         beforeEach(() => dataModule.manager.resetRender())

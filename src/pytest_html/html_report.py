@@ -1,3 +1,4 @@
+# type: ignore
 import bisect
 import datetime
 import json

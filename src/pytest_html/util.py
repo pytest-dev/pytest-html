@@ -1,6 +1,5 @@
 import importlib
 import json
-import os
 from functools import lru_cache
 from typing import Any
 from typing import Dict
@@ -26,11 +25,3 @@ def cleanup_unserializable(d: Dict[str, Any]) -> Dict[str, Any]:
             v = str(v)
         result[k] = v
     return result
-
-
-def get_scripts(scripts_path):
-    return [
-        f
-        for f in os.listdir(scripts_path)
-        if os.path.isfile(os.path.join(scripts_path, f))
-    ]

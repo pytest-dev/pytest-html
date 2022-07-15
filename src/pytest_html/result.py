@@ -1,5 +1,4 @@
 import json
-import os
 import re
 import time
 import warnings
@@ -7,6 +6,7 @@ from base64 import b64decode
 from base64 import b64encode
 from html import escape
 from os.path import isfile
+from pathlib import Path
 
 from _pytest.logging import _remove_ansi_escape_sequences
 from py.xml import html
@@ -86,17 +86,16 @@ class TestResult:
             str(test_index),
             file_extension,
         )[-self.max_asset_filename_length :]
-        asset_path = os.path.join(
-            os.path.dirname(self.logfile), "assets", asset_file_name
-        )
+        asset_path = Path(self.logfile).parent / "assets" / asset_file_name
 
-        os.makedirs(os.path.dirname(asset_path), exist_ok=True)
+        asset_path.parent.mkdir(exist_ok=True, parents=True)
 
         relative_path = f"assets/{asset_file_name}"
 
         kwargs = {"encoding": "utf-8"} if "b" not in mode else {}
-        with open(asset_path, mode, **kwargs) as f:
-            f.write(content)
+        func = asset_path.write_bytes if "b" in mode else asset_path.write_text
+        func(content, **kwargs)
+
         return relative_path
 
     def append_extra_html(self, extra, extra_index, test_index):

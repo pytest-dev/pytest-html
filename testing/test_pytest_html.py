@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-#import builtins
+# import builtins
 import json
 import os
 import random
@@ -28,12 +28,12 @@ pytest_plugins = ("pytester",)
 #     builtins.open = _open
 
 
-def remove_deprecation_from_recwarn(recwarn):
-    # TODO: Temporary hack until they fix
-    # https://github.com/pytest-dev/pytest/issues/6936
-    return [
-        item for item in recwarn if "TerminalReporter.writer" not in repr(item.message)
-    ]
+# def remove_deprecation_from_recwarn(recwarn):
+#     # TODO: Temporary hack until they fix
+#     # https://github.com/pytest-dev/pytest/issues/6936
+#     return [
+#         item for item in recwarn if "TerminalReporter.writer" not in repr(item.message)
+#     ]
 
 
 def run(testdir, path="report.html", *args):
@@ -1021,8 +1021,8 @@ class TestHTML:
             cssargs.extend(["--css", path])
         result, html = run(testdir, "report.html", "--self-contained-html", *cssargs)
         assert result.ret == 0
-        warnings = remove_deprecation_from_recwarn(recwarn)
-        assert len(warnings) == 0
+        # warnings = remove_deprecation_from_recwarn(recwarn)
+        # assert len(warnings) == 0
         for k, v in css.items():
             assert str(v["path"]) in html
             assert v["style"] in html

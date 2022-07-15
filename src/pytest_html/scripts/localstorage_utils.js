@@ -1,4 +1,3 @@
-
 const getFilter = () => ([
     ...new Set(JSON.parse(localStorage.getItem('filter')))
 ])
@@ -9,7 +8,7 @@ const setFilter = (currentFilter) => {
 const getSort = () => {
     return localStorage.getItem('sort')
 }
-const setSort = (type) => {
+const setSort = (type) => {
     localStorage.setItem('sort', type)
 }
 const getSortDirection = () => {

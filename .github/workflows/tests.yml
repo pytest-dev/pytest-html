@@ -63,9 +63,10 @@ jobs:
             name: pypy3-ubuntu
             python-version: pypy-3.8
 
-          - os: windows-latest
-            name: pypy3-windows
-            python-version: pypy-3.8
+          # TODO: This test takes 10(!) times as long as the regular py38 on Windows
+#          - os: windows-latest
+#            name: pypy3-windows
+#            python-version: pypy-3.8
 
            # https://github.com/pytest-dev/pytest-html/issues/482
           - os: macOS-latest

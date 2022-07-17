@@ -1,7 +1,6 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import builtins
 import json
 import os
 import random
@@ -12,28 +11,6 @@ import pkg_resources
 import pytest
 
 pytest_plugins = ("pytester",)
-
-if os.name == "nt":
-    # Force a utf-8 encoding on file io (since by default windows does not). See
-    # https://github.com/pytest-dev/pytest-html/issues/336
-    #  If we drop support for Python 3.6 and earlier could use python -X utf8 instead.
-    _real_open = builtins.open
-
-    def _open(file, mode="r", buffering=-1, encoding=None, *args, **kwargs):
-        if mode in ("r", "w") and encoding is None:
-            encoding = "utf-8"
-
-        return _real_open(file, mode, buffering, encoding, *args, **kwargs)
-
-    builtins.open = _open
-
-
-def remove_deprecation_from_recwarn(recwarn):
-    # TODO: Temporary hack until they fix
-    # https://github.com/pytest-dev/pytest/issues/6936
-    return [
-        item for item in recwarn if "TerminalReporter.writer" not in repr(item.message)
-    ]
 
 
 def run(testdir, path="report.html", *args):
@@ -972,12 +949,12 @@ class TestHTML:
         assert result.ret == 0
         assert not re.search(r"\[[\d;]+m", html)
 
-    @pytest.mark.parametrize("content", [("'foo'"), ("u'\u0081'")])
+    @pytest.mark.parametrize("content", ["'foo'", "u'\u0081'"])
     def test_utf8_longrepr(self, testdir, content):
         testdir.makeconftest(
             f"""
             import pytest
-            @pytest.hookimpl(hookwrapper=True)
+            @pytest.hookimpl(tryfirst=True, hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
@@ -1021,8 +998,6 @@ class TestHTML:
             cssargs.extend(["--css", path])
         result, html = run(testdir, "report.html", "--self-contained-html", *cssargs)
         assert result.ret == 0
-        warnings = remove_deprecation_from_recwarn(recwarn)
-        assert len(warnings) == 0
         for k, v in css.items():
             assert str(v["path"]) in html
             assert v["style"] in html

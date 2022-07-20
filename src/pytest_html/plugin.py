@@ -1,10 +1,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import os
-
 import pytest
-from _pytest.pathlib import Path
+from pathlib import Path
 
 from . import extras  # noqa: F401
 from .html_report import HTMLReport
@@ -75,7 +73,7 @@ def pytest_configure(config):
     if html_path:
         missing_css_files = []
         for css_path in config.getoption("css"):
-            if not os.path.exists(css_path):
+            if not Path(css_path).exists():
                 missing_css_files.append(css_path)
 
         if missing_css_files:

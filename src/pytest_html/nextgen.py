@@ -1,15 +1,19 @@
+import base64
+import binascii
 import datetime
 import json
 import os
 import re
 import shutil
+import warnings
 
 import pytest
-from _pytest.pathlib import Path
+from pathlib import Path
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
 from . import __version__
+from . import extras
 from .util import cleanup_unserializable
 
 
@@ -36,18 +40,27 @@ class BaseReport(object):
             self._data["title"] = title
 
     def __init__(self, report_path, config):
-        _plugin_path = os.path.dirname(__file__)
-        self._report_path = Path(report_path).resolve()
+        self._report_path = Path(os.path.expandvars(report_path)).expanduser().resolve()
         self._report_path.parent.mkdir(parents=True, exist_ok=True)
 
-        self._resources_path = Path(_plugin_path, "resources")
+        self._resources_path = Path(__file__).parent.joinpath("resources")
 
         self._config = config
         self._css = None
         self._template = None
         self._template_filename = "index.jinja2"
 
+        self._max_asset_filename_length = int(config.getini("max_asset_filename_length"))
+
         self._report = self.Report(self._report_path.name)
+
+    def _asset_filename(self, test_id, extra_index, test_index, file_extension):
+        return "{}_{}_{}.{}".format(
+            re.sub(r"[^\w.]", "_", test_id),
+            str(extra_index),
+            str(test_index),
+            file_extension,
+        )[-self._max_asset_filename_length:]
 
     def _generate_report(self, self_contained=False):
         generated = datetime.datetime.now()
@@ -79,6 +92,12 @@ class BaseReport(object):
                 return True
 
         return False
+
+    def _data_content(self, *args, **kwargs):
+        pass
+
+    def _media_content(self, *args, **kwargs):
+        pass
 
     def _read_template(self, search_paths):
         env = Environment(
@@ -129,12 +148,27 @@ class BaseReport(object):
             config=self._config, report=report
         )
 
-        # # TODO rename to "extras" since list
-        # if hasattr(report, "extra"):
-        #     for extra in report.extra:
-        #         if extra["mime_type"] is not None and "image" in extra["mime_type"]:
-        #             data.update({"extras": extra})
+        test_id = report.nodeid.encode("utf-8").decode("unicode_escape")
+        test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
 
+        # TODO rename to "extras" since list
+        report_extras = getattr(report, "extra", [])
+        for extra_index, extra in enumerate(report_extras):
+            content = extra["content"]
+            asset_name = self._asset_filename(test_id, extra_index, test_index, extra['extension'])
+            if extra["format_type"] == extras.FORMAT_JSON:
+                content = json.dumps(content)
+                extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+
+            if extra["format_type"] == extras.FORMAT_TEXT:
+                if isinstance(content, bytes):
+                    content = content.decode("utf-8")
+                extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+
+            if extra["format_type"] == extras.FORMAT_IMAGE or extra["format_type"] == extras.FORMAT_VIDEO:
+                extra["content"] = self._media_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+
+        data.update({"extras": report_extras})
         self._report.data["tests"].append(data)
         self._generate_report()
 
@@ -154,6 +188,23 @@ class NextGenReport(BaseReport):
         new_css_path = shutil.copy(self._default_css_path, self._assets_path)
         self._css = [new_css_path] + self._config.getoption("css")
 
+    def _data_content(self, content, asset_name, *args, **kwargs):
+        content = content.encode("utf-8")
+        return self._write_content(content, asset_name)
+
+    def _media_content(self, content, asset_name, *args, **kwargs):
+        try:
+            media_data = base64.b64decode(content.encode("utf-8"), validate=True)
+            return self._write_content(media_data, asset_name)
+        except binascii.Error:
+            # if not base64 content, just return as it's a file or link
+            return content
+
+    def _write_content(self, content, asset_name):
+        content_path = Path(self._assets_path, asset_name)
+        content_path.write_bytes(content)
+        return content_path.as_uri()
+
 
 class NextGenSelfContainedReport(BaseReport):
     def __init__(self, report_path, config):
@@ -163,6 +214,25 @@ class NextGenSelfContainedReport(BaseReport):
         )
 
         self._css = ["style.css"] + self._config.getoption("css")
+
+    def _data_content(self, content, mime_type, *args, **kwargs):
+        charset = "utf-8"
+        data = base64.b64encode(content.encode(charset)).decode(charset)
+        return f"data:{mime_type};charset={charset};base64,{data}"
+
+    def _media_content(self, content, mime_type, *args, **kwargs):
+        try:
+            # test if content is base64
+            base64.b64decode(content.encode("utf-8"), validate=True)
+            return f"data:{mime_type};base64,{content}"
+        except binascii.Error:
+            # if not base64 content, issue warning and just return as it's a file or link
+            warnings.warn(
+                "Self-contained HTML report "
+                "includes link to external "
+                f"resource: {content}"
+            )
+            return content
 
     def _generate_report(self, *args, **kwargs):
         super()._generate_report(self_contained=True)

@@ -85,7 +85,7 @@ class TestResult:
             str(extra_index),
             str(test_index),
             file_extension,
-        )[-self.max_asset_filename_length :]
+        )[-self.max_asset_filename_length:]
         asset_path = os.path.join(
             os.path.dirname(self.logfile), "assets", asset_file_name
         )

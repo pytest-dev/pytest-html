@@ -60,7 +60,7 @@ const renderContent = (tests) => {
   rows.forEach((row) => !!row && table.appendChild(row));
 };
 
-const renderDerrived = (tests, collectedItems) => {
+const renderDerived = (tests, collectedItems) => {
   const renderSet = tests.filter(({ when }) => when === 'call');
 
   const possibleOutcomes = [
@@ -121,7 +121,7 @@ const renderPage = () => {
 
   renderStatic();
   renderContent(filteredTests);
-  renderDerrived(allTests, collectedItems);
+  renderDerived(allTests, collectedItems);
 };
 
 const redraw = () => {

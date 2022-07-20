@@ -4,7 +4,7 @@ class DataManager {
         this.renderData = { ...data }
     }
 
-    getRawObject() {
+    getRawObject() {
         return { ...this.data }
     }
     resetRender() {

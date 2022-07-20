@@ -1,13 +1,13 @@
-const dataModule = require('./datamanager.js')
+const { manager } = require('./datamanager.js')
 const localStorageModule = require('./localstorage_utils.js')
 
 const getFilteredSubSet = (filter) =>
-  dataModule.manager.getRawObject().tests.filter(({ outcome }) => !filter.includes(outcome))
+  manager.getRawObject().tests.filter(({ outcome }) => !filter.includes(outcome))
 
 const doInitFilter = () => {
   const currentFilter = localStorageModule.getFilter()
   const filteredSubset = getFilteredSubSet(currentFilter)
-  dataModule.manager.setRender(filteredSubset)
+  manager.setRender(filteredSubset)
 }
 
 const doFilter = (type, apply) => {
@@ -25,9 +25,9 @@ const doFilter = (type, apply) => {
 
   if (currentFilter.length) {
     const filteredSubset = getFilteredSubSet(currentFilter)
-    dataModule.manager.setRender(filteredSubset)
+    manager.setRender(filteredSubset)
   } else {
-    dataModule.manager.resetRender()
+    manager.resetRender()
   }
 }
 

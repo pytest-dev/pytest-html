@@ -1,3 +1,4 @@
+const { formatDuration } = require('./utils.js')
 const { dom, findAll } = require('./dom.js')
 const { manager } = require('./datamanager.js')
 const { doSort } = require('./sort.js')
@@ -49,15 +50,20 @@ const renderContent = (tests) => {
   const rows = renderSet.map((test) =>
     dom.getResultTBody(test, getOutcome(test, tests))
   );
+
   const table = document.querySelector('#results-table');
   removeChildren(table);
-  const tableHeader = dom.getListHeader();
+  const tableHeader = dom.getListHeader(manager.getHtmlData('resultsTableHeader'));
   if (!rows.length) {
     tableHeader.appendChild(dom.getListHeaderEmpty());
   }
+
   table.appendChild(tableHeader);
 
   rows.forEach((row) => !!row && table.appendChild(row));
+
+  // Add custom html from the pytest_html_results_summary hook
+  dom.setAdditionalSummary(manager.getHtmlData('additionalSummary'));
 };
 
 const renderDerived = (tests, collectedItems) => {
@@ -84,9 +90,11 @@ const renderDerived = (tests, collectedItems) => {
 
 
   if (collectedItems === renderSet.length) {
-    const accTime = tests.reduce((prev, { duration }) => prev + duration, 0).toFixed(2)
-
-    document.querySelector('.run-count').innerText = `${renderSet.length} tests ran in ${accTime} seconds.`;
+    const accTime = tests.reduce((prev, { duration }) => prev + duration, 0)
+    const formattedAccTime = formatDuration(accTime)
+    const testWord = renderSet.length > 1 ? 'tests' : 'test'
+    const innerText = `${renderSet.length} ${testWord} ran in ${formattedAccTime} seconds.`
+    document.querySelector('.run-count').innerText = innerText;
     document.querySelector('.summary__reload__button').classList.add('hidden');
   } else {
     document.querySelector('.run-count').innerText = `${renderSet.length} / ${collectedItems} tests done`;

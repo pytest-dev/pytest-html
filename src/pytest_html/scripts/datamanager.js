@@ -28,6 +28,12 @@ class DataManager {
     getCollectedItems() {
         return this.renderData.collectedItems
     }
+    getDurationFormat() {
+        return this.renderData.durationFormat
+    }
+    getHtmlData(name) {
+        return this.renderData[name]
+    }
 }
 
 module.exports = {

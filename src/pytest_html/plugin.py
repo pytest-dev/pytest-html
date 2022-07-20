@@ -49,6 +49,11 @@ def pytest_addoption(parser):
         help="use next-gen report.",
     )
     parser.addini(
+        "duration_format",
+        default=None,
+        help="the format for duration.",
+    )
+    parser.addini(
         "render_collapsed",
         type="bool",
         default=False,

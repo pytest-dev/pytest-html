@@ -3,11 +3,12 @@ import binascii
 import datetime
 import json
 import os
+import pytest
 import re
 import shutil
 import warnings
 
-import pytest
+from collections import defaultdict
 from pathlib import Path
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -18,18 +19,35 @@ from .util import cleanup_unserializable
 
 
 class BaseReport(object):
+    class Cells(object):
+        def __init__(self):
+            self._html = {}
+
+        @property
+        def html(self):
+            return self._html
+
+        def insert(self, index, html):
+            self._html[index] = html
+
     class Report(object):
-        def __init__(self, title):
+        def __init__(self, title, duration_format):
             self._data = {
                 "title": title,
                 "collectedItems": 0,
+                "durationFormat": duration_format,
                 "environment": {},
                 "tests": [],
+                "resultsTableHeader": {},
+                "additionalSummary": defaultdict(list),
             }
 
         @property
         def data(self):
             return self._data
+
+        def set_data(self, key, value):
+            self._data[key] = value
 
         @property
         def title(self):
@@ -50,9 +68,10 @@ class BaseReport(object):
         self._template = None
         self._template_filename = "index.jinja2"
 
+        self._duration_format = config.getini("duration_format")
         self._max_asset_filename_length = int(config.getini("max_asset_filename_length"))
 
-        self._report = self.Report(self._report_path.name)
+        self._report = self.Report(self._report_path.name, self._duration_format)
 
     def _asset_filename(self, test_id, extra_index, test_index, file_extension):
         return "{}_{}_{}.{}".format(
@@ -104,7 +123,6 @@ class BaseReport(object):
             loader=FileSystemLoader(search_paths),
             autoescape=True,
         )
-
         return env.get_template(self._template_filename)
 
     def _render_html(
@@ -138,6 +156,19 @@ class BaseReport(object):
         self._generate_report()
         session.config.hook.pytest_html_report_title(report=self._report)
 
+        header_cells = self.Cells()
+        session.config.hook.pytest_html_results_table_header(cells=header_cells)
+        self._report.set_data("resultsTableHeader", header_cells.html)
+
+    @pytest.hookimpl(trylast=True)
+    def pytest_sessionfinish(self, session):
+        session.config.hook.pytest_html_results_summary(
+            prefix=self._report.data["additionalSummary"]["prefix"],
+            summary=self._report.data["additionalSummary"]["summary"],
+            postfix=self._report.data["additionalSummary"]["postfix"],
+        )
+        self._generate_report()
+
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
         self._report.data["collectedItems"] = len(session.items)
@@ -149,6 +180,15 @@ class BaseReport(object):
         )
 
         test_id = report.nodeid.encode("utf-8").decode("unicode_escape")
+
+        row_cells = self.Cells()
+        self._config.hook.pytest_html_results_table_row(report=report, cells=row_cells)
+        data.update({"resultsTableRow": row_cells.html})
+
+        table_html = []
+        self._config.hook.pytest_html_results_table_html(report=report, data=table_html)
+        data.update({"tableHtml": table_html})
+
         test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
 
         # TODO rename to "extras" since list

@@ -1,3 +1,4 @@
+const { formatDuration } = require('./utils.js');
 const templateEnvRow = document.querySelector('#template_environment_row');
 const templateResult = document.querySelector('#template_results-table__tbody');
 const aTag = document.querySelector('#template_a');
@@ -25,6 +26,12 @@ const findAll = (selector, elem) => {
   return [...elem.querySelectorAll(selector)];
 };
 
+const insertAdditionalHTML = (html, element, selector) => {
+  Object.keys(html).map((key) => {
+    element.querySelectorAll(selector).item(key).insertAdjacentHTML('beforebegin', html[key]);
+  });
+};
+
 const dom = {
   getStaticRow: (key, value) => {
     const envRow = templateEnvRow.content.cloneNode(true);
@@ -44,7 +51,7 @@ const dom = {
 
     return envRow;
   },
-  getListHeader: () => {
+  getListHeader: (extraHeader) => {
     const header = listHeader.content.cloneNode(true);
     const sortAttr = localStorage.getItem('sort');
     const sortAsc = JSON.parse(localStorage.getItem('sortAsc'));
@@ -58,15 +65,18 @@ const dom = {
       }
     });
 
+    // Add custom html from the pytest_html_results_table_header hook
+    insertAdditionalHTML(extraHeader, header, 'th');
+
     return header;
   },
   getListHeaderEmpty: () => listHeaderEmpty.content.cloneNode(true),
-  getResultTBody: ({ nodeid, longrepr, extras, duration }, outcome) => {
+  getResultTBody: ({ nodeid, longrepr, duration, extras, resultsTableRow, tableHtml }, outcome) => {
     const resultBody = templateResult.content.cloneNode(true);
     resultBody.querySelector('tbody').classList.add(outcome);
     resultBody.querySelector('.col-result').innerText = outcome;
     resultBody.querySelector('.col-name').innerText = nodeid;
-    resultBody.querySelector('.col-duration').innerText = `${(duration * 1000).toFixed(2)}s`;
+    resultBody.querySelector('.col-duration').innerText = `${formatDuration(duration)}s`;
     if (outcome === 'failed') {
       resultBody.querySelector('.log').innerText = longrepr
         ? longrepr.reprtraceback.reprentries[0].data.lines.join('\n')
@@ -94,7 +104,32 @@ const dom = {
         }
       });
 
+    // Add custom html from the pytest_html_results_table_row hook
+    resultsTableRow &&
+      insertAdditionalHTML(resultsTableRow, resultBody, 'td');
+
+    // Add custom html from the pytest_html_results_table_html hook
+    tableHtml &&
+      tableHtml.forEach((item) => {
+        resultBody.querySelector('td[class="extra"]').insertAdjacentHTML('beforeend', item);
+      });
+
     return resultBody;
+  },
+  setAdditionalSummary: (additionalSummary) => {
+    Object.keys(additionalSummary).map((key) => {
+      switch (key) {
+        case 'prefix':
+          document.querySelector('div[class="summary"] h2').insertAdjacentHTML('beforeend', additionalSummary[key]);
+          break;
+        case 'summary':
+          document.querySelector('div[class="controls"]').insertAdjacentHTML('afterend', additionalSummary[key]);
+          break;
+        case 'postfix':
+          document.querySelector('#results-table').insertAdjacentHTML('beforebegin', additionalSummary[key]);
+          break;
+      };
+    });
   },
 };
 

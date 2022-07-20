@@ -1,15 +1,18 @@
 {
+  "scripts": {
+    "unit": "mocha testing/**/unittest.js",
+    "build:css": "sass --no-source-map --no-error-css src/layout/css/style.scss src/pytest_html/resources/style.css",
+    "build:jsapp": "browserify ./src/pytest_html/scripts/index.js > ./src/pytest_html/resources/app.js",
+    "build": "npm run unit && npm run build:css && npm run build:jsapp"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.3"
+  },
   "devDependencies": {
     "browserify": "^17.0.0",
     "chai": "^4.3.6",
     "mocha": "^10.0.0",
     "sass": "^1.52.3",
     "sinon": "^14.0.0"
-  },
-  "scripts": {
-    "unit": "mocha testing/**/unittest.js",
-    "build:css": "sass --no-source-map --no-error-css src/layout/css/style.scss src/pytest_html/resources/style.css",
-    "build:jsapp": "browserify ./src/pytest_html/scripts/index.js > ./src/pytest_html/resources/app.js",
-    "build": "npm run unit && npm run build:css && npm run build:jsapp"
   }
 }

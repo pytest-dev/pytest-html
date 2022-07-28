@@ -1,3 +1,4 @@
+const imgViewer = require('./imgViewer.js')
 const templateEnvRow = document.querySelector('#template_environment_row');
 const templateResult = document.querySelector('#template_results-table__tbody');
 const aTag = document.querySelector('#template_a');
@@ -62,11 +63,12 @@ const dom = {
   },
   getListHeaderEmpty: () => listHeaderEmpty.content.cloneNode(true),
   getResultTBody: ({ nodeid, longrepr, extras, duration }, outcome) => {
-    const resultBody = templateResult.content.cloneNode(true);
-    resultBody.querySelector('tbody').classList.add(outcome);
-    resultBody.querySelector('.col-result').innerText = outcome;
-    resultBody.querySelector('.col-name').innerText = nodeid;
-    resultBody.querySelector('.col-duration').innerText = `${(duration * 1000).toFixed(2)}s`;
+    const resultBody = templateResult.content.cloneNode(true)
+    resultBody.querySelector('tbody').classList.add(outcome)
+    resultBody.querySelector('.col-result').innerText = outcome
+    resultBody.querySelector('.col-name').innerText = nodeid
+    resultBody.querySelector('.col-duration').innerText = `${(duration * 1000).toFixed(2)}s`
+    // imgViewer.setupImgViewer(resultBody, images) "images: need to be an array of th filenames. The files are expected to be found in assets."
     if (outcome === 'failed') {
       resultBody.querySelector('.log').innerText = longrepr
         ? longrepr.reprtraceback.reprentries[0].data.lines.join('\n')

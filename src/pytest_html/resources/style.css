@@ -127,12 +127,36 @@ div.image {
   border: 1px solid #e6e6e6;
   float: right;
   height: 240px;
-  margin-left: 5px;
+  margin: 0 5px;
   overflow: hidden;
   width: 320px;
 }
-div.image img {
-  width: 320px;
+.image-container {
+  display: flex;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 220px;
+}
+
+.image-container__nav--right,
+.image-container__nav--left {
+  flex: 0 0 25px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.image-container__frame {
+  flex: 1 1;
+  text-align: center;
+}
+
+.image-overview {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
 }
 
 div.video {

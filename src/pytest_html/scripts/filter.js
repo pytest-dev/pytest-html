@@ -2,7 +2,7 @@ const dataModule = require('./datamanager.js')
 const localStorageModule = require('./localstorage_utils.js')
 
 const getFilteredSubSet = (filter) =>
-  dataModule.manager.getRawObject().tests.filter(({ outcome }) => !filter.includes(outcome))
+  dataModule.manager.allData.tests.filter(({ outcome }) => !filter.includes(outcome))
 
 const doInitFilter = () => {
   const currentFilter = localStorageModule.getFilter()

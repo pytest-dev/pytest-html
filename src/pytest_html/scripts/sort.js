@@ -15,7 +15,7 @@ const genericSort = (list, key, ascending) => {
 const doInitSort = () => {
   const type = localStorageModule.getSort()
   const ascending = localStorageModule.getSortDirection()
-  const list = manager.getRender()
+  const list = manager.testSubset
   const sortedList = genericSort(list, type, ascending);
   manager.setRender(sortedList);
 }
@@ -26,7 +26,7 @@ const doSort = (type) => {
   const ascending = newSortType ? true : !currentAsc;
   localStorageModule.setSort(type)
   localStorageModule.setSortDirection(ascending)
-  const list = manager.getRender()
+  const list = manager.testSubset
 
   const sortedList = genericSort(list, type, ascending);
   manager.setRender(sortedList);

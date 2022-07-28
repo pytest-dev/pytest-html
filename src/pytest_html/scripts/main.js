@@ -30,8 +30,8 @@ const getOutcome = ({ nodeid }, tests) => {
 };
 
 const renderStatic = () => {
-  const title = manager.getTitle()
-  const environment = manager.getEnvironment()
+  const title = manager.title
+  const environment = manager.environment
   document.querySelector('#title').innerText = title;
   document.querySelector('#head-title').innerText = title;
   const rows = Object.keys(environment).map((key) =>
@@ -115,9 +115,9 @@ const bindEvents = () => {
 };
 
 const renderPage = () => {
-  const filteredTests = manager.getRender()
-  const allTests = manager.getRaw()
-  const collectedItems = manager.getCollectedItems()
+  const filteredTests = manager.testSubset
+  const allTests = manager.allTests
+  const collectedItems = manager.collectedItems
 
   renderStatic();
   renderContent(filteredTests);

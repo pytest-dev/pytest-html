@@ -75,24 +75,23 @@ const dom = {
       resultBody.querySelector('.extras-row').classList.add('hidden');
     }
 
-    extras &&
-      extras.forEach(({ name, format_type, content }) => {
-        const extraLink = aTag.content.cloneNode(true);
-        const extraLinkItem = extraLink.querySelector('a');
-        const folderItems = ['image', 'video', 'text', 'html', 'json'];
+    extras?.forEach(({ name, format_type, content }) => {
+      const extraLink = aTag.content.cloneNode(true);
+      const extraLinkItem = extraLink.querySelector('a');
+      const folderItems = ['image', 'video', 'text', 'html', 'json'];
 
-        extraLinkItem.href = content;
-        extraLinkItem.className = `col-links__extra ${format_type}`;
-        extraLinkItem.innerText = name;
-        resultBody.querySelector('.col-links').appendChild(extraLinkItem);
+      extraLinkItem.href = content;
+      extraLinkItem.className = `col-links__extra ${format_type}`;
+      extraLinkItem.innerText = name;
+      resultBody.querySelector('.col-links').appendChild(extraLinkItem);
 
-        if (format_type === 'image') {
-          const imgElTemp = aTagImg.content.cloneNode(true);
-          imgElTemp.querySelector('a').href = content;
-          imgElTemp.querySelector('img').src = content;
-          resultBody.querySelector('.extra .image').appendChild(imgElTemp);
-        }
-      });
+      if (format_type === 'image') {
+        const imgElTemp = aTagImg.content.cloneNode(true);
+        imgElTemp.querySelector('a').href = content;
+        imgElTemp.querySelector('img').src = content;
+        resultBody.querySelector('.extra .image').appendChild(imgElTemp);
+      }
+    });
 
     return resultBody;
   },

@@ -145,16 +145,16 @@ function showExtras(colresultElem) {
   const extras = colresultElem.parentNode.nextElementSibling;
   const expandcollapse = colresultElem.firstElementChild;
   extras.classList.remove('collapsed');
-  expandcollapse && expandcollapse.classList.remove('expander');
-  expandcollapse && expandcollapse.classList.add('collapser');
+  expandcollapse?.classList.remove('expander');
+  expandcollapse?.classList.add('collapser');
 }
 
 function hideExtras(colresultElem) {
   const extras = colresultElem.parentNode.nextElementSibling;
   const expandcollapse = colresultElem.firstElementChild;
   extras.classList.add('collapsed');
-  expandcollapse && expandcollapse.classList.remove('collapser');
-  expandcollapse && expandcollapse.classList.add('expander');
+  expandcollapse?.classList.remove('collapser');
+  expandcollapse?.classList.add('expander');
 }
 
 exports.redraw = redraw

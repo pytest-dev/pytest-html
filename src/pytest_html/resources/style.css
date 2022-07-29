@@ -136,7 +136,7 @@ div.image {
   align-items: center;
   flex: 1 1;
   overflow: hidden;
-  height: 220px;
+  height: 200px;
 }
 
 .image-container__nav--right,
@@ -148,9 +148,11 @@ div.image {
 
 .image-container__frame {
   flex: 1 1;
+  cursor: pointer;
   text-align: center;
 }
 
+.image-name,
 .image-overview {
   display: flex;
   flex-direction: row;

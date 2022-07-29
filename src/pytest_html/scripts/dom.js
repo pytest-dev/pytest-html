@@ -68,7 +68,6 @@ const dom = {
     resultBody.querySelector('.col-result').innerText = outcome
     resultBody.querySelector('.col-name').innerText = nodeid
     resultBody.querySelector('.col-duration').innerText = `${(duration * 1000).toFixed(2)}s`
-    // imgViewer.setupImgViewer(resultBody, images) "images: need to be an array of th filenames. The files are expected to be found in assets."
     if (outcome === 'failed') {
       resultBody.querySelector('.log').innerText = longrepr
         ? longrepr.reprtraceback.reprentries[0].data.lines.join('\n')
@@ -76,7 +75,7 @@ const dom = {
     } else {
       resultBody.querySelector('.extras-row').classList.add('hidden');
     }
-
+    const images = []
     extras &&
       extras.forEach(({ name, format_type, content }) => {
         const extraLink = aTag.content.cloneNode(true);
@@ -89,13 +88,11 @@ const dom = {
         resultBody.querySelector('.col-links').appendChild(extraLinkItem);
 
         if (format_type === 'image') {
-          const imgElTemp = aTagImg.content.cloneNode(true);
-          imgElTemp.querySelector('a').href = content;
-          imgElTemp.querySelector('img').src = content;
-          resultBody.querySelector('.extra .image').appendChild(imgElTemp);
+          images.push({path: content, name})
         }
-      });
-
+      }
+    )
+    imgViewer.setupImgViewer(resultBody, images)
     return resultBody;
   },
 };

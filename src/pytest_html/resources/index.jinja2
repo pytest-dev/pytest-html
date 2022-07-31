@@ -79,6 +79,9 @@
     <div class="summary">
       <div class="summary__data">
         <h2>Summary</h2>
+        {% for p in prefix %}
+        {{ p|safe }}
+        {% endfor %}
         <p class="run-count"></p>
         <p class="filter">(Un)check the boxes to filter the results.</p>
         <div class="summary__reload">
@@ -103,6 +106,12 @@
           </div>
         </div>
       </div>
+    {% for s in summary %}
+    {{ s|safe }}
+    {% endfor %}
+    {% for p in postfix %}
+    {{ p|safe }}
+    {% endfor %}
     <table id="results-table"></table>
   </body>
   <footer>

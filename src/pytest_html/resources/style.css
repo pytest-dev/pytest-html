@@ -70,10 +70,6 @@ span.xpassed,
   color: red;
 }
 
-.col-result {
-  text-transform: capitalize;
-}
-
 .col-links__extra {
   margin-right: 3px;
 }

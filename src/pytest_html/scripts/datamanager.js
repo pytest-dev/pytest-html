@@ -3,7 +3,6 @@ class DataManager {
         this.data = { ...data }
         this.renderData = { ...data }
     }
-
     getRawObject() {
         return { ...this.data }
     }
@@ -27,6 +26,9 @@ class DataManager {
     }
     getCollectedItems() {
         return this.renderData.collectedItems
+    }
+    getDurationFormat() {
+        return this.renderData.durationFormat
     }
 }
 

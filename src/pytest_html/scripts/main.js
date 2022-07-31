@@ -11,22 +11,18 @@ const removeChildren = (node) => {
   }
 };
 
-const getOutcome = ({ nodeid }, tests) => {
+const getOutcome = ({ nodeid, wasxfail }, tests) => {
   const relatedOutcome = tests
     .filter((test) => test.nodeid === nodeid)
     .map(({ outcome }) => outcome);
   if (relatedOutcome.includes('failed')) {
-    return 'failed';
+    return (wasxfail === undefined) ? 'Failed' : 'XPassed';
   } else if (relatedOutcome.includes('error')) {
-    return 'error';
-  } else if (relatedOutcome.includes('xpassed')) {
-    return 'xpassed';
-  } else if (relatedOutcome.includes('xfailed')) {
-    return 'xfailed';
+    return 'Error';
   } else if (relatedOutcome.includes('skipped')) {
-    return 'skipped';
+    return (wasxfail === undefined) ? 'Skipped' : 'XFailed';
   } else {
-    return 'passed';
+    return (wasxfail === undefined) ? 'Passed' : 'XPassed';
   }
 };
 
@@ -53,7 +49,7 @@ const renderContent = (tests) => {
 
   const table = document.querySelector('#results-table');
   removeChildren(table);
-  const tableHeader = dom.getListHeader(manager.getHtmlData('resultsTableHeader'));
+  const tableHeader = dom.getListHeader(manager.renderData);
   if (!rows.length) {
     tableHeader.appendChild(dom.getListHeaderEmpty());
   }
@@ -62,32 +58,41 @@ const renderContent = (tests) => {
 
   rows.forEach((row) => !!row && table.appendChild(row));
 
-  // Add custom html from the pytest_html_results_summary hook
-  dom.setAdditionalSummary(manager.getHtmlData('additionalSummary'));
+  table.querySelectorAll('.extra').forEach((item) => {
+      item.colSpan = document.querySelectorAll('th').length;
+  });
 };
 
 const renderDerived = (tests, collectedItems) => {
   const renderSet = tests.filter(({ when }) => when === 'call');
 
   const possibleOutcomes = [
-    'passed',
-    'skipped',
-    'failed',
-    'error',
-    'xfailed',
-    'xpassed',
-    'rerun',
+    {outcome: 'passed', label: 'Passed'},
+    {outcome: 'skipped', label: 'Skipped'},
+    {outcome: 'failed', label: 'Failed'},
+    {outcome: 'error', label: 'Errors'},
+    {outcome: 'xfailed', label: 'Unexpected failures'},
+    {outcome: 'xpassed', label: 'Unexpected passes'},
+    {outcome: 'rerun', label: 'Reruns'},
   ];
+
   const currentFilter = getFilter()
-  possibleOutcomes.forEach((outcome) => {
-    const count = renderSet.filter((test) => test.outcome === outcome).length;
+  possibleOutcomes.forEach(({outcome, label}) => {
+    const count = renderSet.filter((test) => {
+      const wasXpassed = outcome === 'xpassed' && ['passed', 'failed'].includes(test.outcome);
+      const wasXfailed = outcome === 'xfailed' && test.outcome === 'skipped';
+      if (test.wasxfail !== undefined) {
+        return wasXpassed || wasXfailed;
+      } else {
+        return test.outcome === outcome;
+      }
+    }).length;
     const input = document.querySelector(`input[data-test-result="${outcome}"]`)
-    document.querySelector(`.${outcome}`).innerText = `${count} ${outcome}`;
+    document.querySelector(`.${outcome}`).innerText = `${count} ${label}`;
 
     input.disabled = !count;
     input.checked = !currentFilter.includes(outcome)
   });
-
 
   if (collectedItems === renderSet.length) {
     const accTime = tests.reduce((prev, { duration }) => prev + duration, 0)

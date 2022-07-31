@@ -12,6 +12,7 @@ from collections import defaultdict
 from pathlib import Path
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+from jinja2 import select_autoescape
 
 from . import __version__
 from . import extras
@@ -90,6 +91,9 @@ class BaseReport(object):
             self._css,
             self_contained=self_contained,
             test_data=cleanup_unserializable(self._report.data),
+            prefix=self._report.data["additionalSummary"]["prefix"],
+            summary=self._report.data["additionalSummary"]["summary"],
+            postfix=self._report.data["additionalSummary"]["postfix"],
         )
 
         self._write_report(rendered_report)
@@ -121,7 +125,9 @@ class BaseReport(object):
     def _read_template(self, search_paths):
         env = Environment(
             loader=FileSystemLoader(search_paths),
-            autoescape=True,
+            autoescape=select_autoescape(
+                enabled_extensions=('jinja2',),
+            ),
         )
         return env.get_template(self._template_filename)
 
@@ -133,6 +139,9 @@ class BaseReport(object):
         styles,
         self_contained,
         test_data,
+        summary,
+        prefix,
+        postfix,
     ):
         return self._template.render(
             date=date,
@@ -141,6 +150,9 @@ class BaseReport(object):
             styles=styles,
             self_contained=self_contained,
             test_data=json.dumps(test_data),
+            summary=summary,
+            prefix=prefix,
+            postfix=postfix,
         )
 
     def _write_report(self, rendered_report):

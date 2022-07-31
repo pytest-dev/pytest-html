@@ -3,7 +3,6 @@ class DataManager {
         this.data = { ...data }
         this.renderData = { ...data }
     }
-
     getRawObject() {
         return { ...this.data }
     }
@@ -30,9 +29,6 @@ class DataManager {
     }
     getDurationFormat() {
         return this.renderData.durationFormat
-    }
-    getHtmlData(name) {
-        return this.renderData[name]
     }
 }
 

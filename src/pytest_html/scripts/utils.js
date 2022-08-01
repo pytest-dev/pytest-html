@@ -13,6 +13,4 @@ const formatDuration = (dur) => {
     }
 }
 
-module.exports = {
-    formatDuration
-}
+module.exports = { formatDuration }

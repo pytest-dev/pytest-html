@@ -1,32 +1,30 @@
 {
     "env": {
         "browser": true,
+        "commonjs": true,
         "es2021": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "google"
+    ],
     "parserOptions": {
-        "ecmaVersion": 12
+        "ecmaVersion": "latest"
     },
     "rules": {
         "array-bracket-spacing": "error",
         "block-scoped-var": "error",
         "block-spacing": "error",
         "brace-style": "error",
-        "camelcase": "error",
+        "camelcase": "off",
         "class-methods-use-this": "error",
         "consistent-return": "error",
         "default-case": "error",
         "default-case-last": "error",
         "default-param-last": "error",
         "grouped-accessor-pairs": "error",
-        "indent": [
-            "error",
-            4
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
+        "indent": [ "error", 4 ],
+        "linebreak-style": [ "error", "unix" ],
+        "max-len": ["error", { "code": 120 }],
         "no-caller": "error",
         "no-console": "error",
         "no-empty-function": "error",
@@ -43,17 +41,25 @@
         "no-throw-literal": "error",
         "no-undefined": "error",
         "no-unreachable-loop": "error",
-        "no-unused-expressions": "error",
+        "no-unused-expressions": "off",
         "no-useless-backreference": "error",
         "no-useless-concat": "error",
         "no-var": "error",
+        "object-curly-spacing": [
+            "error",
+            "always", 
+            { 
+                "arraysInObjects": true 
+            }
+        ],
         "prefer-const": "error",
         "prefer-promise-reject-errors": "error",
         "require-atomic-updates": "error",
         "require-await": "error",
+        "require-jsdoc" : 0,
         "semi": [
             "error",
-            "always"
+            "never"
         ],
         "quotes": [
             "error",

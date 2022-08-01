@@ -46,7 +46,7 @@ describe('Filter tests', () => {
 
             doInitFilter()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])
+            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])
         })
         it("exclude passed", () => {
             getFilterMock = sinon.stub(localStorageModule, 'getFilter').returns(['passed'])
@@ -54,7 +54,7 @@ describe('Filter tests', () => {
 
             doInitFilter()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'failed' ])
+            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'failed' ])
         })
     })
     describe('doFilter', () => {
@@ -67,7 +67,7 @@ describe('Filter tests', () => {
 
             doFilter('passed', true)
             expect(managerSpy.callCount).to.eql(0)
-            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])
+            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])
         })
         it("applies a filter", () => {
             getFilterMock = sinon.stub(localStorageModule, 'getFilter').returns([])
@@ -76,7 +76,7 @@ describe('Filter tests', () => {
 
             doFilter('passed', false)
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'failed' ])
+            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'failed' ])
         })
     })
 })
@@ -122,7 +122,7 @@ describe('Sort tests', () => {
 
             doInitSort()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])
+            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'passed', 'failed', 'passed', 'passed', 'passed', 'passed' ])
         })
         it("has stored sort preference", () => {
             sortMock = sinon.stub(localStorageModule, 'getSort').returns('outcome')
@@ -131,7 +131,7 @@ describe('Sort tests', () => {
 
             doInitSort()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'failed', 'passed', 'passed', 'passed', 'passed', 'passed' ])
+            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'failed', 'passed', 'passed', 'passed', 'passed', 'passed' ])
         })
     })
     describe('doSort', () => {
@@ -147,7 +147,7 @@ describe('Sort tests', () => {
 
             doSort('outcome')
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.getRender().map(({outcome}) => outcome)).to.eql([ 'passed', 'passed', 'passed', 'passed', 'passed', 'failed' ])
+            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'passed', 'passed', 'passed', 'passed', 'passed', 'failed' ])
         })
     })
 })

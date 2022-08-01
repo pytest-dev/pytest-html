@@ -16,19 +16,19 @@ const getOutcome = ({ nodeid, wasxfail }, tests) => {
         .filter((test) => test.nodeid === nodeid)
         .map(({ outcome }) => outcome)
     if (relatedOutcome.includes('failed')) {
-        return (typeof wasxfail === 'undefined') ? 'Failed' : 'XPassed'
+        return typeof wasxfail === 'undefined' ? 'Failed' : 'XPassed'
     } else if (relatedOutcome.includes('error')) {
         return 'Error'
     } else if (relatedOutcome.includes('skipped')) {
-        return (typeof wasxfail === 'undefined') ? 'Skipped' : 'XFailed'
+        return typeof wasxfail === 'undefined' ? 'Skipped' : 'XFailed'
     } else {
-        return (typeof wasxfail === 'undefined') ? 'Passed' : 'XPassed'
+        return typeof wasxfail === 'undefined' ? 'Passed' : 'XPassed'
     }
 }
 
 const renderStatic = () => {
-    const title = manager.getTitle()
-    const environment = manager.getEnvironment()
+    const title = manager.title
+    const environment = manager.environment
     document.querySelector('#title').innerText = title
     document.querySelector('#head-title').innerText = title
     const rows = Object.keys(environment).map((key) =>
@@ -77,7 +77,7 @@ const renderDerived = (tests, collectedItems) => {
     ]
 
     const currentFilter = getFilter()
-    possibleOutcomes.forEach(({outcome, label}) => {
+    possibleOutcomes.forEach(({ outcome, label }) => {
         const count = renderSet.filter((test) => {
             const wasXpassed = outcome === 'xpassed' && ['passed', 'failed'].includes(test.outcome)
             const wasXfailed = outcome === 'xfailed' && test.outcome === 'skipped'
@@ -128,9 +128,9 @@ const bindEvents = () => {
 }
 
 const renderPage = () => {
-    const filteredTests = manager.getRender()
-    const allTests = manager.getRaw()
-    const collectedItems = manager.getCollectedItems()
+    const filteredTests = manager.testSubset
+    const allTests = manager.allTests
+    const collectedItems = manager.collectedItems
 
     renderStatic()
     renderContent(filteredTests)

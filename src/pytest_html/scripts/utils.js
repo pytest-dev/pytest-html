@@ -5,7 +5,7 @@ const duration = require('dayjs/plugin/duration')
 dayjs.extend(duration)
 
 const formatDuration = (dur) => {
-    const durationFormat = manager.getDurationFormat()
+    const durationFormat = manager.durationFormat
     if (durationFormat.length === 0) {
         return dur.toFixed(2)
     } else {

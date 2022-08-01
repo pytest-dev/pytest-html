@@ -1,4 +1,5 @@
 const { formatDuration } = require('./utils.js');
+const imgViewer = require('./imgViewer.js');
 const templateEnvRow = document.querySelector('#template_environment_row');
 const templateResult = document.querySelector('#template_results-table__tbody');
 const aTag = document.querySelector('#template_a');
@@ -85,7 +86,7 @@ const dom = {
     } else {
       resultBody.querySelector('.extras-row').classList.add('hidden');
     }
-
+    const images = []
     extras &&
       extras.forEach(({ name, format_type, content }) => {
         const extraLink = aTag.content.cloneNode(true);
@@ -98,12 +99,10 @@ const dom = {
         resultBody.querySelector('.col-links').appendChild(extraLinkItem);
 
         if (format_type === 'image') {
-          const imgElTemp = aTagImg.content.cloneNode(true);
-          imgElTemp.querySelector('a').href = content;
-          imgElTemp.querySelector('img').src = content;
-          resultBody.querySelector('.extra .image').appendChild(imgElTemp);
+          images.push({path: content, name})
         }
       });
+    imgViewer.setupImgViewer(resultBody, images)
 
     // Add custom html from the pytest_html_results_table_row hook
     resultsTableRow &&

@@ -8,7 +8,7 @@ function init() {
     manager.setManager(data)
     doInitFilter()
     doInitSort()
-    redraw()   
+    redraw()
 }
 
 init()

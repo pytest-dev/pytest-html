@@ -1,9 +1,9 @@
 class DataManager {
-    setManager(data){
+    setManager(data) {
         this.data = { ...data }
         this.renderData = { ...data }
     }
-    getRawObject() {
+    get allData() {
         return { ...this.data }
     }
     resetRender() {
@@ -12,26 +12,26 @@ class DataManager {
     setRender(data) {
         this.renderData.tests = data
     }
-    getRender() {
+    get testSubset() {
         return [...this.renderData.tests]
     }
-    getRaw() {
+    get allTests() {
         return [...this.data.tests]
     }
-    getTitle() {
+    get title() {
         return this.renderData.title
     }
-    getEnvironment() {
+    get environment() {
         return this.renderData.environment
     }
-    getCollectedItems() {
+    get collectedItems() {
         return this.renderData.collectedItems
     }
-    getDurationFormat() {
+    get durationFormat() {
         return this.renderData.durationFormat
     }
 }
 
 module.exports = {
-    manager: new DataManager()
+    manager: new DataManager(),
 }

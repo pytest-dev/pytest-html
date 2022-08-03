@@ -159,6 +159,9 @@ div.image {
   flex: 1 1;
   overflow: hidden;
   height: 200px;
+  video {
+    width: 100%;
+  }
 }
 .image-container__nav--right,
 .image-container__nav--left {
@@ -180,21 +183,6 @@ div.image {
   justify-content: space-around;
   flex: 0 0 25px;
   align-items: center;
-}
-
-div.video {
-  border: $border-width solid #e6e6e6;
-  float: right;
-  height: $extra-height;
-  margin-left: $spacing;
-  overflow: hidden;
-  width: $extra-media-width;
-
-  video {
-    overflow: hidden;
-    width: $extra-media-width;
-    height: $extra-height;
-  }
 }
 
 .collapsed {

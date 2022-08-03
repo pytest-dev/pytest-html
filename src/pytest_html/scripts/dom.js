@@ -87,8 +87,8 @@ const dom = {
             extraLinkItem.innerText = name
             resultBody.querySelector('.col-links').appendChild(extraLinkItem)
 
-            if (format_type === 'image') {
-                images.push({ path: content, name })
+            if (['image', 'video'].includes(format_type)) {
+                images.push({ path: content, name, format_type })
             }
         })
         imgViewer.setupImgViewer(resultBody, images)

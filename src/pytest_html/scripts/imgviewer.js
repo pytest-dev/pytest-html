@@ -25,15 +25,26 @@ const setupImgViewer = (resultBody, assets) => {
     const imgViewer = new ImageViewer(assets)
     const leftArrow = resultBody.querySelector('.image-container__nav--left')
     const rightArrow = resultBody.querySelector('.image-container__nav--right')
-    const imgContainer = resultBody.querySelector('.image-container__frame')
     const imageName = resultBody.querySelector('.image-name')
     const counter = resultBody.querySelector('.image-overview')
-
-    const imgel = document.createElement('img')
-    imgContainer.appendChild(imgel)
+    const imageEl = resultBody.querySelector('img')
+    const imageElWrap = resultBody.querySelector('.image__screenshot')
+    const videoEl = resultBody.querySelector('source')
+    const videoElWrap = resultBody.querySelector('.image__video')
 
     const setImg = (image, index) => {
-        imgel.src = image?.path
+        if (image?.format_type === 'image') {
+            imageEl.src = image.path
+
+            imageElWrap.classList.remove('hidden')
+            videoElWrap.classList.add('hidden')
+        } else if (image?.format_type === 'video') {
+            videoEl.src = image.path
+
+            videoElWrap.classList.remove('hidden')
+            imageElWrap.classList.add('hidden')
+        }
+
         imageName.innerText = image?.name
         counter.innerText = `${index + 1} / ${assets.length}`
     }
@@ -48,12 +59,12 @@ const setupImgViewer = (resultBody, assets) => {
         setImg(image, index)
     }
     const openImg = () => {
-        window.open(imgViewer.activeImage, '_blank')
+        window.open(imgViewer.activeImage.path, '_blank')
     }
 
     leftArrow.addEventListener('click', moveLeft)
     rightArrow.addEventListener('click', doRight)
-    imgel.addEventListener('click', openImg)
+    imageEl.addEventListener('click', openImg)
 }
 
 exports.setupImgViewer = setupImgViewer

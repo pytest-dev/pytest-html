@@ -204,7 +204,7 @@ class BaseReport(object):
         test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
 
         # TODO rename to "extras" since list
-        report_extras = getattr(report, "extra", [])
+        report_extras = getattr(report, "extras", [])
         for extra_index, extra in enumerate(report_extras):
             content = extra["content"]
             asset_name = self._asset_filename(test_id, extra_index, test_index, extra['extension'])

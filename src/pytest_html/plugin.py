@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import pytest
+import warnings
 from pathlib import Path
 
 from . import extras  # noqa: F401
@@ -114,8 +115,8 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
     if report.when == "call":
         fixture_extras = getattr(item.config, "extras", [])
-        plugin_extras = getattr(report, "extra", [])
-        report.extra = fixture_extras + plugin_extras
+        plugin_extras = getattr(report, "extras", [])
+        report.extras = fixture_extras + plugin_extras
 
 
 @pytest.fixture
@@ -129,6 +130,27 @@ def extra(pytestconfig):
 
         def test_foo(extra):
             extra.append(pytest_html.extras.url("https://www.example.com/"))
+    """
+    warnings.warn(
+        "The 'extra' fixture is deprecated and will be removed in a future release, use 'extras' instead.",
+        DeprecationWarning
+    )
+    pytestconfig.extras = []
+    yield pytestconfig.extras
+    del pytestconfig.extras[:]
+
+
+@pytest.fixture
+def extras(pytestconfig):
+    """Add details to the HTML reports.
+
+    .. code-block:: python
+
+        import pytest_html
+
+
+        def test_foo(extras):
+            extras.append(pytest_html.extras.url("https://www.example.com/"))
     """
     pytestconfig.extras = []
     yield pytestconfig.extras

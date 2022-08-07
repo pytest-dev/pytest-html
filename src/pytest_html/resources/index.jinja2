@@ -31,11 +31,6 @@
     <template id="template_a">
       <a target="_blank"></a>
     </template>
-    <template id="template_img">
-      <a target="_blank">
-        <img />
-      </a>
-    </template>
     <template id="template_results-table__tbody">
       <tbody class="results-table-row">
         <tr>
@@ -46,14 +41,19 @@
         </tr>
         <tr class="extras-row">
           <td class="extra" colspan="4">
-            <div class="image">
-              <div class="image-container">
-                  <div class="image-container__nav--left"><</div>
-                  <div class="image-container__frame"></div>
-                  <div class="image-container__nav--right">></div>
+            <div class="media">
+              <div class="media-container">
+                  <div class="media-container__nav--left"><</div>
+                  <div class="media-container__viewport">
+                    <img src="" />
+                    <video controls>
+                      <source src="" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="media-container__nav--right">></div>
                 </div>
-                <div class="image-name"></div> 
-                <div class="image-overview"></div> 
+                <div class="media__name"></div> 
+                <div class="media__counter"></div> 
             </div>
             <div class="log"></div>
           </td>

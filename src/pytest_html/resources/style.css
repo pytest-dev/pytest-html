@@ -119,7 +119,7 @@ span.xpassed,
   height: inherit;
 }
 
-div.image {
+div.media {
   border: 1px solid #e6e6e6;
   float: right;
   height: 240px;
@@ -127,48 +127,41 @@ div.image {
   overflow: hidden;
   width: 320px;
 }
-.image-container {
-  display: flex;
+
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
   align-items: center;
   flex: 1 1;
   overflow: hidden;
   height: 200px;
 }
 
-.image-container__nav--right,
-.image-container__nav--left {
-  flex: 0 0 25px;
+.media-container__nav--right,
+.media-container__nav--left {
   text-align: center;
   cursor: pointer;
 }
 
-.image-container__frame {
-  flex: 1 1;
+.media-container__viewport {
   cursor: pointer;
   text-align: center;
+  height: inherit;
+}
+.media-container__viewport img,
+.media-container__viewport video {
+  object-fit: cover;
+  width: 100%;
+  max-height: 100%;
 }
 
-.image-name,
-.image-overview {
+.media__name,
+.media__counter {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   flex: 0 0 25px;
   align-items: center;
-}
-
-div.video {
-  border: 1px solid #e6e6e6;
-  float: right;
-  height: 240px;
-  margin-left: 5px;
-  overflow: hidden;
-  width: 320px;
-}
-div.video video {
-  overflow: hidden;
-  width: 320px;
-  height: 240px;
 }
 
 .collapsed {

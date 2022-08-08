@@ -90,6 +90,10 @@ const dom = {
             if (['image', 'video'].includes(format_type)) {
                 media.push({ path: content, name, format_type })
             }
+
+            if (format_type === 'html') {
+              resultBody.querySelector('.extraHTML').insertAdjacentHTML('beforeend', `<div>${content}</div>`)
+            }
         })
         mediaViewer.setUp(resultBody, media)
 

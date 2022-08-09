@@ -30,6 +30,9 @@ class DataManager {
     get durationFormat() {
         return this.renderData.durationFormat
     }
+    get isFinished() {
+      return this.data.runningState === 'Finished'
+    }
 }
 
 module.exports = {

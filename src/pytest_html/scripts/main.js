@@ -11,21 +11,6 @@ const removeChildren = (node) => {
     }
 }
 
-const getOutcome = ({ nodeid, wasxfail }, tests) => {
-    const relatedOutcome = tests
-        .filter((test) => test.nodeid === nodeid)
-        .map(({ outcome }) => outcome)
-    if (relatedOutcome.includes('failed')) {
-        return typeof wasxfail === 'undefined' ? 'Failed' : 'XPassed'
-    } else if (relatedOutcome.includes('error')) {
-        return 'Error'
-    } else if (relatedOutcome.includes('skipped')) {
-        return typeof wasxfail === 'undefined' ? 'Skipped' : 'XFailed'
-    } else {
-        return typeof wasxfail === 'undefined' ? 'Passed' : 'XPassed'
-    }
-}
-
 const renderStatic = () => {
     const title = manager.title
     const environment = manager.environment
@@ -41,10 +26,10 @@ const renderStatic = () => {
 }
 
 const renderContent = (tests) => {
-    const renderSet = tests.filter(({ when }) => when === 'call')
+    const renderSet = tests.filter(({ when, outcome }) => when === 'call' || outcome === 'Error' )
 
     const rows = renderSet.map((test) =>
-        dom.getResultTBody(test, getOutcome(test, tests))
+      dom.getResultTBody(test)
     )
 
     const table = document.querySelector('#results-table')
@@ -63,8 +48,8 @@ const renderContent = (tests) => {
     })
 }
 
-const renderDerived = (tests, collectedItems) => {
-    const renderSet = tests.filter(({ when }) => when === 'call')
+const renderDerived = (tests, collectedItems, isFinished) => {
+    const renderSet = tests.filter(({ when, outcome }) => when === 'call' || outcome === 'Error')
 
     const possibleOutcomes = [
         { outcome: 'passed', label: 'Passed' },
@@ -78,15 +63,7 @@ const renderDerived = (tests, collectedItems) => {
 
     const currentFilter = getFilter()
     possibleOutcomes.forEach(({ outcome, label }) => {
-        const count = renderSet.filter((test) => {
-            const wasXpassed = outcome === 'xpassed' && ['passed', 'failed'].includes(test.outcome)
-            const wasXfailed = outcome === 'xfailed' && test.outcome === 'skipped'
-            if (typeof test.wasxfail !== 'undefined') {
-                return wasXpassed || wasXfailed
-            } else {
-                return test.outcome === outcome
-            }
-        }).length
+        const count = renderSet.filter((test) => test.outcome.toLowerCase() === outcome).length
         const input = document.querySelector(`input[data-test-result="${outcome}"]`)
         document.querySelector(`.${outcome}`).innerText = `${count} ${label}`
 
@@ -94,15 +71,18 @@ const renderDerived = (tests, collectedItems) => {
         input.checked = !currentFilter.includes(outcome)
     })
 
-    if (collectedItems === renderSet.length) {
+    const numberOfTests = renderSet.filter(({outcome}) =>
+      ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(outcome)
+    ).length
+    if (isFinished) {
         const accTime = tests.reduce((prev, { duration }) => prev + duration, 0)
         const formattedAccTime = formatDuration(accTime)
-        const testWord = renderSet.length > 1 ? 'tests' : 'test'
-        const innerText = `${renderSet.length} ${testWord} ran in ${formattedAccTime} seconds.`
+        const testWord = numberOfTests > 1 ? 'tests' : 'test'
+        const innerText = `${numberOfTests} ${testWord} ran in ${formattedAccTime} seconds.`
         document.querySelector('.run-count').innerText = innerText
         document.querySelector('.summary__reload__button').classList.add('hidden')
     } else {
-        document.querySelector('.run-count').innerText = `${renderSet.length} / ${collectedItems} tests done`
+        document.querySelector('.run-count').innerText = `${numberOfTests} / ${collectedItems} tests done`
     }
 }
 
@@ -128,13 +108,11 @@ const bindEvents = () => {
 }
 
 const renderPage = () => {
-    const filteredTests = manager.testSubset
-    const allTests = manager.allTests
-    const collectedItems = manager.collectedItems
+    const { testSubset, allTests, collectedItems, isFinished } = manager
 
     renderStatic()
-    renderContent(filteredTests)
-    renderDerived(allTests, collectedItems)
+    renderContent(testSubset)
+    renderDerived(allTests, collectedItems, isFinished)
 }
 
 const redraw = () => {

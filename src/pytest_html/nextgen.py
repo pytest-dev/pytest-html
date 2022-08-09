@@ -36,6 +36,7 @@ class BaseReport(object):
             self._data = {
                 "title": title,
                 "collectedItems": 0,
+                "runningState": "not_started",
                 "durationFormat": duration_format,
                 "environment": {},
                 "tests": [],
@@ -122,6 +123,27 @@ class BaseReport(object):
     def _media_content(self, *args, **kwargs):
         pass
 
+    def _process_extras(self, report):
+        test_id = report.nodeid.encode("utf-8").decode("unicode_escape")
+        test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
+        report_extras = getattr(report, "extras", [])
+        for extra_index, extra in enumerate(report_extras):
+            content = extra["content"]
+            asset_name = self._asset_filename(test_id, extra_index, test_index, extra['extension'])
+            if extra["format_type"] == extras.FORMAT_JSON:
+                content = json.dumps(content)
+                extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+
+            if extra["format_type"] == extras.FORMAT_TEXT:
+                if isinstance(content, bytes):
+                    content = content.decode("utf-8")
+                extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+
+            if extra["format_type"] == extras.FORMAT_IMAGE or extra["format_type"] == extras.FORMAT_VIDEO:
+                extra["content"] = self._media_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+
+        return report_extras
+
     def _read_template(self, search_paths):
         env = Environment(
             loader=FileSystemLoader(search_paths),
@@ -165,12 +187,14 @@ class BaseReport(object):
         if hasattr(config, "_metadata") and config._metadata:
             self._report.data["environment"] = self._generate_environment()
 
-        self._generate_report()
         session.config.hook.pytest_html_report_title(report=self._report)
 
         header_cells = self.Cells()
         session.config.hook.pytest_html_results_table_header(cells=header_cells)
         self._report.set_data("resultsTableHeader", header_cells.html)
+
+        self._report.data["runningState"] = "Started"
+        self._generate_report()
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionfinish(self, session):
@@ -179,6 +203,7 @@ class BaseReport(object):
             summary=self._report.data["additionalSummary"]["summary"],
             postfix=self._report.data["additionalSummary"]["postfix"],
         )
+        self._report.data["runningState"] = "Finished"
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
@@ -191,7 +216,7 @@ class BaseReport(object):
             config=self._config, report=report
         )
 
-        test_id = report.nodeid.encode("utf-8").decode("unicode_escape")
+        data["outcome"] = _process_outcome(report)
 
         row_cells = self.Cells()
         self._config.hook.pytest_html_results_table_row(report=report, cells=row_cells)
@@ -201,25 +226,7 @@ class BaseReport(object):
         self._config.hook.pytest_html_results_table_html(report=report, data=table_html)
         data.update({"tableHtml": table_html})
 
-        test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
-
-        report_extras = getattr(report, "extras", [])
-        for extra_index, extra in enumerate(report_extras):
-            content = extra["content"]
-            asset_name = self._asset_filename(test_id, extra_index, test_index, extra['extension'])
-            if extra["format_type"] == extras.FORMAT_JSON:
-                content = json.dumps(content)
-                extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
-
-            if extra["format_type"] == extras.FORMAT_TEXT:
-                if isinstance(content, bytes):
-                    content = content.decode("utf-8")
-                extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
-
-            if extra["format_type"] == extras.FORMAT_IMAGE or extra["format_type"] == extras.FORMAT_VIDEO:
-                extra["content"] = self._media_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
-
-        data.update({"extras": report_extras})
+        data.update({"extras": self._process_extras(report)})
         self._report.data["tests"].append(data)
         self._generate_report()
 
@@ -287,3 +294,15 @@ class NextGenSelfContainedReport(BaseReport):
 
     def _generate_report(self, *args, **kwargs):
         super()._generate_report(self_contained=True)
+
+
+def _process_outcome(report):
+    if report.when in ["setup", "teardown"] and report.outcome == "failed":
+        return "Error"
+    if hasattr(report, "wasxfail"):
+        if report.outcome in ["passed", "failed"]:
+            return "XPassed"
+        if report.outcome == "skipped":
+            return "XFailed"
+
+    return report.outcome.capitalize()

@@ -216,6 +216,9 @@ class BaseReport(object):
             config=self._config, report=report
         )
 
+        if report.longrepr:
+            data["longreprtext"] = report.longreprtext
+
         data["outcome"] = _process_outcome(report)
 
         row_cells = self.Cells()

@@ -64,19 +64,20 @@ const dom = {
         return header
     },
     getListHeaderEmpty: () => listHeaderEmpty.content.cloneNode(true),
-    getResultTBody: ({ nodeid, longrepr, duration, extras, resultsTableRow, tableHtml, outcome}) => {
+    getResultTBody: ({ nodeid, longreprtext, duration, extras, resultsTableRow, tableHtml, outcome}) => {
         const outcomeLower = outcome.toLowerCase()
         const resultBody = templateResult.content.cloneNode(true)
         resultBody.querySelector('tbody').classList.add(outcomeLower)
         resultBody.querySelector('.col-result').innerText = outcome
         resultBody.querySelector('.col-name').innerText = nodeid
         resultBody.querySelector('.col-duration').innerText = `${formatDuration(duration)}s`
-        if (['failed', 'error', 'xfailed', 'xpassed'].includes(outcomeLower)) {
-            resultBody.querySelector('.log').innerText = longrepr ?
-                longrepr.reprtraceback.reprentries[0].data.lines.join('\n') : ''
+
+        if (longreprtext) {
+            resultBody.querySelector('.log').innerText = longreprtext
         } else {
             resultBody.querySelector('.extras-row').classList.add('hidden')
         }
+
         const media = []
         extras?.forEach(({ name, format_type, content }) => {
             const extraLink = aTag.content.cloneNode(true)

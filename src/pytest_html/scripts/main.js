@@ -12,26 +12,25 @@ const removeChildren = (node) => {
 }
 
 const renderStatic = () => {
-    const title = manager.title
-    const environment = manager.environment
-    document.querySelector('#title').innerText = title
-    document.querySelector('#head-title').innerText = title
-    const rows = Object.keys(environment).map((key) =>
-        dom.getStaticRow(key, environment[key])
-    )
-
-    const table = document.querySelector('#environment')
-    removeChildren(table)
-    rows.forEach((row) => table.appendChild(row))
+    const renderTitle = () => {
+        const title = manager.title
+        document.querySelector('#title').innerText = title
+        document.querySelector('#head-title').innerText = title
+    }
+    const renderTable = () => {
+        const environment = manager.environment
+        const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
+        const table = document.querySelector('#environment')
+        removeChildren(table)
+        rows.forEach((row) => table.appendChild(row))
+    }
+    renderTitle()
+    renderTable()
 }
 
 const renderContent = (tests) => {
     const renderSet = tests.filter(({ when, outcome }) => when === 'call' || outcome === 'Error' )
-
-    const rows = renderSet.map((test) =>
-      dom.getResultTBody(test)
-    )
-
+    const rows = renderSet.map(dom.getResultTBody)
     const table = document.querySelector('#results-table')
     removeChildren(table)
     const tableHeader = dom.getListHeader(manager.renderData)
@@ -71,9 +70,9 @@ const renderDerived = (tests, collectedItems, isFinished) => {
         input.checked = !currentFilter.includes(outcome)
     })
 
-    const numberOfTests = renderSet.filter(({outcome}) =>
-      ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(outcome)
-    ).length
+    const numberOfTests = renderSet.filter(({ outcome }) =>
+        ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(outcome)).length
+
     if (isFinished) {
         const accTime = tests.reduce((prev, { duration }) => prev + duration, 0)
         const formattedAccTime = formatDuration(accTime)
@@ -104,6 +103,14 @@ const bindEvents = () => {
             doFilter(testResult, element.checked)
             redraw()
         })
+    })
+    document.querySelector('#show_all_details').addEventListener('click', () => {
+        manager.allCollapsed = false
+        redraw()
+    })
+    document.querySelector('#hide_all_details').addEventListener('click', () => {
+        manager.allCollapsed = true
+        redraw()
     })
 }
 

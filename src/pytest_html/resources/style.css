@@ -245,9 +245,22 @@ div.media {
   justify-content: space-between;
 }
 
-.filters {
+.filters,
+.collapse {
   display: flex;
   align-items: center;
+}
+.filters button,
+.collapse button {
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.filters button:hover,
+.collapse button:hover {
+  color: #ccc;
 }
 
 .filter__label {

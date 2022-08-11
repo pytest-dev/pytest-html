@@ -12,6 +12,13 @@ class DataManager {
     setRender(data) {
         this.renderData.tests = data
     }
+
+    set allCollapsed(collapsed) {
+        this.renderData = { ...this.data, tests: [...this.data.tests.map((test) => (
+            { ...test, collapsed }
+        ))] }
+    }
+
     get testSubset() {
         return [...this.renderData.tests]
     }
@@ -31,7 +38,7 @@ class DataManager {
         return this.renderData.durationFormat
     }
     get isFinished() {
-      return this.data.runningState === 'Finished'
+        return this.data.runningState === 'Finished'
     }
 }
 

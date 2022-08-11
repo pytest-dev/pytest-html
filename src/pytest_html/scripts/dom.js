@@ -64,7 +64,7 @@ const dom = {
         return header
     },
     getListHeaderEmpty: () => listHeaderEmpty.content.cloneNode(true),
-    getResultTBody: ({ nodeid, longreprtext, duration, extras, resultsTableRow, tableHtml, outcome}) => {
+    getResultTBody: ({ nodeid, longreprtext, duration, extras, resultsTableRow, tableHtml, outcome, collapsed }) => {
         const outcomeLower = outcome.toLowerCase()
         const resultBody = templateResult.content.cloneNode(true)
         resultBody.querySelector('tbody').classList.add(outcomeLower)
@@ -72,9 +72,11 @@ const dom = {
         resultBody.querySelector('.col-name').innerText = nodeid
         resultBody.querySelector('.col-duration').innerText = `${formatDuration(duration)}s`
 
+
         if (longreprtext) {
             resultBody.querySelector('.log').innerText = longreprtext
-        } else {
+        }
+        if (collapsed || !longreprtext) {
             resultBody.querySelector('.extras-row').classList.add('hidden')
         }
 

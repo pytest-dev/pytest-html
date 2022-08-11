@@ -296,9 +296,20 @@ div.media {
   display: flex;
   justify-content: space-between;
 }
-.filters {
+.filters,
+.collapse {
   display: flex;
   align-items: center;
+  button {
+    color: #999;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-decoration: underline;
+    &:hover {
+      color: #ccc;
+    }
+  }
 }
 .filter__label {
   margin-right: 10px;

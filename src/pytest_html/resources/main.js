@@ -32,6 +32,8 @@ function sortColumn(elem) {
         key = keyResult;
     } else if (elem.classList.contains('links')) {
         key = keyLink;
+    } else if (elem.classList.contains('duration')) {
+        key = keyDuration;
     } else {
         key = keyAlpha;
     }
@@ -178,6 +180,12 @@ function sort(items, keyFunc, reversed) {
 function keyAlpha(colIndex) {
     return function(elem) {
         return elem.childNodes[1].childNodes[colIndex].firstChild.data.toLowerCase();
+    };
+}
+
+function keyDuration(colIndex) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[colIndex].firstChild.data.toLowerCase());
     };
 }
 

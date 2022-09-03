@@ -207,6 +207,10 @@ class BaseReport(object):
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
+    def pytest_terminal_summary(self, terminalreporter):
+        terminalreporter.write_sep("-", f"Generated html report: file://{self._report_path}")
+
+    @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
         self._report.data["collectedItems"] = len(session.items)
 

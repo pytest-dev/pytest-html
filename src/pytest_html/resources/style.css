@@ -168,18 +168,21 @@ div.media {
   display: none;
 }
 
-.expander::after {
-  content: " (show details)";
+.col-result {
+  cursor: pointer;
+}
+.col-result:hover::after {
   color: #bbb;
   font-style: italic;
   cursor: pointer;
 }
 
-.collapser::after {
+.col-result.collapser:hover::after {
   content: " (hide details)";
-  color: #bbb;
-  font-style: italic;
-  cursor: pointer;
+}
+
+.col-result.expander:hover::after {
+  content: " (show details)";
 }
 
 /*------------------

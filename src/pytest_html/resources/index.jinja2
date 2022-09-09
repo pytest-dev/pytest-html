@@ -76,6 +76,14 @@
         <th colspan="4">No results found. Check the filters.</th>
       </tr>
     </template>
+    <template id="template_table-colgroup">
+      <colgroup>
+        <col span="1" style="width: 25%;">
+        <col span="1" style="width: 25%;">
+        <col span="1" style="width: 25%;">
+        <col span="1" style="width: 25%;">
+      </colgroup>
+    </template>
     <!-- END TEMPLATES -->
     <div class="summary">
       <div class="summary__data">
@@ -113,6 +121,7 @@
     {% for p in postfix %}
     {{ p|safe }}
     {% endfor %}
+
     <table id="results-table"></table>
   </body>
   <footer>

@@ -123,13 +123,17 @@ class BaseReport(object):
     def _media_content(self, *args, **kwargs):
         pass
 
-    def _process_extras(self, report):
-        test_id = report.nodeid.encode("utf-8").decode("unicode_escape")
+    def _process_extras(self, report, test_id):
         test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
         report_extras = getattr(report, "extras", [])
         for extra_index, extra in enumerate(report_extras):
             content = extra["content"]
-            asset_name = self._asset_filename(test_id, extra_index, test_index, extra['extension'])
+            asset_name = self._asset_filename(
+                test_id.encode("utf-8").decode("unicode_escape"),
+                extra_index,
+                test_index,
+                extra['extension']
+            )
             if extra["format_type"] == extras.FORMAT_JSON:
                 content = json.dumps(content)
                 extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
@@ -220,6 +224,11 @@ class BaseReport(object):
             config=self._config, report=report
         )
 
+        test_id = report.nodeid
+        if report.when != "call":
+            test_id += f"::{report.when}"
+            data["nodeid"] = test_id
+
         if report.longrepr:
             data["longreprtext"] = report.longreprtext
 
@@ -233,7 +242,7 @@ class BaseReport(object):
         self._config.hook.pytest_html_results_table_html(report=report, data=table_html)
         data.update({"tableHtml": table_html})
 
-        data.update({"extras": self._process_extras(report)})
+        data.update({"extras": self._process_extras(report, test_id)})
         self._report.data["tests"].append(data)
         self._generate_report()
 

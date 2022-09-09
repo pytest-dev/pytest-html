@@ -183,23 +183,31 @@ div.media {
   flex: 0 0 25px;
   align-items: center;
 }
-
 .collapsed {
   display: none;
 }
 
-.expander::after {
-  content: ' (show details)';
+@mixin rowToggle {
   color: #bbb;
   font-style: italic;
   cursor: pointer;
 }
 
-.collapser::after {
-  content: ' (hide details)';
-  color: #bbb;
-  font-style: italic;
+.col-result {
   cursor: pointer;
+  &:hover::after {
+    @include rowToggle;
+  }
+}
+.col-result.collapser {
+  &:hover::after {
+    content: ' (hide details)';
+  }
+}
+.col-result.expander {
+  &:hover::after {
+    content: ' (show details)';
+  }
 }
 
 /*------------------

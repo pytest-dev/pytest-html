@@ -1044,7 +1044,7 @@ class TestHTML:
         )
         result, html = run(testdir)
         assert result.ret == 0
-        assert r"\u6d4b\u8bd5\u7528\u4f8b\u540d\u79f0" not in html
+        assert r"测试用例名称" not in html
 
     @pytest.mark.parametrize("is_collapsed", [True, False])
     def test_collapsed(self, testdir, is_collapsed):

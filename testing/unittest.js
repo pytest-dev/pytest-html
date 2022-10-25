@@ -45,7 +45,7 @@ describe('Filter tests', () => {
     after(() => dataModule.manager.setManager({ tests: [] }))
     describe('doInitFilter', () => {
         it('has no stored filters', () => {
-            getFilterMock = sinon.stub(storageModule, 'getFilter').returns([])
+            getFilterMock = sinon.stub(storageModule, 'getVisible').returns([])
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
             doInitFilter()
@@ -55,7 +55,7 @@ describe('Filter tests', () => {
             ])
         })
         it('exclude passed', () => {
-            getFilterMock = sinon.stub(storageModule, 'getFilter').returns(['passed'])
+            getFilterMock = sinon.stub(storageModule, 'getVisible').returns(['passed'])
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
             doInitFilter()
@@ -67,7 +67,7 @@ describe('Filter tests', () => {
         let setFilterMock
         afterEach(() => setFilterMock.restore())
         it('removes a filter', () => {
-            getFilterMock = sinon.stub(storageModule, 'getFilter').returns(['passed'])
+            getFilterMock = sinon.stub(storageModule, 'getVisible').returns(['passed'])
             setFilterMock = sinon.stub(storageModule, 'setFilter')
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
@@ -78,7 +78,7 @@ describe('Filter tests', () => {
             ])
         })
         it('applies a filter', () => {
-            getFilterMock = sinon.stub(storageModule, 'getFilter').returns([])
+            getFilterMock = sinon.stub(storageModule, 'getVisible').returns([])
             setFilterMock = sinon.stub(storageModule, 'setFilter')
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 

@@ -3,7 +3,7 @@ const { dom, findAll } = require('./dom.js')
 const { manager } = require('./datamanager.js')
 const { doSort } = require('./sort.js')
 const { doFilter } = require('./filter.js')
-const { getFilter } = require('./storage.js')
+const { getVisible } = require('./storage.js')
 
 const removeChildren = (node) => {
     while (node.firstChild) {
@@ -74,14 +74,14 @@ const renderDerived = (tests, collectedItems, isFinished) => {
         { outcome: 'rerun', label: 'Reruns' },
     ]
 
-    const currentFilter = getFilter()
+    const currentFilter = getVisible()
     possibleOutcomes.forEach(({ outcome, label }) => {
         const count = renderSet.filter((test) => test.outcome.toLowerCase() === outcome).length
         const input = document.querySelector(`input[data-test-result="${outcome}"]`)
         document.querySelector(`.${outcome}`).innerText = `${count} ${label}`
 
         input.disabled = !count
-        input.checked = !currentFilter.includes(outcome)
+        input.checked = currentFilter.includes(outcome)
     })
 
     const numberOfTests = renderSet.filter(({ outcome }) =>

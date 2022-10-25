@@ -229,8 +229,7 @@ class BaseReport(object):
             test_id += f"::{report.when}"
             data["nodeid"] = test_id
 
-        if report.longrepr:
-            data["longreprtext"] = report.longreprtext
+        data["longreprtext"] = report.longreprtext or "No log output captured."
 
         data["outcome"] = _process_outcome(report)
 
@@ -250,7 +249,7 @@ class BaseReport(object):
 class NextGenReport(BaseReport):
     def __init__(self, report_path, config):
         super().__init__(report_path, config)
-        self._assets_path = Path(self._report_path.parent, "assets")
+        self._assets_path = Path("assets")
         self._assets_path.mkdir(parents=True, exist_ok=True)
         self._default_css_path = Path(self._resources_path, "style.css")
 
@@ -275,9 +274,9 @@ class NextGenReport(BaseReport):
             return content
 
     def _write_content(self, content, asset_name):
-        content_path = Path(self._assets_path, asset_name)
-        content_path.write_bytes(content)
-        return content_path.as_uri()
+        content_relative_path = Path(self._assets_path, asset_name)
+        Path(self._report_path.parent, content_relative_path).write_bytes(content)
+        return str(content_relative_path)
 
 
 class NextGenSelfContainedReport(BaseReport):

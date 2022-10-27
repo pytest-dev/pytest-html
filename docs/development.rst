@@ -104,12 +104,12 @@ Releasing a new version
 
 Follow these steps to release a new version of the project:
 
-#.  Update your local main with the upstream main (``git pull --rebase upstream main``)
+#.  Update your local master with the upstream master (``git pull --rebase upstream master``)
 #.  Create a new branch
 #.  Update `the changelog`_ with the new version, today's date, and all changes/new features
 #.  Commit and push the new branch and then create a new pull request
 #.  Wait for tests and reviews and then merge the branch
-#.  Once merged, update your local main again (``git pull --rebase upstream main``)
+#.  Once merged, update your local master again (``git pull --rebase upstream master``)
 #.  Tag the release with the new release version (``git tag v<new tag>``)
 #.  Push the tag (``git push upstream --tags``)
 #. Done. Check `Github Actions`_ for release progress.

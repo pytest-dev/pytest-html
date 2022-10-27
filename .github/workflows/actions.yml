@@ -6,7 +6,7 @@ on:
   push:  # only publishes pushes to the main branch to TestPyPI
     branches:  # any maintenance branch but not tag
       # avoid generic ** as it duplicates builds from temporary branches
-      - "main"
+      - "master"
       - "stable/**"
     tags-ignore:
     - >-
@@ -18,7 +18,7 @@ jobs:
     name: Build Docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
     - name: Set up Python
       uses: actions/setup-python@v3
       with:

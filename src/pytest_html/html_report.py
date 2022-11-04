@@ -256,10 +256,10 @@ class HTMLReport:
         if not self.self_contained:
             assets_dir.mkdir(parents=True, exist_ok=True)
 
-        self.logfile.write_text(report_content)
+        self.logfile.write_text(report_content, encoding="utf-8")
         if not self.self_contained:
             style_path = assets_dir / "style.css"
-            style_path.write_text(self.style_css)
+            style_path.write_text(self.style_css, encoding="utf-8")
 
     def _post_process_reports(self):
         for test_name, test_reports in self.reports.items():

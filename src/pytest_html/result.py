@@ -163,10 +163,10 @@ class TestResult:
         else:
             # support %f, since time.strftime doesn't support it out of the box
             # keep a precision of 2 for legacy reasons
-            formatted_milliseconds = "00"
+            formatted_milliseconds = "000.000"
             if "." in string_duration:
                 milliseconds = string_duration.split(".")[1]
-                formatted_milliseconds = milliseconds[0:2]
+                formatted_milliseconds = milliseconds[0:3]+'.'+milliseconds[3:6]
 
             duration_formatter = duration_formatter.replace(
                 "%f", formatted_milliseconds

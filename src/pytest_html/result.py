@@ -166,7 +166,7 @@ class TestResult:
             formatted_milliseconds = "000.000"
             if "." in string_duration:
                 milliseconds = string_duration.split(".")[1]
-                formatted_milliseconds = milliseconds[0:3]+'.'+milliseconds[3:6]
+                formatted_milliseconds = milliseconds[0:3] + "." + milliseconds[3:6]
 
             duration_formatter = duration_formatter.replace(
                 "%f", formatted_milliseconds

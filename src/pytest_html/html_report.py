@@ -201,6 +201,9 @@ class HTMLReport:
 
         body.extend(results)
 
+        if self.self_contained:
+            body.append(html.div(html.img(), id="large", onclick="zoomOut()"))
+
         doc = html.html(head, body)
 
         unicode_doc = "<!DOCTYPE html>\n{}".format(doc.unicode(indent=2))

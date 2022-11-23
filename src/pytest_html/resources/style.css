@@ -117,6 +117,7 @@ div.image {
   margin-left: 5px;
   overflow: hidden;
   width: 320px;
+  cursor: zoom-in;
 }
 div.image img {
   width: 320px;
@@ -183,4 +184,27 @@ div.video video {
 .desc.active .sort-icon {
   /*finish triangle*/
   border-top: 8px solid #999;
+}
+
+/*---------------------------
+ * 4. Zoom in self-contained
+ *---------------------------*/
+#large {
+  display: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  position: fixed;
+  margin: auto;
+  overflow: scroll;
+  cursor: zoom-out;
+  background: rgba(0,0,0,0.5) no-repeat center;
+}
+
+#large img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

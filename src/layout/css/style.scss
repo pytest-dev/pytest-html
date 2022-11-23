@@ -141,6 +141,7 @@ div.image {
 	margin-left: $spacing;
 	overflow: hidden;
 	width: $extra-media-width;
+	cursor: zoom-in;
 
 	img {
 		width: $extra-media-width;
@@ -213,5 +214,30 @@ div.video {
 	.desc.active & {
 		/*finish triangle*/
 		border-top: $triangle-width solid #999;
+	}
+}
+
+
+/*---------------------------
+ * 4. Zoom in self-contained
+ *---------------------------*/
+
+#large {
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 100;
+	position: fixed;
+	margin: auto;
+	overflow: scroll;
+	cursor: zoom-out;
+	background: rgba(0,0,0,0.5) no-repeat center;
+
+	img {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
 	}
 }

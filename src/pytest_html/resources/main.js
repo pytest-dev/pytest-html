@@ -111,6 +111,23 @@ function addCollapse() {
     });
 }
 
+function zoomIn(event) {
+    const large = find('#large');
+    find('img', large).setAttribute('src', event.target.getAttribute('src'));
+    large.style.display = 'block';
+    large.scrollTop = 0;
+}
+
+function zoomOut() { // eslint-disable-line no-unused-vars
+    find('#large').style.display = 'none';
+}
+
+function addZoomIn() {
+    findAll('.image img').forEach(function(elem) {
+        elem.addEventListener('click', zoomIn);
+    });
+}
+
 function getQueryParameter(name) {
     const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
@@ -120,6 +137,8 @@ function init () { // eslint-disable-line no-unused-vars
     resetSortHeaders();
 
     addCollapse();
+
+    addZoomIn();
 
     showFilters();
 

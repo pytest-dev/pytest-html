@@ -27,7 +27,7 @@ def read_html(path):
 
 def assert_results_by_outcome(html, test_outcome, test_outcome_number, label=None):
     # Asserts if the test number of this outcome in the summary is correct
-    regex_summary = r"(\d)+ {}".format(label or test_outcome)
+    regex_summary = r"(\d)+ {}".format(label or test_outcome)
     assert int(re.search(regex_summary, html).group(1)) == test_outcome_number
 
     # Asserts if the generated checkbox of this outcome is correct
@@ -204,7 +204,7 @@ class TestHTML:
 
         expected_report_extras = (
             r'<td class="col-links"><a class="url" href="http://www.example.com/" '
-            'target="_blank">URL</a> </td>'
+            'target="_blank">URL</a></td>'
         )
         assert len(re.findall(expected_report_extras, html)) == 3
 
@@ -295,7 +295,6 @@ class TestHTML:
             testdir.makeconftest(
                 f"""
                 import pytest
-                from py.xml import html
 
                 def pytest_html_report_title(report):
                     report.title = "{report_title}"
@@ -376,19 +375,21 @@ class TestHTML:
         testdir.makeconftest(
             f"""
             import pytest
-            from py.xml import html
+            from pytest_html.outcome import Outcome
 
             def pytest_html_results_summary(prefix, summary, postfix):
-                prefix.append(html.p("prefix is {content_prefix}"))
-                summary.extend([html.p("extra summary is {content_summary}")])
-                postfix.extend([html.p("postfix is {content_suffix}")])
+                prefix.append("<p>prefix is {content_prefix}</p>")
+                summary.extend([
+                    Outcome("{content_summary}", 42, label="extended_summary"),
+                ])
+                postfix.extend(["<p>postfix is {content_suffix}</p>"])
         """
         )
         testdir.makepyfile("def test_pass(): pass")
         result, html = run(testdir)
         assert result.ret == 0
         assert len(re.findall(content_prefix, html)) == 1
-        assert len(re.findall(content_summary, html)) == 1
+        assert len(re.findall(f'data-test-result="{content_summary}"', html)) == 1
         assert len(re.findall(content_suffix, html)) == 1
 
     def test_extra_html(self, testdir):
@@ -827,9 +828,13 @@ class TestHTML:
     }
     _unordered_dict_with_html_expected = (
         r"<td>content</td>\n\s+<td>{"
-        r'"First Link": "<a href=\\"https://www.w3schools.com\\">W3Schools</a>", '
-        r'"Second Link": "<a href=\\"https://www.w3schools.com\\">W2Schools</a>", '
-        r'"Third Link": "<a href=\\"https://www.w3schools.com\\">W4Schools</a>"}</td>'
+        r'"First Link": "&lt;a href=&#34;https://www.w3schools.com&#34;&gt;'
+        r'W3Schools&lt;/a&gt;", '
+        r'"Second Link": "&lt;a href=&#34;https://www.w3schools.com&#34;&gt;'
+        r'W2Schools&lt;/a&gt;", '
+        r'"Third Link": "&lt;a href=&#34;https://www.w3schools.com&#34;&gt;'
+        r'W4Schools&lt;/a&gt;"'
+        r"}</td>"
     )
 
     @pytest.mark.parametrize(
@@ -1148,8 +1153,8 @@ class TestHTML:
         assert_results(html)
 
         extra_log_div_regex = re.compile(
-            '<div class="log"> -+Captured stdout call-+ <br/>stdout print line\n<br/> '
-            "-+Captured stderr call-+ <br/>stderr print line\n<br/></div>"
+            '<div class="log"> -+Captured stdout call-+ \n<br/>\nstdout print line\n'
+            "<br/>\n -+Captured stderr call-+ \n<br/>\nstderr print line\n<br/></div>"
         )
         if should_capture:
             assert extra_log_div_regex.search(html) is not None
@@ -1178,8 +1183,9 @@ class TestHTML:
         assert_results(html, passed=0, failed=1)
 
         extra_log_div_regex = re.compile(
-            '<div class="log">.*-+Captured stdout call-+ <br/>stdout print line\n<br/> '
-            "-+Captured stderr call-+ <br/>stderr print line\n<br/></div>"
+            '<div class="log">.*-+Captured stdout call-+ \n<br/>\nstdout print line\n'
+            "<br/>\n -+Captured stderr call-+ \n<br/>\nstderr print line\n<br/></div>",
+            re.DOTALL,
         )
         if should_capture:
             assert extra_log_div_regex.search(html) is not None
@@ -1237,6 +1243,6 @@ class TestHTML:
         for variable in expected_environment_values:
             variable_value = expected_environment_values[variable]
             variable_value_regex = re.compile(
-                f"<tr>\n.*<td>{variable}</td>\n.*<td>{variable_value}</td></tr>"
+                f"<tr>\n.*<td>{variable}</td>\n.*<td>{variable_value}</td>\n.*</tr>"
             )
             assert variable_value_regex.search(html) is not None

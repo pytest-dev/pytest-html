@@ -102,11 +102,8 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 
 .. code-block:: python
 
-   from py.xml import html
-
-
    def pytest_html_results_summary(prefix, summary, postfix):
-       prefix.extend([html.p("foo: bar")])
+       prefix.extend(["<p>foo: bar</p>"])
 
 Extra content
 ~~~~~~~~~~~~~
@@ -124,6 +121,7 @@ URL         ``extra.url('http://www.example.com/')``
 Image       ``extra.image(image, mime_type='image/gif', extension='gif')``
 Image       ``extra.image('/path/to/file.png')``
 Image       ``extra.image('http://some_image.png')``
+Video       ``extra.video(video, mime_type='video/webm', extension='webm')``
 ==========  ============================================
 
 **Note**: When adding an image from file, the path can be either absolute
@@ -141,6 +139,14 @@ Image format  Example
 PNG           ``extra.png(image)``
 JPEG          ``extra.jpg(image)``
 SVG           ``extra.svg(image)``
+============  ====================
+
+And for video formats:
+
+============  ====================
+Image format  Example
+============  ====================
+MPEG4         ``extra.mp4(video)``
 ============  ====================
 
 The following example adds the various types of extras using a
@@ -197,19 +203,18 @@ adds a sortable time column, and removes the links column:
 .. code-block:: python
 
   from datetime import datetime
-  from py.xml import html
   import pytest
 
 
   def pytest_html_results_table_header(cells):
-      cells.insert(2, html.th("Description"))
-      cells.insert(1, html.th("Time", class_="sortable time", col="time"))
+      cells.insert(2, "<th>Description</th>")
+      cells.insert(1, '<th class="sortable time" col="time">Time</th>')
       cells.pop()
 
 
   def pytest_html_results_table_row(report, cells):
-      cells.insert(2, html.td(report.description))
-      cells.insert(1, html.td(datetime.utcnow(), class_="col-time"))
+      cells.insert(2, f"<td>{report.description}</td>")
+      cells.insert(1, f'<td class="col-time">{datetime.utcnow()}</td>')
       cells.pop()
 
 
@@ -230,18 +235,15 @@ following example removes all passed results from the report:
           del cells[:]
 
 The log output and additional HTML can be modified by implementing the
-:code:`pytest_html_results_html` hook. The following example replaces all
+:code:`pytest_html_results_table_html` hook. The following example replaces all
 additional HTML and log output with a notice that the log is empty:
 
 .. code-block:: python
 
-  from py.xml import html
-
-
   def pytest_html_results_table_html(report, data):
       if report.passed:
           del data[:]
-          data.append(html.div("No log output captured.", class_="empty log"))
+          data.append('<div class="empty log">No log output captured.</div>')
 
 Display options
 ---------------

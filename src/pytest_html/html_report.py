@@ -8,13 +8,16 @@ from collections import defaultdict
 from collections import OrderedDict
 from pathlib import Path
 
-from py.xml import html
-from py.xml import raw
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+from markupsafe import escape
+from markupsafe import Markup
 
 from . import __pypi_url__
 from . import __version__
 from .outcome import Outcome
 from .result import TestResult
+from .result_header import ResultHeader
 from .util import ansi_support
 
 
@@ -22,7 +25,6 @@ class HTMLReport:
     def __init__(self, logfile, config):
         logfile = Path(os.path.expandvars(logfile)).expanduser()
         self.logfile = logfile.absolute()
-        self.test_logs = []
         self.title = self.logfile.name
         self.results = []
         self.errors = self.failed = 0
@@ -33,19 +35,16 @@ class HTMLReport:
         self.self_contained = config.getoption("self_contained_html")
         self.config = config
         self.reports = defaultdict(list)
+        self.jinja = Environment(
+            loader=FileSystemLoader(Path(__file__).parent / "resources"),
+            autoescape=True,
+        )
 
     def _appendrow(self, outcome, report):
-        result = TestResult(outcome, report, self.logfile, self.config)
-        if result.row_table is not None:
+        result = TestResult(outcome, report, self.jinja, self.logfile, self.config)
+        if result.cells:
             index = bisect.bisect_right(self.results, result)
             self.results.insert(index, result)
-            tbody = html.tbody(
-                result.row_table,
-                class_="{} results-table-row".format(result.outcome.lower()),
-            )
-            if result.row_extra is not None:
-                tbody.append(result.row_extra)
-            self.test_logs.insert(index, tbody)
 
     def append_passed(self, report):
         if report.when == "call":
@@ -86,10 +85,11 @@ class HTMLReport:
         suite_time_delta = suite_stop_time - self.suite_start_time
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
         generated = datetime.datetime.now()
-
+        report_tmpl = self.jinja.get_template("report.html.jinja")
+        main_js_path = Path(__file__).parent / "resources" / "main.js"
+        main_js = main_js_path.read_text()
         css_path = Path(__file__).parent / "resources" / "style.css"
         self.style_css = css_path.read_text()
-
         if ansi_support():
             ansi_css = [
                 "\n/******************************",
@@ -98,7 +98,6 @@ class HTMLReport:
             ]
             ansi_css.extend([str(r) for r in ansi_support().style.get_styles()])
             self.style_css += "\n".join(ansi_css)
-
         # <DF> Add user-provided CSS
         for path in self.config.getoption("css"):
             self.style_css += "\n/******************************"
@@ -106,16 +105,7 @@ class HTMLReport:
             self.style_css += f"\n * {path}"
             self.style_css += "\n ******************************/\n\n"
             self.style_css += Path(path).read_text()
-
-        css_href = "assets/style.css"
-        html_css = html.link(href=css_href, rel="stylesheet", type="text/css")
-        if self.self_contained:
-            html_css = html.style(raw(self.style_css))
-
         session.config.hook.pytest_html_report_title(report=self)
-
-        head = html.head(html.meta(charset="utf-8"), html.title(self.title), html_css)
-
         outcomes = [
             Outcome("passed", self.passed),
             Outcome("skipped", self.skipped),
@@ -124,87 +114,39 @@ class HTMLReport:
             Outcome("xfailed", self.xfailed, label="expected failures"),
             Outcome("xpassed", self.xpassed, label="unexpected passes"),
         ]
-
         if self.rerun is not None:
             outcomes.append(Outcome("rerun", self.rerun))
-
-        summary = [
-            html.p(f"{numtests} tests ran in {suite_time_delta:.2f} seconds. "),
-            html.p(
-                "(Un)check the boxes to filter the results.",
-                class_="filter",
-                hidden="true",
-            ),
-        ]
-
-        for i, outcome in enumerate(outcomes, start=1):
-            summary.append(outcome.checkbox)
-            summary.append(outcome.summary_item)
-            if i < len(outcomes):
-                summary.append(", ")
-
-        cells = [
-            html.th("Result", class_="sortable result initial-sort", col="result"),
-            html.th("Test", class_="sortable", col="name"),
-            html.th("Duration", class_="sortable", col="duration"),
-            html.th("Links", class_="sortable links", col="links"),
-        ]
-        session.config.hook.pytest_html_results_table_header(cells=cells)
-
-        results = [
-            html.h2("Results"),
-            html.table(
-                [
-                    html.thead(
-                        html.tr(cells),
-                        html.tr(
-                            [
-                                html.th(
-                                    "No results found. Try to check the filters",
-                                    colspan=len(cells),
-                                )
-                            ],
-                            id="not-found-message",
-                            hidden="true",
-                        ),
-                        id="results-table-head",
-                    ),
-                    self.test_logs,
-                ],
-                id="results-table",
-            ),
-        ]
-
-        main_js_path = Path(__file__).parent / "resources" / "main.js"
-        main_js = main_js_path.read_text()
-
-        body = html.body(
-            html.script(raw(main_js)),
-            html.h1(self.title),
-            html.p(
-                "Report generated on {} at {} by ".format(
-                    generated.strftime("%d-%b-%Y"), generated.strftime("%H:%M:%S")
-                ),
-                html.a("pytest-html", href=__pypi_url__),
-                f" v{__version__}",
-            ),
-            onLoad="init()",
-        )
-
-        body.extend(self._generate_environment(session.config))
-
         summary_prefix, summary_postfix = [], []
         session.config.hook.pytest_html_results_summary(
-            prefix=summary_prefix, summary=summary, postfix=summary_postfix
+            prefix=summary_prefix, summary=outcomes, postfix=summary_postfix
         )
-        body.extend([html.h2("Summary")] + summary_prefix + summary + summary_postfix)
-
-        body.extend(results)
-
-        doc = html.html(head, body)
-
-        unicode_doc = "<!DOCTYPE html>\n{}".format(doc.unicode(indent=2))
-
+        headers = [
+            ResultHeader(
+                label="Result", class_html="sortable result initial-sort", col="result"
+            ),
+            ResultHeader(label="Test", class_html="sortable", col="name"),
+            ResultHeader(label="Duration", class_html="sortable", col="duration"),
+            ResultHeader(label="Links", class_html="sortable links", col="links"),
+        ]
+        session.config.hook.pytest_html_results_table_header(cells=headers)
+        unicode_doc = report_tmpl.render(
+            version=__version__,
+            pypi_url=__pypi_url__,
+            generated=generated,
+            title=self.title,
+            css_embedded=self.self_contained,
+            css_content=self.style_css,
+            js_content=main_js,
+            environments=self._generate_environment(session.config),
+            dumps_order=self._dumps_order,
+            numtests=numtests,
+            suite_time_delta=suite_time_delta,
+            summary_prefix=summary_prefix,
+            summary_postfix=summary_postfix,
+            headers=headers,
+            outcomes=outcomes,
+            results=[str(result) for result in self.results],
+        )
         # Fix encoding issues, e.g. with surrogates
         unicode_doc = unicode_doc.encode("utf-8", errors="xmlcharrefreplace")
         return unicode_doc.decode("utf-8")
@@ -212,33 +154,18 @@ class HTMLReport:
     def _generate_environment(self, config):
         if not hasattr(config, "_metadata") or config._metadata is None:
             return []
-
         metadata = config._metadata
-        environment = [html.h2("Environment")]
-        rows = []
-
+        environments = {}
         keys = [k for k in metadata.keys()]
         if not isinstance(metadata, OrderedDict):
             keys.sort()
-
         for key in keys:
             value = metadata[key]
             if self._is_redactable_environment_variable(key, config):
                 black_box_ascii_value = 0x2593
                 value = "".join(chr(black_box_ascii_value) for char in str(value))
-
-            if isinstance(value, str) and value.startswith("http"):
-                value = html.a(value, href=value, target="_blank")
-            elif isinstance(value, (list, tuple, set)):
-                value = ", ".join(str(i) for i in sorted(map(str, value)))
-            elif isinstance(value, dict):
-                sorted_dict = {k: value[k] for k in sorted(value)}
-                value = json.dumps(sorted_dict)
-            raw_value_string = raw(str(value))
-            rows.append(html.tr(html.td(key), html.td(raw_value_string)))
-
-        environment.append(html.table(rows, id="environment"))
-        return environment
+            environments[key] = value
+        return environments
 
     def _is_redactable_environment_variable(self, environment_variable, config):
         redactable_regexes = config.getini("environment_table_redact_list")
@@ -247,6 +174,13 @@ class HTMLReport:
                 return True
 
         return False
+
+    def _dumps_order(self, value):
+        sorted_dict = {
+            escape(k): escape(value[k]) if isinstance(value[k], str) else value[k]
+            for k in sorted(value)
+        }
+        return Markup(json.dumps(sorted_dict))
 
     def _save_report(self, report_content):
         dir_name = self.logfile.parent

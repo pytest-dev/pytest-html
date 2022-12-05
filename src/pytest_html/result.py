@@ -9,15 +9,14 @@ from os.path import isfile
 from pathlib import Path
 
 from _pytest.logging import _remove_ansi_escape_sequences
-from py.xml import html
-from py.xml import raw
 
 from . import extras
+from .result_data import ResultData
 from .util import ansi_support
 
 
 class TestResult:
-    def __init__(self, outcome, report, logfile, config):
+    def __init__(self, outcome, report, jinja, logfile, config):
         self.test_id = report.nodeid.encode("utf-8").decode("unicode_escape")
         if getattr(report, "when", "call") != "call":
             self.test_id = "::".join([report.nodeid, report.when])
@@ -28,44 +27,29 @@ class TestResult:
         self.links_html = []
         self.self_contained = config.getoption("self_contained_html")
         self.max_asset_filename_length = int(config.getini("max_asset_filename_length"))
+        self.jinja = jinja
         self.logfile = logfile
         self.config = config
-        self.row_table = self.row_extra = None
-
+        self.render_collapsed = config.getini("render_collapsed")
         test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
-
         for extra_index, extra in enumerate(getattr(report, "extra", [])):
             self.append_extra_html(extra, extra_index, test_index)
-
         self.append_log_html(
             report,
             self.additional_html,
             config.option.capture,
             config.option.showcapture,
         )
-
-        cells = [
-            html.td(self.outcome, class_="col-result"),
-            html.td(self.test_id, class_="col-name"),
-            html.td(self.formatted_time, class_="col-duration"),
-            html.td(self.links_html, class_="col-links"),
+        self.cells = [
+            ResultData(data=self.outcome, name="result"),
+            ResultData(data=self.test_id, name="name"),
+            ResultData(data=self.formatted_time, name="duration"),
+            ResultData(data=" ".join(self.links_html), name="links"),
         ]
-
-        self.config.hook.pytest_html_results_table_row(report=report, cells=cells)
-
+        self.config.hook.pytest_html_results_table_row(report=report, cells=self.cells)
         self.config.hook.pytest_html_results_table_html(
             report=report, data=self.additional_html
         )
-
-        if len(cells) > 0:
-            tr_class = None
-            if self.config.getini("render_collapsed"):
-                tr_class = "collapsed"
-            self.row_table = html.tr(cells)
-            self.row_extra = html.tr(
-                html.td(self.additional_html, class_="extra", colspan=len(cells)),
-                class_=tr_class,
-            )
 
     def __lt__(self, other):
         order = (
@@ -101,47 +85,22 @@ class TestResult:
     def append_extra_html(self, extra, extra_index, test_index):
         href = None
         if extra.get("format_type") == extras.FORMAT_IMAGE:
-            self._append_image(extra, extra_index, test_index)
-
+            href = self._append_image(extra, extra_index, test_index)
         elif extra.get("format_type") == extras.FORMAT_HTML:
-            self.additional_html.append(html.div(raw(extra.get("content"))))
-
+            href = self._append_html(extra, extra_index, test_index)
         elif extra.get("format_type") == extras.FORMAT_JSON:
-            content = json.dumps(extra.get("content"))
-            if self.self_contained:
-                href = self._data_uri(content, mime_type=extra.get("mime_type"))
-            else:
-                href = self.create_asset(
-                    content, extra_index, test_index, extra.get("extension")
-                )
-
+            href = self._append_json(extra, extra_index, test_index)
         elif extra.get("format_type") == extras.FORMAT_TEXT:
-            content = extra.get("content")
-            if isinstance(content, bytes):
-                content = content.decode("utf-8")
-            if self.self_contained:
-                href = self._data_uri(content)
-            else:
-                href = self.create_asset(
-                    content, extra_index, test_index, extra.get("extension")
-                )
-
+            href = self._append_text(extra, extra_index, test_index)
         elif extra.get("format_type") == extras.FORMAT_URL:
-            href = extra.get("content")
-
+            href = self._append_url(extra, extra_index, test_index)
         elif extra.get("format_type") == extras.FORMAT_VIDEO:
-            self._append_video(extra, extra_index, test_index)
-
+            href = self._append_video(extra, extra_index, test_index)
         if href is not None:
             self.links_html.append(
-                html.a(
-                    extra.get("name"),
-                    class_=extra.get("format_type"),
-                    href=href,
-                    target="_blank",
-                )
+                f'<a class="{extra.get("format_type")}" href="{href}" target="_blank">'
+                f'{extra.get("name")}</a>'
             )
-            self.links_html.append(" ")
 
     def _format_time(self, report):
         # parse the report duration into its display version and return
@@ -174,7 +133,8 @@ class TestResult:
             duration_as_gmtime = time.gmtime(report.duration)
             return time.strftime(duration_formatter, duration_as_gmtime)
 
-    def _populate_html_log_div(self, log, report):
+    def _populate_html_log_div(self, report):
+        logs = []
         if report.longrepr:
             # longreprtext is only filled out on failure by pytest
             #    otherwise will be None.
@@ -184,20 +144,18 @@ class TestResult:
             for line in text.splitlines():
                 separator = line.startswith("_ " * 10)
                 if separator:
-                    log.append(line[:80])
+                    logs.append(line[:80])
                 else:
                     exception = line.startswith("E   ")
                     if exception:
-                        log.append(html.span(raw(escape(line)), class_="error"))
+                        logs.append(f'<span class="error">{escape(line)}</span>')
                     else:
-                        log.append(raw(escape(line)))
-                log.append(html.br())
-
+                        logs.append(escape(line))
+                logs.append("<br/>")
         for section in report.sections:
             header, content = map(escape, section)
-            log.append(f" {header:-^80} ")
-            log.append(html.br())
-
+            logs.append(f" {header:-^80} ")
+            logs.append("<br/>")
             if ansi_support():
                 converter = ansi_support().Ansi2HTMLConverter(
                     inline=False, escaped=False
@@ -205,9 +163,9 @@ class TestResult:
                 content = converter.convert(content, full=False)
             else:
                 content = _remove_ansi_escape_sequences(content)
-
-            log.append(raw(content))
-            log.append(html.br())
+            logs.append(content.rstrip())
+            logs.append("<br/>")
+        return logs
 
     def append_log_html(
         self,
@@ -216,19 +174,20 @@ class TestResult:
         pytest_capture_value,
         pytest_show_capture_value,
     ):
-        log = html.div(class_="log")
-
         should_skip_captured_output = pytest_capture_value == "no"
         if report.outcome == "failed" and not should_skip_captured_output:
             should_skip_captured_output = pytest_show_capture_value == "no"
-        if not should_skip_captured_output:
-            self._populate_html_log_div(log, report)
-
-        if len(log) == 0:
-            log = html.div(class_="empty log")
-            log.append("No log output captured.")
-
-        additional_html.append(log)
+        if should_skip_captured_output:
+            logs = []
+        else:
+            logs = self._populate_html_log_div(report)
+        if logs:
+            str_logs = "\n".join(logs)
+            additional_html.append(f'<div class="log">{str_logs}</div>')
+        else:
+            additional_html.append(
+                '<div class="empty log">No log output captured.</div>'
+            )
 
     def _make_media_html_div(
         self, extra, extra_index, test_index, base_extra_string, base_extra_class
@@ -247,23 +206,18 @@ class TestResult:
                     "includes link to external "
                     f"resource: {content}"
                 )
-
-            html_div = html.a(
-                raw(base_extra_string.format(extra.get("content"))), href=content
-            )
+            html_div = f'<a href="{content}">{base_extra_string.format(content)}</a>'
         elif self.self_contained:
             src = f"data:{extra.get('mime_type')};base64,{content}"
-            html_div = raw(base_extra_string.format(src))
+            html_div = base_extra_string.format(src)
         else:
             content = b64decode(content.encode("utf-8"))
             href = src = self.create_asset(
                 content, extra_index, test_index, extra.get("extension"), "wb"
             )
-            html_div = html.a(
-                raw(base_extra_string.format(src)),
-                class_=base_extra_class,
-                target="_blank",
-                href=href,
+            html_div = (
+                f'<a class="{base_extra_class}" href="{href}" target="_blank">'
+                f"{base_extra_string.format(src)}</a>"
             )
         return html_div
 
@@ -272,15 +226,53 @@ class TestResult:
         html_div = self._make_media_html_div(
             extra, extra_index, test_index, image_base, "image"
         )
-        self.additional_html.append(html.div(html_div, class_="image"))
+        self.additional_html.append(f'<div class="image">{html_div}</div>')
+        return None
+
+    def _append_html(self, extra, extra_index, test_index):
+        self.additional_html.append(f'<div>{extra.get("content")}</div>')
+        return None
+
+    def _append_json(self, extra, extra_index, test_index):
+        content = json.dumps(extra.get("content"))
+        if self.self_contained:
+            return self._data_uri(content, mime_type=extra.get("mime_type"))
+        else:
+            return self.create_asset(
+                content, extra_index, test_index, extra.get("extension")
+            )
+
+    def _append_text(self, extra, extra_index, test_index):
+        content = extra.get("content")
+        if isinstance(content, bytes):
+            content = content.decode("utf-8")
+        if self.self_contained:
+            return self._data_uri(content)
+        else:
+            return self.create_asset(
+                content, extra_index, test_index, extra.get("extension")
+            )
+
+    def _append_url(self, extra, extra_index, test_index):
+        return extra.get("content")
 
     def _append_video(self, extra, extra_index, test_index):
         video_base = '<video controls><source src="{}" type="video/mp4"></video>'
         html_div = self._make_media_html_div(
             extra, extra_index, test_index, video_base, "video"
         )
-        self.additional_html.append(html.div(html_div, class_="video"))
+        self.additional_html.append(f'<div class="video">{html_div}</div>')
+        return None
 
     def _data_uri(self, content, mime_type="text/plain", charset="utf-8"):
         data = b64encode(content.encode(charset)).decode("ascii")
         return f"data:{mime_type};charset={charset};base64,{data}"
+
+    def __str__(self):
+        tmpl = self.jinja.get_template("result.html.jinja")
+        return tmpl.render(
+            outcome=self.outcome,
+            columns=self.cells,
+            additional_html="\n".join(self.additional_html),
+            render_collapsed=self.render_collapsed,
+        )

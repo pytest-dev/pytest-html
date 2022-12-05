@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block head -%}
+    <meta charset="utf-8"/>
+    <title>{{ title }}</title>
+    {% if css_embedded -%}
+    <style style="text/css"><!--
+      {{ css_content|safe }}
+    --></style>
+    {%- else -%}
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/>
+    {%- endif %}
+    {%- endblock head %}
+  </head>
+  <body onLoad="init()">
+    {% block body -%}
+    {% block body_script -%}
+    <script type="text/javascript"><!--
+      {{ js_content|safe }}
+    --></script>
+    {%- endblock body_script %}
+    {% block body_header -%}
+    <h1>{{ title }}</h1>
+    <p>Report generated on {{ generated.strftime("%d-%b-%Y") }} at {{ generated.strftime("%H:%M:%S") }} by <a href="{{ pypi_url }}">pytest-html</a> v{{ version }}</p>
+    {%- endblock body_header %}
+    {% block body_env -%}
+    {% if environments -%}
+    <h2>Environment</h2>
+    <table id="environment">
+      {% for key, value in environments.items() -%}
+      <tr>
+        <td>{{ key }}</td>
+        <td>
+          {%- if value is string and value.startswith('http') -%}
+            <a href="{{ value }}" target="_blank">{{ value }}</a>
+          {%- elif value is mapping -%}
+            {{ dumps_order(value) }}
+          {%- elif not (value is string) and value is iterable -%}
+            {{ value|map('string')|sort(case_sensitive=true)|join(', ') }}
+          {%- else -%}
+            {{ value|string }}
+          {%- endif -%}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    {%- endif %}
+    {%- endblock body_env %}
+    {% block body_summary -%}
+    <h2>Summary</h2>
+    {% for sp in summary_prefix %}{{ sp|safe }}{% endfor %}
+    <p>{{ numtests }} tests ran in {{ '%0.2f'|format(suite_time_delta) }} seconds.</p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p>
+    {%- set filter_sep = joiner(', ') -%}
+    {% for outcome in outcomes %}
+    {{ filter_sep() }}<input checked="true" class="filter" data-test-result="{{ outcome.test_result|lower }}"{% if outcome.total == 0 %} disabled="true"{% endif %} hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="{{ outcome.class_html }}">{{ outcome.total }} {{ outcome.label }}</span>
+    {% endfor %}
+    {% for sp in summary_postfix %}{{ sp|safe }}{% endfor %}
+    {%- endblock body_summary %}
+    {% block body_results -%}
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead>
+        <tr>
+          {% for header in headers -%}
+            <th class="{{ header.class_html }}" col="{{ header.col }}">{{ header.label }}</th>
+          {%- endfor %}
+        </tr>
+        <tr id="no-found-message" hidden="true">
+          <th colspan="{{ headers|length }}">No results found. Try to check the filters</th>
+        </tr>
+      </thead>
+      {% for result in results -%}{{ result|safe }}{%- endfor %}
+    </table>
+    {%- endblock body_results %}
+    {%- endblock body %}
+  </body>
+</html>

@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-pytest-html will work with Python >=3.6 or PyPy3.
+pytest-html will work with Python >=3.7 or PyPy3.
 
 Installing pytest-html
 ----------------------

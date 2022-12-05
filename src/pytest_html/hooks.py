@@ -8,16 +8,21 @@ def pytest_html_report_title(report):
 
 
 def pytest_html_results_summary(prefix, summary, postfix):
-    """Called before adding the summary section to the report"""
+    """Called before adding the summary section to the report.
+    prefix and postfix are lists of strings (empty by default)
+    summary is a list of pytest_html.outcome.Outcome"""
 
 
 def pytest_html_results_table_header(cells):
-    """Called after building results table header."""
+    """Called after building results table header.
+    cells is a list of pytest_html.result_header.ResultHeader"""
 
 
 def pytest_html_results_table_row(report, cells):
-    """Called after building results table row."""
+    """Called after building results table row.
+    cells is a list of pytest_html.result_data.ResultData"""
 
 
 def pytest_html_results_table_html(report, data):
-    """Called after building results table additional HTML."""
+    """Called after building results table additional HTML.
+    data is a list of strings"""

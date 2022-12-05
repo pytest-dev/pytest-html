@@ -6,6 +6,11 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
+Next
+~~~~
+
+* Removed deprecated and unmaintained ``py`` dependency and replaced it with ``jinja2``.
+
 3.2.0 (2022-10-25)
 ~~~~~~~~~~~~~~~~~~
 

@@ -1,0 +1,14 @@
+{%- if columns -%}
+<tbody class="{{ outcome|lower }} results-table-row">
+<tr>
+  {% for column in columns -%}
+  <td class="col-{{ column.name }}">{{ column.data|safe }}</td>
+  {%- endfor %}
+</tr>
+{% if additional_html -%}
+<tr {% if render_collapsed %}class="collapsed"{% endif %}>
+  <td class="extra" colspan="{{ columns|length }}">{{ additional_html|safe }}</td>
+</tr>
+{%- endif %}
+</tbody>
+{%- endif -%}

@@ -75,7 +75,7 @@ const dom = {
         resultBody.querySelector('.col-result').classList.add(`${collapsed ? 'expander' : 'collapser'}`)
         resultBody.querySelector('.col-result').dataset.id = id
         resultBody.querySelector('.col-name').innerText = nodeid
-        resultBody.querySelector('.col-duration').innerText = `${formatDuration(duration)}s`
+        resultBody.querySelector('.col-duration').innerText = formatDuration(duration)
 
 
         if (longreprtext) {

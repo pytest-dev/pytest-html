@@ -2,6 +2,7 @@ const { expect } = require('chai')
 const sinon = require('sinon')
 const { doInitFilter, doFilter } = require('../src/pytest_html/scripts/filter.js')
 const { doInitSort, doSort } = require('../src/pytest_html/scripts/sort.js')
+const { formatDuration } = require('../src/pytest_html/scripts/utils.js')
 const dataModule = require('../src/pytest_html/scripts/datamanager.js')
 const storageModule = require('../src/pytest_html/scripts/storage.js')
 
@@ -92,7 +93,7 @@ describe('Sort tests', () => {
         let sortDirectionMock
         beforeEach(() => dataModule.manager.resetRender())
 
-        afterEach(() => [sortMock,sortDirectionMock, managerSpy].forEach((fn) => fn.restore()))
+        afterEach(() => [sortMock, sortDirectionMock, managerSpy].forEach((fn) => fn.restore()))
         it('has no stored sort', () => {
             sortMock = sinon.stub(storageModule, 'getSort').returns(null)
             sortDirectionMock = sinon.stub(storageModule, 'getSortDirection').returns(null)
@@ -138,6 +139,20 @@ describe('Sort tests', () => {
             expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
                 'passed', 'passed', 'passed', 'passed', 'passed', 'failed',
             ])
+        })
+    })
+})
+
+describe('utils tests', () => {
+    describe('formatDuration', () => {
+        it('handles small durations', () => {
+            expect(formatDuration(123)).to.eql('123ms')
+            expect(formatDuration(0)).to.eql('0ms')
+            expect(formatDuration(999)).to.eql('999ms')
+        })
+        it('handles larger durations', () => {
+            expect(formatDuration(1234)).to.eql('00:00:01')
+            expect(formatDuration(12345678)).to.eql('03:25:46')
         })
     })
 })

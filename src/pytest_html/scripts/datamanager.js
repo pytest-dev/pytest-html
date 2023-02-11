@@ -47,9 +47,6 @@ class DataManager {
     get collectedItems() {
         return this.renderData.collectedItems
     }
-    get durationFormat() {
-        return this.renderData.durationFormat
-    }
     get isFinished() {
         return this.data.runningState === 'Finished'
     }

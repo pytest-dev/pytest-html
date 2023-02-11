@@ -1,16 +1,23 @@
-const { manager } = require('./datamanager.js')
+const formatedNumber = (number) =>
+    number.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+    })
 
-const dayjs = require('dayjs')
-const duration = require('dayjs/plugin/duration')
-dayjs.extend(duration)
 
-const formatDuration = (dur) => {
-    const durationFormat = manager.durationFormat
-    if (durationFormat.length === 0) {
-        return dur.toFixed(2)
-    } else {
-        return dayjs.duration(dur * 1000).format(durationFormat)
+const formatDuration = ( ms ) => {
+    const totalSeconds = ms / 1000
+
+    if (totalSeconds < 1) {
+        return `${ms}ms`
     }
+    const hours = Math.floor(totalSeconds / 3600)
+    let remainingSeconds = totalSeconds % 3600
+    const minutes = Math.floor(remainingSeconds / 60)
+    remainingSeconds = remainingSeconds % 60
+    const seconds = Math.round(remainingSeconds)
+
+    return `${formatedNumber(hours)}:${formatedNumber(minutes)}:${formatedNumber(seconds)}`
 }
 
 module.exports = { formatDuration }

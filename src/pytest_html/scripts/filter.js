@@ -27,7 +27,7 @@ const doFilter = (type, show) => {
     }
 }
 
-module.exports= {
+module.exports = {
     doFilter,
     doInitFilter,
 }

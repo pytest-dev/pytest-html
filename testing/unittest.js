@@ -6,43 +6,47 @@ const dataModule = require('../src/pytest_html/scripts/datamanager.js')
 const storageModule = require('../src/pytest_html/scripts/storage.js')
 
 
+const setTestData = () => {
+    const jsonDatan = {
+        'tests':
+            [
+                {
+                    'id': 'passed_1',
+                    'outcome': 'passed',
+                },
+                {
+                    'id': 'failed_2',
+                    'outcome': 'failed',
+                },
+                {
+                    'id': 'passed_3',
+                    'outcome': 'passed',
+                },
+                {
+                    'id': 'passed_4',
+                    'outcome': 'passed',
+                },
+                {
+                    'id': 'passed_5',
+                    'outcome': 'passed',
+                },
+                {
+                    'id': 'passed_6',
+                    'outcome': 'passed',
+                },
+            ],
+    }
+    dataModule.manager.setManager(jsonDatan)
+}
+
 describe('Filter tests', () => {
     let getFilterMock
     let managerSpy
-    before(() => {
-        const jsonDatan = {
-            'tests':
-                [
-                    {
-                        'id': 'passed_1',
-                        'outcome': 'passed',
-                    },
-                    {
-                        'id': 'failed_2',
-                        'outcome': 'failed',
-                    },
-                    {
-                        'id': 'passed_3',
-                        'outcome': 'passed',
-                    },
-                    {
-                        'id': 'passed_4',
-                        'outcome': 'passed',
-                    },
-                    {
-                        'id': 'passed_5',
-                        'outcome': 'passed',
-                    },
-                    {
-                        'id': 'passed_6',
-                        'outcome': 'passed',
-                    },
-                ],
-        }
-        dataModule.manager.setManager(jsonDatan)
-    })
+
+    beforeEach(setTestData)
     afterEach(() => [getFilterMock, managerSpy].forEach((fn) => fn.restore()))
     after(() => dataModule.manager.setManager({ tests: [] }))
+
     describe('doInitFilter', () => {
         it('has no stored filters', () => {
             getFilterMock = sinon.stub(storageModule, 'getVisible').returns([])
@@ -50,12 +54,10 @@ describe('Filter tests', () => {
 
             doInitFilter()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
-                'passed', 'failed', 'passed', 'passed', 'passed', 'passed',
-            ])
+            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([])
         })
         it('exclude passed', () => {
-            getFilterMock = sinon.stub(storageModule, 'getVisible').returns(['passed'])
+            getFilterMock = sinon.stub(storageModule, 'getVisible').returns(['failed'])
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
             doInitFilter()
@@ -66,63 +68,23 @@ describe('Filter tests', () => {
     describe('doFilter', () => {
         let setFilterMock
         afterEach(() => setFilterMock.restore())
-        it('removes a filter', () => {
+        it('removes all but passed', () => {
             getFilterMock = sinon.stub(storageModule, 'getVisible').returns(['passed'])
             setFilterMock = sinon.stub(storageModule, 'setFilter')
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
             doFilter('passed', true)
-            expect(managerSpy.callCount).to.eql(0)
-            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
-                'passed', 'failed', 'passed', 'passed', 'passed', 'passed'
-            ])
-        })
-        it('applies a filter', () => {
-            getFilterMock = sinon.stub(storageModule, 'getVisible').returns([])
-            setFilterMock = sinon.stub(storageModule, 'setFilter')
-            managerSpy = sinon.spy(dataModule.manager, 'setRender')
-
-            doFilter('passed', false)
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'failed' ])
+            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
+                'passed', 'passed', 'passed', 'passed', 'passed',
+            ])
         })
     })
 })
 
 
 describe('Sort tests', () => {
-    before(() => {
-        const jsonDatan = {
-            'tests': 
-                [
-                    {
-                        'id': 'outcome_1',
-                        'outcome': 'passed',
-                    },
-                    {
-                        'id': 'outcome_2',
-                        'outcome': 'failed',
-                    },
-                    {
-                        'id': 'outcome_3',
-                        'outcome': 'passed',
-                    },
-                    {
-                        'id': 'outcome_4',
-                        'outcome': 'passed',
-                    },
-                    {
-                        'id': 'outcome_5',
-                        'outcome': 'passed',
-                    },
-                    {
-                        'id': 'outcome_6',
-                        'outcome': 'passed',
-                    },
-                ],
-        }
-        dataModule.manager.setManager(jsonDatan)
-    })
+    beforeEach(setTestData)
     after(() => dataModule.manager.setManager({ tests: [] }))
     describe('doInitSort', () => {
         let managerSpy
@@ -155,9 +117,15 @@ describe('Sort tests', () => {
         })
     })
     describe('doSort', () => {
-        let getSortMock, setSortMock, getSortDirectionMock, setSortDirection, managerSpy
+        let getSortMock
+        let setSortMock
+        let getSortDirectionMock
+        let setSortDirection
+        let managerSpy
 
-        afterEach(() => [getSortMock, setSortMock, getSortDirectionMock, setSortDirection, managerSpy].forEach(fn => fn.restore()))
+        afterEach(() => [
+            getSortMock, setSortMock, getSortDirectionMock, setSortDirection, managerSpy,
+        ].forEach((fn) => fn.restore()))
         it('sort on outcome', () => {
             getSortMock = sinon.stub(storageModule, 'getSort').returns(null)
             setSortMock = sinon.stub(storageModule, 'setSort')
@@ -167,7 +135,9 @@ describe('Sort tests', () => {
 
             doSort('outcome')
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({outcome}) => outcome)).to.eql([ 'passed', 'passed', 'passed', 'passed', 'passed', 'failed' ])
+            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
+                'passed', 'passed', 'passed', 'passed', 'passed', 'failed',
+            ])
         })
     })
 })

@@ -3,10 +3,8 @@ const possibleFiltes = ['passed', 'skipped', 'failed', 'error', 'xfailed', 'xpas
 const getVisible = () => {
     const url = new URL(window.location.href)
     const settings = new URLSearchParams(url.search).get('visible') || ''
-    const toret = settings ?
+    return settings ?
         [...new Set(settings.split(',').filter((filter) => possibleFiltes.includes(filter)))] : possibleFiltes
-
-    return toret
 }
 const hideCategory = (categoryToHide) => {
     const url = new URL(window.location.href)
@@ -19,6 +17,9 @@ const hideCategory = (categoryToHide) => {
 }
 
 const showCategory = (categoryToShow) => {
+    if (typeof window === 'undefined') {
+        return
+    }
     const url = new URL(window.location.href)
     const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',') || [...possibleFiltes]
     const settings = [...new Set([categoryToShow, ...currentVisible])]
@@ -49,9 +50,15 @@ const setSort = (type) => {
 }
 
 const getCollapsedCategory = () => {
-    const url = new URL(window.location.href)
-    const collapsedItems = new URLSearchParams(url.search).get('collapsed')
-    return collapsedItems?.split(',') || []
+    let categotries
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        const collapsedItems = new URLSearchParams(url.search).get('collapsed')
+        categotries = collapsedItems?.split(',') || []
+    } else {
+        categotries = []
+    }
+    return categotries
 }
 
 const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc'))

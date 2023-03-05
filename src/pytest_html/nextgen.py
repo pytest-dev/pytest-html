@@ -3,13 +3,13 @@ import binascii
 import datetime
 import json
 import os
-import pytest
 import re
 import warnings
-
 from collections import defaultdict
 from functools import partial
 from pathlib import Path
+
+import pytest
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import select_autoescape
@@ -22,9 +22,7 @@ from .util import cleanup_unserializable
 try:
     from ansi2html import Ansi2HTMLConverter, style
 
-    converter = Ansi2HTMLConverter(
-        inline=False, escaped=False
-    )
+    converter = Ansi2HTMLConverter(inline=False, escaped=False)
     _handle_ansi = partial(converter.convert, full=False)
     _ansi_styles = style.get_styles()
 except ImportError:
@@ -34,8 +32,8 @@ except ImportError:
     _ansi_styles = []
 
 
-class BaseReport(object):
-    class Cells(object):
+class BaseReport:
+    class Cells:
         def __init__(self):
             self._html = {}
 
@@ -46,7 +44,7 @@ class BaseReport(object):
         def insert(self, index, html):
             self._html[index] = html
 
-    class Report(object):
+    class Report:
         def __init__(self, title, duration_format):
             self._data = {
                 "title": title,
@@ -80,9 +78,13 @@ class BaseReport(object):
         self._resources_path = Path(__file__).parent.joinpath("resources")
         self._config = config
         self._template = _read_template([self._resources_path])
-        self._css = _process_css(Path(self._resources_path, default_css), self._config.getoption("css"))
+        self._css = _process_css(
+            Path(self._resources_path, default_css), self._config.getoption("css")
+        )
         self._duration_format = config.getini("duration_format")
-        self._max_asset_filename_length = int(config.getini("max_asset_filename_length"))
+        self._max_asset_filename_length = int(
+            config.getini("max_asset_filename_length")
+        )
         self._report = self.Report(self._report_path.name, self._duration_format)
 
     @property
@@ -96,7 +98,7 @@ class BaseReport(object):
             str(extra_index),
             str(test_index),
             file_extension,
-        )[-self._max_asset_filename_length:]
+        )[-self._max_asset_filename_length :]
 
     def _generate_report(self, self_contained=False):
         generated = datetime.datetime.now()
@@ -147,19 +149,28 @@ class BaseReport(object):
                 test_id.encode("utf-8").decode("unicode_escape"),
                 extra_index,
                 test_index,
-                extra['extension']
+                extra["extension"],
             )
             if extra["format_type"] == extras.FORMAT_JSON:
                 content = json.dumps(content)
-                extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+                extra["content"] = self._data_content(
+                    content, asset_name=asset_name, mime_type=extra["mime_type"]
+                )
 
             if extra["format_type"] == extras.FORMAT_TEXT:
                 if isinstance(content, bytes):
                     content = content.decode("utf-8")
-                extra["content"] = self._data_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+                extra["content"] = self._data_content(
+                    content, asset_name=asset_name, mime_type=extra["mime_type"]
+                )
 
-            if extra["format_type"] == extras.FORMAT_IMAGE or extra["format_type"] == extras.FORMAT_VIDEO:
-                extra["content"] = self._media_content(content, asset_name=asset_name, mime_type=extra["mime_type"])
+            if (
+                extra["format_type"] == extras.FORMAT_IMAGE
+                or extra["format_type"] == extras.FORMAT_VIDEO
+            ):
+                extra["content"] = self._media_content(
+                    content, asset_name=asset_name, mime_type=extra["mime_type"]
+                )
 
         return report_extras
 
@@ -218,7 +229,9 @@ class BaseReport(object):
 
     @pytest.hookimpl(trylast=True)
     def pytest_terminal_summary(self, terminalreporter):
-        terminalreporter.write_sep("-", f"Generated html report: file://{self._report_path.resolve()}")
+        terminalreporter.write_sep(
+            "-", f"Generated html report: file://{self._report_path.resolve()}"
+        )
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
@@ -307,7 +320,7 @@ class NextGenSelfContainedReport(BaseReport):
             base64.b64decode(content.encode("utf-8"), validate=True)
             return f"data:{mime_type};base64,{content}"
         except binascii.Error:
-            # if not base64 content, issue warning and just return as it's a file or link
+            # if not base64, issue warning and just return as it's a file or link
             warnings.warn(
                 "Self-contained HTML report "
                 "includes link to external "
@@ -361,7 +374,7 @@ def _read_template(search_paths, template_name="index.jinja2"):
     env = Environment(
         loader=FileSystemLoader(search_paths),
         autoescape=select_autoescape(
-            enabled_extensions=('jinja2',),
+            enabled_extensions=("jinja2",),
         ),
     )
     return env.get_template(template_name)

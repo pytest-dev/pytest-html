@@ -109,8 +109,8 @@ jobs:
       # TODO: https://github.com/pytest-dev/pytest-html/issues/481
       - name: Upload coverage to codecov
         if: >-
-          ${{ 
-            ! github.event.schedule && 
+          ${{
+            ! github.event.schedule &&
             ! matrix.skip-coverage &&
             github.repository_owner == 'pytest-dev'
           }}

@@ -1,11 +1,11 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import pytest
 import warnings
 from pathlib import Path
 
-from . import extras  # noqa: F401
+import pytest
+
 from .nextgen import NextGenReport
 from .nextgen import NextGenSelfContainedReport
 
@@ -121,8 +121,9 @@ def extra(pytestconfig):
             extra.append(pytest_html.extras.url("https://www.example.com/"))
     """
     warnings.warn(
-        "The 'extra' fixture is deprecated and will be removed in a future release, use 'extras' instead.",
-        DeprecationWarning
+        "The 'extra' fixture is deprecated and will be removed in a future release"
+        ", use 'extras' instead.",
+        DeprecationWarning,
     )
     pytestconfig.extras = []
     yield pytestconfig.extras

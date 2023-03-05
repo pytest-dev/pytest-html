@@ -47,9 +47,9 @@
         "no-var": "error",
         "object-curly-spacing": [
             "error",
-            "always", 
-            { 
-                "arraysInObjects": true 
+            "always",
+            {
+                "arraysInObjects": true
             }
         ],
         "prefer-const": "error",

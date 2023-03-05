@@ -1,17 +1,15 @@
 import base64
 import importlib.resources
-import pkg_resources
 import json
 import os
-
-import pytest
 import random
 import re
-
+from base64 import b64encode
 from pathlib import Path
 
+import pkg_resources
+import pytest
 from assertpy import assert_that
-from base64 import b64encode
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
@@ -33,12 +31,11 @@ def run(pytester, path="report.html", *args):
     pytester.runpytest("-s", "--html", path, *args)
 
     chrome_options = webdriver.ChromeOptions()
-    # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--window-size=1920x1080")
-    chrome_options.add_argument("--allow-file-access-from-files")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--window-size=1920x1080")
+    # chrome_options.add_argument("--allow-file-access-from-files")
     driver = webdriver.Remote(
-        command_executor='http://127.0.0.1:4444',
-        options=chrome_options
+        command_executor="http://127.0.0.1:4444", options=chrome_options
     )
     try:
         # Begin workaround
@@ -50,24 +47,23 @@ def run(pytester, path="report.html", *args):
             except PermissionError:
                 continue
         # End workaround
-        # sleep(5)
+
         driver.get(f"file:///reports{path}")
-        # sleep(5)
         return BeautifulSoup(driver.page_source, "html.parser")
     finally:
         driver.quit()
 
 
 def assert_results(
-        page,
-        passed=0,
-        skipped=0,
-        failed=0,
-        error=0,
-        xfailed=0,
-        xpassed=0,
-        rerun=0,
-        total_tests=None,
+    page,
+    passed=0,
+    skipped=0,
+    failed=0,
+    error=0,
+    xfailed=0,
+    xpassed=0,
+    rerun=0,
+    total_tests=None,
 ):
     args = locals()
     number_of_tests = 0
@@ -82,7 +78,8 @@ def assert_results(
     # if total_tests is not None:
     #     number_of_tests = total_tests
     # total = get_text(page, "p[class='run-count']")
-    # expr = r"%d %s ran in \d+.\d+ seconds." % (number_of_tests, "tests" if number_of_tests > 1 else "test")
+    # expr = r"%d %s ran in \d+.\d+ seconds."
+    # % (number_of_tests, "tests" if number_of_tests > 1 else "test")
     # assert_that(total).matches(expr)
 
 
@@ -106,11 +103,13 @@ def get_log(page):
 
 def file_content():
     try:
-        return importlib.resources.files("pytest_html") \
-            .joinpath("resources", "style.css") \
-            .read_bytes() \
-            .decode("utf-8") \
+        return (
+            importlib.resources.files("pytest_html")
+            .joinpath("resources", "style.css")
+            .read_bytes()
+            .decode("utf-8")
             .strip()
+        )
     except AttributeError:
         # Needed for python < 3.9
         return pkg_resources.resource_string(
@@ -119,7 +118,8 @@ def file_content():
 
 
 class TestHTML:
-    @pytest.mark.parametrize("pause, expectation",
+    @pytest.mark.parametrize(
+        "pause, expectation",
         [
             (0.4, 400),
             (1, r"^((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$)"),
@@ -131,11 +131,14 @@ class TestHTML:
             import time
             def test_sleep():
                 time.sleep({pause})
-        """)
+        """
+        )
         page = run(pytester)
         duration = get_text(page, "#results-table td[class='col-duration']")
         if pause < 1:
-            assert_that(int(duration.replace("ms", ""))).is_between(expectation, expectation * 2)
+            assert_that(int(duration.replace("ms", ""))).is_between(
+                expectation, expectation * 2
+            )
         else:
             assert_that(duration).matches(expectation)
 
@@ -241,9 +244,7 @@ class TestHTML:
         assert_that(col_name).contains("::setup")
         assert_that(get_log(page)).contains("ValueError")
 
-    @pytest.mark.parametrize(
-        "title", ["", "Special Report"]
-    )
+    @pytest.mark.parametrize("title", ["", "Special Report"])
     def test_report_title(self, pytester, title):
         pytester.makepyfile("def test_pass(): pass")
 
@@ -267,17 +268,13 @@ class TestHTML:
 
         content = file_content()
 
-        assert_that(
-            get_text(page, "head style").strip()
-        ).contains(content)
+        assert_that(get_text(page, "head style").strip()).contains(content)
 
     def test_resources_css(self, pytester):
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        assert_that(
-            page.select_one("head link")['href']
-        ).is_equal_to(
+        assert_that(page.select_one("head link")["href"]).is_equal_to(
             str(Path("assets", "style.css"))
         )
 
@@ -328,9 +325,7 @@ class TestHTML:
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        assert_that(
-            page.select_one(".summary .extraHTML").string
-        ).is_equal_to(content)
+        assert_that(page.select_one(".summary .extraHTML").string).is_equal_to(content)
 
     @pytest.mark.parametrize(
         "content, encoded",
@@ -355,9 +350,7 @@ class TestHTML:
 
         element = page.select_one(".summary a[class='col-links__extra text']")
         assert_that(element.string).is_equal_to("Text")
-        assert_that(
-            element["href"]
-        ).is_equal_to(
+        assert_that(element["href"]).is_equal_to(
             f"data:text/plain;charset=utf-8;base64,{encoded}"
         )
 
@@ -385,9 +378,7 @@ class TestHTML:
 
         element = page.select_one(".summary a[class='col-links__extra json']")
         assert_that(element.string).is_equal_to("JSON")
-        assert_that(
-            element["href"]
-        ).is_equal_to(
+        assert_that(element["href"]).is_equal_to(
             f"data:application/json;charset=utf-8;base64,{data}"
         )
 
@@ -477,8 +468,6 @@ class TestHTML:
         # assert_that(element["href"]).is_equal_to(src)
 
         element = page.select_one(".summary .media video")
-        assert_that(
-            str(element)
-        ).is_equal_to(
+        assert_that(str(element)).is_equal_to(
             f'<video controls="">\n<source src="{src}" type="{mime_type}"/>\n</video>'
         )

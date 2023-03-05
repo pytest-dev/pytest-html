@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [[ $(uname) == "Darwin" ]]; then
+  volume="/private/var/folders:/reports/private/var/folders"
+else
+  volume="${TMPDIR:-/tmp}:/reports${TMPDIR:-/tmp}"
+fi
+
+if [[ "${1}" == "down" ]]; then
+  docker-compose -f <(sed -e "s;%%VOLUME%%;${volume};g" docker-compose.tmpl.yml) down
+else
+  docker-compose -f <(sed -e "s;%%VOLUME%%;${volume};g" docker-compose.tmpl.yml) up -d
+fi

@@ -1,14 +1,13 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import os
+import warnings
+from pathlib import Path
 
 import pytest
-from _pytest.pathlib import Path
 
-from . import extras  # noqa: F401
-from .html_report import HTMLReport
 from .nextgen import NextGenReport
+from .nextgen import NextGenSelfContainedReport
 
 
 def pytest_addhooks(pluginmanager):
@@ -44,6 +43,11 @@ def pytest_addoption(parser):
         help="append given css file content to report style file.",
     )
     parser.addini(
+        "duration_format",
+        default=None,
+        help="the format for duration.",
+    )
+    parser.addini(
         "render_collapsed",
         type="bool",
         default=False,
@@ -64,39 +68,34 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    htmlpath = config.getoption("htmlpath")
-    if htmlpath:
+    html_path = config.getoption("htmlpath")
+    if html_path:
         missing_css_files = []
-        for csspath in config.getoption("css"):
-            if not os.path.exists(csspath):
-                missing_css_files.append(csspath)
+        for css_path in config.getoption("css"):
+            if not Path(css_path).exists():
+                missing_css_files.append(css_path)
 
         if missing_css_files:
-            oserror = (
+            os_error = (
                 f"Missing CSS file{'s' if len(missing_css_files) > 1 else ''}:"
                 f" {', '.join(missing_css_files)}"
             )
-            raise OSError(oserror)
+            raise OSError(os_error)
 
         if not hasattr(config, "workerinput"):
-            # prevent opening htmlpath on worker nodes (xdist)
-            config._html = HTMLReport(htmlpath, config)
+            # prevent opening html_path on worker nodes (xdist)
+            if config.getoption("self_contained_html"):
+                html = NextGenSelfContainedReport(html_path, config)
+            else:
+                html = NextGenReport(html_path, config)
 
-            config._next_gen = NextGenReport(config, Path("nextgendata.js"))
-            config.pluginmanager.register(config._html)
-            config.pluginmanager.register(config._next_gen)
+            config.pluginmanager.register(html)
 
 
 def pytest_unconfigure(config):
-    html = getattr(config, "_html", None)
+    html = config.pluginmanager.getplugin("html")
     if html:
-        del config._html
         config.pluginmanager.unregister(html)
-
-    next_gen = getattr(config, "_next_gen", None)
-    if next_gen:
-        del config._next_gen
-        config.pluginmanager.unregister(next_gen)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -105,8 +104,8 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
     if report.when == "call":
         fixture_extras = getattr(item.config, "extras", [])
-        plugin_extras = getattr(report, "extra", [])
-        report.extra = fixture_extras + plugin_extras
+        plugin_extras = getattr(report, "extras", [])
+        report.extras = fixture_extras + plugin_extras
 
 
 @pytest.fixture
@@ -119,7 +118,29 @@ def extra(pytestconfig):
 
 
         def test_foo(extra):
-            extra.append(pytest_html.extras.url("http://www.example.com/"))
+            extra.append(pytest_html.extras.url("https://www.example.com/"))
+    """
+    warnings.warn(
+        "The 'extra' fixture is deprecated and will be removed in a future release"
+        ", use 'extras' instead.",
+        DeprecationWarning,
+    )
+    pytestconfig.extras = []
+    yield pytestconfig.extras
+    del pytestconfig.extras[:]
+
+
+@pytest.fixture
+def extras(pytestconfig):
+    """Add details to the HTML reports.
+
+    .. code-block:: python
+
+        import pytest_html
+
+
+        def test_foo(extras):
+            extras.append(pytest_html.extras.url("https://www.example.com/"))
     """
     pytestconfig.extras = []
     yield pytestconfig.extras

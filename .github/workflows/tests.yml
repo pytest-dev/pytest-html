@@ -8,6 +8,7 @@ jobs:
     name: ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - tox-env: "py37"
@@ -64,7 +65,7 @@ jobs:
            # https://github.com/pytest-dev/pytest-html/issues/482
 #          - os: macOS-latest
 #            name: pypy3-mac
-#            python-version: pypy3
+#            python-version: pypy-3.8
 
           - tox-env: "devel"
             python-version: "3.11-dev"

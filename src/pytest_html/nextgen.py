@@ -5,10 +5,10 @@ import json
 import os
 import pytest
 import re
-import shutil
 import warnings
 
 from collections import defaultdict
+from functools import partial
 from pathlib import Path
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -17,6 +17,21 @@ from jinja2 import select_autoescape
 from . import __version__
 from . import extras
 from .util import cleanup_unserializable
+
+
+try:
+    from ansi2html import Ansi2HTMLConverter, style
+
+    converter = Ansi2HTMLConverter(
+        inline=False, escaped=False
+    )
+    _handle_ansi = partial(converter.convert, full=False)
+    _ansi_styles = style.get_styles()
+except ImportError:
+    from _pytest.logging import _remove_ansi_escape_sequences
+
+    _handle_ansi = _remove_ansi_escape_sequences
+    _ansi_styles = []
 
 
 class BaseReport(object):
@@ -59,21 +74,21 @@ class BaseReport(object):
         def title(self, title):
             self._data["title"] = title
 
-    def __init__(self, report_path, config):
-        self._report_path = Path(os.path.expandvars(report_path)).expanduser().resolve()
+    def __init__(self, report_path, config, default_css="style.css"):
+        self._report_path = Path(os.path.expandvars(report_path)).expanduser()
         self._report_path.parent.mkdir(parents=True, exist_ok=True)
-
         self._resources_path = Path(__file__).parent.joinpath("resources")
-
         self._config = config
-        self._css = None
-        self._template = None
-        self._template_filename = "index.jinja2"
-
+        self._template = _read_template([self._resources_path])
+        self._css = _process_css(Path(self._resources_path, default_css), self._config.getoption("css"))
         self._duration_format = config.getini("duration_format")
         self._max_asset_filename_length = int(config.getini("max_asset_filename_length"))
-
         self._report = self.Report(self._report_path.name, self._duration_format)
+
+    @property
+    def css(self):
+        # implement in subclasses
+        return
 
     def _asset_filename(self, test_id, extra_index, test_index, file_extension):
         return "{}_{}_{}.{}".format(
@@ -89,7 +104,7 @@ class BaseReport(object):
             generated.strftime("%d-%b-%Y"),
             generated.strftime("%H:%M:%S"),
             __version__,
-            self._css,
+            self.css,
             self_contained=self_contained,
             test_data=cleanup_unserializable(self._report.data),
             prefix=self._report.data["additionalSummary"]["prefix"],
@@ -148,15 +163,6 @@ class BaseReport(object):
 
         return report_extras
 
-    def _read_template(self, search_paths):
-        env = Environment(
-            loader=FileSystemLoader(search_paths),
-            autoescape=select_autoescape(
-                enabled_extensions=('jinja2',),
-            ),
-        )
-        return env.get_template(self._template_filename)
-
     def _render_html(
         self,
         date,
@@ -212,7 +218,7 @@ class BaseReport(object):
 
     @pytest.hookimpl(trylast=True)
     def pytest_terminal_summary(self, terminalreporter):
-        terminalreporter.write_sep("-", f"Generated html report: file://{self._report_path}")
+        terminalreporter.write_sep("-", f"Generated html report: file://{self._report_path.resolve()}")
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
@@ -229,7 +235,9 @@ class BaseReport(object):
             test_id += f"::{report.when}"
             data["nodeid"] = test_id
 
-        data["longreprtext"] = report.longreprtext or "No log output captured."
+        # Order here matters!
+        log = report.longreprtext or report.capstdout or "No log output captured."
+        data["longreprtext"] = _handle_ansi(log)
 
         data["outcome"] = _process_outcome(report)
 
@@ -249,17 +257,18 @@ class BaseReport(object):
 class NextGenReport(BaseReport):
     def __init__(self, report_path, config):
         super().__init__(report_path, config)
-        self._assets_path = Path("assets")
+        self._assets_path = Path(self._report_path.parent, "assets")
         self._assets_path.mkdir(parents=True, exist_ok=True)
-        self._default_css_path = Path(self._resources_path, "style.css")
+        self._css_path = Path(self._assets_path, "style.css")
 
-        self._template = self._read_template(
-            [self._resources_path, self._assets_path]
-        )
+        with self._css_path.open("w", encoding="utf-8") as f:
+            f.write(self._css)
 
-        # Copy default css file (style.css) to assets directory
-        new_css_path = shutil.copy(self._default_css_path, self._assets_path)
-        self._css = [new_css_path] + self._config.getoption("css")
+    @property
+    def css(self):
+        # print("woot", Path(self._assets_path.name, "style.css"))
+        # print("waat", self._css_path.relative_to(self._report_path.parent))
+        return Path(self._assets_path.name, "style.css")
 
     def _data_content(self, content, asset_name, *args, **kwargs):
         content = content.encode("utf-8")
@@ -275,18 +284,17 @@ class NextGenReport(BaseReport):
 
     def _write_content(self, content, asset_name):
         content_relative_path = Path(self._assets_path, asset_name)
-        Path(self._report_path.parent, content_relative_path).write_bytes(content)
-        return str(content_relative_path)
+        content_relative_path.write_bytes(content)
+        return str(content_relative_path.relative_to(self._report_path.parent))
 
 
 class NextGenSelfContainedReport(BaseReport):
     def __init__(self, report_path, config):
         super().__init__(report_path, config)
-        self._template = self._read_template(
-            [self._resources_path]
-        )
 
-        self._css = ["style.css"] + self._config.getoption("css")
+    @property
+    def css(self):
+        return self._css
 
     def _data_content(self, content, mime_type, *args, **kwargs):
         charset = "utf-8"
@@ -311,6 +319,32 @@ class NextGenSelfContainedReport(BaseReport):
         super()._generate_report(self_contained=True)
 
 
+def _process_css(default_css, extra_css):
+    with open(default_css, encoding="utf-8") as f:
+        css = f.read()
+
+    # Add user-provided CSS
+    for path in extra_css:
+        css += "\n/******************************"
+        css += "\n * CUSTOM CSS"
+        css += f"\n * {path}"
+        css += "\n ******************************/\n\n"
+        with open(path, encoding="utf-8") as f:
+            css += f.read()
+
+    # ANSI support
+    if _ansi_styles:
+        ansi_css = [
+            "\n/******************************",
+            " * ANSI2HTML STYLES",
+            " ******************************/\n",
+        ]
+        ansi_css.extend([str(r) for r in _ansi_styles])
+        css += "\n".join(ansi_css)
+
+    return css
+
+
 def _process_outcome(report):
     if report.when in ["setup", "teardown"] and report.outcome == "failed":
         return "Error"
@@ -321,3 +355,13 @@ def _process_outcome(report):
             return "XFailed"
 
     return report.outcome.capitalize()
+
+
+def _read_template(search_paths, template_name="index.jinja2"):
+    env = Environment(
+        loader=FileSystemLoader(search_paths),
+        autoescape=select_autoescape(
+            enabled_extensions=('jinja2',),
+        ),
+    )
+    return env.get_template(template_name)

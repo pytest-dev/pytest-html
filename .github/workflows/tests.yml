@@ -5,120 +5,132 @@ on:
 
 jobs:
   test_python:
-    name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            name: py36-ubuntu
-            python-version: 3.6
+          - tox-env: "py37"
+            python-version: "3.7"
 
-          - os: windows-latest
-            name: py36-windows
-            python-version: 3.6
+#          https://github.com/pytest-dev/pytest-html/issues/585
+#          - os: windows-latest
+#            name: py37-windows
+#            python-version: 3.7
 
-          - os: macOS-latest
-            name: py36-mac
-            python-version: 3.6
+#          https://github.com/pytest-dev/pytest-html/issues/585
+#          - os: macOS-latest
+#            name: py37-mac
+#            python-version: 3.7
 
-          - os: ubuntu-latest
-            name: py37-ubuntu
-            python-version: 3.7
+          - tox-env: "py38"
+            python-version: "3.8"
 
-          - os: windows-latest
-            name: py37-windows
-            python-version: 3.7
+#          https://github.com/pytest-dev/pytest-html/issues/585
+#          - os: windows-latest
+#            name: py38-windows
+#            python-version: 3.8
 
-          - os: macOS-latest
-            name: py37-mac
-            python-version: 3.7
+#          https://github.com/pytest-dev/pytest-html/issues/585
+#          - os: macOS-latest
+#            name: py38-mac
+#            python-version: 3.8
 
-          - os: ubuntu-latest
-            name: py38-ubuntu
-            python-version: 3.8
+          - tox-env: "py39"
+            python-version: "3.9"
 
-          - os: windows-latest
-            name: py38-windows
-            python-version: 3.8
+          - tox-env: "py310"
+            python-version: "3.10"
 
-          - os: macOS-latest
-            name: py38-mac
-            python-version: 3.8
+#          https://github.com/pytest-dev/pytest-html/issues/585
+#          - os: windows-latest
+#            name: py39-windows
+#            python-version: 3.9
 
-          - os: ubuntu-latest
-            name: py39-ubuntu
-            python-version: 3.9
+#          https://github.com/pytest-dev/pytest-html/issues/585
+#          - os: macOS-latest
+#            name: py39-mac
+#            python-version: 3.9
 
-          - os: windows-latest
-            name: py39-windows
-            python-version: 3.9
+          - tox-env: "pypy3"
+            python-version: "pypy3.9"
+            skip-coverage: true
 
-          - os: macOS-latest
-            name: py39-mac
-            python-version: 3.9
-
-          - os: ubuntu-latest
-            name: pypy3-ubuntu
-            python-version: pypy3
-
-          - os: windows-latest
-            name: pypy3-windows
-            python-version: pypy3
+#          https://github.com/pytest-dev/pytest-html/issues/585
+#          - os: windows-latest
+#            name: pypy3-windows
+#            python-version: pypy3
 
            # https://github.com/pytest-dev/pytest-html/issues/482
 #          - os: macOS-latest
 #            name: pypy3-mac
 #            python-version: pypy3
 
-          - os: ubuntu-latest
-            name: devel-ubuntu
-            python-version: 3.9
+          - tox-env: "devel"
+            python-version: "3.11-dev"
 
     steps:
       - name: Set Newline Behavior
-        run : git config --global core.autocrlf false
-      - uses: actions/checkout@master
-      - name: Set up Python
-        uses: actions/setup-python@v2
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v3
+
+      - name: Start chrome
+        run: ./start
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
         with:
-          python-version: ${{ matrix['python-version'] }}
+          node-version: '16.x'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build app
+        run: npm run build:ci
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - name: Install tox
         run: python -m pip install --upgrade tox
-      - name: Get Tox Environment Name From Matrix Name
-        uses: rishabhgupta/split-by@v1
-        id: split-matrix-name
-        with:
-          string: '${{ matrix.name }}'
-          split-by: '-'
-      - name: Test with coverage
-        if: "! contains(matrix.name, 'pypy3')"
-        run: python -m tox -e ${{ steps.split-matrix-name.outputs._0}}-cov
-      - name: Test without coverage
-        if: "contains(matrix.name, 'pypy3')"
-        run: python -m tox -e ${{ steps.split-matrix-name.outputs._0}}
 
-       # TODO: https://github.com/pytest-dev/pytest-html/issues/481
-#      - name: Upload coverage to codecov
-#        if: github.event.schedule == ''
-#        uses: codecov/codecov-action@v2
-#        with:
-#          fail_ci_if_error: true
-#          file: ./coverage.xml
-#          flags: tests
-#          name: ${{ matrix.py }} - ${{ matrix.os }}
-#          verbose: true
+      - name: Test with coverage
+        if: ${{ ! matrix.skip-coverage }}
+        run: tox -e ${{ matrix.tox-env }}-cov
+
+      - name: Test without coverage
+        if: ${{ matrix.skip-coverage }}
+        run: tox -e ${{ matrix.tox-env }}
+
+      # TODO: https://github.com/pytest-dev/pytest-html/issues/481
+      - name: Upload coverage to codecov
+        if: >-
+          ${{ 
+            ! github.event.schedule && 
+            ! matrix.skip-coverage &&
+            github.repository_owner == 'pytest-dev'
+          }}
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: tests
+          name: ${{ matrix.tox-env }}
+          verbose: true
 
   test_javascript:
-    name: grunt
+    name: mocha
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
+          node-version: '16.x'
       - name: Install Dependencies
-        run: npm install
-      - name: QUnit Tests
-        run: npm test
+        run: npm ci
+      - name: Mocha Tests
+        run: npm run unit

@@ -6,7 +6,6 @@ import warnings
 from pathlib import Path
 
 from . import extras  # noqa: F401
-from .html_report import HTMLReport
 from .nextgen import NextGenReport
 from .nextgen import NextGenSelfContainedReport
 
@@ -42,12 +41,6 @@ def pytest_addoption(parser):
         metavar="path",
         default=[],
         help="append given css file content to report style file.",
-    )
-    group.addoption(
-        "--next-gen",
-        action="store_true",
-        default=False,
-        help="use next-gen report.",
     )
     parser.addini(
         "duration_format",
@@ -91,14 +84,10 @@ def pytest_configure(config):
 
         if not hasattr(config, "workerinput"):
             # prevent opening html_path on worker nodes (xdist)
-
-            if not config.getoption("next_gen"):
-                html = HTMLReport(html_path, config)
+            if config.getoption("self_contained_html"):
+                html = NextGenSelfContainedReport(html_path, config)
             else:
-                if config.getoption("self_contained_html"):
-                    html = NextGenSelfContainedReport(html_path, config)
-                else:
-                    html = NextGenReport(html_path, config)
+                html = NextGenReport(html_path, config)
 
             config.pluginmanager.register(html)
 

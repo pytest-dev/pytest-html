@@ -1,6 +1,6 @@
 const storageModule = require('./storage.js')
 const { formatDuration } = require('./utils.js')
-const mediaViewer = require('./mediaViewer.js')
+const mediaViewer = require('./mediaviewer.js')
 const templateEnvRow = document.querySelector('#template_environment_row')
 const templateCollGroup = document.querySelector('#template_table-colgroup')
 const templateResult = document.querySelector('#template_results-table__tbody')
@@ -69,19 +69,24 @@ const dom = {
     getColGroup: () => templateCollGroup.content.cloneNode(true),
     getResultTBody: ({ nodeid, id, longreprtext, duration, extras, resultsTableRow, tableHtml, outcome, collapsed }) => {
         const outcomeLower = outcome.toLowerCase()
+        let formattedDuration = formatDuration(duration)
+        formattedDuration = formatDuration < 1 ? formattedDuration.ms : formattedDuration.formatted
         const resultBody = templateResult.content.cloneNode(true)
         resultBody.querySelector('tbody').classList.add(outcomeLower)
         resultBody.querySelector('.col-result').innerText = outcome
         resultBody.querySelector('.col-result').classList.add(`${collapsed ? 'expander' : 'collapser'}`)
         resultBody.querySelector('.col-result').dataset.id = id
         resultBody.querySelector('.col-name').innerText = nodeid
-        resultBody.querySelector('.col-duration').innerText = formatDuration(duration)
+
+        resultBody.querySelector('.col-duration').innerText = duration < 1 ? formatDuration(duration).ms : formatDuration(duration).formatted
 
 
         if (longreprtext) {
-            resultBody.querySelector('.log').innerText = longreprtext
+            // resultBody.querySelector('.log').innerText = longreprtext
+            resultBody.querySelector('.log').innerHTML = longreprtext
         }
-        if (collapsed || !longreprtext) {
+        // if (collapsed || !longreprtext) {
+        if (collapsed) {
             resultBody.querySelector('.extras-row').classList.add('hidden')
         }
 

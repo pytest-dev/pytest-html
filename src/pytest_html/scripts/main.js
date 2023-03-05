@@ -91,8 +91,9 @@ const renderDerived = (tests, collectedItems, isFinished) => {
         const accTime = tests.reduce((prev, { duration }) => prev + duration, 0)
         const formattedAccTime = formatDuration(accTime)
         const testWord = numberOfTests > 1 ? 'tests' : 'test'
-        const innerText = `${numberOfTests} ${testWord} ran in ${formattedAccTime} seconds.`
-        document.querySelector('.run-count').innerText = innerText
+        const durationText = formattedAccTime.hasOwnProperty('ms') ? formattedAccTime.ms : formattedAccTime.seconds
+
+        document.querySelector('.run-count').innerText = `${numberOfTests} ${testWord} ran in ${durationText}.`
         document.querySelector('.summary__reload__button').classList.add('hidden')
     } else {
         document.querySelector('.run-count').innerText = `${numberOfTests} / ${collectedItems} tests done`

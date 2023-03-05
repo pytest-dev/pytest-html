@@ -146,13 +146,13 @@ describe('Sort tests', () => {
 describe('utils tests', () => {
     describe('formatDuration', () => {
         it('handles small durations', () => {
-            expect(formatDuration(123)).to.eql('123ms')
-            expect(formatDuration(0)).to.eql('0ms')
-            expect(formatDuration(999)).to.eql('999ms')
+            expect(formatDuration(0.123).ms).to.eql('123 ms')
+            expect(formatDuration(0).ms).to.eql('0 ms')
+            expect(formatDuration(0.999).ms).to.eql('999 ms')
         })
         it('handles larger durations', () => {
-            expect(formatDuration(1234)).to.eql('00:00:01')
-            expect(formatDuration(12345678)).to.eql('03:25:46')
+            expect(formatDuration(1.234).formatted).to.eql('00:00:01')
+            expect(formatDuration(12345.678).formatted).to.eql('03:25:46')
         })
     })
 })

@@ -1,6 +1,7 @@
 {
   "scripts": {
     "unit": "mocha testing/**/unittest.js",
+    "build:ci": "npm run build:css && npm run build:jsapp",
     "build:css": "sass --no-source-map --no-error-css src/layout/css/style.scss src/pytest_html/resources/style.css",
     "build:jsapp": "browserify ./src/pytest_html/scripts/index.js > ./src/pytest_html/resources/app.js",
     "build": "npm run unit && npm run build:css && npm run build:jsapp"

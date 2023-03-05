@@ -18,20 +18,21 @@ jobs:
     name: Build Docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.6
+        python-version: '3.10'
     - name: Install tox
       run: python -m pip install --upgrade tox
     - name: Build docs with tox
-      run: python -m tox -e docs
+      run: tox -e docs
 
   tests:
-    uses: pytest-dev/pytest-html/.github/workflows/tests.yml@master
+    uses: ./.github/workflows/tests.yml
 
   publish:
+    if: github.repository_owner == 'pytest-dev'
     name: Publish to PyPI registry
     needs:
       - tests
@@ -41,14 +42,16 @@ jobs:
       TOXENV: packaging
 
     steps:
-      - name: Switch to using Python 3.6 by default
-        uses: actions/setup-python@v2
+      - name: Switch to using Python 3.10 by default
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.6
+          python-version: '3.10'
+
       - name: Install tox
         run: python -m pip install --user tox
+
       - name: Check out src from Git
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           # Get shallow Git history (default) for tag creation events
           # but have a complete clone for any other workflows.
@@ -63,6 +66,7 @@ jobs:
               ) &&
               1 || 0
             }}
+
       - name: Drop Git tags from HEAD for non-tag-create events
         if: >-
           github.event_name != 'create' ||
@@ -71,8 +75,10 @@ jobs:
           git tag --points-at HEAD
           |
           xargs git tag --delete
+
       - name: Build dists
         run: python -m tox
+
       - name: Publish to test.pypi.org
         if: >-
           (
@@ -85,14 +91,15 @@ jobs:
             github.event_name == 'create' &&
             github.event.ref_type == 'tag'
           )
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@v1
         with:
           password: ${{ secrets.testpypi_password }}
           repository_url: https://test.pypi.org/legacy/
+
       - name: Publish to pypi.org
         if: >-  # "create" workflows run separately from "push" & "pull_request"
           github.event_name == 'create' &&
           github.event.ref_type == 'tag'
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@v1
         with:
           password: ${{ secrets.pypi_password }}

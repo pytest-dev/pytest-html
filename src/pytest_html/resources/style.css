@@ -70,10 +70,6 @@ span.xpassed,
   color: red;
 }
 
-.col-result {
-  text-transform: capitalize;
-}
-
 .col-links__extra {
   margin-right: 3px;
 }
@@ -123,48 +119,70 @@ span.xpassed,
   height: inherit;
 }
 
-div.image {
+div.media {
   border: 1px solid #e6e6e6;
   float: right;
   height: 240px;
-  margin-left: 5px;
+  margin: 0 5px;
   overflow: hidden;
-  width: 320px;
-}
-div.image img {
   width: 320px;
 }
 
-div.video {
-  border: 1px solid #e6e6e6;
-  float: right;
-  height: 240px;
-  margin-left: 5px;
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
   overflow: hidden;
-  width: 320px;
+  height: 200px;
 }
-div.video video {
-  overflow: hidden;
-  width: 320px;
-  height: 240px;
+
+.media-container__nav--right,
+.media-container__nav--left {
+  text-align: center;
+  cursor: pointer;
+}
+
+.media-container__viewport {
+  cursor: pointer;
+  text-align: center;
+  height: inherit;
+}
+.media-container__viewport img,
+.media-container__viewport video {
+  object-fit: cover;
+  width: 100%;
+  max-height: 100%;
+}
+
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
 }
 
 .collapsed {
   display: none;
 }
 
-.expander::after {
-  content: " (show details)";
+.col-result {
+  cursor: pointer;
+}
+.col-result:hover::after {
   color: #bbb;
   font-style: italic;
   cursor: pointer;
 }
 
-.collapser::after {
+.col-result.collapser:hover::after {
   content: " (hide details)";
-  color: #bbb;
-  font-style: italic;
-  cursor: pointer;
+}
+
+.col-result.expander:hover::after {
+  content: " (show details)";
 }
 
 /*------------------
@@ -198,9 +216,6 @@ div.video video {
   display: none;
 }
 
-.summary {
-  display: flex;
-}
 .summary__data {
   flex: 0 0 550px;
 }
@@ -228,6 +243,29 @@ div.video video {
   flex: 0 0 550px;
 }
 
-input.filter {
-  margin-left: 10px;
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters,
+.collapse {
+  display: flex;
+  align-items: center;
+}
+.filters button,
+.collapse button {
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.filters button:hover,
+.collapse button:hover {
+  color: #ccc;
+}
+
+.filter__label {
+  margin-right: 10px;
 }

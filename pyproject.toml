@@ -1,9 +1,64 @@
 [build-system]
-requires = [
-  "setuptools >= 45",
-  "setuptools_scm[toml] >= 7.0.0",
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "pytest-html"
+description = "pytest plugin for generating HTML reports"
+version = "4.0.0-rc0"
+license = "MPL-2.0"
+authors = [
+    "Dave Hunt <dhunt@mozilla.com>",
+    "Jim Brannlund <jimbrannlund@fastmail.com>"
 ]
-build-backend = "setuptools.build_meta"
+readme = "README.rst"
+homepage = "https://github.com/pytest-dev/pytest-html"
+repository = "https://github.com/pytest-dev/pytest-html"
+keywords = [
+    "pytest",
+    "html",
+    "report",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Utilities",
+]
+packages = [
+    { include = "pytest_html", from = "src" },
+]
+include = [
+    { path = "testing", format = "sdist" },
+    { path = "docs", format = "sdist" },
+    "src/pytest_html/resources",
+    "src/pytest_html/resources/app.js",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+pytest = ">=7.0.0"
+pytest-metadata = ">=2.0.2"
+Jinja2 = ">=3.0.0"
+
+[tool.poetry.dev-dependencies]
+assertpy = ">=1.1"
+beautifulsoup4 = ">=4.11.1"
+black = ">=22.1.0"
+flake8 = ">=4.0.1"
+pre-commit = ">=2.17.0"
+pytest-xdist = ">=2.4.0"
+pytest-mock = ">=3.7.0"
+selenium = ">=4.3.0"
+tox = ">=3.24.5"
+
+[tool.poetry.plugins.pytest11]
+html = "pytest_html.plugin"
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"

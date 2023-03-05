@@ -35,7 +35,6 @@ local.properties
 # JS files/folders
 ## node / npm
 node_modules/
-package-lock.json
 
 # MacOS files
 .DS_Store
@@ -51,3 +50,6 @@ Pipfile.lock
 
 # sphinx/read the docs
 docs/_build/
+
+*.html
+assets/

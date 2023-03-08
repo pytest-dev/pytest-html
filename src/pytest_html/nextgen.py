@@ -45,7 +45,8 @@ class BaseReport:
             self._html[index] = html
 
     class Report:
-        def __init__(self, title):
+        def __init__(self, title, config):
+            self._config = config
             self._data = {
                 "title": title,
                 "collectedItems": 0,
@@ -55,6 +56,10 @@ class BaseReport:
                 "resultsTableHeader": {},
                 "additionalSummary": defaultdict(list),
             }
+
+        @property
+        def config(self):
+            return self._config
 
         @property
         def data(self):
@@ -86,7 +91,8 @@ class BaseReport:
         self._max_asset_filename_length = int(
             config.getini("max_asset_filename_length")
         )
-        self._report = self.Report(self._report_path.name)
+
+        self._report = self.Report(self._report_path.name, config)
 
     @property
     def css(self):

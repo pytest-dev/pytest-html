@@ -243,6 +243,9 @@ class BaseReport:
             config=self._config, report=report
         )
 
+        if "node" in data:
+            data["node"] = str(data["node"])
+
         test_id = report.nodeid
         if report.when != "call":
             test_id += f"::{report.when}"

@@ -471,3 +471,8 @@ class TestHTML:
         assert_that(str(element)).is_equal_to(
             f'<video controls="">\n<source src="{src}" type="{mime_type}"/>\n</video>'
         )
+
+    def test_xdist(self, pytester):
+        pytester.makepyfile("def test_xdist(): pass")
+        page = run(pytester, "report.html", "-n1")
+        assert_results(page, passed=1)

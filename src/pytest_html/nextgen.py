@@ -243,6 +243,9 @@ class BaseReport:
             config=self._config, report=report
         )
 
+        # The WorkerController (from xdist) object is unserializable, so we remove it
+        data.pop("node", None)
+
         test_id = report.nodeid
         if report.when != "call":
             test_id += f"::{report.when}"

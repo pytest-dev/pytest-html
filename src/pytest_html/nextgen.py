@@ -239,14 +239,19 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
-        data = self._config.hook.pytest_report_to_serializable(
+        serialized_report = self._config.hook.pytest_report_to_serializable(
             config=self._config, report=report
         )
+
+        data = {
+            "duration": serialized_report["duration"],
+            "when": serialized_report["when"],
+        }
 
         test_id = report.nodeid
         if report.when != "call":
             test_id += f"::{report.when}"
-            data["nodeid"] = test_id
+        data["nodeid"] = test_id
 
         # Order here matters!
         log = report.longreprtext or report.capstdout or "No log output captured."

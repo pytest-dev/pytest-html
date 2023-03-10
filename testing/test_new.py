@@ -33,7 +33,6 @@ def run(pytester, path="report.html", *args):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920x1080")
-    # chrome_options.add_argument("--allow-file-access-from-files")
     driver = webdriver.Remote(
         command_executor="http://127.0.0.1:4444", options=chrome_options
     )
@@ -471,3 +470,8 @@ class TestHTML:
         assert_that(str(element)).is_equal_to(
             f'<video controls="">\n<source src="{src}" type="{mime_type}"/>\n</video>'
         )
+
+    def test_xdist(self, pytester):
+        pytester.makepyfile("def test_xdist(): pass")
+        page = run(pytester, "report.html", "-n1")
+        assert_results(page, passed=1)

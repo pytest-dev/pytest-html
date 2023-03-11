@@ -37,11 +37,25 @@ class BaseReport:
         def __init__(self):
             self._html = {}
 
+        def __delitem__(self, key):
+            # This means the item should be removed
+            self._html = None
+
         @property
         def html(self):
             return self._html
 
         def insert(self, index, html):
+            # backwards-compat
+            if not isinstance(html, str):
+                if html.__module__.startswith("py."):
+                    warnings.warn(
+                        "The 'py' module is deprecated and support "
+                        "will be removed in a future release.",
+                        DeprecationWarning,
+                    )
+                html = str(html)
+                html = html.replace("col", "data-column-type")
             self._html[index] = html
 
     class Report:
@@ -219,6 +233,7 @@ class BaseReport:
 
         header_cells = self.Cells()
         session.config.hook.pytest_html_results_table_header(cells=header_cells)
+
         self._report.set_data("resultsTableHeader", header_cells.html)
 
         self._report.set_data("runningState", "Started")
@@ -258,25 +273,30 @@ class BaseReport:
         }
 
         test_id = report.nodeid
-        if report.when != "call":
+        if report.when == "call":
+            row_cells = self.Cells()
+            self._config.hook.pytest_html_results_table_row(
+                report=report, cells=row_cells
+            )
+            if row_cells.html is None:
+                return
+            data["resultsTableRow"] = row_cells.html
+
+            table_html = []
+            self._config.hook.pytest_html_results_table_html(
+                report=report, data=table_html
+            )
+            data["tableHtml"] = table_html
+        else:
             test_id += f"::{report.when}"
         data["testId"] = test_id
 
         # Order here matters!
         log = report.longreprtext or report.capstdout or "No log output captured."
         data["log"] = _handle_ansi(log)
-
         data["result"] = _process_outcome(report)
-
-        row_cells = self.Cells()
-        self._config.hook.pytest_html_results_table_row(report=report, cells=row_cells)
-        data["resultsTableRow"] = row_cells.html
-
-        table_html = []
-        self._config.hook.pytest_html_results_table_html(report=report, data=table_html)
-        data["tableHtml"] = table_html
-
         data["extras"] = self._process_extras(report, test_id)
+
         self._report.add_test(data)
         self._generate_report()
 

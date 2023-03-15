@@ -256,7 +256,7 @@ class HTMLReport:
         if not self.self_contained:
             assets_dir.mkdir(parents=True, exist_ok=True)
 
-        self.logfile.write_text(report_content)
+        self.logfile.write_text(report_content, encoding='utf-8')
         if not self.self_contained:
             style_path = assets_dir / "style.css"
             style_path.write_text(self.style_css)

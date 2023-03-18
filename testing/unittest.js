@@ -13,27 +13,27 @@ const setTestData = () => {
             [
                 {
                     'id': 'passed_1',
-                    'outcome': 'passed',
+                    'result': 'passed',
                 },
                 {
                     'id': 'failed_2',
-                    'outcome': 'failed',
+                    'result': 'failed',
                 },
                 {
                     'id': 'passed_3',
-                    'outcome': 'passed',
+                    'result': 'passed',
                 },
                 {
                     'id': 'passed_4',
-                    'outcome': 'passed',
+                    'result': 'passed',
                 },
                 {
                     'id': 'passed_5',
-                    'outcome': 'passed',
+                    'result': 'passed',
                 },
                 {
                     'id': 'passed_6',
-                    'outcome': 'passed',
+                    'result': 'passed',
                 },
             ],
     }
@@ -55,7 +55,7 @@ describe('Filter tests', () => {
 
             doInitFilter()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([])
+            expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([])
         })
         it('exclude passed', () => {
             getFilterMock = sinon.stub(storageModule, 'getVisible').returns(['failed'])
@@ -63,7 +63,7 @@ describe('Filter tests', () => {
 
             doInitFilter()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql(['failed'])
+            expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql(['failed'])
         })
     })
     describe('doFilter', () => {
@@ -76,7 +76,7 @@ describe('Filter tests', () => {
 
             doFilter('passed', true)
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
+            expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
                 'passed', 'passed', 'passed', 'passed', 'passed',
             ])
         })
@@ -101,18 +101,18 @@ describe('Sort tests', () => {
 
             doInitSort()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
+            expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
                 'passed', 'failed', 'passed', 'passed', 'passed', 'passed',
             ])
         })
         it('has stored sort preference', () => {
-            sortMock = sinon.stub(storageModule, 'getSort').returns('outcome')
+            sortMock = sinon.stub(storageModule, 'getSort').returns('result')
             sortDirectionMock = sinon.stub(storageModule, 'getSortDirection').returns(false)
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
             doInitSort()
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
+            expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
                 'failed', 'passed', 'passed', 'passed', 'passed', 'passed',
             ])
         })
@@ -127,16 +127,16 @@ describe('Sort tests', () => {
         afterEach(() => [
             getSortMock, setSortMock, getSortDirectionMock, setSortDirection, managerSpy,
         ].forEach((fn) => fn.restore()))
-        it('sort on outcome', () => {
+        it('sort on result', () => {
             getSortMock = sinon.stub(storageModule, 'getSort').returns(null)
             setSortMock = sinon.stub(storageModule, 'setSort')
             getSortDirectionMock = sinon.stub(storageModule, 'getSortDirection').returns(null)
             setSortDirection = sinon.stub(storageModule, 'setSortDirection')
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
-            doSort('outcome')
+            doSort('result')
             expect(managerSpy.callCount).to.eql(1)
-            expect(dataModule.manager.testSubset.map(({ outcome }) => outcome)).to.eql([
+            expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
                 'passed', 'passed', 'passed', 'passed', 'passed', 'failed',
             ])
         })

@@ -52,7 +52,7 @@ const dom = {
         const header = listHeader.content.cloneNode(true)
         const sortAttr = storageModule.getSort()
         const sortAsc = JSON.parse(storageModule.getSortDirection())
-        const sortables = ['outcome', 'nodeid', 'duration']
+        const sortables = ['result', 'testId', 'duration']
 
         sortables.forEach((sortCol) => {
             if (sortCol === sortAttr) {
@@ -67,23 +67,23 @@ const dom = {
     },
     getListHeaderEmpty: () => listHeaderEmpty.content.cloneNode(true),
     getColGroup: () => templateCollGroup.content.cloneNode(true),
-    getResultTBody: ({ nodeid, id, longreprtext, duration, extras, resultsTableRow, tableHtml, outcome, collapsed }) => {
-        const outcomeLower = outcome.toLowerCase()
+    getResultTBody: ({ testId, id, log, duration, extras, resultsTableRow, tableHtml, result, collapsed }) => {
+        const resultLower = result.toLowerCase()
         let formattedDuration = formatDuration(duration)
         formattedDuration = formatDuration < 1 ? formattedDuration.ms : formattedDuration.formatted
         const resultBody = templateResult.content.cloneNode(true)
-        resultBody.querySelector('tbody').classList.add(outcomeLower)
-        resultBody.querySelector('.col-result').innerText = outcome
+        resultBody.querySelector('tbody').classList.add(resultLower)
+        resultBody.querySelector('.col-result').innerText = result
         resultBody.querySelector('.col-result').classList.add(`${collapsed ? 'expander' : 'collapser'}`)
         resultBody.querySelector('.col-result').dataset.id = id
-        resultBody.querySelector('.col-name').innerText = nodeid
+        resultBody.querySelector('.col-name').innerText = testId
 
         resultBody.querySelector('.col-duration').innerText = duration < 1 ? formatDuration(duration).ms : formatDuration(duration).formatted
 
 
-        if (longreprtext) {
-            // resultBody.querySelector('.log').innerText = longreprtext
-            resultBody.querySelector('.log').innerHTML = longreprtext
+        if (log) {
+            // resultBody.querySelector('.log').innerText = log
+            resultBody.querySelector('.log').innerHTML = log
         }
         // if (collapsed || !longreprtext) {
         if (collapsed) {

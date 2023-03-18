@@ -61,6 +61,9 @@ class BaseReport:
         def data(self):
             return self._data
 
+        def add_test(self, test):
+            self._data["tests"].append(test)
+
         def set_data(self, key, value):
             self._data[key] = value
 
@@ -206,7 +209,7 @@ class BaseReport:
     def pytest_sessionstart(self, session):
         config = session.config
         if hasattr(config, "_metadata") and config._metadata:
-            self._report.data["environment"] = self._generate_environment()
+            self._report.set_data("environment", self._generate_environment())
 
         session.config.hook.pytest_html_report_title(report=self._report)
 
@@ -214,7 +217,7 @@ class BaseReport:
         session.config.hook.pytest_html_results_table_header(cells=header_cells)
         self._report.set_data("resultsTableHeader", header_cells.html)
 
-        self._report.data["runningState"] = "Started"
+        self._report.set_data("runningState", "Started")
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
@@ -224,7 +227,7 @@ class BaseReport:
             summary=self._report.data["additionalSummary"]["summary"],
             postfix=self._report.data["additionalSummary"]["postfix"],
         )
-        self._report.data["runningState"] = "Finished"
+        self._report.set_data("runningState", "Finished")
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
@@ -235,35 +238,36 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
-        self._report.data["collectedItems"] = len(session.items)
+        self._report.set_data("collectedItems", len(session.items))
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
-        data = self._config.hook.pytest_report_to_serializable(
-            config=self._config, report=report
-        )
+        data = {
+            "duration": report.duration,
+            "when": report.when,
+        }
 
         test_id = report.nodeid
         if report.when != "call":
             test_id += f"::{report.when}"
-            data["nodeid"] = test_id
+        data["testId"] = test_id
 
         # Order here matters!
         log = report.longreprtext or report.capstdout or "No log output captured."
-        data["longreprtext"] = _handle_ansi(log)
+        data["log"] = _handle_ansi(log)
 
-        data["outcome"] = _process_outcome(report)
+        data["result"] = _process_outcome(report)
 
         row_cells = self.Cells()
         self._config.hook.pytest_html_results_table_row(report=report, cells=row_cells)
-        data.update({"resultsTableRow": row_cells.html})
+        data["resultsTableRow"] = row_cells.html
 
         table_html = []
         self._config.hook.pytest_html_results_table_html(report=report, data=table_html)
-        data.update({"tableHtml": table_html})
+        data["tableHtml"] = table_html
 
-        data.update({"extras": self._process_extras(report, test_id)})
-        self._report.data["tests"].append(data)
+        data["extras"] = self._process_extras(report, test_id)
+        self._report.add_test(data)
         self._generate_report()
 
 

@@ -6,7 +6,7 @@ class DataManager {
         const dataBlob = { ...data, tests: data.tests.map((test, index) => ({
             ...test,
             id: `test_${index}`,
-            collapsed: collapsedCategories.includes(test.outcome.toLowerCase()),
+            collapsed: collapsedCategories.includes(test.result.toLowerCase()),
         })) }
         this.data = { ...dataBlob }
         this.renderData = { ...dataBlob }

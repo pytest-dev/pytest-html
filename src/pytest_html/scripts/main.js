@@ -29,7 +29,7 @@ const renderStatic = () => {
 }
 
 const renderContent = (tests) => {
-    const renderSet = tests.filter(({ when, outcome }) => when === 'call' || outcome === 'Error' )
+    const renderSet = tests.filter(({ when, result }) => when === 'call' || result === 'Error' )
     const rows = renderSet.map(dom.getResultTBody)
     const table = document.querySelector('#results-table')
     removeChildren(table)
@@ -62,30 +62,30 @@ const renderContent = (tests) => {
 }
 
 const renderDerived = (tests, collectedItems, isFinished) => {
-    const renderSet = tests.filter(({ when, outcome }) => when === 'call' || outcome === 'Error')
+    const renderSet = tests.filter(({ when, result }) => when === 'call' || result === 'Error')
 
-    const possibleOutcomes = [
-        { outcome: 'passed', label: 'Passed' },
-        { outcome: 'skipped', label: 'Skipped' },
-        { outcome: 'failed', label: 'Failed' },
-        { outcome: 'error', label: 'Errors' },
-        { outcome: 'xfailed', label: 'Unexpected failures' },
-        { outcome: 'xpassed', label: 'Unexpected passes' },
-        { outcome: 'rerun', label: 'Reruns' },
+    const possibleResults = [
+        { result: 'passed', label: 'Passed' },
+        { result: 'skipped', label: 'Skipped' },
+        { result: 'failed', label: 'Failed' },
+        { result: 'error', label: 'Errors' },
+        { result: 'xfailed', label: 'Unexpected failures' },
+        { result: 'xpassed', label: 'Unexpected passes' },
+        { result: 'rerun', label: 'Reruns' },
     ]
 
     const currentFilter = getVisible()
-    possibleOutcomes.forEach(({ outcome, label }) => {
-        const count = renderSet.filter((test) => test.outcome.toLowerCase() === outcome).length
-        const input = document.querySelector(`input[data-test-result="${outcome}"]`)
-        document.querySelector(`.${outcome}`).innerText = `${count} ${label}`
+    possibleResults.forEach(({ result, label }) => {
+        const count = renderSet.filter((test) => test.result.toLowerCase() === result).length
+        const input = document.querySelector(`input[data-test-result="${result}"]`)
+        document.querySelector(`.${result}`).innerText = `${count} ${label}`
 
         input.disabled = !count
-        input.checked = currentFilter.includes(outcome)
+        input.checked = currentFilter.includes(result)
     })
 
-    const numberOfTests = renderSet.filter(({ outcome }) =>
-        ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(outcome)).length
+    const numberOfTests = renderSet.filter(({ result }) =>
+        ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(result)).length
 
     if (isFinished) {
         const accTime = tests.reduce((prev, { duration }) => prev + duration, 0)

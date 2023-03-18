@@ -41,7 +41,7 @@ const setFilter = (currentFilter) => {
 
 const getSort = () => {
     const url = new URL(window.location.href)
-    return new URLSearchParams(url.search).get('sort') || 'outcome'
+    return new URLSearchParams(url.search).get('sort') || 'result'
 }
 const setSort = (type) => {
     const url = new URL(window.location.href)

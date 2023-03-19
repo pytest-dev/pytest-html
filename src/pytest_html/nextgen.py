@@ -61,8 +61,19 @@ class BaseReport:
         def data(self):
             return self._data
 
-        def add_test(self, test):
-            self._data["tests"].append(test)
+        def add_test(self, test, when, outcome, nodeid):
+            pattern = re.escape(nodeid) + r"(::(setup|teardown))?$"
+            if when == "call" or (when == "setup" and outcome == "failed"):
+                self._data["tests"].append(test)
+                return True
+            elif when == "teardown" and outcome == "failed":
+                tests = self._data["tests"]
+                tests[:] = [
+                    test if re.match(pattern, test["testId"]) else test
+                    for test in tests
+                ]
+                return True
+            return False
 
         def set_data(self, key, value):
             self._data[key] = value
@@ -244,7 +255,6 @@ class BaseReport:
     def pytest_runtest_logreport(self, report):
         data = {
             "duration": report.duration,
-            "when": report.when,
         }
 
         test_id = report.nodeid
@@ -267,8 +277,11 @@ class BaseReport:
         data["tableHtml"] = table_html
 
         data["extras"] = self._process_extras(report, test_id)
-        self._report.add_test(data)
-        self._generate_report()
+        was_added = self._report.add_test(
+            data, report.when, report.outcome, report.nodeid
+        )
+        if was_added:
+            self._generate_report()
 
 
 class NextGenReport(BaseReport):

@@ -29,8 +29,7 @@ const renderStatic = () => {
 }
 
 const renderContent = (tests) => {
-    const renderSet = tests.filter(({ when, result }) => when === 'call' || result === 'Error' )
-    const rows = renderSet.map(dom.getResultTBody)
+    const rows = tests.map(dom.getResultTBody)
     const table = document.querySelector('#results-table')
     removeChildren(table)
     const tableHeader = dom.getListHeader(manager.renderData)
@@ -62,8 +61,6 @@ const renderContent = (tests) => {
 }
 
 const renderDerived = (tests, collectedItems, isFinished) => {
-    const renderSet = tests.filter(({ when, result }) => when === 'call' || result === 'Error')
-
     const possibleResults = [
         { result: 'passed', label: 'Passed' },
         { result: 'skipped', label: 'Skipped' },
@@ -76,7 +73,7 @@ const renderDerived = (tests, collectedItems, isFinished) => {
 
     const currentFilter = getVisible()
     possibleResults.forEach(({ result, label }) => {
-        const count = renderSet.filter((test) => test.result.toLowerCase() === result).length
+        const count = tests.filter((test) => test.result.toLowerCase() === result).length
         const input = document.querySelector(`input[data-test-result="${result}"]`)
         document.querySelector(`.${result}`).innerText = `${count} ${label}`
 
@@ -84,8 +81,8 @@ const renderDerived = (tests, collectedItems, isFinished) => {
         input.checked = currentFilter.includes(result)
     })
 
-    const numberOfTests = renderSet.filter(({ result }) =>
-        ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(result)).length
+      const numberOfTests = tests.filter(({ result }) =>
+          ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(result)).length
 
     if (isFinished) {
         const accTime = tests.reduce((prev, { duration }) => prev + duration, 0)

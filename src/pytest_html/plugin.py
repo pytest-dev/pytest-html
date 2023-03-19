@@ -43,11 +43,6 @@ def pytest_addoption(parser):
         help="append given css file content to report style file.",
     )
     parser.addini(
-        "duration_format",
-        default=None,
-        help="the format for duration.",
-    )
-    parser.addini(
         "render_collapsed",
         type="bool",
         default=False,

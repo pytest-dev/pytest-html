@@ -281,29 +281,6 @@ The following query parameters may be passed:
 * :code:`xpassed`
 * :code:`rerun`
 
-Formatting the Duration Column
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The formatting of the timestamp used in the :code:`Durations` column can be modified by setting :code:`duration_formatter`
-on the :code:`report` attribute. All `time.strftime`_ formatting directives are supported. In addition, it is possible
-to supply :code:`%f` to get duration milliseconds. If this value is not set, the values in the :code:`Durations` column are
-displayed in :code:`%S.%f` format where :code:`%S` is the total number of seconds a test ran for.
-
-Below is an example of a :code:`conftest.py` file setting :code:`duration_formatter`:
-
-.. code-block:: python
-
-   import pytest
-
-
-   @pytest.hookimpl(hookwrapper=True)
-   def pytest_runtest_makereport(item, call):
-       outcome = yield
-       report = outcome.get_result()
-       setattr(report, "duration_formatter", "%H:%M:%S.%f")
-
-**NOTE**: Milliseconds are always displayed with a precision of 2
-
 .. _@pytest.hookimpl(tryfirst=True): https://docs.pytest.org/en/stable/writing_plugins.html#hook-function-ordering-call-example
 .. _ansi2html: https://pypi.python.org/pypi/ansi2html/
 .. _Content Security Policy (CSP): https://developer.mozilla.org/docs/Web/Security/CSP/

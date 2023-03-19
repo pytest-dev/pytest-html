@@ -45,12 +45,11 @@ class BaseReport:
             self._html[index] = html
 
     class Report:
-        def __init__(self, title, duration_format):
+        def __init__(self, title):
             self._data = {
                 "title": title,
                 "collectedItems": 0,
                 "runningState": "not_started",
-                "durationFormat": duration_format,
                 "environment": {},
                 "tests": [],
                 "resultsTableHeader": {},
@@ -84,11 +83,10 @@ class BaseReport:
         self._css = _process_css(
             Path(self._resources_path, default_css), self._config.getoption("css")
         )
-        self._duration_format = config.getini("duration_format")
         self._max_asset_filename_length = int(
             config.getini("max_asset_filename_length")
         )
-        self._report = self.Report(self._report_path.name, self._duration_format)
+        self._report = self.Report(self._report_path.name)
 
     @property
     def css(self):
@@ -242,6 +240,12 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
+        if hasattr(report, "duration_formatter"):
+            warnings.warn(
+                "'duration_formatter' has been removed and no longer has any effect!",
+                DeprecationWarning,
+            )
+
         data = {
             "duration": report.duration,
             "when": report.when,

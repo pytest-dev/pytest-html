@@ -33,7 +33,6 @@ def run(pytester, path="report.html", *args):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920x1080")
-    # chrome_options.add_argument("--allow-file-access-from-files")
     driver = webdriver.Remote(
         command_executor="http://127.0.0.1:4444", options=chrome_options
     )
@@ -475,4 +474,56 @@ class TestHTML:
     def test_xdist(self, pytester):
         pytester.makepyfile("def test_xdist(): pass")
         page = run(pytester, "report.html", "-n1")
+        assert_results(page, passed=1)
+
+    def test_results_table_hook_insert(self, pytester):
+        header_selector = (
+            ".summary #results-table-head tr:nth-child(1) th:nth-child({})"
+        )
+        row_selector = ".summary #results-table tr:nth-child(1) td:nth-child({})"
+
+        pytester.makeconftest(
+            """
+            def pytest_html_results_table_header(cells):
+                cells.insert(2, "<th>Description</th>")
+                cells.insert(
+                    1,
+                    '<th class="sortable time" data-column-type="time">Time</th>'
+                )
+
+            def pytest_html_results_table_row(report, cells):
+                cells.insert(2, "<td>A description</td>")
+                cells.insert(1, '<td class="col-time">A time</td>')
+        """
+        )
+        pytester.makepyfile("def test_pass(): pass")
+        page = run(pytester)
+
+        assert_that(get_text(page, header_selector.format(2))).is_equal_to("Time")
+        assert_that(get_text(page, header_selector.format(3))).is_equal_to(
+            "Description"
+        )
+
+        assert_that(get_text(page, row_selector.format(2))).is_equal_to("A time")
+        assert_that(get_text(page, row_selector.format(3))).is_equal_to("A description")
+
+    def test_results_table_hook_delete(self, pytester):
+        pytester.makeconftest(
+            """
+            def pytest_html_results_table_row(report, cells):
+                if report.skipped:
+                    del cells[:]
+        """
+        )
+        pytester.makepyfile(
+            """
+            import pytest
+            def test_skip():
+                pytest.skip('reason')
+
+            def test_pass(): pass
+
+        """
+        )
+        page = run(pytester)
         assert_results(page, passed=1)

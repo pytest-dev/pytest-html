@@ -1,15 +1,15 @@
-const possibleFiltes = ['passed', 'skipped', 'failed', 'error', 'xfailed', 'xpassed', 'rerun']
+const possibleFilters = ['passed', 'skipped', 'failed', 'error', 'xfailed', 'xpassed', 'rerun']
 
 const getVisible = () => {
     const url = new URL(window.location.href)
     const settings = new URLSearchParams(url.search).get('visible') || ''
     return settings ?
-        [...new Set(settings.split(',').filter((filter) => possibleFiltes.includes(filter)))] : possibleFiltes
+        [...new Set(settings.split(',').filter((filter) => possibleFilters.includes(filter)))] : possibleFilters
 }
 const hideCategory = (categoryToHide) => {
     const url = new URL(window.location.href)
     const visibleParams = new URLSearchParams(url.search).get('visible')
-    const currentVisible = visibleParams ? visibleParams.split(',') : [...possibleFiltes]
+    const currentVisible = visibleParams ? visibleParams.split(',') : [...possibleFilters]
     const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
 
     url.searchParams.set('visible', settings)
@@ -21,15 +21,15 @@ const showCategory = (categoryToShow) => {
         return
     }
     const url = new URL(window.location.href)
-    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',') || [...possibleFiltes]
+    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',') || [...possibleFilters]
     const settings = [...new Set([categoryToShow, ...currentVisible])]
-    const noFilter = possibleFiltes.length === settings.length || !settings.length
+    const noFilter = possibleFilters.length === settings.length || !settings.length
 
     noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
     history.pushState({}, null, unescape(url.href))
 }
 const setFilter = (currentFilter) => {
-    if (!possibleFiltes.includes(currentFilter)) {
+    if (!possibleFilters.includes(currentFilter)) {
         return
     }
     const url = new URL(window.location.href)

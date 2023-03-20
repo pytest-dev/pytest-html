@@ -52,16 +52,27 @@ const dom = {
         const header = listHeader.content.cloneNode(true)
         const sortAttr = storageModule.getSort()
         const sortAsc = JSON.parse(storageModule.getSortDirection())
-        const sortables = ['result', 'testId', 'duration']
+
+        const regex = /data-column-type="(\w+)/
+        const cols = Object.values(resultsTableHeader).reduce((result, value) => {
+            if (value.includes("sortable")) {
+                const matches = regex.exec(value)
+                if (matches) {
+                    result.push(matches[1])
+                }
+            }
+            return result
+        }, [])
+        const sortables = ['result', 'testId', 'duration', ...cols]
+
+        // Add custom html from the pytest_html_results_table_header hook
+        insertAdditionalHTML(resultsTableHeader, header, 'th')
 
         sortables.forEach((sortCol) => {
             if (sortCol === sortAttr) {
                 header.querySelector(`[data-column-type="${sortCol}"]`).classList.add(sortAsc ? 'desc' : 'asc')
             }
         })
-
-        // Add custom html from the pytest_html_results_table_header hook
-        insertAdditionalHTML(resultsTableHeader, header, 'th')
 
         return header
     },

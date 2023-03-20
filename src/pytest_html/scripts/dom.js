@@ -84,6 +84,7 @@ const dom = {
         formattedDuration = formatDuration < 1 ? formattedDuration.ms : formattedDuration.formatted
         const resultBody = templateResult.content.cloneNode(true)
         resultBody.querySelector('tbody').classList.add(resultLower)
+        resultBody.querySelector('tbody').id = testId
         resultBody.querySelector('.col-result').innerText = result
         resultBody.querySelector('.col-result').classList.add(`${collapsed ? 'expander' : 'collapser'}`)
         resultBody.querySelector('.col-result').dataset.id = id

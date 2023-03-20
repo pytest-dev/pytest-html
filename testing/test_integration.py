@@ -31,7 +31,8 @@ def run(pytester, path="report.html", *args):
     pytester.runpytest("-s", "--html", path, *args)
 
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--headless")
+    if os.environ.get("CI", False):
+        chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920x1080")
     driver = webdriver.Remote(
         command_executor="http://127.0.0.1:4444", options=chrome_options
@@ -90,9 +91,12 @@ def get_text(page, selector):
     return get_element(page, selector).string
 
 
-def get_log(page):
+def get_log(page, test_id=None):
     # TODO(jim) move to get_text (use .contents)
-    log = get_element(page, ".summary div[class='log']")
+    if test_id:
+        log = get_element(page, f".summary tbody[id$='{test_id}'] div[class='log']")
+    else:
+        log = get_element(page, ".summary div[class='log']")
     all_text = ""
     for text in log.strings:
         all_text += text
@@ -527,3 +531,96 @@ class TestHTML:
         )
         page = run(pytester)
         assert_results(page, passed=1)
+
+
+class TestLogCapturing:
+    LOG_LINE_REGEX = r"\s+this is {}"
+
+    @pytest.fixture
+    def log_cli(self, pytester):
+        pytester.makeini(
+            """
+            [pytest]
+            log_cli = 1
+            log_cli_level = INFO
+            log_cli_date_format = %Y-%m-%d %H:%M:%S
+            log_cli_format = %(asctime)s %(levelname)s: %(message)s
+        """
+        )
+
+    @pytest.fixture
+    def test_file(self):
+        return """
+            import pytest
+            import logging
+            @pytest.fixture
+            def setup():
+                logging.info("this is setup")
+                {setup}
+                yield
+                logging.info("this is teardown")
+                {teardown}
+
+            def test_logging(setup):
+                logging.info("this is test")
+                assert {assertion}
+        """
+
+    @pytest.mark.usefixtures("log_cli")
+    def test_all_pass(self, test_file, pytester):
+        pytester.makepyfile(test_file.format(setup="", teardown="", assertion=True))
+        page = run(pytester)
+        assert_results(page, passed=1)
+
+        log = get_log(page)
+        for when in ["setup", "test", "teardown"]:
+            assert_that(log).matches(self.LOG_LINE_REGEX.format(when))
+
+    @pytest.mark.usefixtures("log_cli")
+    def test_setup_error(self, test_file, pytester):
+        pytester.makepyfile(
+            test_file.format(setup="error", teardown="", assertion=True)
+        )
+        page = run(pytester)
+        assert_results(page, error=1)
+
+        log = get_log(page)
+        assert_that(log).matches(self.LOG_LINE_REGEX.format("setup"))
+        assert_that(log).does_not_match(self.LOG_LINE_REGEX.format("test"))
+        assert_that(log).does_not_match(self.LOG_LINE_REGEX.format("teardown"))
+
+    @pytest.mark.usefixtures("log_cli")
+    def test_test_fails(self, test_file, pytester):
+        pytester.makepyfile(test_file.format(setup="", teardown="", assertion=False))
+        page = run(pytester)
+        assert_results(page, failed=1)
+
+        log = get_log(page)
+        for when in ["setup", "test", "teardown"]:
+            assert_that(log).matches(self.LOG_LINE_REGEX.format(when))
+
+    @pytest.mark.usefixtures("log_cli")
+    @pytest.mark.parametrize(
+        "assertion, result", [(True, {"passed": 1}), (False, {"failed": 1})]
+    )
+    def test_teardown_error(self, test_file, pytester, assertion, result):
+        pytester.makepyfile(
+            test_file.format(setup="", teardown="error", assertion=assertion)
+        )
+        page = run(pytester)
+        assert_results(page, error=1, **result)
+
+        for test_name in ["test_logging", "test_logging::teardown"]:
+            log = get_log(page, test_name)
+            for when in ["setup", "test", "teardown"]:
+                assert_that(log).matches(self.LOG_LINE_REGEX.format(when))
+
+    def test_no_log(self, test_file, pytester):
+        pytester.makepyfile(test_file.format(setup="", teardown="", assertion=True))
+        page = run(pytester)
+        assert_results(page, passed=1)
+
+        log = get_log(page, "test_logging")
+        assert_that(log).contains("No log output captured.")
+        for when in ["setup", "test", "teardown"]:
+            assert_that(log).does_not_match(self.LOG_LINE_REGEX.format(when))

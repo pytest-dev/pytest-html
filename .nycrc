@@ -1,0 +1,5 @@
+{
+  "report-dir": ".",
+  "reporter": ["cobertura"],
+  "exclude": ["testing/**"]
+}

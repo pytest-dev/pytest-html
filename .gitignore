@@ -9,6 +9,7 @@ dist
 # Codecov
 .coverage
 coverage.xml
+cobertura-coverage.xml
 
 # IDE Specific files/folders
 ## Pycharm IDE - Jetbrains
@@ -53,3 +54,5 @@ docs/_build/
 
 *.html
 assets/
+
+.nyc_output

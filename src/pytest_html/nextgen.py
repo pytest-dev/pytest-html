@@ -66,10 +66,18 @@ class BaseReport:
                 "collectedItems": 0,
                 "runningState": "not_started",
                 "environment": {},
-                "tests": [],
+                "tests": defaultdict(list),
                 "resultsTableHeader": {},
                 "additionalSummary": defaultdict(list),
             }
+
+        @property
+        def title(self):
+            return self._data["title"]
+
+        @title.setter
+        def title(self, title):
+            self._data["title"] = title
 
         @property
         def config(self):
@@ -79,19 +87,33 @@ class BaseReport:
         def data(self):
             return self._data
 
-        def add_test(self, test):
-            self._data["tests"].append(test)
-
         def set_data(self, key, value):
             self._data[key] = value
 
-        @property
-        def title(self):
-            return self._data["title"]
+        def add_test(self, test_data, report):
+            # regardless of pass or fail we must add teardown logging to "call"
+            if report.when == "teardown":
+                self.update_test_log(report)
 
-        @title.setter
-        def title(self, title):
-            self._data["title"] = title
+            # passed "setup" and "teardown" are not added to the html
+            if report.when == "call" or _is_error(report):
+                processed_logs = _process_logs(report)
+                test_data["log"] = _handle_ansi(processed_logs)
+                self._data["tests"][report.nodeid].append(test_data)
+                return True
+
+            return False
+
+        def update_test_log(self, report):
+            log = []
+            for test in self._data["tests"][report.nodeid]:
+                if test["testId"] == report.nodeid:
+                    for section in report.sections:
+                        header, content = section
+                        if "teardown" in header:
+                            log.append(f" \n{header:-^80} ")
+                            log.append(content)
+                    test["log"] += _handle_ansi("\n".join(log))
 
     def __init__(self, report_path, config, default_css="style.css"):
         self._report_path = Path(os.path.expandvars(report_path)).expanduser()
@@ -269,7 +291,6 @@ class BaseReport:
 
         data = {
             "duration": report.duration,
-            "when": report.when,
         }
 
         test_id = report.nodeid
@@ -291,14 +312,11 @@ class BaseReport:
             test_id += f"::{report.when}"
         data["testId"] = test_id
 
-        # Order here matters!
-        log = report.longreprtext or report.capstdout or "No log output captured."
-        data["log"] = _handle_ansi(log)
         data["result"] = _process_outcome(report)
         data["extras"] = self._process_extras(report, test_id)
 
-        self._report.add_test(data)
-        self._generate_report()
+        if self._report.add_test(data, report):
+            self._generate_report()
 
 
 class NextGenReport(BaseReport):
@@ -313,8 +331,6 @@ class NextGenReport(BaseReport):
 
     @property
     def css(self):
-        # print("woot", Path(self._assets_path.name, "style.css"))
-        # print("waat", self._css_path.relative_to(self._report_path.parent))
         return Path(self._assets_path.name, "style.css")
 
     def _data_content(self, content, asset_name, *args, **kwargs):
@@ -392,8 +408,25 @@ def _process_css(default_css, extra_css):
     return css
 
 
+def _is_error(report):
+    return report.when in ["setup", "teardown"] and report.outcome == "failed"
+
+
+def _process_logs(report):
+    log = []
+    if report.longreprtext:
+        log.append(report.longreprtext)
+    for section in report.sections:
+        header, content = section
+        log.append(f" \n{header:-^80} ")
+        log.append(content)
+    if not log:
+        log.append("No log output captured.")
+    return "\n".join(log)
+
+
 def _process_outcome(report):
-    if report.when in ["setup", "teardown"] and report.outcome == "failed":
+    if _is_error(report):
         return "Error"
     if hasattr(report, "wasxfail"):
         if report.outcome in ["passed", "failed"]:

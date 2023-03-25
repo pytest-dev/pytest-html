@@ -17,6 +17,19 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm run unit
+      - name: Upload coverage to codecov
+        if: >-
+          ${{
+            ! github.event.schedule &&
+            github.repository_owner == 'pytest-dev'
+          }}
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          files: ./cobertura-coverage.xml
+          flags: js_tests
+          name: ubuntu-latest-node-16
+          verbose: true
 
   test_unit:
     name: ${{ matrix.os }} - ${{ matrix.python-version }}
@@ -98,8 +111,8 @@ jobs:
         with:
           fail_ci_if_error: true
           files: ./coverage.xml
-          flags: tests
-          name: ${{ matrix.os }}-${{ matrix.python-version }}
+          flags: py_unit_tests
+          name: ${{ matrix.os }}-python-${{ matrix.python-version }}
           verbose: true
 
   test_integration:
@@ -160,7 +173,6 @@ jobs:
         if: ${{ matrix.tox-env }}
         run: tox -e ${{ matrix.tox-env }} -- testing/test_integration.py
 
-      # TODO: https://github.com/pytest-dev/pytest-html/issues/481
       - name: Upload coverage to codecov
         if: >-
           ${{
@@ -172,6 +184,6 @@ jobs:
         with:
           fail_ci_if_error: true
           files: ./coverage.xml
-          flags: tests
-          name: ${{ matrix.tox-env }}
+          flags: py_integration_tests
+          name: ubuntu-latest-${{ matrix.python-version }}
           verbose: true

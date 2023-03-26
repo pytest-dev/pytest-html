@@ -1,4 +1,13 @@
-const possibleFilters = ['passed', 'skipped', 'failed', 'error', 'xfailed', 'xpassed', 'rerun']
+const possibleResults = [
+    { result: 'passed', label: 'Passed' },
+    { result: 'skipped', label: 'Skipped' },
+    { result: 'failed', label: 'Failed' },
+    { result: 'error', label: 'Errors' },
+    { result: 'xfailed', label: 'Unexpected failures' },
+    { result: 'xpassed', label: 'Unexpected passes' },
+    { result: 'rerun', label: 'Reruns' },
+]
+const possibleFilters = possibleResults.map((item) => item.result)
 
 const getVisible = () => {
     const url = new URL(window.location.href)
@@ -49,16 +58,29 @@ const setSort = (type) => {
     history.pushState({}, null, unescape(url.href))
 }
 
-const getCollapsedCategory = () => {
-    let categotries
+const getCollapsedCategory = (config) => {
+    let categories
     if (typeof window !== 'undefined') {
         const url = new URL(window.location.href)
         const collapsedItems = new URLSearchParams(url.search).get('collapsed')
-        categotries = collapsedItems?.split(',') || []
+        switch (true) {
+            case collapsedItems === null:
+                categories = config || ['passed'];
+                break;
+            case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
+                categories = [];
+                break;
+            case /^all$/.test(collapsedItems):
+                categories = [...possibleFilters];
+                break;
+            default:
+                categories = collapsedItems?.split(',').map(item => item.toLowerCase()) || [];
+                break;
+        }
     } else {
-        categotries = []
+        categories = []
     }
-    return categotries
+    return categories
 }
 
 const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc'))
@@ -75,4 +97,6 @@ module.exports = {
     setSort,
     setSortDirection,
     getCollapsedCategory,
+    possibleFilters,
+    possibleResults,
 }

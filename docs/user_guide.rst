@@ -248,15 +248,19 @@ Auto Collapsing Table Rows
 
 By default, all rows in the **Results** table will be expanded except those that have :code:`Passed`.
 
-This behavior can be customized either with a query parameter: :code:`?collapsed=Passed,XFailed,Skipped`
-or by setting the :code:`render_collapsed` in a configuration file (pytest.ini, setup.cfg, etc).
+This behavior can be customized with a query parameter: :code:`?collapsed=Passed,XFailed,Skipped`.
+If you want all rows to be collapsed you can pass :code:`?collapsed=All`.
+By setting the query parameter to empty string :code:`?collapsed=""` **none** of the rows will be collapsed.
+
+Note that the query parameter is case insensitive, so passing :code:`PASSED` and :code:`passed` has the same effect.
+
+You can also set the collapsed behaviour by setting the :code:`render_collapsed` in a configuration file (pytest.ini, setup.cfg, etc).
+Note that the query parameter takes precedence.
 
 .. code-block:: ini
 
   [pytest]
-  render_collapsed = True
-
-**NOTE:** Setting :code:`render_collapsed` will, unlike the query parameter, affect all statuses.
+  render_collapsed = failed,error
 
 Controlling Test Result Visibility Via Query Params
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

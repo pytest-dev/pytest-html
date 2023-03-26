@@ -28,7 +28,7 @@ OUTCOMES = {
 
 def run(pytester, path="report.html", *args):
     path = pytester.path.joinpath(path)
-    pytester.runpytest("-s", "--html", path, *args)
+    pytester.runpytest("--html", path, *args)
 
     chrome_options = webdriver.ChromeOptions()
     if os.environ.get("CI", False):
@@ -531,6 +531,39 @@ class TestHTML:
         )
         page = run(pytester)
         assert_results(page, passed=1)
+
+    @pytest.mark.parametrize("no_capture", ["", "-s"])
+    def test_standard_streams(self, pytester, no_capture):
+        pytester.makepyfile(
+            """
+            import pytest
+            import sys
+            @pytest.fixture
+            def setup():
+                print("this is setup stdout")
+                print("this is setup stderr", file=sys.stderr)
+                yield
+                print("this is teardown stdout")
+                print("this is teardown stderr", file=sys.stderr)
+
+            def test_streams(setup):
+                print("this is call stdout")
+                print("this is call stderr", file=sys.stderr)
+                assert True
+        """
+        )
+        page = run(pytester, "report.html", no_capture)
+        assert_results(page, passed=1)
+
+        log = get_log(page)
+        for when in ["setup", "call", "teardown"]:
+            for stream in ["stdout", "stderr"]:
+                if no_capture:
+                    assert_that(log).does_not_match(f"- Captured {stream} {when} -")
+                    assert_that(log).does_not_match(f"this is {when} {stream}")
+                else:
+                    assert_that(log).matches(f"- Captured {stream} {when} -")
+                    assert_that(log).matches(f"this is {when} {stream}")
 
 
 class TestLogCapturing:

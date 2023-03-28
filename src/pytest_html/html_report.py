@@ -129,7 +129,7 @@ class HTMLReport:
             outcomes.append(Outcome("rerun", self.rerun))
 
         summary = [
-            html.p(f"{numtests} tests ran in {suite_time_delta:.2f} seconds. "),
+            html.p(f"{numtests} tests ran in {self.__time_converter(suite_time_delta)} minutes. "),
             html.p(
                 "(Un)check the boxes to filter the results.",
                 class_="filter",
@@ -334,3 +334,10 @@ class HTMLReport:
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep("-", f"generated html file: {self.logfile.as_uri()}")
+
+    def __time_converter(self, suite_time_delta):
+        # Calculate the total time duration in seconds
+        hours = suite_time_delta // (60 * 60)
+        minutes = suite_time_delta // 60
+        seconds = suite_time_delta % 60
+        return f"{round(hours)}:{round(minutes)}:{round(seconds, 2)}"

@@ -129,7 +129,9 @@ class HTMLReport:
             outcomes.append(Outcome("rerun", self.rerun))
 
         summary = [
-            html.p(f"{numtests} tests ran in {self.__time_converter(suite_time_delta)} minutes. "),
+            html.p(
+                f"{numtests} tests ran in {self.__time_converter(suite_time_delta)} minutes. "
+            ),
             html.p(
                 "(Un)check the boxes to filter the results.",
                 class_="filter",

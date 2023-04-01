@@ -195,16 +195,29 @@ describe('Storage tests', () => {
             expect(collapsedItems).to.eql(['failed', 'error', 'passed'])
         })
 
-        it('handles python config', () => {
-            mockWindow()
-            const collapsedItems = storageModule.getCollapsedCategory(['failed', 'error'])
-            expect(collapsedItems).to.eql(['failed', 'error'])
+        const config = [
+          { value: ['failed', 'error'], expected: ['failed', 'error'] },
+          { value: ['all'], expected: storageModule.possibleFilters }
+        ]
+        config.forEach(({value, expected}) => {
+            it(`handles python config: ${value}`, () => {
+                mockWindow()
+                const collapsedItems = storageModule.getCollapsedCategory(value)
+                expect(collapsedItems).to.eql(expected)
+            })
         })
 
-        it('handles python config precedence', () => {
-            mockWindow('collapsed=xpassed,xfailed')
-            const collapsedItems = storageModule.getCollapsedCategory(['failed', 'error'])
-            expect(collapsedItems).to.eql(['xpassed', 'xfailed'])
+        const precedence = [
+            {query: 'collapsed=xpassed,xfailed', config: ['failed', 'error'], expected: ['xpassed', 'xfailed']},
+            {query: 'collapsed=all', config: ['failed', 'error'], expected: storageModule.possibleFilters},
+            {query: 'collapsed=xpassed,xfailed', config: ['all'], expected: ['xpassed', 'xfailed']},
+        ]
+        precedence.forEach(({query, config, expected}, index) => {
+            it(`handles python config precedence ${index + 1}`, () => {
+                mockWindow(query)
+                const collapsedItems = storageModule.getCollapsedCategory(config)
+                expect(collapsedItems).to.eql(expected)
+            })
         })
 
         const falsy = [

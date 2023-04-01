@@ -727,11 +727,12 @@ class TestCollapsedQueryParam:
         assert_that(is_collapsed(page, "test_fail")).is_false()
         assert_that(is_collapsed(page, "test_error::setup")).is_false()
 
-    def test_render_collapsed(self, pytester, test_file):
+    @pytest.mark.parametrize("param", ["failed,error", "FAILED,eRRoR"])
+    def test_render_collapsed(self, pytester, test_file, param):
         pytester.makeini(
-            """
+            f"""
             [pytest]
-            render_collapsed = failed,error
+            render_collapsed = {param}
         """
         )
         pytester.makepyfile(test_file)

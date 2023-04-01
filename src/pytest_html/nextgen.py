@@ -111,7 +111,7 @@ class BaseReport:
                     for section in report.sections:
                         header, content = section
                         if "teardown" in header:
-                            log.append(f" \n{header:-^80} ")
+                            log.append(f"{' ' + header + ' ':-^80}")
                             log.append(content)
                     test["log"] += _handle_ansi("\n".join(log))
 
@@ -415,11 +415,17 @@ def _is_error(report):
 def _process_logs(report):
     log = []
     if report.longreprtext:
-        log.append(report.longreprtext)
+        log.append(report.longreprtext + "\n")
     for section in report.sections:
         header, content = section
-        log.append(f" \n{header:-^80} ")
+        log.append(f"{' ' + header + ' ':-^80}")
         log.append(content)
+
+        # weird formatting related to logs
+        if "log" in header:
+            log.append("")
+            if "call" in header:
+                log.append("")
     if not log:
         log.append("No log output captured.")
     return "\n".join(log)

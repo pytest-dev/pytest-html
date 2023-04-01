@@ -24,3 +24,19 @@ def test_duration_format_deprecation_warning(pytester):
             "*DeprecationWarning: 'duration_formatter'*",
         ],
     )
+
+
+def test_cells_pop_deprecation_warning(pytester):
+    pytester.makeconftest(
+        """
+        def pytest_html_results_table_row(cells):
+            cells.pop()
+    """
+    )
+    pytester.makepyfile("def test_pass(): pass")
+    result = run(pytester)
+    result.stdout.fnmatch_lines(
+        [
+            "*DeprecationWarning: 'pop' is deprecated*",
+        ],
+    )

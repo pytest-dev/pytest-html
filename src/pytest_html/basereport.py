@@ -77,7 +77,9 @@ class BaseReport:
 
             collapsed = config.getini("render_collapsed")
             if collapsed:
-                self.set_data("collapsed", collapsed.split(","))
+                self.set_data(
+                    "collapsed", [outcome.lower() for outcome in collapsed.split(",")]
+                )
 
         @property
         def title(self):

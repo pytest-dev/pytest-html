@@ -94,10 +94,11 @@ const dom = {
 
 
         if (log) {
-            // resultBody.querySelector('.log').innerText = log
             resultBody.querySelector('.log').innerHTML = log
+        } else {
+            resultBody.querySelector('.log').remove()
         }
-        // if (collapsed || !longreprtext) {
+
         if (collapsed) {
             resultBody.querySelector('.extras-row').classList.add('hidden')
         }

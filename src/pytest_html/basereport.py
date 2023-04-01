@@ -14,8 +14,10 @@ from jinja2 import select_autoescape
 
 from pytest_html import __version__
 from pytest_html import extras
+from pytest_html.table import Header
+from pytest_html.table import Html
+from pytest_html.table import Row
 from pytest_html.util import cleanup_unserializable
-
 
 try:
     from ansi2html import Ansi2HTMLConverter, style
@@ -31,37 +33,6 @@ except ImportError:
 
 
 class BaseReport:
-    class Cells:
-        def __init__(self):
-            self._html = {}
-
-        def __delitem__(self, key):
-            # This means the item should be removed
-            self._html = None
-
-        @property
-        def html(self):
-            return self._html
-
-        def insert(self, index, html):
-            # backwards-compat
-            if not isinstance(html, str):
-                if html.__module__.startswith("py."):
-                    warnings.warn(
-                        "The 'py' module is deprecated and support "
-                        "will be removed in a future release.",
-                        DeprecationWarning,
-                    )
-                html = str(html)
-                html = html.replace("col", "data-column-type")
-            self._html[index] = html
-
-        def pop(self, *args):
-            warnings.warn(
-                "'pop' is deprecated and no longer supported.",
-                DeprecationWarning,
-            )
-
     class Report:
         def __init__(self, title, config):
             self._config = config
@@ -100,15 +71,16 @@ class BaseReport:
         def set_data(self, key, value):
             self._data[key] = value
 
-        def add_test(self, test_data, report):
+        def add_test(self, test_data, report, remove_log=False):
             # regardless of pass or fail we must add teardown logging to "call"
-            if report.when == "teardown":
+            if report.when == "teardown" and not remove_log:
                 self.update_test_log(report)
 
             # passed "setup" and "teardown" are not added to the html
             if report.when == "call" or _is_error(report):
-                processed_logs = _process_logs(report)
-                test_data["log"] = _handle_ansi(processed_logs)
+                if not remove_log:
+                    processed_logs = _process_logs(report)
+                    test_data["log"] = _handle_ansi(processed_logs)
                 self._data["tests"][report.nodeid].append(test_data)
                 return True
 
@@ -117,7 +89,7 @@ class BaseReport:
         def update_test_log(self, report):
             log = []
             for test in self._data["tests"][report.nodeid]:
-                if test["testId"] == report.nodeid:
+                if test["testId"] == report.nodeid and "log" in test:
                     for section in report.sections:
                         header, content = section
                         if "teardown" in header:
@@ -260,7 +232,7 @@ class BaseReport:
 
         session.config.hook.pytest_html_report_title(report=self._report)
 
-        header_cells = self.Cells()
+        header_cells = Header()
         session.config.hook.pytest_html_results_table_header(cells=header_cells)
 
         self._report.set_data("resultsTableHeader", header_cells.html)
@@ -301,8 +273,9 @@ class BaseReport:
         }
 
         test_id = report.nodeid
+        table_html = Html()
         if report.when == "call":
-            row_cells = self.Cells()
+            row_cells = Row()
             self._config.hook.pytest_html_results_table_row(
                 report=report, cells=row_cells
             )
@@ -310,11 +283,10 @@ class BaseReport:
                 return
             data["resultsTableRow"] = row_cells.html
 
-            table_html = []
             self._config.hook.pytest_html_results_table_html(
                 report=report, data=table_html
             )
-            data["tableHtml"] = table_html
+            data["tableHtml"] = table_html.html["html"]
         else:
             test_id += f"::{report.when}"
         data["testId"] = test_id
@@ -322,7 +294,7 @@ class BaseReport:
         data["result"] = _process_outcome(report)
         data["extras"] = self._process_extras(report, test_id)
 
-        if self._report.add_test(data, report):
+        if self._report.add_test(data, report, table_html.replace_log):
             self._generate_report()
 
 

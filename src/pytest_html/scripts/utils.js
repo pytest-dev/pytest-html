@@ -1,4 +1,4 @@
-const formatedNumber = (number) =>
+const formattedNumber = (number) =>
     number.toLocaleString('en-US', {
         minimumIntegerDigits: 2,
         useGrouping: false,
@@ -17,7 +17,7 @@ const formatDuration = ( totalSeconds ) => {
 
     return {
       seconds: `${Math.round(totalSeconds)} seconds`,
-      formatted: `${formatedNumber(hours)}:${formatedNumber(minutes)}:${formatedNumber(seconds)}`,
+      formatted: `${formattedNumber(hours)}:${formattedNumber(minutes)}:${formattedNumber(seconds)}`,
     }
 }
 

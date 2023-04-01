@@ -58,6 +58,12 @@ class BaseReport:
                 html = html.replace("col", "data-column-type")
             self._html[index] = html
 
+        def pop(self, *args):
+            warnings.warn(
+                "'pop' is deprecated and no longer supported.",
+                DeprecationWarning,
+            )
+
     class Report:
         def __init__(self, title, config):
             self._config = config

@@ -3,7 +3,7 @@ const { dom, findAll } = require('./dom.js')
 const { manager } = require('./datamanager.js')
 const { doSort } = require('./sort.js')
 const { doFilter } = require('./filter.js')
-const { getVisible } = require('./storage.js')
+const { getVisible, possibleResults } = require('./storage.js')
 
 const removeChildren = (node) => {
     while (node.firstChild) {
@@ -61,16 +61,6 @@ const renderContent = (tests) => {
 }
 
 const renderDerived = (tests, collectedItems, isFinished) => {
-    const possibleResults = [
-        { result: 'passed', label: 'Passed' },
-        { result: 'skipped', label: 'Skipped' },
-        { result: 'failed', label: 'Failed' },
-        { result: 'error', label: 'Errors' },
-        { result: 'xfailed', label: 'Unexpected failures' },
-        { result: 'xpassed', label: 'Unexpected passes' },
-        { result: 'rerun', label: 'Reruns' },
-    ]
-
     const currentFilter = getVisible()
     possibleResults.forEach(({ result, label }) => {
         const count = tests.filter((test) => test.result.toLowerCase() === result).length

@@ -4,6 +4,7 @@ import json
 import os
 import random
 import re
+import urllib.parse
 from base64 import b64encode
 from pathlib import Path
 
@@ -26,9 +27,16 @@ OUTCOMES = {
 }
 
 
-def run(pytester, path="report.html", *args):
+def run(pytester, path="report.html", cmd_flags=None, query_params=None):
+    if cmd_flags is None:
+        cmd_flags = []
+
+    if query_params is None:
+        query_params = {}
+    query_params = urllib.parse.urlencode(query_params)
+
     path = pytester.path.joinpath(path)
-    pytester.runpytest("--html", path, *args)
+    pytester.runpytest("--html", path, *cmd_flags)
 
     chrome_options = webdriver.ChromeOptions()
     if os.environ.get("CI", False):
@@ -48,7 +56,7 @@ def run(pytester, path="report.html", *args):
                 continue
         # End workaround
 
-        driver.get(f"file:///reports{path}")
+        driver.get(f"file:///reports{path}?{query_params}")
         return BeautifulSoup(driver.page_source, "html.parser")
     finally:
         driver.quit()
@@ -89,6 +97,10 @@ def get_element(page, selector):
 
 def get_text(page, selector):
     return get_element(page, selector).string
+
+
+def is_collapsed(page, test_name):
+    return get_element(page, f".summary tbody[id$='{test_name}'] .expander")
 
 
 def get_log(page, test_id=None):
@@ -267,7 +279,7 @@ class TestHTML:
 
     def test_resources_inline_css(self, pytester):
         pytester.makepyfile("def test_pass(): pass")
-        page = run(pytester, "report.html", "--self-contained-html")
+        page = run(pytester, cmd_flags=["--self-contained-html"])
 
         content = file_content()
 
@@ -349,7 +361,7 @@ class TestHTML:
         )
 
         pytester.makepyfile("def test_pass(): pass")
-        page = run(pytester, "report.html", "--self-contained-html")
+        page = run(pytester, cmd_flags=["--self-contained-html"])
 
         element = page.select_one(".summary a[class='col-links__extra text']")
         assert_that(element.string).is_equal_to("Text")
@@ -374,7 +386,7 @@ class TestHTML:
         )
 
         pytester.makepyfile("def test_pass(): pass")
-        page = run(pytester, "report.html", "--self-contained-html")
+        page = run(pytester, cmd_flags=["--self-contained-html"])
 
         content_str = json.dumps(content)
         data = b64encode(content_str.encode("utf-8")).decode("ascii")
@@ -435,7 +447,7 @@ class TestHTML:
         """
         )
         pytester.makepyfile("def test_pass(): pass")
-        page = run(pytester, "report.html", "--self-contained-html")
+        page = run(pytester, cmd_flags=["--self-contained-html"])
 
         # element = page.select_one(".summary a[class='col-links__extra image']")
         src = f"data:{mime_type};base64,{data}"
@@ -463,7 +475,7 @@ class TestHTML:
         """
         )
         pytester.makepyfile("def test_pass(): pass")
-        page = run(pytester, "report.html", "--self-contained-html")
+        page = run(pytester, cmd_flags=["--self-contained-html"])
 
         # element = page.select_one(".summary a[class='col-links__extra video']")
         src = f"data:{mime_type};base64,{data}"
@@ -477,7 +489,7 @@ class TestHTML:
 
     def test_xdist(self, pytester):
         pytester.makepyfile("def test_xdist(): pass")
-        page = run(pytester, "report.html", "-n1")
+        page = run(pytester, cmd_flags=["-n1"])
         assert_results(page, passed=1)
 
     def test_results_table_hook_insert(self, pytester):
@@ -552,7 +564,7 @@ class TestHTML:
                 assert True
         """
         )
-        page = run(pytester, "report.html", no_capture)
+        page = run(pytester, "report.html", cmd_flags=[no_capture])
         assert_results(page, passed=1)
 
         log = get_log(page)
@@ -657,3 +669,95 @@ class TestLogCapturing:
         assert_that(log).contains("No log output captured.")
         for when in ["setup", "test", "teardown"]:
             assert_that(log).does_not_match(self.LOG_LINE_REGEX.format(when))
+
+
+class TestCollapsedQueryParam:
+    @pytest.fixture
+    def test_file(self):
+        return """
+            import pytest
+            @pytest.fixture
+            def setup():
+                error
+
+            def test_error(setup):
+                assert True
+
+            def test_pass():
+                assert True
+
+            def test_fail():
+                assert False
+        """
+
+    def test_default(self, pytester, test_file):
+        pytester.makepyfile(test_file)
+        page = run(pytester)
+        assert_results(page, passed=1, failed=1, error=1)
+
+        assert_that(is_collapsed(page, "test_pass")).is_true()
+        assert_that(is_collapsed(page, "test_fail")).is_false()
+        assert_that(is_collapsed(page, "test_error::setup")).is_false()
+
+    @pytest.mark.parametrize("param", ["failed,error", "FAILED,eRRoR"])
+    def test_specified(self, pytester, test_file, param):
+        pytester.makepyfile(test_file)
+        page = run(pytester, query_params={"collapsed": param})
+        assert_results(page, passed=1, failed=1, error=1)
+
+        assert_that(is_collapsed(page, "test_pass")).is_false()
+        assert_that(is_collapsed(page, "test_fail")).is_true()
+        assert_that(is_collapsed(page, "test_error::setup")).is_true()
+
+    def test_all(self, pytester, test_file):
+        pytester.makepyfile(test_file)
+        page = run(pytester, query_params={"collapsed": "all"})
+        assert_results(page, passed=1, failed=1, error=1)
+
+        for test_name in ["test_pass", "test_fail", "test_error::setup"]:
+            assert_that(is_collapsed(page, test_name)).is_true()
+
+    @pytest.mark.parametrize("param", ["", 'collapsed=""', "collapsed=''"])
+    def test_falsy(self, pytester, test_file, param):
+        pytester.makepyfile(test_file)
+        page = run(pytester, query_params={"collapsed": param})
+        assert_results(page, passed=1, failed=1, error=1)
+
+        assert_that(is_collapsed(page, "test_pass")).is_false()
+        assert_that(is_collapsed(page, "test_fail")).is_false()
+        assert_that(is_collapsed(page, "test_error::setup")).is_false()
+
+    def test_render_collapsed(self, pytester, test_file):
+        pytester.makeini(
+            """
+            [pytest]
+            render_collapsed = failed,error
+        """
+        )
+        pytester.makepyfile(test_file)
+        page = run(pytester)
+        assert_results(page, passed=1, failed=1, error=1)
+
+        assert_that(is_collapsed(page, "test_pass")).is_false()
+        assert_that(is_collapsed(page, "test_fail")).is_true()
+        assert_that(is_collapsed(page, "test_error::setup")).is_true()
+
+    def test_render_collapsed_precedence(self, pytester, test_file):
+        pytester.makeini(
+            """
+            [pytest]
+            render_collapsed = failed,error
+        """
+        )
+        test_file += """
+            def test_skip():
+                pytest.skip('meh')
+        """
+        pytester.makepyfile(test_file)
+        page = run(pytester, query_params={"collapsed": "skipped"})
+        assert_results(page, passed=1, failed=1, error=1, skipped=1)
+
+        assert_that(is_collapsed(page, "test_pass")).is_false()
+        assert_that(is_collapsed(page, "test_fail")).is_false()
+        assert_that(is_collapsed(page, "test_error::setup")).is_false()
+        assert_that(is_collapsed(page, "test_skip")).is_true()

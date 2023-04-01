@@ -71,6 +71,10 @@ class BaseReport:
                 "additionalSummary": defaultdict(list),
             }
 
+            collapsed = config.getini("render_collapsed")
+            if collapsed:
+                self.set_data("collapsed", collapsed.split(","))
+
         @property
         def title(self):
             return self._data["title"]

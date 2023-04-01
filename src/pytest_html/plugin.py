@@ -44,8 +44,8 @@ def pytest_addoption(parser):
     )
     parser.addini(
         "render_collapsed",
-        type="bool",
-        default=False,
+        type="string",
+        default="",
         help="Open the report with all rows collapsed. Useful for very large reports",
     )
     parser.addini(

@@ -156,3 +156,69 @@ describe('utils tests', () => {
         })
     })
 })
+
+describe('Storage tests', () => {
+    describe('getCollapsedCategory', () => {
+        let originalWindow
+        const mockWindow = (queryParam) => {
+            const mock = {
+                location: {
+                    href: `https://example.com/page?${queryParam}`
+                }
+            }
+            originalWindow = global.window
+            global.window = mock
+        }
+        after(() => global.window = originalWindow)
+
+        it('collapses passed by default', () => {
+            mockWindow()
+            const collapsedItems = storageModule.getCollapsedCategory()
+            expect(collapsedItems).to.eql(['passed'])
+        })
+
+        it('collapses specified outcomes', () => {
+            mockWindow('collapsed=failed,error')
+            const collapsedItems = storageModule.getCollapsedCategory()
+            expect(collapsedItems).to.eql(['failed', 'error'])
+        })
+
+        it('collapses all', () => {
+            mockWindow('collapsed=all')
+            const collapsedItems = storageModule.getCollapsedCategory()
+            expect(collapsedItems).to.eql(storageModule.possibleFilters)
+        })
+
+        it('handles case insensitive params', () => {
+            mockWindow('collapsed=fAiLeD,ERROR,passed')
+            const collapsedItems = storageModule.getCollapsedCategory()
+            expect(collapsedItems).to.eql(['failed', 'error', 'passed'])
+        })
+
+        it('handles python config', () => {
+            mockWindow()
+            const collapsedItems = storageModule.getCollapsedCategory(['failed', 'error'])
+            expect(collapsedItems).to.eql(['failed', 'error'])
+        })
+
+        it('handles python config precedence', () => {
+            mockWindow('collapsed=xpassed,xfailed')
+            const collapsedItems = storageModule.getCollapsedCategory(['failed', 'error'])
+            expect(collapsedItems).to.eql(['xpassed', 'xfailed'])
+        })
+
+        const falsy = [
+          { param: 'collapsed' },
+          { param: 'collapsed=' },
+          { param: 'collapsed=""' },
+          { param: 'collapsed=\'\'' }
+        ]
+        falsy.forEach(({param}) => {
+            it(`collapses none with ${param}`, () => {
+                mockWindow(param)
+                const collapsedItems = storageModule.getCollapsedCategory()
+                expect(collapsedItems).to.be.empty
+            })
+        })
+    })
+})

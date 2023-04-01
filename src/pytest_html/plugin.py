@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from .nextgen import NextGenReport
-from .nextgen import NextGenSelfContainedReport
+from pytest_html.report import Report
+from pytest_html.selfcontained_report import SelfContainedReport
 
 
 def pytest_addhooks(pluginmanager):
@@ -80,9 +80,9 @@ def pytest_configure(config):
         if not hasattr(config, "workerinput"):
             # prevent opening html_path on worker nodes (xdist)
             if config.getoption("self_contained_html"):
-                html = NextGenSelfContainedReport(html_path, config)
+                html = SelfContainedReport(html_path, config)
             else:
-                html = NextGenReport(html_path, config)
+                html = Report(html_path, config)
 
             config.pluginmanager.register(html)
 

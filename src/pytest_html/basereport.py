@@ -1,5 +1,3 @@
-import base64
-import binascii
 import datetime
 import json
 import os
@@ -14,9 +12,9 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import select_autoescape
 
-from . import __version__
-from . import extras
-from .util import cleanup_unserializable
+from pytest_html import __version__
+from pytest_html import extras
+from pytest_html.util import cleanup_unserializable
 
 
 try:
@@ -217,10 +215,7 @@ class BaseReport:
                     content, asset_name=asset_name, mime_type=extra["mime_type"]
                 )
 
-            if (
-                extra["format_type"] == extras.FORMAT_IMAGE
-                or extra["format_type"] == extras.FORMAT_VIDEO
-            ):
+            if extra["format_type"] in [extras.FORMAT_IMAGE, extras.FORMAT_VIDEO]:
                 extra["content"] = self._media_content(
                     content, asset_name=asset_name, mime_type=extra["mime_type"]
                 )
@@ -327,69 +322,6 @@ class BaseReport:
 
         if self._report.add_test(data, report):
             self._generate_report()
-
-
-class NextGenReport(BaseReport):
-    def __init__(self, report_path, config):
-        super().__init__(report_path, config)
-        self._assets_path = Path(self._report_path.parent, "assets")
-        self._assets_path.mkdir(parents=True, exist_ok=True)
-        self._css_path = Path(self._assets_path, "style.css")
-
-        with self._css_path.open("w", encoding="utf-8") as f:
-            f.write(self._css)
-
-    @property
-    def css(self):
-        return Path(self._assets_path.name, "style.css")
-
-    def _data_content(self, content, asset_name, *args, **kwargs):
-        content = content.encode("utf-8")
-        return self._write_content(content, asset_name)
-
-    def _media_content(self, content, asset_name, *args, **kwargs):
-        try:
-            media_data = base64.b64decode(content.encode("utf-8"), validate=True)
-            return self._write_content(media_data, asset_name)
-        except binascii.Error:
-            # if not base64 content, just return as it's a file or link
-            return content
-
-    def _write_content(self, content, asset_name):
-        content_relative_path = Path(self._assets_path, asset_name)
-        content_relative_path.write_bytes(content)
-        return str(content_relative_path.relative_to(self._report_path.parent))
-
-
-class NextGenSelfContainedReport(BaseReport):
-    def __init__(self, report_path, config):
-        super().__init__(report_path, config)
-
-    @property
-    def css(self):
-        return self._css
-
-    def _data_content(self, content, mime_type, *args, **kwargs):
-        charset = "utf-8"
-        data = base64.b64encode(content.encode(charset)).decode(charset)
-        return f"data:{mime_type};charset={charset};base64,{data}"
-
-    def _media_content(self, content, mime_type, *args, **kwargs):
-        try:
-            # test if content is base64
-            base64.b64decode(content.encode("utf-8"), validate=True)
-            return f"data:{mime_type};base64,{content}"
-        except binascii.Error:
-            # if not base64, issue warning and just return as it's a file or link
-            warnings.warn(
-                "Self-contained HTML report "
-                "includes link to external "
-                f"resource: {content}"
-            )
-            return content
-
-    def _generate_report(self, *args, **kwargs):
-        super()._generate_report(self_contained=True)
 
 
 def _process_css(default_css, extra_css):

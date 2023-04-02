@@ -106,7 +106,7 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 
 
    def pytest_html_results_summary(prefix, summary, postfix):
-       prefix.extend([html.p("foo: bar")])
+       prefix.extend(["<p>foo: bar</p>"])
 
 Extra content
 ~~~~~~~~~~~~~
@@ -238,7 +238,7 @@ additional HTML and log output with a notice that the log is empty:
   def pytest_html_results_table_html(report, data):
       if report.passed:
           del data[:]
-          data.append(html.div("No log output captured.", class_="empty log"))
+          data.append("<div class='empty log'>No log output captured.</div>")
 
 Display options
 ---------------

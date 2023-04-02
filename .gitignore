@@ -56,3 +56,5 @@ docs/_build/
 assets/
 
 .nyc_output
+
+.venv/

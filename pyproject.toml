@@ -1,65 +1,87 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+build-backend = "hatchling.build"
+requires = [
+  "hatch-vcs>=0.3",
+  "hatchling>=1.13",
+]
 
-[tool.poetry]
+[project]
 name = "pytest-html"
 description = "pytest plugin for generating HTML reports"
-version = "4.0.0-rc0"
-license = "MPL-2.0"
-authors = [
-    "Dave Hunt <dhunt@mozilla.com>",
-    "Jim Brannlund <jimbrannlund@fastmail.com>"
-]
 readme = "README.rst"
-homepage = "https://github.com/pytest-dev/pytest-html"
-repository = "https://github.com/pytest-dev/pytest-html"
+license = "MPL-2.0"
+requires-python = ">=3.7"
 keywords = [
-    "pytest",
-    "html",
-    "report",
+  "pytest",
+  "html",
+  "report",
+]
+authors = [
+  { name = "Dave Hunt", email =  "dhunt@mozilla.com" },
+  { name = "Jim Brannlund", email = "jimbrannlund@fastmail.com" },
 ]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Framework :: Pytest",
-    "Intended Audience :: Developers",
-    "Operating System :: POSIX",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: MacOS :: MacOS X",
-    "Topic :: Software Development :: Quality Assurance",
-    "Topic :: Software Development :: Testing",
-    "Topic :: Utilities",
+  "Development Status :: 5 - Production/Stable",
+  "Framework :: Pytest",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: POSIX",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS :: MacOS X",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Utilities",
 ]
-packages = [
-    { include = "pytest_html", from = "src" },
+dependencies = [
+  "pytest>=7.0.0",
+  "pytest-metadata>=2.0.2",
+  "Jinja2>=3.0.0",
 ]
-include = [
-    { path = "testing", format = "sdist" },
-    { path = "docs", format = "sdist" },
-    "src/pytest_html/resources",
-    "src/pytest_html/resources/app.js",
+dynamic = [
+  "version",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.7"
-pytest = ">=7.0.0"
-pytest-metadata = ">=2.0.2"
-Jinja2 = ">=3.0.0"
+[project.optional-dependencies]
+test = [
+  "assertpy>=1.1",
+  "beautifulsoup4>=4.11.1",
+  "black>=22.1.0",
+  "flake8>=4.0.1",
+  "pre-commit>=2.17.0",
+  "pytest-xdist>=2.4.0",
+  "pytest-mock>=3.7.0",
+  "selenium>=4.3.0",
+  "tox>=3.24.5",
+]
 
-[tool.poetry.dev-dependencies]
-assertpy = ">=1.1"
-beautifulsoup4 = ">=4.11.1"
-black = ">=22.1.0"
-flake8 = ">=4.0.1"
-pre-commit = ">=2.17.0"
-pytest-xdist = ">=2.4.0"
-pytest-mock = ">=3.7.0"
-selenium = ">=4.3.0"
-tox = ">=3.24.5"
+[project.urls]
+Homepage = "https://github.com/pytest-dev/pytest-html"
+Tracker = "https://github.com/pytest-dev/pytest-html/issues"
+Source = "https://github.com/pytest-dev/pytest-html"
 
-[tool.poetry.plugins.pytest11]
-html = "pytest_html.plugin"
+[project.entry-points.pytest11]
+env = "pytest_html.plugin"
 
-[tool.setuptools_scm]
-local_scheme = "no-local-version"
-write_to = "src/pytest_html/__version.py"
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+exclude = [
+  "src/pytest_html/scripts/*",
+]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/pytest_html/__version.py"

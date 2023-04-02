@@ -83,13 +83,6 @@ def assert_results(
             result = get_text(page, f"span[class={outcome}]")
             assert_that(result).is_equal_to(f"{number} {OUTCOMES[outcome]}")
 
-    # if total_tests is not None:
-    #     number_of_tests = total_tests
-    # total = get_text(page, "p[class='run-count']")
-    # expr = r"%d %s ran in \d+.\d+ seconds."
-    # % (number_of_tests, "tests" if number_of_tests > 1 else "test")
-    # assert_that(total).matches(expr)
-
 
 def get_element(page, selector):
     return page.select_one(selector)
@@ -150,12 +143,43 @@ class TestHTML:
         )
         page = run(pytester)
         duration = get_text(page, "#results-table td[class='col-duration']")
+        total_duration = get_text(page, "p[class='run-count']")
         if pause < 1:
             assert_that(int(duration.replace("ms", ""))).is_between(
                 expectation, expectation * 2
             )
+            assert_that(total_duration).matches(r"\d+\s+ms")
         else:
             assert_that(duration).matches(expectation)
+            assert_that(total_duration).matches(r"\d{2}:\d{2}:\d{2}")
+
+    def test_total_number_of_tests_zero(self, pytester):
+        page = run(pytester)
+        assert_results(page)
+
+        total = get_text(page, "p[class='run-count']")
+        assert_that(total).matches(r"0 test(?!s)")
+
+    def test_total_number_of_tests_singular(self, pytester):
+        pytester.makepyfile("def test_pass(): pass")
+        page = run(pytester)
+        assert_results(page, passed=1)
+
+        total = get_text(page, "p[class='run-count']")
+        assert_that(total).matches(r"1 test(?!s)")
+
+    def test_total_number_of_tests_plural(self, pytester):
+        pytester.makepyfile(
+            """
+            def test_pass_one(): pass
+            def test_pass_two(): pass
+            """
+        )
+        page = run(pytester)
+        assert_results(page, passed=2)
+
+        total = get_text(page, "p[class='run-count']")
+        assert_that(total).matches(r"2 tests(?!\S)")
 
     def test_pass(self, pytester):
         pytester.makepyfile("def test_pass(): pass")

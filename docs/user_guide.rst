@@ -106,7 +106,7 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 
 
    def pytest_html_results_summary(prefix, summary, postfix):
-       prefix.extend([html.p("foo: bar")])
+       prefix.extend(["<p>foo: bar</p>"])
 
 Extra content
 ~~~~~~~~~~~~~
@@ -197,20 +197,17 @@ adds a sortable time column, and removes the links column:
 .. code-block:: python
 
   from datetime import datetime
-  from py.xml import html
   import pytest
 
 
   def pytest_html_results_table_header(cells):
-      cells.insert(2, html.th("Description"))
-      cells.insert(1, html.th("Time", class_="sortable time", col="time"))
-      cells.pop()
+      cells.insert(2, "<th>Description</th>")
+      cells.insert(1, '<th class="sortable time" data-column-type="time">Time</th>')
 
 
   def pytest_html_results_table_row(report, cells):
-      cells.insert(2, html.td(report.description))
-      cells.insert(1, html.td(datetime.utcnow(), class_="col-time"))
-      cells.pop()
+      cells.insert(2, "<td>A description</td>")
+      cells.insert(1, '<td class="col-time">A time</td>')
 
 
   @pytest.hookimpl(hookwrapper=True)
@@ -241,7 +238,7 @@ additional HTML and log output with a notice that the log is empty:
   def pytest_html_results_table_html(report, data):
       if report.passed:
           del data[:]
-          data.append(html.div("No log output captured.", class_="empty log"))
+          data.append("<div class='empty log'>No log output captured.</div>")
 
 Display options
 ---------------
@@ -251,15 +248,19 @@ Auto Collapsing Table Rows
 
 By default, all rows in the **Results** table will be expanded except those that have :code:`Passed`.
 
-This behavior can be customized either with a query parameter: :code:`?collapsed=Passed,XFailed,Skipped`
-or by setting the :code:`render_collapsed` in a configuration file (pytest.ini, setup.cfg, etc).
+This behavior can be customized with a query parameter: :code:`?collapsed=Passed,XFailed,Skipped`.
+If you want all rows to be collapsed you can pass :code:`?collapsed=All`.
+By setting the query parameter to empty string :code:`?collapsed=""` **none** of the rows will be collapsed.
+
+Note that the query parameter is case insensitive, so passing :code:`PASSED` and :code:`passed` has the same effect.
+
+You can also set the collapsed behaviour by setting the :code:`render_collapsed` in a configuration file (pytest.ini, setup.cfg, etc).
+Note that the query parameter takes precedence.
 
 .. code-block:: ini
 
   [pytest]
-  render_collapsed = True
-
-**NOTE:** Setting :code:`render_collapsed` will, unlike the query parameter, affect all statuses.
+  render_collapsed = failed,error
 
 Controlling Test Result Visibility Via Query Params
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,29 +281,6 @@ The following query parameters may be passed:
 * :code:`xfailed`
 * :code:`xpassed`
 * :code:`rerun`
-
-Formatting the Duration Column
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The formatting of the timestamp used in the :code:`Durations` column can be modified by setting :code:`duration_formatter`
-on the :code:`report` attribute. All `time.strftime`_ formatting directives are supported. In addition, it is possible
-to supply :code:`%f` to get duration milliseconds. If this value is not set, the values in the :code:`Durations` column are
-displayed in :code:`%S.%f` format where :code:`%S` is the total number of seconds a test ran for.
-
-Below is an example of a :code:`conftest.py` file setting :code:`duration_formatter`:
-
-.. code-block:: python
-
-   import pytest
-
-
-   @pytest.hookimpl(hookwrapper=True)
-   def pytest_runtest_makereport(item, call):
-       outcome = yield
-       report = outcome.get_result()
-       setattr(report, "duration_formatter", "%H:%M:%S.%f")
-
-**NOTE**: Milliseconds are always displayed with a precision of 2
 
 .. _@pytest.hookimpl(tryfirst=True): https://docs.pytest.org/en/stable/writing_plugins.html#hook-function-ordering-call-example
 .. _ansi2html: https://pypi.python.org/pypi/ansi2html/

@@ -3,12 +3,14 @@ repos:
     rev: 22.3.0
     hooks:
       - id: black
-        args: [--safe, --quiet]
+        args: [--safe, --quiet, --line-length=88]
+
   - repo: https://github.com/asottile/blacken-docs
     rev: v1.12.1
     hooks:
       - id: blacken-docs
         additional_dependencies: [black==22.3.0]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
     hooks:
@@ -19,6 +21,7 @@ repos:
       - id: check-yaml
       - id: debug-statements
         language_version: python3
+
   - repo: https://github.com/PyCQA/flake8
     rev: 4.0.1
     hooks:
@@ -27,23 +30,27 @@ repos:
         additional_dependencies:
           - flake8-builtins==1.5.3
           - flake8-typing-imports==1.12.0
+
   - repo: https://github.com/asottile/reorder_python_imports
     rev: v3.0.1
     hooks:
       - id: reorder-python-imports
         args: ["--application-directories=.:src:testing", --py3-plus]
+
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.32.0
     hooks:
       - id: pyupgrade
         args: [--py3-plus]
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.13.0
-    hooks:
-      - id: eslint
-        additional_dependencies:
-          - eslint@7.13.0
-        args: [src]
+
+#  - repo: https://github.com/pre-commit/mirrors-eslint
+#    rev: v7.13.0
+#    hooks:
+#      - id: eslint
+#        additional_dependencies:
+#          - eslint@7.13.0
+#        args: [src]
+
   - repo: local
     hooks:
       - id: rst
@@ -52,6 +59,7 @@ repos:
         files: ^(README.rst)$
         language: python
         additional_dependencies: [pygments, restructuredtext_lint]
+
   - repo: https://github.com/elidupuis/mirrors-sass-lint
     rev: "5cc45653263b423398e4af2561fae362903dd45d"
     hooks:

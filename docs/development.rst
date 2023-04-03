@@ -93,11 +93,11 @@ Once `npm`_ is installed, you can install all needed dependencies by running:
 
   $ npm install
 
-Run the following to generate the CSS:
+Run the following to build the application:
 
 .. code-block:: bash
 
-  $ npm run build:css
+  $ npm run build
 
 Releasing a new version
 -----------------------

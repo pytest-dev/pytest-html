@@ -6,8 +6,12 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
-3.2.0 (unreleased)
+3.2.0 (2022-10-25)
 ~~~~~~~~~~~~~~~~~~
+
+* Explicitly add py.xml dependency.
+
+  * Thanks to `@smartEBL <https://github.com/smartEBL>`_ for the PR
 
 * Implement the ``visible`` URL query parameter to control visibility of test results on page load. (`#399 <https://github.com/pytest-dev/pytest-html/issues/399>`_)
 

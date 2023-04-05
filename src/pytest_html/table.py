@@ -29,6 +29,15 @@ class Html(Table):
 
 
 class Cell(Table):
+    def __setitem__(self, key, value):
+        warnings.warn(
+            "list-type assignment is deprecated and support "
+            "will be removed in a future release. "
+            "Please use 'insert()' instead.",
+            DeprecationWarning,
+        )
+        self.insert(key, value)
+
     def insert(self, index, html):
         # backwards-compat
         if not isinstance(html, str):

@@ -98,9 +98,16 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     if report.when == "call":
+        deprecated_extra = getattr(report, "extra", [])
+        if deprecated_extra:
+            warnings.warn(
+                "The 'report.extra' attribute is deprecated and will be removed in a future release"
+                ", use 'report.extras' instead.",
+                DeprecationWarning,
+            )
         fixture_extras = getattr(item.config, "extras", [])
         plugin_extras = getattr(report, "extras", [])
-        report.extras = fixture_extras + plugin_extras
+        report.extras = fixture_extras + plugin_extras + deprecated_extra
 
 
 @pytest.fixture

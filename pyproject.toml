@@ -68,7 +68,7 @@ Tracker = "https://github.com/pytest-dev/pytest-html/issues"
 Source = "https://github.com/pytest-dev/pytest-html"
 
 [project.entry-points.pytest11]
-env = "pytest_html.plugin"
+html = "pytest_html.plugin"
 
 [tool.hatch.version]
 source = "vcs"

@@ -1,17 +1,16 @@
 Development
 ===========
 
-To contribute to `pytest-html` you can use `Pipenv`_ to manage a python virtual environment and
+To contribute to `pytest-html` you can use `Hatch`_ to manage a python virtual environment and
 `pre-commit`_ to help you with styling and formatting.
 
 To setup the virtual environment and pre-commit, run:
 
 .. code-block:: bash
 
-  $ pipenv install --dev
-  $ pipenv run pre-commit install
+  $ hatch -e test run pre-commit install
 
-If you're not using `Pipenv`_, run the following to install `pre-commit`_:
+If you're not using `Hatch`_, run the following to install `pre-commit`_:
 
 .. code-block:: bash
 
@@ -35,14 +34,31 @@ Running Tests
 Python
 ~~~~~~
 
-You will need `Tox`_ installed to run the tests against the supported Python versions. If you're using `Pipenv`_
+You will need `Tox`_ and `Docker`_ installed to run the tests against the supported Python versions. If you're using `Hatch`_
 it will be installed for you.
 
-With `Pipenv`_, run:
+The integration tests requires `Docker`_ as we have to render the report.
+This is then done using `Selenium`_ and `BeautifulSoup`_
+
+To start the image needed, run:
 
 .. code-block:: bash
 
-  $ pipenv run tox
+  $ ./start
+
+Sometimes the image becomes unresponsive and needs a restart:
+
+.. code-block:: bash
+
+  $ ./start down && ./start
+
+You can watch the tests in your browser at `localhost:7900`, the password is `secret`.
+
+To run the tests with `Hatch`_, run:
+
+.. code-block:: bash
+
+  $ hatch -e test run tox
 
 Otherwise, to install and run, do:
 
@@ -54,7 +70,7 @@ Otherwise, to install and run, do:
 JavaScript
 ~~~~~~~~~~
 
-You will need `npm`_ installed to run the JavaScript tests. Internally, we use `Grunt`_ and `QUnit`_ to run the tests.
+You will need `npm`_ installed to run the JavaScript tests. Internally, we use `Mocha`_, `Chai`_, `Sinon`_ to run the tests.
 
 Once `npm`_ is installed, you can install all needed dependencies by running:
 
@@ -66,7 +82,7 @@ Run the following to execute the tests:
 
 .. code-block:: bash
 
-  $ npm test
+  $ npm run unit
 
 Documentation
 -------------
@@ -110,18 +126,22 @@ Follow these steps to release a new version of the project:
 #.  Commit and push the new branch and then create a new pull request
 #.  Wait for tests and reviews and then merge the branch
 #.  Once merged, update your local master again (``git pull --rebase upstream master``)
-#.  Tag the release with the new release version (``git tag v<new tag>``)
+#.  Tag the release with the new release version (``git tag <new tag>``)
 #.  Push the tag (``git push upstream --tags``)
 #. Done. Check `Github Actions`_ for release progress.
 
 .. _GitHub Actions: https://github.com/pytest-dev/pytest-html/actions
-.. _Grunt: https://gruntjs.com
+.. _Mocha: https://mochajs.org/
 .. _npm: https://www.npmjs.com
-.. _Pipenv: https://pipenv.pypa.io/en/latest
+.. _Hatch: https://hatch.pypa.io/latest/
 .. _pre-commit: https://pre-commit.com
-.. _QUnit: https://qunitjs.com
+.. _Chai: https://www.chaijs.com/
+.. _Sinon: https://sinonjs.org/
 .. _Read The Docs: https://readthedocs.com
 .. _RST: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 .. _SASS/SCSS: https://sass-lang.com
 .. _the changelog: https://pytest-html.readthedocs.io/en/latest/changelog.html
 .. _Tox: https://tox.readthedocs.io
+.. _Docker: https://www.docker.com/
+.. _Selenium: https://www.selenium.dev/
+.. _BeautifulSoup: https://beautiful-soup-4.readthedocs.io/en/latest/

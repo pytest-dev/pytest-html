@@ -21,4 +21,19 @@ const formatDuration = ( totalSeconds ) => {
     }
 }
 
-module.exports = { formatDuration }
+const transformTableObj = (obj) => {
+    const appends = {}
+    const inserts = {}
+    for (const key in obj) {
+        key.startsWith("Z") ? appends[key] = obj[key] : inserts[key] = obj[key]
+    }
+    return {
+        appends,
+        inserts,
+    }
+}
+
+module.exports = {
+    formatDuration,
+    transformTableObj,
+}

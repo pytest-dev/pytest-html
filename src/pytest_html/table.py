@@ -29,6 +29,10 @@ class Html(Table):
 
 
 class Cell(Table):
+    def __init__(self):
+        super().__init__()
+        self._append_counter = 0
+
     def __setitem__(self, key, value):
         warnings.warn(
             "list-type assignment is deprecated and support "
@@ -37,6 +41,12 @@ class Cell(Table):
             DeprecationWarning,
         )
         self.insert(key, value)
+
+    def append(self, item):
+        # We need a way of separating inserts from appends in JS,
+        # hence the "Z" prefix
+        self.insert(f"Z{self._append_counter}", item)
+        self._append_counter += 1
 
     def insert(self, index, html):
         # backwards-compat

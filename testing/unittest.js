@@ -2,7 +2,7 @@ const { expect } = require('chai')
 const sinon = require('sinon')
 const { doInitFilter, doFilter } = require('../src/pytest_html/scripts/filter.js')
 const { doInitSort, doSort } = require('../src/pytest_html/scripts/sort.js')
-const { formatDuration } = require('../src/pytest_html/scripts/utils.js')
+const { formatDuration, transformTableObj } = require('../src/pytest_html/scripts/utils.js')
 const dataModule = require('../src/pytest_html/scripts/datamanager.js')
 const storageModule = require('../src/pytest_html/scripts/storage.js')
 
@@ -153,6 +153,23 @@ describe('utils tests', () => {
         it('handles larger durations', () => {
             expect(formatDuration(1.234).formatted).to.eql('00:00:01')
             expect(formatDuration(12345.678).formatted).to.eql('03:25:46')
+        })
+    })
+    describe('transformTableObj', () => {
+        it('handles empty object', () => {
+            expect(transformTableObj({})).to.eql({appends: {}, inserts: {}})
+        })
+        it('handles no appends', () => {
+            const expected = {1: "hello", 2: "goodbye"}
+            expect(transformTableObj(expected)).to.eql({appends: {}, inserts: expected})
+        })
+        it('handles no inserts', () => {
+            const expected = {"Z1": "hello", "Z2": "goodbye"}
+            expect(transformTableObj(expected)).to.eql({appends: expected, inserts: {}})
+        })
+        it('handles both', () => {
+            const expected = {appends: {"Z1": "hello", "Z2": "goodbye"}, inserts: {1: "mee", 2: "moo"}}
+            expect(transformTableObj({...expected.appends, ...expected.inserts})).to.eql(expected)
         })
     })
 })

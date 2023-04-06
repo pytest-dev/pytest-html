@@ -102,28 +102,25 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 
 .. code-block:: python
 
-   from py.xml import html
-
-
    def pytest_html_results_summary(prefix, summary, postfix):
        prefix.extend(["<p>foo: bar</p>"])
 
 Extra content
 ~~~~~~~~~~~~~
 
-You can add details to the HTML report by creating an 'extra' list on the
+You can add details to the HTML report by creating an 'extras' list on the
 report object. Here are the types of extra content that can be added:
 
 ==========  ============================================
 Type        Example
 ==========  ============================================
-Raw HTML    ``extra.html('<div>Additional HTML</div>')``
-`JSON`_     ``extra.json({'name': 'pytest'})``
-Plain text  ``extra.text('Add some simple Text')``
-URL         ``extra.url('http://www.example.com/')``
-Image       ``extra.image(image, mime_type='image/gif', extension='gif')``
-Image       ``extra.image('/path/to/file.png')``
-Image       ``extra.image('http://some_image.png')``
+Raw HTML    ``extras.html('<div>Additional HTML</div>')``
+`JSON`_     ``extras.json({'name': 'pytest'})``
+Plain text  ``extras.text('Add some simple Text')``
+URL         ``extras.url('http://www.example.com/')``
+Image       ``extras.image(image, mime_type='image/gif', extension='gif')``
+Image       ``extras.image('/path/to/file.png')``
+Image       ``extras.image('http://some_image.png')``
 ==========  ============================================
 
 **Note**: When adding an image from file, the path can be either absolute
@@ -138,9 +135,9 @@ There are also convenient types for several image formats:
 ============  ====================
 Image format  Example
 ============  ====================
-PNG           ``extra.png(image)``
-JPEG          ``extra.jpg(image)``
-SVG           ``extra.svg(image)``
+PNG           ``extras.png(image)``
+JPEG          ``extras.jpg(image)``
+SVG           ``extras.svg(image)``
 ============  ====================
 
 The following example adds the various types of extras using a
@@ -150,42 +147,44 @@ conftest.py file:
 .. code-block:: python
 
   import pytest
+  import pytest_html
 
 
   @pytest.hookimpl(hookwrapper=True)
   def pytest_runtest_makereport(item, call):
-      pytest_html = item.config.pluginmanager.getplugin("html")
       outcome = yield
       report = outcome.get_result()
-      extra = getattr(report, "extra", [])
+      extras = getattr(report, "extras", [])
       if report.when == "call":
           # always add url to report
-          extra.append(pytest_html.extras.url("http://www.example.com/"))
+          extras.append(pytest_html.extras.url("http://www.example.com/"))
           xfail = hasattr(report, "wasxfail")
           if (report.skipped and xfail) or (report.failed and not xfail):
               # only add additional html on failure
-              extra.append(pytest_html.extras.html("<div>Additional HTML</div>"))
-          report.extra = extra
+              extras.append(pytest_html.extras.html("<div>Additional HTML</div>"))
+          report.extras = extras
 
 You can also specify the :code:`name` argument for all types other than :code:`html` which will change the title of the
 created hyper link:
 
 .. code-block:: python
 
-    extra.append(pytest_html.extras.text("some string", name="Different title"))
+    extras.append(pytest_html.extras.text("some string", name="Different title"))
 
-It is also possible to use the fixture :code:`extra` to add content directly
+It is also possible to use the fixture :code:`extras` to add content directly
 in a test function without implementing hooks. These will generally end up
 before any extras added by plugins.
 
 .. code-block:: python
 
-   from pytest_html import extras
+   import pytest_html
 
 
-   def test_extra(extra):
-       extra.append(extras.text("some string"))
+   def test_extra(extras):
+       extras.append(pytest_html.extras.text("some string"))
 
+
+.. _modifying-results-table:
 
 Modifying the results table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -196,7 +195,6 @@ adds a sortable time column, and removes the links column:
 
 .. code-block:: python
 
-  from datetime import datetime
   import pytest
 
 
@@ -232,9 +230,6 @@ additional HTML and log output with a notice that the log is empty:
 
 .. code-block:: python
 
-  from py.xml import html
-
-
   def pytest_html_results_table_html(report, data):
       if report.passed:
           del data[:]
@@ -242,6 +237,8 @@ additional HTML and log output with a notice that the log is empty:
 
 Display options
 ---------------
+
+.. _render-collapsed:
 
 Auto Collapsing Table Rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

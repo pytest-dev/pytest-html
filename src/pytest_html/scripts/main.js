@@ -65,7 +65,12 @@ const renderDerived = (tests, collectedItems, isFinished) => {
     possibleResults.forEach(({ result, label }) => {
         const count = tests.filter((test) => test.result.toLowerCase() === result).length
         const input = document.querySelector(`input[data-test-result="${result}"]`)
+        const lastInput = document.querySelector(`input[data-test-result="${result}"]:last-of-type`)
         document.querySelector(`.${result}`).innerText = `${count} ${label}`
+        // add a comma and whitespace between the results
+        if (input !== lastInput) {
+            document.querySelector(`.${result}`).innerText += ', '
+        }
 
         input.disabled = !count
         input.checked = currentFilter.includes(result)

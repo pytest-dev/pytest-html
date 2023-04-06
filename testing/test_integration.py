@@ -81,7 +81,7 @@ def assert_results(
         if isinstance(number, int):
             number_of_tests += number
             result = get_text(page, f"span[class={outcome}]")
-            assert_that(result).is_equal_to(f"{number} {OUTCOMES[outcome]}")
+            assert_that(result).matches(rf"{number} {OUTCOMES[outcome]}")
 
 
 def get_element(page, selector):

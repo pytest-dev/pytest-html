@@ -1,3 +1,4 @@
+import re
 import warnings
 
 
@@ -32,6 +33,7 @@ class Cell(Table):
     def __init__(self):
         super().__init__()
         self._append_counter = 0
+        self._sortables = dict()
 
     def __setitem__(self, key, value):
         warnings.warn(
@@ -41,6 +43,10 @@ class Cell(Table):
             DeprecationWarning,
         )
         self.insert(key, value)
+
+    @property
+    def sortables(self):
+        return self._sortables
 
     def append(self, item):
         # We need a way of separating inserts from appends in JS,
@@ -58,7 +64,8 @@ class Cell(Table):
                     DeprecationWarning,
                 )
             html = str(html)
-            html = html.replace("col", "data-column-type")
+            html = html.replace("col=", "data-column-type=")
+        self._extract_sortable(html)
         self._html[index] = html
 
     def pop(self, *args):
@@ -66,6 +73,13 @@ class Cell(Table):
             "'pop' is deprecated and no longer supported.",
             DeprecationWarning,
         )
+
+    def _extract_sortable(self, html):
+        match = re.search(r'<td class="col-(\w+)">(.*?)</', html)
+        if match:
+            sortable = match.group(1)
+            value = match.group(2)
+            self._sortables[sortable] = value
 
 
 class Header(Cell):

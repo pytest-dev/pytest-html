@@ -78,7 +78,10 @@ class BaseReport:
         def set_data(self, key, value):
             self._data[key] = value
 
-        def add_test(self, test_data, report, remove_log=False):
+        def add_test(self, test_data, report, row, remove_log=False):
+            for sortable, value in row.sortables.items():
+                test_data[sortable] = value
+
             # regardless of pass or fail we must add teardown logging to "call"
             if report.when == "teardown" and not remove_log:
                 self.update_test_log(report)
@@ -282,28 +285,24 @@ class BaseReport:
         }
 
         test_id = report.nodeid
-        table_html = Html()
-        if report.when == "call":
-            row_cells = Row()
-            self._config.hook.pytest_html_results_table_row(
-                report=report, cells=row_cells
-            )
-            if row_cells.html is None:
-                return
-            data["resultsTableRow"] = row_cells.html
-
-            self._config.hook.pytest_html_results_table_html(
-                report=report, data=table_html
-            )
-            data["tableHtml"] = table_html.html["html"]
-        else:
+        if report.when != "call":
             test_id += f"::{report.when}"
         data["testId"] = test_id
+
+        row_cells = Row()
+        self._config.hook.pytest_html_results_table_row(report=report, cells=row_cells)
+        if row_cells.html is None:
+            return
+        data["resultsTableRow"] = row_cells.html
+
+        table_html = Html()
+        self._config.hook.pytest_html_results_table_html(report=report, data=table_html)
+        data["tableHtml"] = table_html.html["html"]
 
         data["result"] = _process_outcome(report)
         data["extras"] = self._process_extras(report, test_id)
 
-        if self._report.add_test(data, report, table_html.replace_log):
+        if self._report.add_test(data, report, row_cells, table_html.replace_log):
             self._generate_report()
 
 

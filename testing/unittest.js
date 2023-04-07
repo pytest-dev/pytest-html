@@ -102,7 +102,7 @@ describe('Sort tests', () => {
             doInitSort()
             expect(managerSpy.callCount).to.eql(1)
             expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
-                'passed', 'failed', 'passed', 'passed', 'passed', 'passed',
+                'failed', 'passed', 'passed', 'passed', 'passed', 'passed',
             ])
         })
         it('has stored sort preference', () => {
@@ -114,6 +114,17 @@ describe('Sort tests', () => {
             expect(managerSpy.callCount).to.eql(1)
             expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
                 'failed', 'passed', 'passed', 'passed', 'passed', 'passed',
+            ])
+        })
+        it('keeps original test execution order', () => {
+            sortMock = sinon.stub(storageModule, 'getSort').returns('original')
+            sortDirectionMock = sinon.stub(storageModule, 'getSortDirection').returns(false)
+            managerSpy = sinon.spy(dataModule.manager, 'setRender')
+
+            doInitSort()
+            expect(managerSpy.callCount).to.eql(1)
+            expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
+                'passed', 'failed', 'passed', 'passed', 'passed', 'passed',
             ])
         })
     })

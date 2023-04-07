@@ -192,7 +192,40 @@ class TestHTML:
             f"""
             import pytest
             def test_skip():
-                pytest.skip('{reason}')
+                pytest.skip("{reason}")
+        """
+        )
+        page = run(pytester)
+        assert_results(page, skipped=1, total_tests=0)
+
+        log = get_text(page, ".summary div[class='log']")
+        assert_that(log).contains(reason)
+
+    def test_skip_function_marker(self, pytester):
+        reason = str(random.random())
+        pytester.makepyfile(
+            f"""
+            import pytest
+            @pytest.mark.skip(reason="{reason}")
+            def test_skip():
+                assert True
+        """
+        )
+        page = run(pytester)
+        assert_results(page, skipped=1, total_tests=0)
+
+        log = get_text(page, ".summary div[class='log']")
+        assert_that(log).contains(reason)
+
+    def test_skip_class_marker(self, pytester):
+        reason = str(random.random())
+        pytester.makepyfile(
+            f"""
+            import pytest
+            @pytest.mark.skip(reason="{reason}")
+            class TestSkip:
+                def test_skip():
+                    assert True
         """
         )
         page = run(pytester)
@@ -213,12 +246,39 @@ class TestHTML:
             f"""
             import pytest
             def test_xfail():
-                pytest.xfail('{reason}')
+                pytest.xfail("{reason}")
         """
         )
         page = run(pytester)
         assert_results(page, xfailed=1)
         assert_that(get_log(page)).contains(reason)
+
+    def test_xfail_function_marker(self, pytester):
+        reason = str(random.random())
+        pytester.makepyfile(
+            f"""
+            import pytest
+            @pytest.mark.xfail(reason="{reason}")
+            def test_xfail():
+                assert False
+        """
+        )
+        page = run(pytester)
+        assert_results(page, xfailed=1)
+        assert_that(get_log(page)).contains(reason)
+
+    def test_xfail_class_marker(self, pytester):
+        pytester.makepyfile(
+            """
+            import pytest
+            @pytest.mark.xfail(reason="broken")
+            class TestXFail:
+                def test_xfail(self):
+                    assert False
+        """
+        )
+        page = run(pytester)
+        assert_results(page, xfailed=1)
 
     def test_xpass(self, pytester):
         pytester.makepyfile(
@@ -226,7 +286,20 @@ class TestHTML:
             import pytest
             @pytest.mark.xfail()
             def test_xpass():
-                pass
+                assert True
+        """
+        )
+        page = run(pytester)
+        assert_results(page, xpassed=1)
+
+    def test_xpass_class_marker(self, pytester):
+        pytester.makepyfile(
+            """
+            import pytest
+            @pytest.mark.xfail()
+            class TestXPass:
+                def test_xpass(self):
+                    assert True
         """
         )
         page = run(pytester)

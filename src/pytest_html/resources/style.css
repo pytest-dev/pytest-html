@@ -185,6 +185,22 @@ div.media {
   content: " (show details)";
 }
 
+#environment-header.collapser h2:hover::after {
+  content: " (hide details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#environment-header.expander h2:hover::after {
+  content: " (show details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
 /*------------------
  * 3. Sorting items
  *------------------*/

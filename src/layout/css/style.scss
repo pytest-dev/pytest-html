@@ -46,7 +46,6 @@ table {
     border: $border-width solid #e6e6e6;
     vertical-align: top;
   }
-
   tr:nth-child(odd) {
     background-color: #f6f6f6;
   }
@@ -207,6 +206,21 @@ div.media {
 .col-result.expander {
   &:hover::after {
     content: ' (show details)';
+  }
+}
+
+#environment-header.collapser h2 {
+  &:hover::after {
+    content: ' (hide details)';
+    @include rowToggle;
+    font-size: $font-size-text;
+  }
+}
+#environment-header.expander h2 {
+  &:hover::after {
+    content: ' (show details)';
+    @include rowToggle;
+    font-size: $font-size-text;
   }
 }
 

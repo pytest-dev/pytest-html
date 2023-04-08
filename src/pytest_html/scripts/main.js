@@ -17,15 +17,22 @@ const renderStatic = () => {
         document.querySelector('#title').innerText = title
         document.querySelector('#head-title').innerText = title
     }
-    const renderTable = () => {
+    const renderEnvironmentTable = () => {
         const environment = manager.environment
         const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
         const table = document.querySelector('#environment')
         removeChildren(table)
         rows.forEach((row) => table.appendChild(row))
+
+        const header = document.querySelector('#environment-header')
+        header.addEventListener('click', () => {
+            table.classList.toggle('hidden')
+            header.classList.toggle('collapser')
+            header.classList.toggle('expander')
+        })
     }
     renderTitle()
-    renderTable()
+    renderEnvironmentTable()
 }
 
 const renderContent = (tests) => {

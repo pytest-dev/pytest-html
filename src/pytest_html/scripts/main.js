@@ -44,6 +44,19 @@ const renderContent = (tests) => {
     table.querySelectorAll('.extra').forEach((item) => {
         item.colSpan = document.querySelectorAll('th').length
     })
+
+    const { headerPops } = manager.renderData
+    if (headerPops > 0) {
+        // remove 'headerPops' number of header columns
+        findAll('#results-table-head th').splice(-headerPops).forEach(column => column.remove())
+
+        // remove 'headerPops' number of row columns
+        const resultRows = findAll('.results-table-row')
+        resultRows.forEach((elem) => {
+            findAll('td:not(.extra)', elem).splice(-headerPops).forEach(column => column.remove())
+        })
+    }
+
     findAll('.sortable').forEach((elem) => {
         elem.addEventListener('click', (evt) => {
             const { target: element } = evt

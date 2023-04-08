@@ -29,7 +29,6 @@ const doInitSort = () => {
     const ascending = storageModule.getSortDirection()
     const list = manager.testSubset
     const initialOrder = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed', 'Skipped', 'Passed']
-    console.log(list)
     if (type?.toLowerCase() === 'original') {
         manager.setRender(list)
     } else {

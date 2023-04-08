@@ -33,7 +33,7 @@ except ImportError:
 
 
 class BaseReport:
-    class Report:
+    class ReportData:
         def __init__(self, title, config):
             self._config = config
             self._data = {
@@ -122,7 +122,7 @@ class BaseReport:
             config.getini("max_asset_filename_length")
         )
 
-        self._report = self.Report(self._report_path.name, config)
+        self._report = self.ReportData(self._report_path.name, config)
 
     @property
     def css(self):

@@ -254,7 +254,7 @@ By setting the query parameter to empty string :code:`?collapsed=""` **none** of
 
 Note that the query parameter is case insensitive, so passing :code:`PASSED` and :code:`passed` has the same effect.
 
-You can also set the collapsed behaviour by setting the :code:`render_collapsed` in a configuration file (pytest.ini, setup.cfg, etc).
+You can also set the collapsed behaviour by setting :code:`render_collapsed` in a configuration file (pytest.ini, setup.cfg, etc).
 Note that the query parameter takes precedence.
 
 .. code-block:: ini
@@ -262,8 +262,8 @@ Note that the query parameter takes precedence.
   [pytest]
   render_collapsed = failed,error
 
-Controlling Test Result Visibility Via Query Params
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Controlling Test Result Visibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, all tests are visible, regardless of their results. It is possible to control which tests are visible on
 page load by passing the :code:`visible` query parameter. To use this parameter, please pass a comma separated list
@@ -272,7 +272,7 @@ tests in the report that have outcome :code:`passed` or :code:`skipped`.
 
 Note that this match is case insensitive, so passing :code:`PASSED` and :code:`passed` has the same effect.
 
-The following query parameters may be passed:
+The following values may be passed:
 
 * :code:`passed`
 * :code:`skipped`
@@ -282,9 +282,29 @@ The following query parameters may be passed:
 * :code:`xpassed`
 * :code:`rerun`
 
+Results Table Sorting
+~~~~~~~~~~~~~~~~~~~~~
+
+You can change the sort order of the results table on page load by passing the :code:`sort` query parameter.
+
+The following values may be passed:
+
+* :code:`result`
+* :code:`testId`
+* :code:`duration`
+* :code:`original`
+
+Note that the values are case *sensitive*.
+
+``original`` means that a best effort is made to sort the table in the order of execution.
+If tests are run in parallel (with `pytest-xdist`_ for example), then the order may not be
+in the correct order.
+
+
 .. _@pytest.hookimpl(tryfirst=True): https://docs.pytest.org/en/stable/writing_plugins.html#hook-function-ordering-call-example
 .. _ansi2html: https://pypi.python.org/pypi/ansi2html/
 .. _Content Security Policy (CSP): https://developer.mozilla.org/docs/Web/Security/CSP/
 .. _JSON: https://json.org/
 .. _pytest-metadata: https://pypi.python.org/pypi/pytest-metadata/
+.. _pytest-xdist: https://pypi.python.org/pypi/pytest-xdist/
 .. _time.strftime: https://docs.python.org/3/library/time.html#time.strftime

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from pytest_html.basereport import BaseReport as HTMLReport  # noqa: F401
 from pytest_html.report import Report
 from pytest_html.selfcontained_report import SelfContainedReport
 

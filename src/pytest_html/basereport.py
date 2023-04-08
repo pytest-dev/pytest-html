@@ -84,7 +84,9 @@ class BaseReport:
                 self.update_test_log(report)
 
             # passed "setup" and "teardown" are not added to the html
-            if report.when == "call" or _is_error(report):
+            if report.when == "call" or (
+                report.when in ["setup", "teardown"] and report.outcome != "passed"
+            ):
                 if not remove_log:
                     processed_logs = _process_logs(report)
                     test_data["log"] = _handle_ansi(processed_logs)
@@ -338,7 +340,7 @@ def _is_error(report):
 def _process_logs(report):
     log = []
     if report.longreprtext:
-        log.append(report.longreprtext + "\n")
+        log.append(report.longreprtext.replace("<", "&lt;").replace(">", "&gt;") + "\n")
     for section in report.sections:
         header, content = section
         log.append(f"{' ' + header + ' ':-^80}")

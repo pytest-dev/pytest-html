@@ -1,5 +1,5 @@
 const storageModule = require('./storage.js')
-const { formatDuration } = require('./utils.js')
+const { formatDuration, transformTableObj } = require('./utils.js')
 const mediaViewer = require('./mediaviewer.js')
 const templateEnvRow = document.querySelector('#template_environment_row')
 const templateCollGroup = document.querySelector('#template_table-colgroup')
@@ -28,9 +28,9 @@ const findAll = (selector, elem) => {
     return [...elem.querySelectorAll(selector)]
 }
 
-const insertAdditionalHTML = (html, element, selector) => {
+const insertAdditionalHTML = (html, element, selector, position = 'beforebegin') => {
     Object.keys(html).map((key) => {
-        element.querySelectorAll(selector).item(key).insertAdjacentHTML('beforebegin', html[key])
+        element.querySelectorAll(selector).item(key).insertAdjacentHTML(position, html[key])
     })
 }
 
@@ -66,7 +66,9 @@ const dom = {
         const sortables = ['result', 'testId', 'duration', ...cols]
 
         // Add custom html from the pytest_html_results_table_header hook
-        insertAdditionalHTML(resultsTableHeader, header, 'th')
+        const headers = transformTableObj(resultsTableHeader)
+        insertAdditionalHTML(headers.inserts, header, 'th')
+        insertAdditionalHTML(headers.appends, header, 'tr', 'beforeend')
 
         sortables.forEach((sortCol) => {
             if (sortCol === sortAttr) {
@@ -91,7 +93,6 @@ const dom = {
         resultBody.querySelector('.col-name').innerText = testId
 
         resultBody.querySelector('.col-duration').innerText = duration < 1 ? formatDuration(duration).ms : formatDuration(duration).formatted
-
 
         if (log) {
             resultBody.querySelector('.log').innerHTML = log
@@ -126,7 +127,9 @@ const dom = {
         mediaViewer.setUp(resultBody, media)
 
         // Add custom html from the pytest_html_results_table_row hook
-        resultsTableRow && insertAdditionalHTML(resultsTableRow, resultBody, 'td')
+        const rows = transformTableObj(resultsTableRow)
+        resultsTableRow && insertAdditionalHTML(rows.inserts, resultBody, 'td')
+        resultsTableRow && insertAdditionalHTML(rows.appends, resultBody, 'tr', 'beforeend')
 
         // Add custom html from the pytest_html_results_table_html hook
         tableHtml?.forEach((item) => {

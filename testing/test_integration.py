@@ -516,6 +516,44 @@ class TestHTML:
         page = run(pytester, cmd_flags=["-n1"])
         assert_results(page, passed=1)
 
+    def test_results_table_hook_append(self, pytester):
+        header_selector = (
+            ".summary #results-table-head tr:nth-child(1) th:nth-child({})"
+        )
+        row_selector = ".summary #results-table tr:nth-child(1) td:nth-child({})"
+
+        pytester.makeconftest(
+            """
+            def pytest_html_results_table_header(cells):
+                cells.append("<th>Description</th>")
+                cells.append(
+                    '<th class="sortable time" data-column-type="time">Time</th>'
+                )
+
+            def pytest_html_results_table_row(report, cells):
+                cells.append("<td>A description</td>")
+                cells.append('<td class="col-time">A time</td>')
+        """
+        )
+        pytester.makepyfile("def test_pass(): pass")
+        page = run(pytester)
+
+        description_index = 5
+        time_index = 6
+        assert_that(get_text(page, header_selector.format(time_index))).is_equal_to(
+            "Time"
+        )
+        assert_that(
+            get_text(page, header_selector.format(description_index))
+        ).is_equal_to("Description")
+
+        assert_that(get_text(page, row_selector.format(time_index))).is_equal_to(
+            "A time"
+        )
+        assert_that(get_text(page, row_selector.format(description_index))).is_equal_to(
+            "A description"
+        )
+
     def test_results_table_hook_insert(self, pytester):
         header_selector = (
             ".summary #results-table-head tr:nth-child(1) th:nth-child({})"
@@ -539,13 +577,21 @@ class TestHTML:
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        assert_that(get_text(page, header_selector.format(2))).is_equal_to("Time")
-        assert_that(get_text(page, header_selector.format(3))).is_equal_to(
-            "Description"
+        description_index = 3
+        time_index = 2
+        assert_that(get_text(page, header_selector.format(time_index))).is_equal_to(
+            "Time"
         )
+        assert_that(
+            get_text(page, header_selector.format(description_index))
+        ).is_equal_to("Description")
 
-        assert_that(get_text(page, row_selector.format(2))).is_equal_to("A time")
-        assert_that(get_text(page, row_selector.format(3))).is_equal_to("A description")
+        assert_that(get_text(page, row_selector.format(time_index))).is_equal_to(
+            "A time"
+        )
+        assert_that(get_text(page, row_selector.format(description_index))).is_equal_to(
+            "A description"
+        )
 
     def test_results_table_hook_delete(self, pytester):
         pytester.makeconftest(

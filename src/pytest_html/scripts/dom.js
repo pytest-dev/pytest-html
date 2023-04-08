@@ -95,7 +95,9 @@ const dom = {
         resultBody.querySelector('.col-duration').innerText = duration < 1 ? formatDuration(duration).ms : formatDuration(duration).formatted
 
         if (log) {
-            resultBody.querySelector('.log').innerHTML = log
+            // Wrap lines starting with "E" with span.error to color those lines red
+            const wrappedLog = log.replace(/^E.*$/gm, (match) => `<span class="error">${match}</span>`)
+            resultBody.querySelector('.log').innerHTML = wrappedLog
         } else {
             resultBody.querySelector('.log').remove()
         }

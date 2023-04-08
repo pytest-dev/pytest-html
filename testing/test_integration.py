@@ -206,6 +206,9 @@ class TestHTML:
         page = run(pytester)
         assert_results(page, failed=1)
         assert_that(get_log(page)).contains("AssertionError")
+        assert_that(get_text(page, ".summary div[class='log'] span.error")).matches(
+            r"^E\s+assert False$"
+        )
 
     def test_xfail(self, pytester):
         reason = str(random.random())

@@ -246,8 +246,8 @@ class BaseReport:
 
         header_cells = Header()
         session.config.hook.pytest_html_results_table_header(cells=header_cells)
-
         self._report.set_data("resultsTableHeader", header_cells.html)
+        self._report.set_data("headerPops", header_cells.get_pops())
 
         self._report.set_data("runningState", "Started")
         self._generate_report()

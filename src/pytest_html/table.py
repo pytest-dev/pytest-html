@@ -33,6 +33,7 @@ class Cell(Table):
     def __init__(self):
         super().__init__()
         self._append_counter = 0
+        self._pop_counter = 0
         self._sortables = dict()
 
     def __setitem__(self, key, value):
@@ -69,10 +70,10 @@ class Cell(Table):
         self._html[index] = html
 
     def pop(self, *args):
-        warnings.warn(
-            "'pop' is deprecated and no longer supported.",
-            DeprecationWarning,
-        )
+        self._pop_counter += 1
+
+    def get_pops(self):
+        return self._pop_counter
 
     def _extract_sortable(self, html):
         match = re.search(r'<td class="col-(\w+)">(.*?)</', html)
@@ -90,3 +91,7 @@ class Row(Cell):
     def __delitem__(self, key):
         # This means the item should be removed
         self._html = None
+
+    def pop(self, *args):
+        # Calling pop on header is sufficient
+        pass

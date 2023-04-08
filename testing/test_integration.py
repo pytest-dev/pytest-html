@@ -690,6 +690,27 @@ class TestHTML:
         page = run(pytester)
         assert_results(page, passed=1)
 
+    def test_results_table_hook_pop(self, pytester):
+        pytester.makeconftest(
+            """
+            def pytest_html_results_table_header(cells):
+                cells.pop()
+
+            def pytest_html_results_table_row(report, cells):
+                cells.pop()
+        """
+        )
+        pytester.makepyfile("def test_pass(): pass")
+        page = run(pytester)
+
+        header_columns = page.select(".summary #results-table-head th")
+        assert_that(header_columns).is_length(3)
+
+        row_columns = page.select_one(".summary .results-table-row").select(
+            "td:not(.extra)"
+        )
+        assert_that(row_columns).is_length(3)
+
     @pytest.mark.parametrize("no_capture", ["", "-s"])
     def test_standard_streams(self, pytester, no_capture):
         pytester.makepyfile(

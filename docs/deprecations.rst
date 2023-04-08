@@ -1,5 +1,5 @@
-User Guide
-==========
+Deprecations
+============
 
 Deprecation policy
 ------------------
@@ -7,7 +7,7 @@ Deprecation policy
 If not otherwise explicitly stated, deprecations are removed in the next major version.
 
 Deprecations
--------------------------------------
+------------
 
 duration_formatter
 ~~~~~~~~~~~~~~~~~~

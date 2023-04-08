@@ -48,6 +48,13 @@ class BaseReport:
 
             collapsed = config.getini("render_collapsed")
             if collapsed:
+                if collapsed.lower() == "true":
+                    warnings.warn(
+                        "'render_collapsed = True' is deprecated and support "
+                        "will be removed in the next major release. "
+                        "Please use 'render_collapsed = all' instead.",
+                        DeprecationWarning,
+                    )
                 self.set_data(
                     "collapsed", [outcome.lower() for outcome in collapsed.split(",")]
                 )

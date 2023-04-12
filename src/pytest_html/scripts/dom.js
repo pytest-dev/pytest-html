@@ -55,7 +55,7 @@ const dom = {
 
         const regex = /data-column-type="(\w+)/
         const cols = Object.values(resultsTableHeader).reduce((result, value) => {
-            if (value.includes("sortable")) {
+            if (value.includes('sortable')) {
                 const matches = regex.exec(value)
                 if (matches) {
                     result.push(matches[1])
@@ -82,8 +82,6 @@ const dom = {
     getColGroup: () => templateCollGroup.content.cloneNode(true),
     getResultTBody: ({ testId, id, log, duration, extras, resultsTableRow, tableHtml, result, collapsed }) => {
         const resultLower = result.toLowerCase()
-        let formattedDuration = formatDuration(duration)
-        formattedDuration = formatDuration < 1 ? formattedDuration.ms : formattedDuration.formatted
         const resultBody = templateResult.content.cloneNode(true)
         resultBody.querySelector('tbody').classList.add(resultLower)
         resultBody.querySelector('tbody').id = testId
@@ -92,7 +90,8 @@ const dom = {
         resultBody.querySelector('.col-result').dataset.id = id
         resultBody.querySelector('.col-name').innerText = testId
 
-        resultBody.querySelector('.col-duration').innerText = duration < 1 ? formatDuration(duration).ms : formatDuration(duration).formatted
+        const formattedDuration = duration < 1 ? formatDuration(duration).ms : formatDuration(duration).formatted
+        resultBody.querySelector('.col-duration').innerText = formattedDuration
 
         if (log) {
             // Wrap lines starting with "E" with span.error to color those lines red

@@ -64,18 +64,18 @@ const getCollapsedCategory = (config) => {
         const url = new URL(window.location.href)
         const collapsedItems = new URLSearchParams(url.search).get('collapsed')
         switch (true) {
-            case !config && collapsedItems === null:
-                categories = ['passed']
-                break
-            case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
-                categories = []
-                break
-            case /^all$/.test(collapsedItems) || (collapsedItems === null && /^all$/.test(config)):
-                categories = [...possibleFilters]
-                break
-            default:
-                categories = collapsedItems?.split(',').map(item => item.toLowerCase()) || config
-                break
+        case !config && collapsedItems === null:
+            categories = ['passed']
+            break
+        case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
+            categories = []
+            break
+        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(config):
+            categories = [...possibleFilters]
+            break
+        default:
+            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || config
+            break
         }
     } else {
         categories = []

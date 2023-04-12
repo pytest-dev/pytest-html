@@ -48,12 +48,12 @@ const renderContent = (tests) => {
     const { headerPops } = manager.renderData
     if (headerPops > 0) {
         // remove 'headerPops' number of header columns
-        findAll('#results-table-head th').splice(-headerPops).forEach(column => column.remove())
+        findAll('#results-table-head th').splice(-headerPops).forEach((column) => column.remove())
 
         // remove 'headerPops' number of row columns
         const resultRows = findAll('.results-table-row')
         resultRows.forEach((elem) => {
-            findAll('td:not(.extra)', elem).splice(-headerPops).forEach(column => column.remove())
+            findAll('td:not(.extra)', elem).splice(-headerPops).forEach((column) => column.remove())
         })
     }
 

@@ -8,8 +8,8 @@ const genericSort = (list, key, ascending, customOrder) => {
             const aValue = a.result.toLowerCase()
             const bValue = b.result.toLowerCase()
 
-            const aIndex = customOrder.findIndex(item => item.toLowerCase() === aValue)
-            const bIndex = customOrder.findIndex(item => item.toLowerCase() === bValue)
+            const aIndex = customOrder.findIndex((item) => item.toLowerCase() === aValue)
+            const bIndex = customOrder.findIndex((item) => item.toLowerCase() === bValue)
 
             // Compare the indices to determine the sort order
             return aIndex - bIndex

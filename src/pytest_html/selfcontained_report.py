@@ -6,8 +6,8 @@ from pytest_html.basereport import BaseReport
 
 
 class SelfContainedReport(BaseReport):
-    def __init__(self, report_path, config):
-        super().__init__(report_path, config)
+    def __init__(self, report_path, config, report_data):
+        super().__init__(report_path, config, report_data)
 
     @property
     def css(self):

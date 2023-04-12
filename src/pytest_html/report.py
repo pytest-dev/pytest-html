@@ -6,8 +6,8 @@ from pytest_html.basereport import BaseReport
 
 
 class Report(BaseReport):
-    def __init__(self, report_path, config):
-        super().__init__(report_path, config)
+    def __init__(self, report_path, config, report_data):
+        super().__init__(report_path, config, report_data)
         self._assets_path = Path(self._report_path.parent, "assets")
         self._assets_path.mkdir(parents=True, exist_ok=True)
         self._css_path = Path(self._assets_path, "style.css")

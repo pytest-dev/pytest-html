@@ -1,18 +1,20 @@
-import importlib
 import json
-from functools import lru_cache
+from functools import partial
 from typing import Any
 from typing import Dict
 
 
-@lru_cache()
-def ansi_support():
-    try:
-        # from ansi2html import Ansi2HTMLConverter, style  # NOQA
-        return importlib.import_module("ansi2html")
-    except ImportError:
-        # ansi2html is not installed
-        pass
+try:
+    from ansi2html import Ansi2HTMLConverter, style
+
+    converter = Ansi2HTMLConverter(inline=False, escaped=False)
+    _handle_ansi = partial(converter.convert, full=False)
+    _ansi_styles = style.get_styles()
+except ImportError:
+    from _pytest.logging import _remove_ansi_escape_sequences
+
+    _handle_ansi = _remove_ansi_escape_sequences
+    _ansi_styles = []
 
 
 def cleanup_unserializable(d: Dict[str, Any]) -> Dict[str, Any]:

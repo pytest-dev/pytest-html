@@ -168,19 +168,19 @@ describe('utils tests', () => {
     })
     describe('transformTableObj', () => {
         it('handles empty object', () => {
-            expect(transformTableObj({})).to.eql({appends: {}, inserts: {}})
+            expect(transformTableObj({})).to.eql({ appends: {}, inserts: {} })
         })
         it('handles no appends', () => {
-            const expected = {1: "hello", 2: "goodbye"}
-            expect(transformTableObj(expected)).to.eql({appends: {}, inserts: expected})
+            const expected = { 1: 'hello', 2: 'goodbye' }
+            expect(transformTableObj(expected)).to.eql({ appends: {}, inserts: expected })
         })
         it('handles no inserts', () => {
-            const expected = {"Z1": "hello", "Z2": "goodbye"}
-            expect(transformTableObj(expected)).to.eql({appends: expected, inserts: {}})
+            const expected = { 'Z1': 'hello', 'Z2': 'goodbye' }
+            expect(transformTableObj(expected)).to.eql({ appends: expected, inserts: {} })
         })
         it('handles both', () => {
-            const expected = {appends: {"Z1": "hello", "Z2": "goodbye"}, inserts: {1: "mee", 2: "moo"}}
-            expect(transformTableObj({...expected.appends, ...expected.inserts})).to.eql(expected)
+            const expected = { appends: { 'Z1': 'hello', 'Z2': 'goodbye' }, inserts: { 1: 'mee', 2: 'moo' } }
+            expect(transformTableObj({ ...expected.appends, ...expected.inserts })).to.eql(expected)
         })
     })
 })
@@ -191,8 +191,8 @@ describe('Storage tests', () => {
         const mockWindow = (queryParam) => {
             const mock = {
                 location: {
-                    href: `https://example.com/page?${queryParam}`
-                }
+                    href: `https://example.com/page?${queryParam}`,
+                },
             }
             originalWindow = global.window
             global.window = mock
@@ -224,10 +224,10 @@ describe('Storage tests', () => {
         })
 
         const config = [
-          { value: ['failed', 'error'], expected: ['failed', 'error'] },
-          { value: ['all'], expected: storageModule.possibleFilters }
+            { value: ['failed', 'error'], expected: ['failed', 'error'] },
+            { value: ['all'], expected: storageModule.possibleFilters },
         ]
-        config.forEach(({value, expected}) => {
+        config.forEach(({ value, expected }) => {
             it(`handles python config: ${value}`, () => {
                 mockWindow()
                 const collapsedItems = storageModule.getCollapsedCategory(value)
@@ -236,25 +236,25 @@ describe('Storage tests', () => {
         })
 
         const precedence = [
-            {query: 'collapsed=xpassed,xfailed', config: ['failed', 'error'], expected: ['xpassed', 'xfailed']},
-            {query: 'collapsed=all', config: ['failed', 'error'], expected: storageModule.possibleFilters},
-            {query: 'collapsed=xpassed,xfailed', config: ['all'], expected: ['xpassed', 'xfailed']},
+            { query: 'collapsed=xpassed,xfailed', value: ['failed', 'error'], expected: ['xpassed', 'xfailed'] },
+            { query: 'collapsed=all', value: ['failed', 'error'], expected: storageModule.possibleFilters },
+            { query: 'collapsed=xpassed,xfailed', value: ['all'], expected: ['xpassed', 'xfailed'] },
         ]
-        precedence.forEach(({query, config, expected}, index) => {
+        precedence.forEach(({ query, value, expected }, index) => {
             it(`handles python config precedence ${index + 1}`, () => {
                 mockWindow(query)
-                const collapsedItems = storageModule.getCollapsedCategory(config)
+                const collapsedItems = storageModule.getCollapsedCategory(value)
                 expect(collapsedItems).to.eql(expected)
             })
         })
 
         const falsy = [
-          { param: 'collapsed' },
-          { param: 'collapsed=' },
-          { param: 'collapsed=""' },
-          { param: 'collapsed=\'\'' }
+            { param: 'collapsed' },
+            { param: 'collapsed=' },
+            { param: 'collapsed=""' },
+            { param: 'collapsed=\'\'' },
         ]
-        falsy.forEach(({param}) => {
+        falsy.forEach(({ param }) => {
             it(`collapses none with ${param}`, () => {
                 mockWindow(param)
                 const collapsedItems = storageModule.getCollapsedCategory()

@@ -168,10 +168,10 @@ div.media {
   display: none;
 }
 
-.col-result {
+.collapsible td:not(.col-links) {
   cursor: pointer;
 }
-.col-result:hover::after {
+.collapsible td:not(.col-links):hover::after {
   color: #bbb;
   font-style: italic;
   cursor: pointer;

@@ -65,9 +65,9 @@ const renderContent = (tests) => {
             redraw()
         })
     })
-    findAll('.col-result').forEach((elem) => {
+    findAll('.collapsible td:not(.col-links').forEach((elem) => {
         elem.addEventListener('click', ({ target }) => {
-            manager.toggleCollapsedItem(target.dataset.id)
+            manager.toggleCollapsedItem(target.parentElement.dataset.id)
             redraw()
         })
     })

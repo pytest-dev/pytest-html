@@ -70,6 +70,7 @@ Source = "https://github.com/pytest-dev/pytest-html"
 
 [project.entry-points.pytest11]
 html = "pytest_html.plugin"
+html_fixtures = "pytest_html.fixtures"
 
 [tool.hatch.envs.test]
 features = [

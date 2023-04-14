@@ -8,6 +8,7 @@ import pytest
 
 from pytest_html.basereport import BaseReport as HTMLReport  # noqa: F401
 from pytest_html.report import Report
+from pytest_html.report_data import ReportData
 from pytest_html.selfcontained_report import SelfContainedReport
 
 
@@ -80,10 +81,11 @@ def pytest_configure(config):
 
         if not hasattr(config, "workerinput"):
             # prevent opening html_path on worker nodes (xdist)
+            report_data = ReportData(config)
             if config.getoption("self_contained_html"):
-                html = SelfContainedReport(html_path, config)
+                html = SelfContainedReport(html_path, config, report_data)
             else:
-                html = Report(html_path, config)
+                html = Report(html_path, config, report_data)
 
             config.pluginmanager.register(html)
 

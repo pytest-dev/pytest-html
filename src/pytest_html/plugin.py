@@ -6,14 +6,15 @@ from pathlib import Path
 
 import pytest
 
-from pytest_html.basereport import BaseReport as HTMLReport  # noqa: F401
+from pytest_html import extras  # noqa: F401
+from pytest_html.fixtures import extras_stash_key
 from pytest_html.report import Report
 from pytest_html.report_data import ReportData
 from pytest_html.selfcontained_report import SelfContainedReport
 
 
 def pytest_addhooks(pluginmanager):
-    from . import hooks
+    from pytest_html import hooks
 
     pluginmanager.add_hookspecs(hooks)
 
@@ -108,45 +109,6 @@ def pytest_runtest_makereport(item, call):
                 ", use 'report.extras' instead.",
                 DeprecationWarning,
             )
-        fixture_extras = getattr(item.config, "extras", [])
+        fixture_extras = item.config.stash.get(extras_stash_key, [])
         plugin_extras = getattr(report, "extras", [])
         report.extras = fixture_extras + plugin_extras + deprecated_extra
-
-
-@pytest.fixture
-def extra(pytestconfig):
-    """Add details to the HTML reports.
-
-    .. code-block:: python
-
-        import pytest_html
-
-
-        def test_foo(extra):
-            extra.append(pytest_html.extras.url("https://www.example.com/"))
-    """
-    warnings.warn(
-        "The 'extra' fixture is deprecated and will be removed in a future release"
-        ", use 'extras' instead.",
-        DeprecationWarning,
-    )
-    pytestconfig.extras = []
-    yield pytestconfig.extras
-    del pytestconfig.extras[:]
-
-
-@pytest.fixture
-def extras(pytestconfig):
-    """Add details to the HTML reports.
-
-    .. code-block:: python
-
-        import pytest_html
-
-
-        def test_foo(extras):
-            extras.append(pytest_html.extras.url("https://www.example.com/"))
-    """
-    pytestconfig.extras = []
-    yield pytestconfig.extras
-    del pytestconfig.extras[:]

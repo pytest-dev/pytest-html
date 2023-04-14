@@ -78,7 +78,8 @@ jobs:
           }}
         uses: codecov/codecov-action@v3
         with:
-          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
           files: ./cobertura-coverage.xml
           flags: js_tests
           name: ubuntu-latest-node-16
@@ -163,7 +164,8 @@ jobs:
           }}
         uses: codecov/codecov-action@v3
         with:
-          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
           files: ./coverage.xml
           flags: py_unit_tests
           name: ${{ matrix.os }}-python-${{ matrix.python-version }}
@@ -236,7 +238,8 @@ jobs:
           }}
         uses: codecov/codecov-action@v3
         with:
-          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
           files: ./coverage.xml
           flags: py_integration_tests
           name: ubuntu-latest-${{ matrix.python-version }}

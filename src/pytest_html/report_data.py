@@ -30,7 +30,7 @@ class ReportData:
                     DeprecationWarning,
                 )
             self.set_data(
-                "collapsed", [outcome.lower() for outcome in collapsed.split(",")]
+                "renderCollapsed", [outcome.lower() for outcome in collapsed.split(",")]
             )
 
     @property

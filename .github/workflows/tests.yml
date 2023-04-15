@@ -6,7 +6,7 @@ on:
       - master
 
   schedule:
-    - cron: '1 0 * * *'  # Run daily at 0:01 UTC
+    - cron: '0 14 * * *'  # Run daily at 14:00 UTC
 
   pull_request:
 
@@ -45,12 +45,6 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '16.x'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build app.js
-      run: npm run build:ci
 
     - name: Build and Check Package
       uses: hynek/build-and-inspect-python-package@v1
@@ -129,12 +123,6 @@ jobs:
         with:
           node-version: '16.x'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build app
-        run: npm run build:ci
-
       - name: Set up python
         uses: actions/setup-python@v4
         with:
@@ -202,12 +190,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build app
-        run: npm run build:ci
 
       - name: Set up python
         uses: actions/setup-python@v4

@@ -58,23 +58,23 @@ const setSort = (type) => {
     history.pushState({}, null, unescape(url.href))
 }
 
-const getCollapsedCategory = (config) => {
+const getCollapsedCategory = (renderCollapsed) => {
     let categories
     if (typeof window !== 'undefined') {
         const url = new URL(window.location.href)
         const collapsedItems = new URLSearchParams(url.search).get('collapsed')
         switch (true) {
-        case !config && collapsedItems === null:
+        case !renderCollapsed && collapsedItems === null:
             categories = ['passed']
             break
         case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
             categories = []
             break
-        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(config):
+        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(renderCollapsed):
             categories = [...possibleFilters]
             break
         default:
-            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || config
+            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || renderCollapsed
             break
         }
     } else {

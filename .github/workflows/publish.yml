@@ -21,12 +21,6 @@ jobs:
       with:
         node-version: '16.x'
 
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build app.js
-      run: npm run build:ci
-
     - name: Build and Check Package
       uses: hynek/build-and-inspect-python-package@v1
 

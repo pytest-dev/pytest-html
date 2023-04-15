@@ -193,12 +193,13 @@ div.media {
   cursor: pointer;
 }
 
-.col-result {
+.collapsible td:not(.col-links) {
   cursor: pointer;
   &:hover::after {
     @include rowToggle;
   }
 }
+
 .col-result.collapser {
   &:hover::after {
     content: ' (hide details)';

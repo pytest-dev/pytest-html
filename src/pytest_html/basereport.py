@@ -173,6 +173,7 @@ class BaseReport:
             prefix=self._report.data["additionalSummary"]["prefix"],
             summary=self._report.data["additionalSummary"]["summary"],
             postfix=self._report.data["additionalSummary"]["postfix"],
+            session=session,
         )
         self._report.set_data("runningState", "Finished")
         self._generate_report()

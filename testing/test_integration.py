@@ -8,7 +8,6 @@ import urllib.parse
 from base64 import b64encode
 from pathlib import Path
 
-import pkg_resources
 import pytest
 from assertpy import assert_that
 from bs4 import BeautifulSoup
@@ -28,12 +27,8 @@ OUTCOMES = {
 
 
 def run(pytester, path="report.html", cmd_flags=None, query_params=None):
-    if cmd_flags is None:
-        cmd_flags = []
-
-    if query_params is None:
-        query_params = {}
-    query_params = urllib.parse.urlencode(query_params)
+    cmd_flags = cmd_flags or []
+    query_params = urllib.parse.urlencode(query_params) if query_params else {}
 
     path = pytester.path.joinpath(path)
     pytester.runpytest("--html", path, *cmd_flags)
@@ -120,6 +115,8 @@ def file_content():
         )
     except AttributeError:
         # Needed for python < 3.9
+        import pkg_resources
+
         return pkg_resources.resource_string(
             "pytest_html", os.path.join("resources", "style.css")
         ).decode("utf-8")

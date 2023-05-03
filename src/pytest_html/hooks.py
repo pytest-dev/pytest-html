@@ -7,7 +7,7 @@ def pytest_html_report_title(report):
     """Called before adding the title to the report"""
 
 
-def pytest_html_results_summary(prefix, summary, postfix):
+def pytest_html_results_summary(prefix, summary, postfix, session):
     """Called before adding the summary section to the report"""
 
 

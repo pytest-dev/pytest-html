@@ -13,23 +13,9 @@ class Table:
     def html(self):
         return self._html
 
-
-class Html(Table):
-    def __init__(self):
-        super().__init__()
-        self.html.setdefault("html", [])
-        self._replace_log = False
-
-    def __delitem__(self, key):
-        # This means the log should be removed
-        self._replace_log = True
-
-    @property
-    def replace_log(self):
-        return self._replace_log
-
-    def append(self, html):
-        self.html["html"].append(html)
+    @html.setter
+    def html(self, value):
+        self._html = value
 
 
 class Cell(Table):

@@ -50,6 +50,9 @@ dynamic = [
 ]
 
 [project.optional-dependencies]
+docs = [
+  "pip-tools>=6.13.0",
+]
 test = [
   "assertpy>=1.1",
   "beautifulsoup4>=4.11.1",

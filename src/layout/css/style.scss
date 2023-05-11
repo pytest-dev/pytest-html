@@ -230,7 +230,7 @@ div.media {
  *------------------*/
 .sortable {
   cursor: pointer;
-  &.asc {
+  &.desc {
     &:after {
       content: ' ';
       position: relative;
@@ -242,7 +242,7 @@ div.media {
       border-right-color: transparent;
     }
   }
-  &.desc {
+  &.asc {
     &:after {
       content: ' ';
       position: relative;

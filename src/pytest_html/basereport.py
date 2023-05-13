@@ -9,28 +9,21 @@ import warnings
 from pathlib import Path
 
 import pytest
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
-from jinja2 import select_autoescape
 
 from pytest_html import __version__
 from pytest_html import extras
 from pytest_html.table import Header
 from pytest_html.table import Row
-from pytest_html.util import _ansi_styles
 from pytest_html.util import cleanup_unserializable
 
 
 class BaseReport:
-    def __init__(self, report_path, config, report_data, default_css="style.css"):
+    def __init__(self, report_path, config, report_data, template, css):
         self._report_path = Path(os.path.expandvars(report_path)).expanduser()
         self._report_path.parent.mkdir(parents=True, exist_ok=True)
-        self._resources_path = Path(__file__).parent.joinpath("resources")
         self._config = config
-        self._template = _read_template([self._resources_path])
-        self._css = _process_css(
-            Path(self._resources_path, default_css), self._config.getoption("css")
-        )
+        self._template = template
+        self._css = css
         self._max_asset_filename_length = int(
             config.getini("max_asset_filename_length")
         )
@@ -224,32 +217,6 @@ class BaseReport:
             self._generate_report()
 
 
-def _process_css(default_css, extra_css):
-    with open(default_css, encoding="utf-8") as f:
-        css = f.read()
-
-    # Add user-provided CSS
-    for path in extra_css:
-        css += "\n/******************************"
-        css += "\n * CUSTOM CSS"
-        css += f"\n * {path}"
-        css += "\n ******************************/\n\n"
-        with open(path, encoding="utf-8") as f:
-            css += f.read()
-
-    # ANSI support
-    if _ansi_styles:
-        ansi_css = [
-            "\n/******************************",
-            " * ANSI2HTML STYLES",
-            " ******************************/\n",
-        ]
-        ansi_css.extend([str(r) for r in _ansi_styles])
-        css += "\n".join(ansi_css)
-
-    return css
-
-
 def _is_error(report):
     return report.when in ["setup", "teardown"] and report.outcome == "failed"
 
@@ -282,13 +249,3 @@ def _process_outcome(report):
             return "XFailed"
 
     return report.outcome.capitalize()
-
-
-def _read_template(search_paths, template_name="index.jinja2"):
-    env = Environment(
-        loader=FileSystemLoader(search_paths),
-        autoescape=select_autoescape(
-            enabled_extensions=("jinja2",),
-        ),
-    )
-    return env.get_template(template_name)

@@ -1,6 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import os
 import warnings
 from pathlib import Path
 
@@ -11,6 +12,8 @@ from pytest_html.fixtures import extras_stash_key
 from pytest_html.report import Report
 from pytest_html.report_data import ReportData
 from pytest_html.selfcontained_report import SelfContainedReport
+from pytest_html.util import _process_css
+from pytest_html.util import _read_template
 
 
 def pytest_addhooks(pluginmanager):
@@ -68,10 +71,14 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     html_path = config.getoption("htmlpath")
     if html_path:
+        extra_css = [
+            Path(os.path.expandvars(css)).expanduser()
+            for css in config.getoption("css")
+        ]
         missing_css_files = []
-        for css_path in config.getoption("css"):
-            if not Path(css_path).exists():
-                missing_css_files.append(css_path)
+        for css_path in extra_css:
+            if not css_path.exists():
+                missing_css_files.append(str(css_path))
 
         if missing_css_files:
             os_error = (
@@ -82,11 +89,17 @@ def pytest_configure(config):
 
         if not hasattr(config, "workerinput"):
             # prevent opening html_path on worker nodes (xdist)
+            resources_path = Path(__file__).parent.joinpath("resources")
+            default_css = Path(resources_path, "style.css")
+            template = _read_template([resources_path])
+            processed_css = _process_css(default_css, extra_css)
             report_data = ReportData(config)
             if config.getoption("self_contained_html"):
-                html = SelfContainedReport(html_path, config, report_data)
+                html = SelfContainedReport(
+                    html_path, config, report_data, template, processed_css
+                )
             else:
-                html = Report(html_path, config, report_data)
+                html = Report(html_path, config, report_data, template, processed_css)
 
             config.pluginmanager.register(html)
 

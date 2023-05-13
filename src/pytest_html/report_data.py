@@ -52,21 +52,16 @@ class ReportData:
     def set_data(self, key, value):
         self._data[key] = value
 
-    def add_test(self, test_data, report, row, remove_log=False):
-        for sortable, value in row.sortables.items():
-            test_data[sortable] = value
-
+    def add_test(self, test_data, report, logs):
         # regardless of pass or fail we must add teardown logging to "call"
-        if report.when == "teardown" and not remove_log:
+        if report.when == "teardown":
             self.update_test_log(report)
 
         # passed "setup" and "teardown" are not added to the html
         if report.when == "call" or (
             report.when in ["setup", "teardown"] and report.outcome != "passed"
         ):
-            if not remove_log:
-                processed_logs = _process_logs(report)
-                test_data["log"] = _handle_ansi(processed_logs)
+            test_data["log"] = _handle_ansi("\n".join(logs))
             self._data["tests"][report.nodeid].append(test_data)
             return True
 
@@ -79,25 +74,5 @@ class ReportData:
                 for section in report.sections:
                     header, content = section
                     if "teardown" in header:
-                        log.append(f"{' ' + header + ' ':-^80}")
-                        log.append(content)
+                        log.append(f"{' ' + header + ' ':-^80}\n{content}")
                 test["log"] += _handle_ansi("\n".join(log))
-
-
-def _process_logs(report):
-    log = []
-    if report.longreprtext:
-        log.append(report.longreprtext.replace("<", "&lt;").replace(">", "&gt;") + "\n")
-    for section in report.sections:
-        header, content = section
-        log.append(f"{' ' + header + ' ':-^80}")
-        log.append(content)
-
-        # weird formatting related to logs
-        if "log" in header:
-            log.append("")
-            if "call" in header:
-                log.append("")
-    if not log:
-        log.append("No log output captured.")
-    return "\n".join(log)

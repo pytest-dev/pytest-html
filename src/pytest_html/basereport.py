@@ -16,7 +16,6 @@ from jinja2 import select_autoescape
 from pytest_html import __version__
 from pytest_html import extras
 from pytest_html.table import Header
-from pytest_html.table import Html
 from pytest_html.table import Row
 from pytest_html.util import _ansi_styles
 from pytest_html.util import cleanup_unserializable
@@ -210,15 +209,18 @@ class BaseReport:
         if row_cells.html is None:
             return
         data["resultsTableRow"] = row_cells.html
+        for sortable, value in row_cells.sortables.items():
+            data[sortable] = value
 
-        table_html = Html()
-        self._config.hook.pytest_html_results_table_html(report=report, data=table_html)
-        data["tableHtml"] = table_html.html["html"]
+        processed_logs = _process_logs(report)
+        self._config.hook.pytest_html_results_table_html(
+            report=report, data=processed_logs
+        )
 
         data["result"] = _process_outcome(report)
         data["extras"] = self._process_extras(report, test_id)
 
-        if self._report.add_test(data, report, row_cells, table_html.replace_log):
+        if self._report.add_test(data, report, processed_logs):
             self._generate_report()
 
 
@@ -250,6 +252,24 @@ def _process_css(default_css, extra_css):
 
 def _is_error(report):
     return report.when in ["setup", "teardown"] and report.outcome == "failed"
+
+
+def _process_logs(report):
+    log = []
+    if report.longreprtext:
+        log.append(report.longreprtext.replace("<", "&lt;").replace(">", "&gt;") + "\n")
+    for section in report.sections:
+        header, content = section
+        log.append(f"{' ' + header + ' ':-^80}\n{content}")
+
+        # weird formatting related to logs
+        if "log" in header:
+            log.append("")
+            if "call" in header:
+                log.append("")
+    if not log:
+        log.append("No log output captured.")
+    return log
 
 
 def _process_outcome(report):

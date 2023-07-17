@@ -10,14 +10,26 @@ from pytest_html.util import _handle_ansi
 class ReportData:
     def __init__(self, config):
         self._config = config
+
+        default_headers = [
+            '<th class="sortable" data-column-type="result">Result</th>',
+            '<th class="sortable" data-column-type="testId">Test</th>',
+            '<th class="sortable" data-column-type="duration">Duration</th>',
+            "<th>Links</th>",
+        ]
+
         self._data = {
             "title": "",
             "collectedItems": 0,
+            "totalDuration": {
+                "total": 0,
+                "formatted": "",
+            },
             "runningState": "not_started",
             "environment": {},
             "tests": defaultdict(list),
-            "resultsTableHeader": {},
             "additionalSummary": defaultdict(list),
+            "resultsTableHeader": default_headers,
         }
 
         collapsed = config.getini("render_collapsed")

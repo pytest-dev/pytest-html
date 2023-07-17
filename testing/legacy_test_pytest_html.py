@@ -107,7 +107,6 @@ class TestHTML:
     def test_can_format_duration_column(
         self, testdir, duration_formatter, expected_report_content
     ):
-
         testdir.makeconftest(
             f"""
             import pytest

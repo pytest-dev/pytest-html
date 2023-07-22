@@ -207,7 +207,7 @@ div.media {
 .sortable {
   cursor: pointer;
 }
-.sortable.asc:after {
+.sortable.desc:after {
   content: " ";
   position: relative;
   left: 5px;
@@ -217,7 +217,7 @@ div.media {
   border-left-color: transparent;
   border-right-color: transparent;
 }
-.sortable.desc:after {
+.sortable.asc:after {
   content: " ";
   position: relative;
   left: 5px;

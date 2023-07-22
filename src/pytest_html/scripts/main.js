@@ -1,4 +1,3 @@
-const { formatDuration } = require('./utils.js')
 const { dom, findAll } = require('./dom.js')
 const { manager } = require('./datamanager.js')
 const { doSort } = require('./sort.js')
@@ -52,18 +51,6 @@ const renderContent = (tests) => {
         item.colSpan = document.querySelectorAll('th').length
     })
 
-    const { headerPops } = manager.renderData
-    if (headerPops > 0) {
-        // remove 'headerPops' number of header columns
-        findAll('#results-table-head th').splice(-headerPops).forEach((column) => column.remove())
-
-        // remove 'headerPops' number of row columns
-        const resultRows = findAll('.results-table-row')
-        resultRows.forEach((elem) => {
-            findAll('td:not(.extra)', elem).splice(-headerPops).forEach((column) => column.remove())
-        })
-    }
-
     findAll('.sortable').forEach((elem) => {
         elem.addEventListener('click', (evt) => {
             const { target: element } = evt
@@ -80,7 +67,7 @@ const renderContent = (tests) => {
     })
 }
 
-const renderDerived = (tests, collectedItems, isFinished) => {
+const renderDerived = (tests, collectedItems, isFinished, formattedDuration) => {
     const currentFilter = getVisible()
     possibleResults.forEach(({ result, label }) => {
         const count = tests.filter((test) => test.result.toLowerCase() === result).length
@@ -100,12 +87,8 @@ const renderDerived = (tests, collectedItems, isFinished) => {
         ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(result)).length
 
     if (isFinished) {
-        const accTime = tests.reduce((prev, { duration }) => prev + duration, 0)
-        const formattedAccTime = formatDuration(accTime)
         const testWord = numberOfTests > 1 ? 'tests' : 'test'
-        const durationText = formattedAccTime.hasOwnProperty('ms') ? formattedAccTime.ms : formattedAccTime.formatted
-
-        document.querySelector('.run-count').innerText = `${numberOfTests} ${testWord} took ${durationText}.`
+        document.querySelector('.run-count').innerText = `${numberOfTests} ${testWord} took ${formattedDuration}.`
         document.querySelector('.summary__reload__button').classList.add('hidden')
     } else {
         document.querySelector('.run-count').innerText = `${numberOfTests} / ${collectedItems} tests done`
@@ -135,11 +118,11 @@ const bindEvents = () => {
 }
 
 const redraw = () => {
-    const { testSubset, allTests, collectedItems, isFinished } = manager
+    const { testSubset, allTests, collectedItems, isFinished, formattedDuration } = manager
 
     renderStatic()
     renderContent(testSubset)
-    renderDerived(allTests, collectedItems, isFinished)
+    renderDerived(allTests, collectedItems, isFinished, formattedDuration )
 }
 
 exports.redraw = redraw

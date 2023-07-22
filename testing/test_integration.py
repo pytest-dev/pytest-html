@@ -650,7 +650,7 @@ class TestHTML:
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        description_index = 3
+        description_index = 4
         time_index = 2
         assert_that(get_text(page, header_selector.format(time_index))).is_equal_to(
             "Time"

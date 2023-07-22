@@ -50,6 +50,9 @@ class DataManager {
     get isFinished() {
         return this.data.runningState === 'Finished'
     }
+    get formattedDuration() {
+        return this.data.totalDuration.formatted
+    }
 }
 
 module.exports = {

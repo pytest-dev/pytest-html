@@ -3,17 +3,17 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import datetime
 import json
+import math
 import os
 import re
 import warnings
 from pathlib import Path
 
 import pytest
+from pytest_metadata.plugin import metadata_key
 
 from pytest_html import __version__
 from pytest_html import extras
-from pytest_html.table import Header
-from pytest_html.table import Row
 from pytest_html.util import cleanup_unserializable
 
 
@@ -60,8 +60,8 @@ class BaseReport:
 
         self._write_report(rendered_report)
 
-    def _generate_environment(self):
-        metadata = self._config._metadata
+    def _generate_environment(self, metadata_key):
+        metadata = self._config.stash[metadata_key]
         for key in metadata.keys():
             value = metadata[key]
             if self._is_redactable_environment_variable(key):
@@ -145,16 +145,12 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionstart(self, session):
-        config = session.config
-        if hasattr(config, "_metadata") and config._metadata:
-            self._report.set_data("environment", self._generate_environment())
+        self._report.set_data("environment", self._generate_environment(metadata_key))
 
         session.config.hook.pytest_html_report_title(report=self._report)
 
-        header_cells = Header()
-        session.config.hook.pytest_html_results_table_header(cells=header_cells)
-        self._report.set_data("resultsTableHeader", header_cells.html)
-        self._report.set_data("headerPops", header_cells.get_pops())
+        headers = self._report.data["resultsTableHeader"]
+        session.config.hook.pytest_html_results_table_header(cells=headers)
 
         self._report.set_data("runningState", "Started")
         self._generate_report()
@@ -173,7 +169,8 @@ class BaseReport:
     @pytest.hookimpl(trylast=True)
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep(
-            "-", f"Generated html report: file://{self._report_path.resolve()}"
+            "-",
+            f"Generated html report: file://{self._report_path.resolve().as_posix()}",
         )
 
     @pytest.hookimpl(trylast=True)
@@ -189,32 +186,58 @@ class BaseReport:
             )
 
         data = {
-            "duration": report.duration,
+            "result": _process_outcome(report),
+            "duration": _format_duration(report.duration),
         }
+
+        total_duration = self._report.data["totalDuration"]
+        total_duration["total"] += report.duration
+        total_duration["formatted"] = _format_duration(total_duration["total"])
 
         test_id = report.nodeid
         if report.when != "call":
             test_id += f"::{report.when}"
         data["testId"] = test_id
 
-        row_cells = Row()
-        self._config.hook.pytest_html_results_table_row(report=report, cells=row_cells)
-        if row_cells.html is None:
+        data["extras"] = self._process_extras(report, test_id)
+        links = [
+            extra
+            for extra in data["extras"]
+            if extra["format_type"] in ["json", "text", "url"]
+        ]
+        cells = [
+            f'<td class="col-result">{data["result"]}</td>',
+            f'<td class="col-name">{data["testId"]}</td>',
+            f'<td class="col-duration">{data["duration"]}</td>',
+            f'<td class="col-links">{_process_links(links)}</td>',
+        ]
+
+        self._config.hook.pytest_html_results_table_row(report=report, cells=cells)
+        if not cells:
             return
-        data["resultsTableRow"] = row_cells.html
-        for sortable, value in row_cells.sortables.items():
-            data[sortable] = value
+
+        data["resultsTableRow"] = cells
 
         processed_logs = _process_logs(report)
         self._config.hook.pytest_html_results_table_html(
             report=report, data=processed_logs
         )
 
-        data["result"] = _process_outcome(report)
-        data["extras"] = self._process_extras(report, test_id)
-
         if self._report.add_test(data, report, processed_logs):
             self._generate_report()
+
+
+def _format_duration(duration):
+    if duration < 1:
+        return "{} ms".format(round(duration * 1000))
+
+    hours = math.floor(duration / 3600)
+    remaining_seconds = duration % 3600
+    minutes = math.floor(remaining_seconds / 60)
+    remaining_seconds = remaining_seconds % 60
+    seconds = round(remaining_seconds)
+
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
 def _is_error(report):
@@ -249,3 +272,8 @@ def _process_outcome(report):
             return "XFailed"
 
     return report.outcome.capitalize()
+
+
+def _process_links(links):
+    a_tag = '<a target="_blank" href="{content}" class="col-links__extra {format_type}">{name}</a>'
+    return "".join([a_tag.format_map(link) for link in links])

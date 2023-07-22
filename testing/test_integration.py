@@ -759,25 +759,29 @@ class TestLogCapturing:
 
     @pytest.fixture
     def test_file(self):
-        return """
-            import pytest
-            import logging
-            @pytest.fixture
-            def setup():
-                logging.info("this is setup")
-                {setup}
-                yield
-                logging.info("this is teardown")
-                {teardown}
+        def formatter(assertion, setup="", teardown="", flaky=""):
+            return f"""
+                import pytest
+                import logging
+                @pytest.fixture
+                def setup():
+                    logging.info("this is setup")
+                    {setup}
+                    yield
+                    logging.info("this is teardown")
+                    {teardown}
 
-            def test_logging(setup):
-                logging.info("this is test")
-                assert {assertion}
-        """
+                {flaky}
+                def test_logging(setup):
+                    logging.info("this is test")
+                    assert {assertion}
+            """
+
+        return formatter
 
     @pytest.mark.usefixtures("log_cli")
     def test_all_pass(self, test_file, pytester):
-        pytester.makepyfile(test_file.format(setup="", teardown="", assertion=True))
+        pytester.makepyfile(test_file(assertion=True))
         page = run(pytester)
         assert_results(page, passed=1)
 
@@ -787,9 +791,7 @@ class TestLogCapturing:
 
     @pytest.mark.usefixtures("log_cli")
     def test_setup_error(self, test_file, pytester):
-        pytester.makepyfile(
-            test_file.format(setup="error", teardown="", assertion=True)
-        )
+        pytester.makepyfile(test_file(assertion=True, setup="error"))
         page = run(pytester)
         assert_results(page, error=1)
 
@@ -800,7 +802,7 @@ class TestLogCapturing:
 
     @pytest.mark.usefixtures("log_cli")
     def test_test_fails(self, test_file, pytester):
-        pytester.makepyfile(test_file.format(setup="", teardown="", assertion=False))
+        pytester.makepyfile(test_file(assertion=False))
         page = run(pytester)
         assert_results(page, failed=1)
 
@@ -813,9 +815,7 @@ class TestLogCapturing:
         "assertion, result", [(True, {"passed": 1}), (False, {"failed": 1})]
     )
     def test_teardown_error(self, test_file, pytester, assertion, result):
-        pytester.makepyfile(
-            test_file.format(setup="", teardown="error", assertion=assertion)
-        )
+        pytester.makepyfile(test_file(assertion=assertion, teardown="error"))
         page = run(pytester)
         assert_results(page, error=1, **result)
 
@@ -825,7 +825,7 @@ class TestLogCapturing:
                 assert_that(log).matches(self.LOG_LINE_REGEX.format(when))
 
     def test_no_log(self, test_file, pytester):
-        pytester.makepyfile(test_file.format(setup="", teardown="", assertion=True))
+        pytester.makepyfile(test_file(assertion=True))
         page = run(pytester)
         assert_results(page, passed=1)
 
@@ -833,6 +833,18 @@ class TestLogCapturing:
         assert_that(log).contains("No log output captured.")
         for when in ["setup", "test", "teardown"]:
             assert_that(log).does_not_match(self.LOG_LINE_REGEX.format(when))
+
+    @pytest.mark.usefixtures("log_cli")
+    def test_rerun(self, test_file, pytester):
+        pytester.makepyfile(
+            test_file(assertion=False, flaky="@pytest.mark.flaky(reruns=2)")
+        )
+        page = run(pytester, query_params={"visible": "failed"})
+        assert_results(page, failed=1, rerun=2)
+
+        log = get_log(page)
+        assert_that(log.count("Captured log setup")).is_equal_to(3)
+        assert_that(log.count("Captured log teardown")).is_equal_to(5)
 
 
 class TestCollapsedQueryParam:

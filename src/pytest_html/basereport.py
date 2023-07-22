@@ -248,15 +248,17 @@ def _process_logs(report):
     log = []
     if report.longreprtext:
         log.append(report.longreprtext.replace("<", "&lt;").replace(">", "&gt;") + "\n")
-    for section in report.sections:
-        header, content = section
-        log.append(f"{' ' + header + ' ':-^80}\n{content}")
+    # Don't add captured output to reruns
+    if report.outcome != "rerun":
+        for section in report.sections:
+            header, content = section
+            log.append(f"{' ' + header + ' ':-^80}\n{content}")
 
-        # weird formatting related to logs
-        if "log" in header:
-            log.append("")
-            if "call" in header:
+            # weird formatting related to logs
+            if "log" in header:
                 log.append("")
+                if "call" in header:
+                    log.append("")
     if not log:
         log.append("No log output captured.")
     return log

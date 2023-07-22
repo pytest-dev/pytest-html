@@ -94,7 +94,7 @@ describe('Sort tests', () => {
 
         afterEach(() => [sortMock, sortDirectionMock, managerSpy].forEach((fn) => fn.restore()))
         it('has no stored sort', () => {
-            sortMock = sinon.stub(storageModule, 'getSort').returns(null)
+            sortMock = sinon.stub(storageModule, 'getSort').returns('result')
             sortDirectionMock = sinon.stub(storageModule, 'getSortDirection').returns(null)
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 

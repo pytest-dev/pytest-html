@@ -51,7 +51,7 @@ const dom = {
             header.querySelector('#results-table-head > tr').appendChild(t.content)
         })
 
-        header.querySelector(`.sortable[data-column-type="${sortAttr}"]`).classList.add(sortAsc ? 'desc' : 'asc')
+        header.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
 
         return header
     },

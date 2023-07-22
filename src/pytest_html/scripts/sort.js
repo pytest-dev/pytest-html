@@ -24,6 +24,24 @@ const genericSort = (list, key, ascending, customOrder) => {
     return sorted
 }
 
+const durationSort = (list, ascending) => {
+    const parseDuration = (duration) => {
+        if (duration.includes(':')) {
+            // If it's in the format "HH:mm:ss"
+            const [hours, minutes, seconds] = duration.split(':').map(Number)
+            return (hours * 3600 + minutes * 60 + seconds) * 1000
+        } else {
+            // If it's in the format "nnn ms"
+            return parseInt(duration)
+        }
+    }
+    const sorted = list.sort((a, b) => parseDuration(a['duration']) - parseDuration(b['duration']))
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
 const doInitSort = () => {
     const type = storageModule.getSort()
     const ascending = storageModule.getSortDirection()
@@ -32,7 +50,18 @@ const doInitSort = () => {
     if (type?.toLowerCase() === 'original') {
         manager.setRender(list)
     } else {
-        const sortedList = genericSort(list, type, ascending, initialOrder)
+        let sortedList
+        switch (type) {
+        case 'duration':
+            sortedList = durationSort(list, ascending)
+            break
+        case 'result':
+            sortedList = genericSort(list, type, ascending, initialOrder)
+            break
+        default:
+            sortedList = genericSort(list, type, ascending)
+            break
+        }
         manager.setRender(sortedList)
     }
 }
@@ -45,7 +74,7 @@ const doSort = (type) => {
     storageModule.setSortDirection(ascending)
     const list = manager.testSubset
 
-    const sortedList = genericSort(list, type, ascending)
+    const sortedList = type === 'duration' ? durationSort(list, ascending) : genericSort(list, type, ascending)
     manager.setRender(sortedList)
 }
 

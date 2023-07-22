@@ -33,17 +33,21 @@ class ReportData:
         }
 
         collapsed = config.getini("render_collapsed")
-        if collapsed:
-            if collapsed.lower() == "true":
-                warnings.warn(
-                    "'render_collapsed = True' is deprecated and support "
-                    "will be removed in the next major release. "
-                    "Please use 'render_collapsed = all' instead.",
-                    DeprecationWarning,
-                )
-            self.set_data(
-                "renderCollapsed", [outcome.lower() for outcome in collapsed.split(",")]
+        if collapsed.lower() == "true":
+            warnings.warn(
+                "'render_collapsed = True' is deprecated and support "
+                "will be removed in the next major release. "
+                "Please use 'render_collapsed = all' instead.",
+                DeprecationWarning,
             )
+            collapsed = "all"
+
+        self.set_data(
+            "renderCollapsed", [outcome.lower() for outcome in collapsed.split(",")]
+        )
+
+        initial_sort = config.getini("initial_sort")
+        self.set_data("initialSort", initial_sort)
 
     @property
     def title(self):

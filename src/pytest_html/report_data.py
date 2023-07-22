@@ -67,7 +67,7 @@ class ReportData:
     def add_test(self, test_data, report, logs):
         # regardless of pass or fail we must add teardown logging to "call"
         if report.when == "teardown":
-            self.update_test_log(report)
+            self.append_teardown_log(report)
 
         # passed "setup" and "teardown" are not added to the html
         if report.when == "call" or (
@@ -79,12 +79,13 @@ class ReportData:
 
         return False
 
-    def update_test_log(self, report):
+    def append_teardown_log(self, report):
         log = []
-        for test in self._data["tests"][report.nodeid]:
-            if test["testId"] == report.nodeid and "log" in test:
-                for section in report.sections:
-                    header, content = section
-                    if "teardown" in header:
-                        log.append(f"{' ' + header + ' ':-^80}\n{content}")
-                test["log"] += _handle_ansi("\n".join(log))
+        if self._data["tests"][report.nodeid]:
+            # Last index is "call"
+            test = self._data["tests"][report.nodeid][-1]
+            for section in report.sections:
+                header, content = section
+                if "teardown" in header:
+                    log.append(f"{' ' + header + ' ':-^80}\n{content}")
+            test["log"] += _handle_ansi("\n".join(log))

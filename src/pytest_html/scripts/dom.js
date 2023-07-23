@@ -40,9 +40,9 @@ const dom = {
 
         return envRow
     },
-    getListHeader: ({ resultsTableHeader }) => {
+    getListHeader: ({ initialSort, resultsTableHeader }) => {
         const header = listHeader.content.cloneNode(true)
-        const sortAttr = storageModule.getSort()
+        const sortAttr = storageModule.getSort(initialSort)
         const sortAsc = JSON.parse(storageModule.getSortDirection())
 
         resultsTableHeader.forEach((html) => {

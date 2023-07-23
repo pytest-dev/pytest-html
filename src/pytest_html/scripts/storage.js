@@ -48,9 +48,13 @@ const setFilter = (currentFilter) => {
     history.pushState({}, null, unescape(url.href))
 }
 
-const getSort = () => {
+const getSort = (initialSort) => {
     const url = new URL(window.location.href)
-    return new URLSearchParams(url.search).get('sort') || 'result'
+    let sort = new URLSearchParams(url.search).get('sort')
+    if (!sort) {
+        sort = initialSort || 'result'
+    }
+    return sort
 }
 const setSort = (type) => {
     const url = new URL(window.location.href)

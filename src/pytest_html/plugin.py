@@ -51,8 +51,8 @@ def pytest_addoption(parser):
     parser.addini(
         "render_collapsed",
         type="string",
-        default="",
-        help="Open the report with all rows collapsed. Useful for very large reports",
+        default="passed",
+        help="row(s) to render collapsed on open.",
     )
     parser.addini(
         "max_asset_filename_length",
@@ -63,8 +63,14 @@ def pytest_addoption(parser):
     parser.addini(
         "environment_table_redact_list",
         type="linelist",
-        help="A list of regexes corresponding to environment "
+        help="a list of regexes corresponding to environment "
         "table variables whose values should be redacted from the report",
+    )
+    parser.addini(
+        "initial_sort",
+        type="string",
+        default="result",
+        help="column to initially sort on.",
     )
 
 

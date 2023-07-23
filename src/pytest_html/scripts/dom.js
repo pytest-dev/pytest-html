@@ -93,7 +93,7 @@ const dom = {
                 resultBody.querySelector('.extraHTML').insertAdjacentHTML('beforeend', `<div>${content}</div>`)
             }
         })
-        mediaViewer.setUp(resultBody, media)
+        mediaViewer.setup(resultBody, media)
 
         // Add custom html from the pytest_html_results_table_html hook
         tableHtml?.forEach((item) => {
@@ -104,7 +104,9 @@ const dom = {
     },
 }
 
-exports.dom = dom
-exports.htmlToElements = htmlToElements
-exports.find = find
-exports.findAll = findAll
+module.exports = {
+    dom,
+    htmlToElements,
+    find,
+    findAll,
+}

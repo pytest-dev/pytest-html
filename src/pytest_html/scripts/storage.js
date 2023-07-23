@@ -37,6 +37,7 @@ const showCategory = (categoryToShow) => {
     noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
     history.pushState({}, null, unescape(url.href))
 }
+
 const setFilter = (currentFilter) => {
     if (!possibleFilters.includes(currentFilter)) {
         return
@@ -56,6 +57,7 @@ const getSort = (initialSort) => {
     }
     return sort
 }
+
 const setSort = (type) => {
     const url = new URL(window.location.href)
     url.searchParams.set('sort', type)

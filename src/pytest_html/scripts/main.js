@@ -22,13 +22,6 @@ const renderStatic = () => {
         const table = document.querySelector('#environment')
         removeChildren(table)
         rows.forEach((row) => table.appendChild(row))
-
-        const header = document.querySelector('#environment-header')
-        header.addEventListener('click', () => {
-            table.classList.toggle('hidden')
-            header.classList.toggle('collapser')
-            header.classList.toggle('expander')
-        })
     }
     renderTitle()
     renderEnvironmentTable()
@@ -59,6 +52,7 @@ const renderContent = (tests) => {
             redraw()
         })
     })
+
     findAll('.collapsible td:not(.col-links').forEach((elem) => {
         elem.addEventListener('click', ({ target }) => {
             manager.toggleCollapsedItem(target.parentElement.dataset.id)
@@ -103,8 +97,16 @@ const bindEvents = () => {
         doFilter(testResult, element.checked)
         redraw()
     }
+
+    const header = document.querySelector('#environment-header')
+    header.addEventListener('click', () => {
+        const table = document.querySelector('#environment')
+        table.classList.toggle('hidden')
+        header.classList.toggle('collapser')
+        header.classList.toggle('expander')
+    })
+
     findAll('input[name="filter_checkbox"]').forEach((elem) => {
-        elem.removeEventListener('click', filterColumn)
         elem.addEventListener('click', filterColumn)
     })
     document.querySelector('#show_all_details').addEventListener('click', () => {
@@ -120,10 +122,12 @@ const bindEvents = () => {
 const redraw = () => {
     const { testSubset, allTests, collectedItems, isFinished, formattedDuration } = manager
 
-    renderStatic()
     renderContent(testSubset)
     renderDerived(allTests, collectedItems, isFinished, formattedDuration )
 }
 
-exports.redraw = redraw
-exports.bindEvents = bindEvents
+module.exports = {
+    redraw,
+    bindEvents,
+    renderStatic,
+}

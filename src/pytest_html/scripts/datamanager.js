@@ -3,11 +3,15 @@ const { getCollapsedCategory } = require('./storage.js')
 class DataManager {
     setManager(data) {
         const collapsedCategories = [...getCollapsedCategory(data.renderCollapsed)]
-        const dataBlob = { ...data, tests: Object.values(data.tests).flat().map((test, index) => ({
-            ...test,
-            id: `test_${index}`,
-            collapsed: collapsedCategories.includes(test.result.toLowerCase()),
-        })) }
+        const tests = Object.values(data.tests).flat().map((test, index) => {
+            const collapsed = collapsedCategories.includes(test.result.toLowerCase())
+            return {
+                ...test,
+                id: `test_${index}`,
+                collapsed,
+            }
+        })
+        const dataBlob = { ...data, tests }
         this.data = { ...dataBlob }
         this.renderData = { ...dataBlob }
     }

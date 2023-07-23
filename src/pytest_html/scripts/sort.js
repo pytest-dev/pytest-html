@@ -78,5 +78,7 @@ const doSort = (type) => {
     manager.setRender(sortedList)
 }
 
-exports.doSort = doSort
-exports.doInitSort = doInitSort
+module.exports = {
+    doInitSort,
+    doSort,
+}

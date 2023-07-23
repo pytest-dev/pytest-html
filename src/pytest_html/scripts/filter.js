@@ -18,13 +18,8 @@ const doFilter = (type, show) => {
     }
 
     const currentFilter = storageModule.getVisible()
-
-    if (currentFilter.length) {
-        const filteredSubset = getFilteredSubSet(currentFilter)
-        manager.setRender(filteredSubset)
-    } else {
-        manager.resetRender()
-    }
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
 }
 
 module.exports = {

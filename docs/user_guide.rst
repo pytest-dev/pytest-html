@@ -61,19 +61,23 @@ To modify the *Environment* section **before** tests are run, use :code:`pytest_
 
 .. code-block:: python
 
+  from pytest_metadata.plugin import metadata_key
+
+
   def pytest_configure(config):
-      config._metadata["foo"] = "bar"
+      config.stash[metadata_key]["foo"] = "bar"
 
 To modify the *Environment* section **after** tests are run, use :code:`pytest_sessionfinish`:
 
 .. code-block:: python
 
   import pytest
+  from pytest_metadata.plugin import metadata_key
 
 
   @pytest.hookimpl(tryfirst=True)
   def pytest_sessionfinish(session, exitstatus):
-      session.config._metadata["foo"] = "bar"
+      session.config.stash[metadata_key]["foo"] = "bar"
 
 Note that in the above example `@pytest.hookimpl(tryfirst=True)`_ is important, as this ensures that a best effort attempt is made to run your
 :code:`pytest_sessionfinish` **before** any other plugins ( including :code:`pytest-html` and :code:`pytest-metadata` ) run theirs.
@@ -282,7 +286,10 @@ The following values may be passed:
 Results Table Sorting
 ~~~~~~~~~~~~~~~~~~~~~
 
-You can change the sort order of the results table on page load by passing the :code:`sort` query parameter.
+You can change which column the results table is sorted on, on page load by passing the :code:`sort` query parameter.
+
+You can also set the initial sorting by setting :code:`initial_sort` in a configuration file (pytest.ini, setup.cfg, etc).
+Note that the query parameter takes precedence.
 
 The following values may be passed:
 

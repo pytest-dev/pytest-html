@@ -21,7 +21,7 @@ class MediaViewer {
 }
 
 
-const setUp = (resultBody, assets) => {
+const setup = (resultBody, assets) => {
     if (!assets.length) {
         resultBody.querySelector('.media').classList.add('hidden')
         return
@@ -71,4 +71,6 @@ const setUp = (resultBody, assets) => {
     imageEl.addEventListener('click', openImg)
 }
 
-exports.setUp = setUp
+module.exports = {
+    setup,
+}

@@ -151,6 +151,7 @@ class BaseReport:
 
         headers = self._report.data["resultsTableHeader"]
         session.config.hook.pytest_html_results_table_header(cells=headers)
+        self._report.data["resultsTableHeader"] = _fix_py(headers)
 
         self._report.set_data("runningState", "Started")
         self._generate_report()
@@ -216,6 +217,7 @@ class BaseReport:
         if not cells:
             return
 
+        cells = _fix_py(cells)
         data["resultsTableRow"] = cells
 
         processed_logs = _process_logs(report)
@@ -279,3 +281,20 @@ def _process_outcome(report):
 def _process_links(links):
     a_tag = '<a target="_blank" href="{content}" class="col-links__extra {format_type}">{name}</a>'
     return "".join([a_tag.format_map(link) for link in links])
+
+
+def _fix_py(cells):
+    # backwards-compat
+    new_cells = []
+    for html in cells:
+        if not isinstance(html, str):
+            if html.__module__.startswith("py."):
+                warnings.warn(
+                    "The 'py' module is deprecated and support "
+                    "will be removed in a future release.",
+                    DeprecationWarning,
+                )
+            html = str(html)
+            html = html.replace("col=", "data-column-type=")
+        new_cells.append(html)
+    return new_cells

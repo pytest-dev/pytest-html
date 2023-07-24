@@ -80,6 +80,43 @@ describe('Filter tests', () => {
             ])
         })
     })
+    describe('getVisible', () => {
+        let originalWindow
+
+        after(() => global.window = originalWindow)
+
+        it('returns all filters by default', () => {
+            mockWindow()
+            const visibleItems = storageModule.getVisible()
+            expect(visibleItems).to.eql(storageModule.possibleFilters)
+        })
+
+        it('returns specified filters', () => {
+            mockWindow('visible=failed,error')
+            const visibleItems = storageModule.getVisible()
+            expect(visibleItems).to.eql(['failed', 'error'])
+        })
+
+        it('handles case insensitive params', () => {
+            mockWindow('visible=fAiLeD,ERROR,passed')
+            const visibleItems = storageModule.getVisible()
+            expect(visibleItems).to.eql(['failed', 'error', 'passed'])
+        })
+
+        const falsy = [
+            { param: 'visible' },
+            { param: 'visible=' },
+            { param: 'visible=""' },
+            { param: 'visible=\'\'' },
+        ]
+        falsy.forEach(({ param }) => {
+            it(`returns no filters with ${param}`, () => {
+                mockWindow(param)
+                const visibleItems = storageModule.getVisible()
+                expect(visibleItems).to.be.empty
+            })
+        })
+    })
 })
 
 
@@ -153,18 +190,20 @@ describe('Sort tests', () => {
     })
 })
 
+const mockWindow = (queryParam) => {
+    const mock = {
+        location: {
+            href: `https://example.com/page?${queryParam}`,
+        },
+    }
+    originalWindow = global.window
+    global.window = mock
+}
+
 describe('Storage tests', () => {
     describe('getCollapsedCategory', () => {
         let originalWindow
-        const mockWindow = (queryParam) => {
-            const mock = {
-                location: {
-                    href: `https://example.com/page?${queryParam}`,
-                },
-            }
-            originalWindow = global.window
-            global.window = mock
-        }
+
         after(() => global.window = originalWindow)
 
         it('collapses passed by default', () => {

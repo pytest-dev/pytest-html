@@ -83,7 +83,7 @@ jobs:
           verbose: true
 
   test_unit:
-    name: ${{ matrix.os }} - ${{ matrix.python-version }}
+    name: ${{ matrix.os }} - ${{ matrix.python-version }} - unit
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -145,17 +145,13 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-tox-${{ matrix.python-version }}-
 
-      - name: Run unit tests
-        if: ${{ ! matrix.tox-env && matrix.with-coverage }}
-        run: tox -e py${{ matrix.python-version }}-cov -- testing/test_unit.py
+      - name: Run unit tests with coverage
+        if: ${{ matrix.with-coverage }}
+        run: tox -e ${{ matrix.python-version }}-cov -- testing/test_unit.py
 
-      - name: Run unit tests
-        if: ${{ ! matrix.tox-env && ! matrix.with-coverage }}
-        run: tox -e py${{ matrix.python-version }} -- testing/test_unit.py
-
-      - name: Run unit tests
-        if: ${{ matrix.tox-env }}
-        run: tox -e ${{ matrix.tox-env }} -- testing/test_unit.py
+      - name: Run unit tests without coverage
+        if: ${{ ! matrix.with-coverage }}
+        run: tox -e ${{ matrix.tox-env || matrix.python-version }} -- testing/test_unit.py
 
       - name: Upload coverage to codecov
         if: >-
@@ -174,10 +170,7 @@ jobs:
           verbose: true
 
   test_integration:
-    name: ubuntu - ${{ matrix.python-version }}
-    needs:
-      - test_javascript
-      - test_unit
+    name: ubuntu - ${{ matrix.python-version }} - integration
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -224,17 +217,13 @@ jobs:
           restore-keys: |
             ubuntu-latest-tox-${{ matrix.python-version }}-
 
-      - name: Run integration tests
-        if: ${{ ! matrix.tox-env && matrix.with-coverage }}
+      - name: Run integration tests with coverage
+        if: ${{ matrix.with-coverage }}
         run: tox -e ${{ matrix.python-version }}-cov -- testing/test_integration.py
 
-      - name: Run integration tests
-        if: ${{ ! matrix.tox-env && ! matrix.with-coverage }}
-        run: tox -e ${{ matrix.python-version }} -- testing/test_integration.py
-
-      - name: Run integration tests
-        if: ${{ matrix.tox-env }}
-        run: tox -e ${{ matrix.tox-env }} -- testing/test_integration.py
+      - name: Run integration tests without coverage
+        if: ${{ ! matrix.with-coverage }}
+        run: tox -e ${{ matrix.tox-env || matrix.python-version }} -- testing/test_integration.py
 
       - name: Upload coverage to codecov
         if: >-
@@ -251,3 +240,52 @@ jobs:
           flags: py_integration_tests
           name: ubuntu-latest-${{ matrix.python-version }}
           verbose: true
+
+  test_e2e:
+    name: ubuntu - ${{ matrix.python-version }} - e2e
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        include:
+          - python-version: pypy3.9
+            tox-env: py3.9
+          - python-version: 3.11-dev
+            tox-env: devel
+
+    steps:
+      - name: Set newline behavior
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v3
+
+      - name: Start chrome
+        run: ./start
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Ensure latest pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install tox
+        run: python -m pip install --upgrade tox
+
+      - name: Cache tox virtual environment
+        uses: actions/cache@v3
+        with:
+          path: .tox
+          key: ubuntu-latest-tox-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
+          restore-keys: |
+            ubuntu-latest-tox-${{ matrix.python-version }}-
+
+      - name: Run e2e tests
+        run: tox -e ${{ matrix.tox-env || matrix.python-version }} -- testing/test_e2e.py

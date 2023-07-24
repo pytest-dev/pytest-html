@@ -11,10 +11,19 @@ const possibleFilters = possibleResults.map((item) => item.result)
 
 const getVisible = () => {
     const url = new URL(window.location.href)
-    const settings = new URLSearchParams(url.search).get('visible') || ''
-    return settings ?
-        [...new Set(settings.split(',').filter((filter) => possibleFilters.includes(filter)))] : possibleFilters
+    const settings = new URLSearchParams(url.search).get('visible')
+    const lower = (item) => {
+        const lowerItem = item.toLowerCase()
+        if (possibleFilters.includes(lowerItem)) {
+            return lowerItem
+        }
+        return null
+    }
+    return settings === null ?
+        possibleFilters :
+        [...new Set(settings?.split(',').map(lower).filter((item) => item))]
 }
+
 const hideCategory = (categoryToHide) => {
     const url = new URL(window.location.href)
     const visibleParams = new URLSearchParams(url.search).get('visible')

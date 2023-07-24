@@ -7,7 +7,7 @@ const storageModule = require('../src/pytest_html/scripts/storage.js')
 
 
 const setTestData = () => {
-    const jsonDatan = {
+    const jsonData = {
         'tests':
             [
                 {
@@ -36,7 +36,17 @@ const setTestData = () => {
                 },
             ],
     }
-    dataModule.manager.setManager(jsonDatan)
+    dataModule.manager.setManager(jsonData)
+}
+
+const mockWindow = (queryParam) => {
+    const mock = {
+        location: {
+            href: `https://example.com/page?${queryParam}`,
+        },
+    }
+    originalWindow = global.window
+    global.window = mock
 }
 
 describe('Filter tests', () => {
@@ -189,16 +199,6 @@ describe('Sort tests', () => {
         })
     })
 })
-
-const mockWindow = (queryParam) => {
-    const mock = {
-        location: {
-            href: `https://example.com/page?${queryParam}`,
-        },
-    }
-    originalWindow = global.window
-    global.window = mock
-}
 
 describe('Storage tests', () => {
     describe('getCollapsedCategory', () => {

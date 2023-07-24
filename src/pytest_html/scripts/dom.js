@@ -1,9 +1,7 @@
-const storageModule = require('./storage.js')
 const mediaViewer = require('./mediaviewer.js')
 const templateEnvRow = document.querySelector('#template_environment_row')
 const templateCollGroup = document.querySelector('#template_table-colgroup')
 const templateResult = document.querySelector('#template_results-table__tbody')
-const listHeader = document.querySelector('#template_results-table__head')
 const listHeaderEmpty = document.querySelector('#template_results-table__head--empty')
 
 function htmlToElements(html) {
@@ -39,21 +37,6 @@ const dom = {
         td[1].appendChild(valuesElement)
 
         return envRow
-    },
-    getListHeader: ({ initialSort, resultsTableHeader }) => {
-        const header = listHeader.content.cloneNode(true)
-        const sortAttr = storageModule.getSort(initialSort)
-        const sortAsc = JSON.parse(storageModule.getSortDirection())
-
-        resultsTableHeader.forEach((html) => {
-            const t = document.createElement('template')
-            t.innerHTML = html
-            header.querySelector('#results-table-head > tr').appendChild(t.content)
-        })
-
-        header.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
-
-        return header
     },
     getListHeaderEmpty: () => listHeaderEmpty.content.cloneNode(true),
     getColGroup: () => templateCollGroup.content.cloneNode(true),

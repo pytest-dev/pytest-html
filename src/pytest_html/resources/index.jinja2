@@ -55,6 +55,9 @@
     <template id="template_results-table__head">
       <thead id="results-table-head">
         <tr>
+        {% for th in table_head %}
+        {{ th|safe }}
+        {% endfor %}
         </tr>
       </thead>
     </template>

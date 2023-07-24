@@ -2,7 +2,7 @@ const { dom, findAll } = require('./dom.js')
 const { manager } = require('./datamanager.js')
 const { doSort } = require('./sort.js')
 const { doFilter } = require('./filter.js')
-const { getVisible, possibleResults } = require('./storage.js')
+const { getVisible, getSort, getSortDirection, possibleResults } = require('./storage.js')
 
 const removeChildren = (node) => {
     while (node.firstChild) {
@@ -28,10 +28,15 @@ const renderStatic = () => {
 }
 
 const renderContent = (tests) => {
+    const sortAttr = getSort(manager.allData.initialSort)
+    const sortAsc = JSON.parse(getSortDirection())
     const rows = tests.map(dom.getResultTBody)
     const table = document.querySelector('#results-table')
+    const tableHeader = document.getElementById('template_results-table__head').content.cloneNode(true)
+
     removeChildren(table)
-    const tableHeader = dom.getListHeader(manager.renderData)
+
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
     if (!rows.length) {
         tableHeader.appendChild(dom.getListHeaderEmpty())
     }

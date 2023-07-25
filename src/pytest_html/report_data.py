@@ -29,7 +29,6 @@ class ReportData:
         }
 
         self._data = {
-            "title": "",
             "collectedItems": 0,
             "totalDuration": 0,
             "runningState": "not_started",

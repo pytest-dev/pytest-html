@@ -11,19 +11,13 @@ const removeChildren = (node) => {
 }
 
 const renderStatic = () => {
-    const renderTitle = () => {
-        const title = manager.title
-        document.querySelector('#title').innerText = title
-        document.querySelector('#head-title').innerText = title
-    }
     const renderEnvironmentTable = () => {
         const environment = manager.environment
         const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
-        const table = document.querySelector('#environment')
+        const table = document.getElementById('environment')
         removeChildren(table)
         rows.forEach((row) => table.appendChild(row))
     }
-    renderTitle()
     renderEnvironmentTable()
 }
 
@@ -31,7 +25,7 @@ const renderContent = (tests) => {
     const sortAttr = getSort(manager.allData.initialSort)
     const sortAsc = JSON.parse(getSortDirection())
     const rows = tests.map(dom.getResultTBody)
-    const table = document.querySelector('#results-table')
+    const table = document.getElementById('results-table')
     const tableHeader = document.getElementById('template_results-table__head').content.cloneNode(true)
 
     removeChildren(table)
@@ -40,7 +34,6 @@ const renderContent = (tests) => {
     if (!rows.length) {
         tableHeader.appendChild(dom.getListHeaderEmpty())
     }
-    table.appendChild(dom.getColGroup())
     table.appendChild(tableHeader)
 
     rows.forEach((row) => !!row && table.appendChild(row))
@@ -66,7 +59,7 @@ const renderContent = (tests) => {
     })
 }
 
-const renderDerived = (tests, collectedItems, isFinished, formattedDuration) => {
+const renderDerived = () => {
     const currentFilter = getVisible()
     possibleFilters.forEach((result) => {
         const input = document.querySelector(`input[data-test-result="${result}"]`)
@@ -83,9 +76,9 @@ const bindEvents = () => {
         redraw()
     }
 
-    const header = document.querySelector('#environment-header')
+    const header = document.getElementById('environment-header')
     header.addEventListener('click', () => {
-        const table = document.querySelector('#environment')
+        const table = document.getElementById('environment')
         table.classList.toggle('hidden')
         header.classList.toggle('collapser')
         header.classList.toggle('expander')
@@ -94,21 +87,21 @@ const bindEvents = () => {
     findAll('input[name="filter_checkbox"]').forEach((elem) => {
         elem.addEventListener('click', filterColumn)
     })
-    document.querySelector('#show_all_details').addEventListener('click', () => {
+    document.getElementById('show_all_details').addEventListener('click', () => {
         manager.allCollapsed = false
         redraw()
     })
-    document.querySelector('#hide_all_details').addEventListener('click', () => {
+    document.getElementById('hide_all_details').addEventListener('click', () => {
         manager.allCollapsed = true
         redraw()
     })
 }
 
 const redraw = () => {
-    const { testSubset, allTests, collectedItems, isFinished, formattedDuration } = manager
+    const { testSubset } = manager
 
     renderContent(testSubset)
-    renderDerived(allTests, collectedItems, isFinished, formattedDuration )
+    renderDerived()
 }
 
 module.exports = {

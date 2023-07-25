@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8"/>
-    <title id="head-title"></title>
+    <title id="head-title">{{ title }}</title>
     {%- if self_contained %}
       <style type="text/css">
         {{- styles|safe }}
@@ -12,7 +12,7 @@
     {%- endif %}
   </head>
   <body>
-    <h1 id="title"></h1>
+    <h1 id="title">{{ title }}</h1>
     <p>Report generated on {{ date }} at {{ time }} by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
         v{{ version }}</p>
     <div id="environment-header" class="collapser">
@@ -65,14 +65,6 @@
       <tr id="not-found-message">
         <th colspan="4">No results found. Check the filters.</th>
       </tr>
-    </template>
-    <template id="template_table-colgroup">
-      <colgroup>
-        <col span="1" style="width: 25%;">
-        <col span="1" style="width: 25%;">
-        <col span="1" style="width: 25%;">
-        <col span="1" style="width: 25%;">
-      </colgroup>
     </template>
     <!-- END TEMPLATES -->
     <div class="summary">

@@ -46,15 +46,18 @@ class BaseReport:
 
     def _generate_report(self, self_contained=False):
         generated = datetime.datetime.now()
-        rendered_report = self._render_html(
-            generated.strftime("%d-%b-%Y"),
-            generated.strftime("%H:%M:%S"),
-            __version__,
-            self.css,
+        test_data = cleanup_unserializable(self._report.data)
+        test_data = json.dumps(test_data)
+        rendered_report = self._template.render(
+            title=self._report.title,
+            date=generated.strftime("%d-%b-%Y"),
+            time=generated.strftime("%H:%M:%S"),
+            version=__version__,
+            styles=self.css,
             run_count=self._run_count(),
             self_contained=self_contained,
             outcomes=self._report.data["outcomes"],
-            test_data=cleanup_unserializable(self._report.data),
+            test_data=test_data,
             table_head=self._report.data["resultsTableHeader"],
             prefix=self._report.data["additionalSummary"]["prefix"],
             summary=self._report.data["additionalSummary"]["summary"],
@@ -117,36 +120,6 @@ class BaseReport:
                 )
 
         return report_extras
-
-    def _render_html(
-        self,
-        date,
-        time,
-        version,
-        styles,
-        run_count,
-        self_contained,
-        outcomes,
-        test_data,
-        table_head,
-        summary,
-        prefix,
-        postfix,
-    ):
-        return self._template.render(
-            date=date,
-            time=time,
-            version=version,
-            styles=styles,
-            run_count=run_count,
-            self_contained=self_contained,
-            outcomes=outcomes,
-            test_data=json.dumps(test_data),
-            table_head=table_head,
-            summary=summary,
-            prefix=prefix,
-            postfix=postfix,
-        )
 
     def _write_report(self, rendered_report):
         with self._report_path.open("w", encoding="utf-8") as f:

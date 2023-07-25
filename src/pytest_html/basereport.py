@@ -51,6 +51,7 @@ class BaseReport:
             generated.strftime("%H:%M:%S"),
             __version__,
             self.css,
+            run_count=self._run_count(),
             self_contained=self_contained,
             outcomes=self._report.data["outcomes"],
             test_data=cleanup_unserializable(self._report.data),
@@ -123,6 +124,7 @@ class BaseReport:
         time,
         version,
         styles,
+        run_count,
         self_contained,
         outcomes,
         test_data,
@@ -136,6 +138,7 @@ class BaseReport:
             time=time,
             version=version,
             styles=styles,
+            run_count=run_count,
             self_contained=self_contained,
             outcomes=outcomes,
             test_data=json.dumps(test_data),
@@ -148,6 +151,24 @@ class BaseReport:
     def _write_report(self, rendered_report):
         with self._report_path.open("w", encoding="utf-8") as f:
             f.write(rendered_report)
+
+    def _run_count(self):
+        data = self._report.data
+        relevant_outcomes = ["passed", "failed", "xpassed", "xfailed"]
+        counts = 0
+        for outcome in data["outcomes"].keys():
+            if outcome in relevant_outcomes:
+                counts += data["outcomes"][outcome]["value"]
+
+        plural = counts > 1
+        duration = _format_duration(data["totalDuration"])
+
+        if data["runningState"].lower() == "finished":
+            return f"{counts} {'tests' if plural else 'test'} took {duration}."
+
+        return (
+            f"{counts}/{data['collectedItems']} {'tests' if plural else 'test'} done."
+        )
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionstart(self, session):
@@ -197,10 +218,7 @@ class BaseReport:
             "result": outcome,
             "duration": _format_duration(report.duration),
         }
-
-        total_duration = self._report.data["totalDuration"]
-        total_duration["total"] += report.duration
-        total_duration["formatted"] = _format_duration(total_duration["total"])
+        self._report.data["totalDuration"] += report.duration
 
         test_id = report.nodeid
         if report.when != "call":

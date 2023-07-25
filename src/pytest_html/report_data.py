@@ -31,10 +31,7 @@ class ReportData:
         self._data = {
             "title": "",
             "collectedItems": 0,
-            "totalDuration": {
-                "total": 0,
-                "formatted": "",
-            },
+            "totalDuration": 0,
             "runningState": "not_started",
             "environment": {},
             "outcomes": outcomes,

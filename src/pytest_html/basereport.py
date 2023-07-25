@@ -52,6 +52,7 @@ class BaseReport:
             __version__,
             self.css,
             self_contained=self_contained,
+            outcomes=self._report.data["outcomes"],
             test_data=cleanup_unserializable(self._report.data),
             table_head=self._report.data["resultsTableHeader"],
             prefix=self._report.data["additionalSummary"]["prefix"],
@@ -123,6 +124,7 @@ class BaseReport:
         version,
         styles,
         self_contained,
+        outcomes,
         test_data,
         table_head,
         summary,
@@ -135,6 +137,7 @@ class BaseReport:
             version=version,
             styles=styles,
             self_contained=self_contained,
+            outcomes=outcomes,
             test_data=json.dumps(test_data),
             table_head=table_head,
             summary=summary,
@@ -189,8 +192,9 @@ class BaseReport:
                 DeprecationWarning,
             )
 
+        outcome = _process_outcome(report)
         data = {
-            "result": _process_outcome(report),
+            "result": outcome,
             "duration": _format_duration(report.duration),
         }
 
@@ -222,6 +226,10 @@ class BaseReport:
 
         cells = _fix_py(cells)
         data["resultsTableRow"] = cells
+
+        # don't count passed setups and teardowns
+        if not (report.when in ["setup", "teardown"] and report.outcome == "passed"):
+            self._report.data["outcomes"][outcome.lower()]["value"] += 1
 
         processed_logs = _process_logs(report)
         self._config.hook.pytest_html_results_table_html(

@@ -18,6 +18,16 @@ class ReportData:
             "<th>Links</th>",
         ]
 
+        outcomes = {
+            "failed": {"label": "Failed", "value": 0},
+            "passed": {"label": "Passed", "value": 0},
+            "skipped": {"label": "Skipped", "value": 0},
+            "xfailed": {"label": "Unexpected failures", "value": 0},
+            "xpassed": {"label": "Unexpected passes", "value": 0},
+            "error": {"label": "Errors", "value": 0},
+            "rerun": {"label": "Reruns", "value": 0},
+        }
+
         self._data = {
             "title": "",
             "collectedItems": 0,
@@ -27,6 +37,7 @@ class ReportData:
             },
             "runningState": "not_started",
             "environment": {},
+            "outcomes": outcomes,
             "tests": defaultdict(list),
             "additionalSummary": defaultdict(list),
             "resultsTableHeader": default_headers,

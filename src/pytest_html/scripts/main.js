@@ -2,7 +2,7 @@ const { dom, findAll } = require('./dom.js')
 const { manager } = require('./datamanager.js')
 const { doSort } = require('./sort.js')
 const { doFilter } = require('./filter.js')
-const { getVisible, getSort, getSortDirection, possibleResults } = require('./storage.js')
+const { getVisible, getSort, getSortDirection, possibleFilters } = require('./storage.js')
 
 const removeChildren = (node) => {
     while (node.firstChild) {
@@ -68,17 +68,8 @@ const renderContent = (tests) => {
 
 const renderDerived = (tests, collectedItems, isFinished, formattedDuration) => {
     const currentFilter = getVisible()
-    possibleResults.forEach(({ result, label }) => {
-        const count = tests.filter((test) => test.result.toLowerCase() === result).length
+    possibleFilters.forEach((result) => {
         const input = document.querySelector(`input[data-test-result="${result}"]`)
-        const lastInput = document.querySelector(`input[data-test-result="${result}"]:last-of-type`)
-        document.querySelector(`.${result}`).innerText = `${count} ${label}`
-        // add a comma and whitespace between the results
-        if (input !== lastInput) {
-            document.querySelector(`.${result}`).innerText += ', '
-        }
-
-        input.disabled = !count
         input.checked = currentFilter.includes(result)
     })
 

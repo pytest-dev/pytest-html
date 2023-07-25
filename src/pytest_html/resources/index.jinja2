@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8"/>
     <title id="head-title"></title>
-    {% if self_contained %}
+    {%- if self_contained %}
       <style type="text/css">
         {{- styles|safe }}
       </style>
     {% else %}
       <link href="{{ styles }}" rel="stylesheet" type="text/css"/>
-    {% endif %}
+    {%- endif %}
   </head>
   <body>
     <h1 id="title"></h1>
@@ -55,9 +55,9 @@
     <template id="template_results-table__head">
       <thead id="results-table-head">
         <tr>
-        {% for th in table_head %}
-        {{ th|safe }}
-        {% endfor %}
+        {%- for th in table_head %}
+          {{ th|safe }}
+        {%- endfor %}
         </tr>
       </thead>
     </template>
@@ -78,9 +78,9 @@
     <div class="summary">
       <div class="summary__data">
         <h2>Summary</h2>
-        {% for p in prefix %}
+        {%- for p in prefix %}
         {{ p|safe }}
-        {% endfor %}
+        {%- endfor %}
         <p class="run-count"></p>
         <p class="filter">(Un)check the boxes to filter the results.</p>
         <div class="summary__reload">
@@ -91,13 +91,10 @@
         <div class="summary__spacer"></div>
           <div class="controls">
             <div class="filters">
-              <input checked="true" class="filter" data-test-result="failed" name="filter_checkbox" type="checkbox"/><span class="failed"></span>
-              <input checked="true" class="filter" data-test-result="passed" name="filter_checkbox" type="checkbox"/><span class="passed"></span>
-              <input checked="true" class="filter" data-test-result="skipped" name="filter_checkbox" type="checkbox"/><span class="skipped"></span>
-              <input checked="true" class="filter" data-test-result="xfailed" name="filter_checkbox" type="checkbox"/><span class="xfailed"></span>
-              <input checked="true" class="filter" data-test-result="xpassed" name="filter_checkbox" type="checkbox"/><span class="xpassed"></span>
-              <input checked="true" class="filter" data-test-result="error" name="filter_checkbox" type="checkbox"/><span class="error"></span>
-              <input checked="true" class="filter" data-test-result="rerun" name="filter_checkbox" type="checkbox"/><span class="rerun"></span>
+            {%- for result, values in outcomes.items() %}
+              <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}/>
+              <span class="{{ result }}">{{ values["value"] }} {{ values["label"] }}{{ "," if result != "rerun" }}</span>
+            {%- endfor %}
             </div>
             <div class="collapse">
               <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
@@ -105,13 +102,12 @@
           </div>
         </div>
       </div>
-    {% for s in summary %}
+    {%- for s in summary %}
     {{ s|safe }}
-    {% endfor %}
-    {% for p in postfix %}
+    {%- endfor %}
+    {%- for p in postfix %}
     {{ p|safe }}
-    {% endfor %}
-
+    {%- endfor %}
     <table id="results-table"></table>
   </body>
   <footer>

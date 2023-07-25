@@ -72,17 +72,6 @@ const renderDerived = (tests, collectedItems, isFinished, formattedDuration) => 
         const input = document.querySelector(`input[data-test-result="${result}"]`)
         input.checked = currentFilter.includes(result)
     })
-
-    const numberOfTests = tests.filter(({ result }) =>
-        ['Passed', 'Failed', 'XPassed', 'XFailed'].includes(result)).length
-
-    if (isFinished) {
-        const testWord = numberOfTests > 1 ? 'tests' : 'test'
-        document.querySelector('.run-count').innerText = `${numberOfTests} ${testWord} took ${formattedDuration}.`
-        document.querySelector('.summary__reload__button').classList.add('hidden')
-    } else {
-        document.querySelector('.run-count').innerText = `${numberOfTests} / ${collectedItems} tests done`
-    }
 }
 
 const bindEvents = () => {

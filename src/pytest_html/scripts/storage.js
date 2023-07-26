@@ -1,13 +1,12 @@
-const possibleResults = [
-    { result: 'passed', label: 'Passed' },
-    { result: 'skipped', label: 'Skipped' },
-    { result: 'failed', label: 'Failed' },
-    { result: 'error', label: 'Errors' },
-    { result: 'xfailed', label: 'Unexpected failures' },
-    { result: 'xpassed', label: 'Unexpected passes' },
-    { result: 'rerun', label: 'Reruns' },
+const possibleFilters = [
+    'passed',
+    'skipped',
+    'failed',
+    'error',
+    'xfailed',
+    'xpassed',
+    'rerun',
 ]
-const possibleFilters = possibleResults.map((item) => item.result)
 
 const getVisible = () => {
     const url = new URL(window.location.href)
@@ -113,5 +112,4 @@ module.exports = {
     setSortDirection,
     getCollapsedCategory,
     possibleFilters,
-    possibleResults,
 }

@@ -3,10 +3,12 @@ class MediaViewer {
         this.assets = assets
         this.index = 0
     }
+
     nextActive() {
         this.index = this.index === this.assets.length - 1 ? 0 : this.index + 1
         return [this.activeFile, this.index]
     }
+
     prevActive() {
         this.index = this.index === 0 ? this.assets.length - 1 : this.index -1
         return [this.activeFile, this.index]
@@ -15,6 +17,7 @@ class MediaViewer {
     get currentIndex() {
         return this.index
     }
+
     get activeFile() {
         return this.assets[this.index]
     }

@@ -80,8 +80,7 @@ const bindEvents = () => {
     header.addEventListener('click', () => {
         const table = document.getElementById('environment')
         table.classList.toggle('hidden')
-        header.classList.toggle('collapser')
-        header.classList.toggle('expander')
+        header.classList.toggle('collapsed')
     })
 
     findAll('input[name="filter_checkbox"]').forEach((elem) => {

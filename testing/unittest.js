@@ -76,11 +76,8 @@ describe('Filter tests', () => {
         })
     })
     describe('doFilter', () => {
-        let setFilterMock
-        afterEach(() => setFilterMock.restore())
         it('removes all but passed', () => {
             getFilterMock = sinon.stub(storageModule, 'getVisible').returns(['passed'])
-            setFilterMock = sinon.stub(storageModule, 'setFilter')
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
             doFilter('passed', true)

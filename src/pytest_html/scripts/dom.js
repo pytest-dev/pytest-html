@@ -50,7 +50,6 @@ const dom = {
             t.innerHTML = html
             resultBody.querySelector('.collapsible').appendChild(t.content)
         })
-        resultBody.querySelector('.collapsible > td')?.classList.add(`${collapsed ? 'expander' : 'collapser'}`)
 
         if (log) {
             // Wrap lines starting with "E" with span.error to color those lines red
@@ -61,7 +60,10 @@ const dom = {
         }
 
         if (collapsed) {
+            resultBody.querySelector('.collapsible > td')?.classList.add('collapsed')
             resultBody.querySelector('.extras-row').classList.add('hidden')
+        } else {
+            resultBody.querySelector('.collapsible > td')?.classList.remove('collapsed')
         }
 
         const media = []

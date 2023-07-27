@@ -7,7 +7,7 @@ const getFilteredSubSet = (filter) =>
 const doInitFilter = () => {
     const currentFilter = storageModule.getVisible()
     const resultsTable = document.getElementById('results-table')
-    storageModule.possibleFilters.forEach(result => {
+    storageModule.possibleFilters.forEach((result) => {
         const rows = resultsTable.getElementsByClassName(`results-table-row ${result}`)
         const rowsToShow = currentFilter.includes(result) ? rows : []
         const rowsToHide = currentFilter.includes(result) ? [] : rows
@@ -33,7 +33,7 @@ const doFilter = (type, show) => {
 
     const currentFilter = storageModule.getVisible()
     const resultsTable = document.getElementById('results-table')
-    storageModule.possibleFilters.forEach(result => {
+    storageModule.possibleFilters.forEach((result) => {
         const rows = resultsTable.getElementsByClassName(`results-table-row ${result}`)
         const rowsToShow = currentFilter.includes(result) ? rows : []
         const rowsToHide = currentFilter.includes(result) ? [] : rows

@@ -35,12 +35,12 @@ class DataManager {
     }
 
     set allCollapsed(collapsed) {
-        console.log("render data before:")
+        console.log('render data before:')
         console.log(this.renderData)
         this.renderData = { ...this.renderData, tests: [...this.renderData.tests.map((test) => (
             { ...test, collapsed }
         ))] }
-        console.log("render data after:")
+        console.log('render data after:')
         console.log(this.renderData)
     }
 

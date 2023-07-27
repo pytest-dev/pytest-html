@@ -73,7 +73,7 @@ const bindEvents = () => {
         const { testResult } = element.dataset
 
         doFilter(testResult, element.checked)
-        redraw()
+        // redraw()
     }
 
     const header = document.getElementById('environment-header')

@@ -88,7 +88,7 @@ def get_text(page, selector):
 
 
 def is_collapsed(page, test_name):
-    return get_element(page, f".summary tbody[id$='{test_name}'] .expander")
+    return get_element(page, f".summary tbody[id$='{test_name}'] .collapsed")
 
 
 def get_log(page, test_id=None):

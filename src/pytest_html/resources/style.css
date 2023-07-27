@@ -164,10 +164,6 @@ div.media {
   align-items: center;
 }
 
-.collapsed {
-  display: none;
-}
-
 .collapsible td:not(.col-links) {
   cursor: pointer;
 }
@@ -177,15 +173,15 @@ div.media {
   cursor: pointer;
 }
 
-.col-result.collapser:hover::after {
+.col-result:hover::after {
   content: " (hide details)";
 }
 
-.col-result.expander:hover::after {
+.col-result.collapsed:hover::after {
   content: " (show details)";
 }
 
-#environment-header.collapser h2:hover::after {
+#environment-header h2:hover::after {
   content: " (hide details)";
   color: #bbb;
   font-style: italic;
@@ -193,7 +189,7 @@ div.media {
   font-size: 12px;
 }
 
-#environment-header.expander h2:hover::after {
+#environment-header.collapsed h2:hover::after {
   content: " (show details)";
   color: #bbb;
   font-style: italic;

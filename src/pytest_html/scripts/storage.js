@@ -38,22 +38,12 @@ const showCategory = (categoryToShow) => {
         return
     }
     const url = new URL(window.location.href)
-    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',') || [...possibleFilters]
+    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',').filter(Boolean) ||
+        [...possibleFilters]
     const settings = [...new Set([categoryToShow, ...currentVisible])]
     const noFilter = possibleFilters.length === settings.length || !settings.length
 
     noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
-    history.pushState({}, null, unescape(url.href))
-}
-
-const setFilter = (currentFilter) => {
-    if (!possibleFilters.includes(currentFilter)) {
-        return
-    }
-    const url = new URL(window.location.href)
-    const settings = [currentFilter, ...new Set(new URLSearchParams(url.search).get('filter').split(','))]
-
-    url.searchParams.set('filter', settings)
     history.pushState({}, null, unescape(url.href))
 }
 
@@ -103,7 +93,6 @@ const setSortDirection = (ascending) => sessionStorage.setItem('sortAsc', ascend
 
 module.exports = {
     getVisible,
-    setFilter,
     hideCategory,
     showCategory,
     getSort,

@@ -182,9 +182,6 @@ div.media {
   flex: 0 0 25px;
   align-items: center;
 }
-.collapsed {
-  display: none;
-}
 
 @mixin rowToggle {
   color: #bbb;
@@ -199,25 +196,25 @@ div.media {
   }
 }
 
-.col-result.collapser {
+.col-result {
   &:hover::after {
     content: ' (hide details)';
   }
 }
-.col-result.expander {
+.col-result.collapsed {
   &:hover::after {
     content: ' (show details)';
   }
 }
 
-#environment-header.collapser h2 {
+#environment-header h2 {
   &:hover::after {
     content: ' (hide details)';
     @include rowToggle;
     font-size: $font-size-text;
   }
 }
-#environment-header.expander h2 {
+#environment-header.collapsed h2 {
   &:hover::after {
     content: ' (show details)';
     @include rowToggle;

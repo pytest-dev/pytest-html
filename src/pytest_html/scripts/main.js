@@ -38,16 +38,13 @@ const renderContent = (tests) => {
     removeChildren(table)
 
     tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
-    if (!rows.length) {
-        tableHeader.appendChild(dom.getListHeaderEmpty())
-    }
     table.appendChild(tableHeader)
+    if (!rows.length) {
+        const emptyTable = document.getElementById('template_results-table__body--empty').content.cloneNode(true)
+        table.appendChild(emptyTable)
+    }
 
     rows.forEach((row) => !!row && table.appendChild(row))
-
-    table.querySelectorAll('.extra').forEach((item) => {
-        item.colSpan = document.querySelectorAll('th').length
-    })
 
     findAll('.sortable').forEach((elem) => {
         elem.addEventListener('click', (evt) => {

@@ -1,7 +1,6 @@
 const mediaViewer = require('./mediaviewer.js')
 const templateEnvRow = document.getElementById('template_environment_row')
 const templateResult = document.getElementById('template_results-table__tbody')
-const listHeaderEmpty = document.getElementById('template_results-table__head--empty')
 
 function htmlToElements(html) {
     const temp = document.createElement('template')
@@ -37,7 +36,6 @@ const dom = {
 
         return envRow
     },
-    getListHeaderEmpty: () => listHeaderEmpty.content.cloneNode(true),
     getResultTBody: ({ testId, id, log, duration, extras, resultsTableRow, tableHtml, result, collapsed }) => {
         const resultLower = result.toLowerCase()
         const resultBody = templateResult.content.cloneNode(true)

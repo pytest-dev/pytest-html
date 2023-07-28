@@ -26,12 +26,27 @@
         <td></td>
       </tr>
     </template>
+    <template id="template_results-table__head">
+      <thead id="results-table-head">
+        <tr>
+        {%- for th in table_head %}
+          {{ th|safe }}
+        {%- endfor %}
+        </tr>
+      </thead>
+    </template>
+    <template id="template_results-table__body--empty">
+      <tbody class="results-table-row">
+        <tr id="not-found-message">
+          <td colspan="{{ table_head|length }}">No results found. Check the filters.</th>
+        </tr>
+    </template>
     <template id="template_results-table__tbody">
       <tbody class="results-table-row">
         <tr class="collapsible">
         </tr>
         <tr class="extras-row">
-          <td class="extra" colspan="4">
+          <td class="extra" colspan="{{ table_head|length }}">
             <div class="extraHTML"></div>
             <div class="media">
               <div class="media-container">
@@ -52,27 +67,15 @@
         </tr>
       </tbody>
     </template>
-    <template id="template_results-table__head">
-      <thead id="results-table-head">
-        <tr>
-        {%- for th in table_head %}
-          {{ th|safe }}
-        {%- endfor %}
-        </tr>
-      </thead>
-    </template>
-    <template id="template_results-table__head--empty">
-      <tr id="not-found-message">
-        <th colspan="4">No results found. Check the filters.</th>
-      </tr>
-    </template>
     <!-- END TEMPLATES -->
     <div class="summary">
       <div class="summary__data">
         <h2>Summary</h2>
-        {%- for p in additional_summary['prefix'] %}
-        {{ p|safe }}
-        {%- endfor %}
+        <div class="additional-summary prefix">
+          {%- for p in additional_summary['prefix'] %}
+          {{ p|safe }}
+          {%- endfor %}
+        </div>
         <p class="run-count">{{ run_count }}</p>
         <p class="filter">(Un)check the boxes to filter the results.</p>
         <div class="summary__reload">
@@ -81,25 +84,29 @@
           </div>
         </div>
         <div class="summary__spacer"></div>
-          <div class="controls">
-            <div class="filters">
-            {%- for result, values in outcomes.items() %}
-              <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}/>
-              <span class="{{ result }}">{{ values["value"] }} {{ values["label"] }}{{ "," if result != "rerun" }}</span>
-            {%- endfor %}
-            </div>
-            <div class="collapse">
-              <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
-            <div>
+        <div class="controls">
+          <div class="filters">
+          {%- for result, values in outcomes.items() %}
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}/>
+            <span class="{{ result }}">{{ values["value"] }} {{ values["label"] }}{{ "," if result != "rerun" }}</span>
+          {%- endfor %}
+          </div>
+          <div class="collapse">
+            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
           </div>
         </div>
       </div>
-    {%- for s in additional_summary['summary'] %}
-    {{ s|safe }}
-    {%- endfor %}
-    {%- for p in additional_summary['postfix'] %}
-    {{ p|safe }}
-    {%- endfor %}
+      <div class="additional-summary summary">
+        {%- for s in additional_summary['summary'] %}
+        {{ s|safe }}
+        {%- endfor %}
+      </div>
+      <div class="additional-summary postfix">
+        {%- for p in additional_summary['postfix'] %}
+        {{ p|safe }}
+        {%- endfor %}
+      </div>
+    </div>
     <table id="results-table"></table>
   </body>
   <footer>

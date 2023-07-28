@@ -137,6 +137,10 @@ div.media {
   height: 200px;
 }
 
+.media-container--fullscreen {
+  grid-template-columns: 0px auto 0px;
+}
+
 .media-container__nav--right,
 .media-container__nav--left {
   text-align: center;

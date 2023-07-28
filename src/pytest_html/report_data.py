@@ -11,14 +11,17 @@ class ReportData:
     def __init__(self, config):
         self._config = config
 
-        default_headers = [
-            '<th class="sortable" data-column-type="result">Result</th>',
-            '<th class="sortable" data-column-type="testId">Test</th>',
-            '<th class="sortable" data-column-type="duration">Duration</th>',
-            "<th>Links</th>",
-        ]
+        self._additional_summary = {
+            "prefix": [],
+            "summary": [],
+            "postfix": [],
+        }
 
-        outcomes = {
+        self._collected_items = 0
+        self._total_duration = 0
+        self._running_state = "not_started"
+
+        self._outcomes = {
             "failed": {"label": "Failed", "value": 0},
             "passed": {"label": "Passed", "value": 0},
             "skipped": {"label": "Skipped", "value": 0},
@@ -28,15 +31,17 @@ class ReportData:
             "rerun": {"label": "Reruns", "value": 0},
         }
 
+        self._results_table_header = [
+            '<th class="sortable" data-column-type="result">Result</th>',
+            '<th class="sortable" data-column-type="testId">Test</th>',
+            '<th class="sortable" data-column-type="duration">Duration</th>',
+            "<th>Links</th>",
+        ]
+
         self._data = {
-            "collectedItems": 0,
-            "totalDuration": 0,
-            "runningState": "not_started",
             "environment": {},
-            "outcomes": outcomes,
             "tests": defaultdict(list),
-            "additionalSummary": defaultdict(list),
-            "resultsTableHeader": default_headers,
+            "resultsTableRow": None,
         }
 
         collapsed = config.getini("render_collapsed")
@@ -49,12 +54,60 @@ class ReportData:
             )
             collapsed = "all"
 
-        self.set_data(
-            "renderCollapsed", [outcome.lower() for outcome in collapsed.split(",")]
-        )
+        self._data["renderCollapsed"] = [
+            outcome.lower() for outcome in collapsed.split(",")
+        ]
 
         initial_sort = config.getini("initial_sort")
-        self.set_data("initialSort", initial_sort)
+        self._data["initialSort"] = initial_sort
+
+    @property
+    def additional_summary(self):
+        return self._additional_summary
+
+    @additional_summary.setter
+    def additional_summary(self, value):
+        self._additional_summary = value
+
+    @property
+    def collected_items(self):
+        return self._collected_items
+
+    @collected_items.setter
+    def collected_items(self, count):
+        self._collected_items = count
+
+    @property
+    def config(self):
+        return self._config
+
+    @property
+    def data(self):
+        return self._data
+
+    @property
+    def outcomes(self):
+        return self._outcomes
+
+    @outcomes.setter
+    def outcomes(self, outcome):
+        self._outcomes[outcome.lower()]["value"] += 1
+
+    @property
+    def running_state(self):
+        return self._running_state
+
+    @running_state.setter
+    def running_state(self, state):
+        self._running_state = state
+
+    @property
+    def table_header(self):
+        return self._results_table_header
+
+    @table_header.setter
+    def table_header(self, header):
+        self._results_table_header = header
 
     @property
     def title(self):
@@ -65,12 +118,12 @@ class ReportData:
         self._data["title"] = title
 
     @property
-    def config(self):
-        return self._config
+    def total_duration(self):
+        return self._total_duration
 
-    @property
-    def data(self):
-        return self._data
+    @total_duration.setter
+    def total_duration(self, duration):
+        self._total_duration = duration
 
     def set_data(self, key, value):
         self._data[key] = value

@@ -1,19 +1,25 @@
-const { getCollapsedCategory } = require('./storage.js')
+const { getCollapsedCategory, setCollapsedIds } = require('./storage.js')
 
 class DataManager {
     setManager(data) {
         const collapsedCategories = [...getCollapsedCategory(data.renderCollapsed)]
+        const collapsedIds = []
         const tests = Object.values(data.tests).flat().map((test, index) => {
             const collapsed = collapsedCategories.includes(test.result.toLowerCase())
+            const id = `test_${index}`
+            if (collapsed) {
+                collapsedIds.push(id)
+            }
             return {
                 ...test,
-                id: `test_${index}`,
+                id,
                 collapsed,
             }
         })
         const dataBlob = { ...data, tests }
         this.data = { ...dataBlob }
         this.renderData = { ...dataBlob }
+        setCollapsedIds(collapsedIds)
     }
 
     get allData() {
@@ -46,6 +52,10 @@ class DataManager {
 
     get environment() {
         return this.renderData.environment
+    }
+
+    get initialSort() {
+        return this.data.initialSort
     }
 }
 

@@ -44,6 +44,9 @@ const mockWindow = (queryParam) => {
         location: {
             href: `https://example.com/page?${queryParam}`,
         },
+        history: {
+            pushState: sinon.stub(),
+        },
     }
     originalWindow = global.window
     global.window = mock
@@ -76,12 +79,17 @@ describe('Filter tests', () => {
         })
     })
     describe('doFilter', () => {
+        let originalWindow
+
+        after(() => global.window = originalWindow)
+
         it('removes all but passed', () => {
+            mockWindow()
             getFilterMock = sinon.stub(storageModule, 'getVisible').returns(['passed'])
             managerSpy = sinon.spy(dataModule.manager, 'setRender')
 
             doFilter('passed', true)
-            expect(managerSpy.callCount).to.eql(1)
+            expect(managerSpy.callCount).to.eql(2)
             expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
                 'passed', 'passed', 'passed', 'passed', 'passed',
             ])
@@ -134,9 +142,12 @@ describe('Sort tests', () => {
         let managerSpy
         let sortMock
         let sortDirectionMock
-        beforeEach(() => dataModule.manager.resetRender())
+        let originalWindow
 
+        before(() => mockWindow())
+        beforeEach(() => dataModule.manager.resetRender())
         afterEach(() => [sortMock, sortDirectionMock, managerSpy].forEach((fn) => fn.restore()))
+        after(() => global.window = originalWindow)
         it('has no stored sort', () => {
             sortMock = sinon.stub(storageModule, 'getSort').returns('result')
             sortDirectionMock = sinon.stub(storageModule, 'getSortDirection').returns(null)
@@ -191,7 +202,7 @@ describe('Sort tests', () => {
             doSort('result')
             expect(managerSpy.callCount).to.eql(1)
             expect(dataModule.manager.testSubset.map(({ result }) => result)).to.eql([
-                'passed', 'passed', 'passed', 'passed', 'passed', 'failed',
+                'failed', 'passed', 'passed', 'passed', 'passed', 'passed',
             ])
         })
     })

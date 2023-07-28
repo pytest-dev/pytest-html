@@ -4,7 +4,7 @@
     "build:css": "sass --no-source-map --no-error-css src/layout/css/style.scss src/pytest_html/resources/style.css",
     "build:jsapp": "browserify ./src/pytest_html/scripts/index.js > ./src/pytest_html/resources/app.js",
     "lint": "eslint src/pytest_html/scripts/ testing/",
-    "unit": "nyc mocha testing/**/unittest.js",
+    "unit": "nyc mocha testing/**/unittest.js --require mock-local-storage",
     "all": "npm run lint && npm run unit && npm run build:css && npm run build:jsapp"
   },
   "devDependencies": {
@@ -13,6 +13,7 @@
     "eslint": "^8.20.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^10.0.0",
+    "mock-local-storage": "^1.1.24",
     "nyc": "^15.1.0",
     "sass": "^1.52.3",
     "sinon": "^14.0.0"

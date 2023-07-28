@@ -55,18 +55,17 @@ class BaseReport:
             version=__version__,
             styles=self.css,
             run_count=self._run_count(),
+            running_state=self._report.running_state,
             self_contained=self_contained,
-            outcomes=self._report.data["outcomes"],
+            outcomes=self._report.outcomes,
             test_data=test_data,
-            table_head=self._report.data["resultsTableHeader"],
-            prefix=self._report.data["additionalSummary"]["prefix"],
-            summary=self._report.data["additionalSummary"]["summary"],
-            postfix=self._report.data["additionalSummary"]["postfix"],
+            table_head=self._report.table_header,
+            additional_summary=self._report.additional_summary,
         )
 
         self._write_report(rendered_report)
 
-    def _generate_environment(self, metadata_key):
+    def _generate_environment(self):
         metadata = self._config.stash[metadata_key]
         for key in metadata.keys():
             value = metadata[key]
@@ -126,45 +125,42 @@ class BaseReport:
             f.write(rendered_report)
 
     def _run_count(self):
-        data = self._report.data
         relevant_outcomes = ["passed", "failed", "xpassed", "xfailed"]
         counts = 0
-        for outcome in data["outcomes"].keys():
+        for outcome in self._report.outcomes.keys():
             if outcome in relevant_outcomes:
-                counts += data["outcomes"][outcome]["value"]
+                counts += self._report.outcomes[outcome]["value"]
 
         plural = counts > 1
-        duration = _format_duration(data["totalDuration"])
+        duration = _format_duration(self._report.total_duration)
 
-        if data["runningState"].lower() == "finished":
+        if self._report.running_state == "finished":
             return f"{counts} {'tests' if plural else 'test'} took {duration}."
 
-        return (
-            f"{counts}/{data['collectedItems']} {'tests' if plural else 'test'} done."
-        )
+        return f"{counts}/{self._report.collected_items} {'tests' if plural else 'test'} done."
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionstart(self, session):
-        self._report.set_data("environment", self._generate_environment(metadata_key))
+        self._report.set_data("environment", self._generate_environment())
 
         session.config.hook.pytest_html_report_title(report=self._report)
 
-        headers = self._report.data["resultsTableHeader"]
+        headers = self._report.table_header
         session.config.hook.pytest_html_results_table_header(cells=headers)
-        self._report.data["resultsTableHeader"] = _fix_py(headers)
+        self._report.table_header = _fix_py(headers)
 
-        self._report.set_data("runningState", "Started")
+        self._report.running_state = "started"
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionfinish(self, session):
         session.config.hook.pytest_html_results_summary(
-            prefix=self._report.data["additionalSummary"]["prefix"],
-            summary=self._report.data["additionalSummary"]["summary"],
-            postfix=self._report.data["additionalSummary"]["postfix"],
+            prefix=self._report.additional_summary["prefix"],
+            summary=self._report.additional_summary["summary"],
+            postfix=self._report.additional_summary["postfix"],
             session=session,
         )
-        self._report.set_data("runningState", "Finished")
+        self._report.running_state = "finished"
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
@@ -176,7 +172,7 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
-        self._report.set_data("collectedItems", len(session.items))
+        self._report.collected_items = len(session.items)
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
@@ -191,7 +187,7 @@ class BaseReport:
             "result": outcome,
             "duration": _format_duration(report.duration),
         }
-        self._report.data["totalDuration"] += report.duration
+        self._report.total_duration += report.duration
 
         test_id = report.nodeid
         if report.when != "call":
@@ -220,7 +216,7 @@ class BaseReport:
 
         # don't count passed setups and teardowns
         if not (report.when in ["setup", "teardown"] and report.outcome == "passed"):
-            self._report.data["outcomes"][outcome.lower()]["value"] += 1
+            self._report.outcomes = outcome
 
         processed_logs = _process_logs(report)
         self._config.hook.pytest_html_results_table_html(

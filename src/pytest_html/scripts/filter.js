@@ -1,4 +1,5 @@
 const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
 const storageModule = require('./storage.js')
 
 const getFilteredSubSet = (filter) =>
@@ -20,6 +21,9 @@ const doFilter = (type, show) => {
     const currentFilter = storageModule.getVisible()
     const filteredSubset = getFilteredSubSet(currentFilter)
     manager.setRender(filteredSubset)
+
+    const sortColumn = storageModule.getSort()
+    doSort(sortColumn, true)
 }
 
 module.exports = {

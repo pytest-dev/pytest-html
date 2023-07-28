@@ -2,7 +2,14 @@ const { dom, findAll } = require('./dom.js')
 const { manager } = require('./datamanager.js')
 const { doSort } = require('./sort.js')
 const { doFilter } = require('./filter.js')
-const { getVisible, getSort, getSortDirection, possibleFilters } = require('./storage.js')
+const {
+    getVisible,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    getSortDirection,
+    possibleFilters,
+} = require('./storage.js')
 
 const removeChildren = (node) => {
     while (node.firstChild) {
@@ -22,7 +29,7 @@ const renderStatic = () => {
 }
 
 const renderContent = (tests) => {
-    const sortAttr = getSort(manager.allData.initialSort)
+    const sortAttr = getSort(manager.initialSort)
     const sortAsc = JSON.parse(getSortDirection())
     const rows = tests.map(dom.getResultTBody)
     const table = document.getElementById('results-table')
@@ -53,7 +60,17 @@ const renderContent = (tests) => {
 
     findAll('.collapsible td:not(.col-links').forEach((elem) => {
         elem.addEventListener('click', ({ target }) => {
-            manager.toggleCollapsedItem(target.parentElement.dataset.id)
+            const id = target.parentElement.dataset.id
+            manager.toggleCollapsedItem(id)
+
+            const collapsedIds = getCollapsedIds()
+            if (collapsedIds.includes(id)) {
+                const updated = collapsedIds.filter((item) => item !== id)
+                setCollapsedIds(updated)
+            } else {
+                collapsedIds.push(id)
+                setCollapsedIds(collapsedIds)
+            }
             redraw()
         })
     })
@@ -73,6 +90,14 @@ const bindEvents = () => {
         const { testResult } = element.dataset
 
         doFilter(testResult, element.checked)
+        const collapsedIds = getCollapsedIds()
+        const updated = manager.renderData.tests.map((test) => {
+            return {
+                ...test,
+                collapsed: collapsedIds.includes(test.id),
+            }
+        })
+        manager.setRender(updated)
         redraw()
     }
 
@@ -88,10 +113,13 @@ const bindEvents = () => {
     })
     document.getElementById('show_all_details').addEventListener('click', () => {
         manager.allCollapsed = false
+        setCollapsedIds([])
         redraw()
     })
     document.getElementById('hide_all_details').addEventListener('click', () => {
         manager.allCollapsed = true
+        const allIds = manager.renderData.tests.map((test) => test.id)
+        setCollapsedIds(allIds)
         redraw()
     })
 }

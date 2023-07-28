@@ -43,10 +43,14 @@ const durationSort = (list, ascending) => {
 }
 
 const doInitSort = () => {
-    const type = storageModule.getSort(manager.allData.initialSort)
+    const type = storageModule.getSort(manager.initialSort)
     const ascending = storageModule.getSortDirection()
     const list = manager.testSubset
     const initialOrder = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed', 'Skipped', 'Passed']
+
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
     if (type?.toLowerCase() === 'original') {
         manager.setRender(list)
     } else {
@@ -66,14 +70,19 @@ const doInitSort = () => {
     }
 }
 
-const doSort = (type) => {
-    const newSortType = storageModule.getSort(manager.allData.initialSort) !== type
+const doSort = (type, skipDirection) => {
+    const newSortType = storageModule.getSort(manager.initialSort) !== type
     const currentAsc = storageModule.getSortDirection()
-    const ascending = newSortType ? true : !currentAsc
+    let ascending
+    if (skipDirection) {
+        ascending = currentAsc
+    } else {
+        ascending = newSortType ? false : !currentAsc
+    }
     storageModule.setSort(type)
     storageModule.setSortDirection(ascending)
-    const list = manager.testSubset
 
+    const list = manager.testSubset
     const sortedList = type === 'duration' ? durationSort(list, ascending) : genericSort(list, type, ascending)
     manager.setRender(sortedList)
 }

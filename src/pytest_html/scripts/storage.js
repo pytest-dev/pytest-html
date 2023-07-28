@@ -30,7 +30,7 @@ const hideCategory = (categoryToHide) => {
     const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
 
     url.searchParams.set('visible', settings)
-    history.pushState({}, null, unescape(url.href))
+    window.history.pushState({}, null, unescape(url.href))
 }
 
 const showCategory = (categoryToShow) => {
@@ -44,7 +44,7 @@ const showCategory = (categoryToShow) => {
     const noFilter = possibleFilters.length === settings.length || !settings.length
 
     noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
-    history.pushState({}, null, unescape(url.href))
+    window.history.pushState({}, null, unescape(url.href))
 }
 
 const getSort = (initialSort) => {
@@ -59,7 +59,7 @@ const getSort = (initialSort) => {
 const setSort = (type) => {
     const url = new URL(window.location.href)
     url.searchParams.set('sort', type)
-    history.pushState({}, null, unescape(url.href))
+    window.history.pushState({}, null, unescape(url.href))
 }
 
 const getCollapsedCategory = (renderCollapsed) => {
@@ -87,17 +87,21 @@ const getCollapsedCategory = (renderCollapsed) => {
     return categories
 }
 
-const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc'))
-
+const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc')) || false
 const setSortDirection = (ascending) => sessionStorage.setItem('sortAsc', ascending)
+
+const getCollapsedIds = () => JSON.parse(sessionStorage.getItem('collapsedIds')) || []
+const setCollapsedIds = (list) => sessionStorage.setItem('collapsedIds', JSON.stringify(list))
 
 module.exports = {
     getVisible,
     hideCategory,
     showCategory,
+    getCollapsedIds,
+    setCollapsedIds,
     getSort,
-    getSortDirection,
     setSort,
+    getSortDirection,
     setSortDirection,
     getCollapsedCategory,
     possibleFilters,

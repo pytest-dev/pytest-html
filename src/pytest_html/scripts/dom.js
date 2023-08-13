@@ -37,9 +37,8 @@ const dom = {
         return envRow
     },
     getResultTBody: ({ testId, id, log, duration, extras, resultsTableRow, tableHtml, result, collapsed }) => {
-        const resultLower = result.toLowerCase()
         const resultBody = templateResult.content.cloneNode(true)
-        resultBody.querySelector('tbody').classList.add(resultLower)
+        resultBody.querySelector('tbody').classList.add(result.toLowerCase())
         resultBody.querySelector('tbody').id = testId
         resultBody.querySelector('.collapsible').dataset.id = id
 

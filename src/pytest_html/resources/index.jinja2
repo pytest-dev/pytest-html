@@ -26,15 +26,6 @@
         <td></td>
       </tr>
     </template>
-    <template id="template_results-table__head">
-      <thead id="results-table-head">
-        <tr>
-        {%- for th in table_head %}
-          {{ th|safe }}
-        {%- endfor %}
-        </tr>
-      </thead>
-    </template>
     <template id="template_results-table__body--empty">
       <tbody class="results-table-row">
         <tr id="not-found-message">
@@ -107,7 +98,15 @@
         {%- endfor %}
       </div>
     </div>
-    <table id="results-table"></table>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+        {%- for th in table_head %}
+          {{ th|safe }}
+        {%- endfor %}
+        </tr>
+      </thead>
+    </table>
   </body>
   <footer>
     <div id="data-container" data-jsonblob="{{ test_data }}"></div>

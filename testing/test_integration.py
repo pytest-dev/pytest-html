@@ -52,7 +52,13 @@ def run(pytester, path="report.html", cmd_flags=None, query_params=None):
         # End workaround
 
         driver.get(f"file:///reports{path}?{query_params}")
-        return BeautifulSoup(driver.page_source, "html.parser")
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+
+        # remove all templates as they bork the BS parsing
+        for template in soup("template"):
+            template.decompose()
+
+        return soup
     finally:
         driver.quit()
 
@@ -88,15 +94,15 @@ def get_text(page, selector):
 
 
 def is_collapsed(page, test_name):
-    return get_element(page, f".summary tbody[id$='{test_name}'] .collapsed")
+    return get_element(page, f"tbody[id$='{test_name}'] .collapsed")
 
 
 def get_log(page, test_id=None):
     # TODO(jim) move to get_text (use .contents)
     if test_id:
-        log = get_element(page, f".summary tbody[id$='{test_id}'] div[class='log']")
+        log = get_element(page, f"tbody[id$='{test_id}'] div[class='log']")
     else:
-        log = get_element(page, ".summary div[class='log']")
+        log = get_element(page, "div[class='log']")
     all_text = ""
     for text in log.strings:
         all_text += text
@@ -195,7 +201,7 @@ class TestHTML:
         page = run(pytester)
         assert_results(page, skipped=1, total_tests=0)
 
-        log = get_text(page, ".summary div[class='log']")
+        log = get_text(page, "div[class='log']")
         assert_that(log).contains(reason)
 
     def test_skip_function_marker(self, pytester):
@@ -211,7 +217,7 @@ class TestHTML:
         page = run(pytester)
         assert_results(page, skipped=1, total_tests=0)
 
-        log = get_text(page, ".summary div[class='log']")
+        log = get_text(page, "div[class='log']")
         assert_that(log).contains(reason)
 
     def test_skip_class_marker(self, pytester):
@@ -228,7 +234,7 @@ class TestHTML:
         page = run(pytester)
         assert_results(page, skipped=1, total_tests=0)
 
-        log = get_text(page, ".summary div[class='log']")
+        log = get_text(page, "div[class='log']")
         assert_that(log).contains(reason)
 
     def test_fail(self, pytester):
@@ -236,7 +242,7 @@ class TestHTML:
         page = run(pytester)
         assert_results(page, failed=1)
         assert_that(get_log(page)).contains("AssertionError")
-        assert_that(get_text(page, ".summary div[class='log'] span.error")).matches(
+        assert_that(get_text(page, "div[class='log'] span.error")).matches(
             r"^E\s+assert False$"
         )
 
@@ -352,7 +358,7 @@ class TestHTML:
         page = run(pytester)
         assert_results(page, error=1, total_tests=0)
 
-        col_name = get_text(page, ".summary td[class='col-name']")
+        col_name = get_text(page, "td[class='col-name']")
         assert_that(col_name).contains("::setup")
         assert_that(get_log(page)).contains("ValueError")
 
@@ -411,7 +417,9 @@ class TestHTML:
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        elements = page.select(".summary__data p:not(.run-count):not(.filter)")
+        elements = page.select(
+            ".additional-summary p"
+        )  # ".summary__data p:not(.run-count):not(.filter)")
         assert_that(elements).is_length(3)
         for element in elements:
             key = re.search(r"(\w+).*", element.string).group(1)
@@ -437,7 +445,7 @@ class TestHTML:
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        assert_that(page.select_one(".summary .extraHTML").string).is_equal_to(content)
+        assert_that(page.select_one(".extraHTML").string).is_equal_to(content)
 
     @pytest.mark.parametrize(
         "content, encoded",
@@ -460,7 +468,7 @@ class TestHTML:
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester, cmd_flags=["--self-contained-html"])
 
-        element = page.select_one(".summary a[class='col-links__extra text']")
+        element = page.select_one("a[class='col-links__extra text']")
         assert_that(element.string).is_equal_to("Text")
         assert_that(element["href"]).is_equal_to(
             f"data:text/plain;charset=utf-8;base64,{encoded}"
@@ -488,7 +496,7 @@ class TestHTML:
         content_str = json.dumps(content)
         data = b64encode(content_str.encode("utf-8")).decode("ascii")
 
-        element = page.select_one(".summary a[class='col-links__extra json']")
+        element = page.select_one("a[class='col-links__extra json']")
         assert_that(element.string).is_equal_to("JSON")
         assert_that(element["href"]).is_equal_to(
             f"data:application/json;charset=utf-8;base64,{data}"
@@ -512,7 +520,7 @@ class TestHTML:
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        element = page.select_one(".summary a[class='col-links__extra url']")
+        element = page.select_one("a[class='col-links__extra url']")
         assert_that(element.string).is_equal_to("URL")
         assert_that(element["href"]).is_equal_to(content)
 
@@ -551,7 +559,7 @@ class TestHTML:
         # assert_that(element.string).is_equal_to("Image")
         # assert_that(element["href"]).is_equal_to(src)
 
-        element = page.select_one(".summary .media img")
+        element = page.select_one(".media img")
         assert_that(str(element)).is_equal_to(f'<img src="{src}"/>')
 
     @pytest.mark.parametrize("mime_type, extension", [("video/mp4", "mp4")])
@@ -579,7 +587,7 @@ class TestHTML:
         # assert_that(element.string).is_equal_to("Video")
         # assert_that(element["href"]).is_equal_to(src)
 
-        element = page.select_one(".summary .media video")
+        element = page.select_one(".media video")
         assert_that(str(element)).is_equal_to(
             f'<video controls="">\n<source src="{src}" type="{mime_type}"/>\n</video>'
         )
@@ -590,10 +598,8 @@ class TestHTML:
         assert_results(page, passed=1)
 
     def test_results_table_hook_append(self, pytester):
-        header_selector = (
-            ".summary #results-table-head tr:nth-child(1) th:nth-child({})"
-        )
-        row_selector = ".summary #results-table tr:nth-child(1) td:nth-child({})"
+        header_selector = "#results-table-head tr:nth-child(1) th:nth-child({})"
+        row_selector = "#results-table tr:nth-child(1) td:nth-child({})"
 
         pytester.makeconftest(
             """
@@ -628,10 +634,8 @@ class TestHTML:
         )
 
     def test_results_table_hook_insert(self, pytester):
-        header_selector = (
-            ".summary #results-table-head tr:nth-child(1) th:nth-child({})"
-        )
-        row_selector = ".summary #results-table tr:nth-child(1) td:nth-child({})"
+        header_selector = "#results-table-head tr:nth-child(1) th:nth-child({})"
+        row_selector = "#results-table tr:nth-child(1) td:nth-child({})"
 
         pytester.makeconftest(
             """
@@ -700,12 +704,10 @@ class TestHTML:
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        header_columns = page.select(".summary #results-table-head th")
+        header_columns = page.select("#results-table-head th")
         assert_that(header_columns).is_length(3)
 
-        row_columns = page.select_one(".summary .results-table-row").select(
-            "td:not(.extra)"
-        )
+        row_columns = page.select_one(".results-table-row").select("td:not(.extra)")
         assert_that(row_columns).is_length(3)
 
     @pytest.mark.parametrize("no_capture", ["", "-s"])

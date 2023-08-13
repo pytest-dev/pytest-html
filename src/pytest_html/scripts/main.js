@@ -28,49 +28,51 @@ const renderStatic = () => {
     renderEnvironmentTable()
 }
 
+const addItemToggleListener = (elem) => {
+    elem.addEventListener('click', ({ target }) => {
+        const id = target.parentElement.dataset.id
+        manager.toggleCollapsedItem(id)
+
+        const collapsedIds = getCollapsedIds()
+        if (collapsedIds.includes(id)) {
+            const updated = collapsedIds.filter((item) => item !== id)
+            setCollapsedIds(updated)
+        } else {
+            collapsedIds.push(id)
+            setCollapsedIds(collapsedIds)
+        }
+        redraw()
+    })
+}
+
 const renderContent = (tests) => {
     const sortAttr = getSort(manager.initialSort)
     const sortAsc = JSON.parse(getSortDirection())
     const rows = tests.map(dom.getResultTBody)
     const table = document.getElementById('results-table')
-    const tableHeader = document.getElementById('template_results-table__head').content.cloneNode(true)
+    const tableHeader = document.getElementById('results-table-head')
 
-    removeChildren(table)
+    const newTable = document.createElement('table')
+    newTable.id = 'results-table'
 
-    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
-    table.appendChild(tableHeader)
+    // remove all sorting classes and set the relevant
+    findAll('.sortable', tableHeader).forEach((elem) => elem.classList.remove('asc', 'desc'))
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`).classList.add(sortAsc ? 'desc' : 'asc')
+    newTable.appendChild(tableHeader)
+
     if (!rows.length) {
         const emptyTable = document.getElementById('template_results-table__body--empty').content.cloneNode(true)
-        table.appendChild(emptyTable)
+        newTable.appendChild(emptyTable)
+    } else {
+        rows.forEach((row) => {
+            if (!!row) {
+                findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                newTable.appendChild(row)
+            }
+        })
     }
 
-    rows.forEach((row) => !!row && table.appendChild(row))
-
-    findAll('.sortable').forEach((elem) => {
-        elem.addEventListener('click', (evt) => {
-            const { target: element } = evt
-            const { columnType } = element.dataset
-            doSort(columnType)
-            redraw()
-        })
-    })
-
-    findAll('.collapsible td:not(.col-links').forEach((elem) => {
-        elem.addEventListener('click', ({ target }) => {
-            const id = target.parentElement.dataset.id
-            manager.toggleCollapsedItem(id)
-
-            const collapsedIds = getCollapsedIds()
-            if (collapsedIds.includes(id)) {
-                const updated = collapsedIds.filter((item) => item !== id)
-                setCollapsedIds(updated)
-            } else {
-                collapsedIds.push(id)
-                setCollapsedIds(collapsedIds)
-            }
-            redraw()
-        })
-    })
+    table.replaceWith(newTable)
 }
 
 const renderDerived = () => {
@@ -108,6 +110,16 @@ const bindEvents = () => {
     findAll('input[name="filter_checkbox"]').forEach((elem) => {
         elem.addEventListener('click', filterColumn)
     })
+
+    findAll('.sortable').forEach((elem) => {
+        elem.addEventListener('click', (evt) => {
+            const { target: element } = evt
+            const { columnType } = element.dataset
+            doSort(columnType)
+            redraw()
+        })
+    })
+
     document.getElementById('show_all_details').addEventListener('click', () => {
         manager.allCollapsed = false
         setCollapsedIds([])

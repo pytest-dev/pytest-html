@@ -110,7 +110,7 @@ span.xpassed,
   color: black;
   display: block;
   font-family: "Courier New", Courier, monospace;
-  height: 230px;
+  max-height: 230px;
   overflow-y: scroll;
   padding: 5px;
   white-space: pre-wrap;

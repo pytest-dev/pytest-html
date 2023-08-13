@@ -129,7 +129,7 @@ $extra-media-width: 320px;
   color: black;
   display: block;
   font-family: 'Courier New', Courier, monospace;
-  height: $extra-height - 2 * $spacing;
+  max-height: $extra-height - 2 * $spacing;
   overflow-y: scroll;
   padding: $spacing;
   white-space: pre-wrap;

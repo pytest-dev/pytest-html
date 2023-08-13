@@ -31,6 +31,7 @@ const setup = (resultBody, assets) => {
     }
 
     const mediaViewer = new MediaViewer(assets)
+    const container = resultBody.querySelector('.media-container')
     const leftArrow = resultBody.querySelector('.media-container__nav--left')
     const rightArrow = resultBody.querySelector('.media-container__nav--right')
     const mediaName = resultBody.querySelector('.media__name')
@@ -68,9 +69,12 @@ const setup = (resultBody, assets) => {
     const openImg = () => {
         window.open(mediaViewer.activeFile.path, '_blank')
     }
-
-    leftArrow.addEventListener('click', moveLeft)
-    rightArrow.addEventListener('click', doRight)
+    if (assets.length === 1) {
+        container.classList.add('media-container--fullscreen')
+    } else {
+        leftArrow.addEventListener('click', moveLeft)
+        rightArrow.addEventListener('click', doRight)
+    }
     imageEl.addEventListener('click', openImg)
 }
 

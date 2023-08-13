@@ -10,7 +10,6 @@ import warnings
 from pathlib import Path
 
 import pytest
-from pytest_metadata.plugin import metadata_key
 
 from pytest_html import __version__
 from pytest_html import extras
@@ -66,7 +65,18 @@ class BaseReport:
         self._write_report(rendered_report)
 
     def _generate_environment(self):
-        metadata = self._config.stash[metadata_key]
+        try:
+            from pytest_metadata.plugin import metadata_key
+
+            metadata = self._config.stash[metadata_key]
+        except ImportError:
+            # old version of pytest-metadata
+            metadata = self._config._metadata
+            warnings.warn(
+                "'pytest-metadata < 3.0.0' is deprecated and support will be dropped in next major version",
+                DeprecationWarning,
+            )
+
         for key in metadata.keys():
             value = metadata[key]
             if self._is_redactable_environment_variable(key):

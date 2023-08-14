@@ -358,7 +358,7 @@ class TestHTML:
         page = run(pytester)
         assert_results(page, error=1, total_tests=0)
 
-        col_name = get_text(page, "td[class='col-name']")
+        col_name = get_text(page, "td[class='col-testId']")
         assert_that(col_name).contains("::setup")
         assert_that(get_log(page)).contains("ValueError")
 

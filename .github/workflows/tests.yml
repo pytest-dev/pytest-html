@@ -89,21 +89,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "pypy3.9"]
         include:
           - os: ubuntu-latest
             python-version: "3.10"
             with-coverage: true
-
-          - os: ubuntu-latest
-            python-version: pypy3.9
-            tox-env: py3.9
-          - os: windows-latest
-            python-version: pypy3.9
-            tox-env: py3.9
-          - os: macos-latest
-            python-version: pypy3.9
-            tox-env: py3.9
 
           - os: ubuntu-latest
             python-version: 3.11-dev
@@ -175,12 +165,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "pypy3.9"]
         include:
           - python-version: "3.10"
             with-coverage: true
-          - python-version: pypy3.9
-            tox-env: py3.9
           - python-version: 3.11-dev
             tox-env: devel
 
@@ -247,10 +235,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "pypy3.9"]
         include:
-          - python-version: pypy3.9
-            tox-env: py3.9
           - python-version: 3.11-dev
             tox-env: devel
 

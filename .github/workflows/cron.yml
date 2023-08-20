@@ -1,0 +1,10 @@
+name: Scheduled Tests
+
+on:
+  schedule:
+    - cron: '0 14 * * *'  # Run daily at 14:00 UTC
+
+jobs:
+  tests:
+    if: github.repository_owner == 'pytest-dev'
+    uses: ./.github/workflows/tests.yml

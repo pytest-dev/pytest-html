@@ -149,6 +149,15 @@ class BaseReport:
 
         return f"{counts}/{self._report.collected_items} {'tests' if plural else 'test'} done."
 
+    def _hydrate_data(self, data, cells):
+        for index, cell in enumerate(cells):
+            # extract column name and data if column is sortable
+            if "sortable" in self._report.table_header[index]:
+                name_match = re.search(r"col-(\w+)", cell)
+                data_match = re.search(r"<td.*?>(.*?)</td>", cell)
+                if name_match and data_match:
+                    data[name_match.group(1)] = data_match.group(1)
+
     @pytest.hookimpl(trylast=True)
     def pytest_sessionstart(self, session):
         self._report.set_data("environment", self._generate_environment())
@@ -193,35 +202,33 @@ class BaseReport:
             )
 
         outcome = _process_outcome(report)
-        data = {
-            "result": outcome,
-            "duration": _format_duration(report.duration),
-        }
+        duration = _format_duration(report.duration)
         self._report.total_duration += report.duration
 
         test_id = report.nodeid
         if report.when != "call":
             test_id += f"::{report.when}"
-        data["testId"] = test_id
 
-        data["extras"] = self._process_extras(report, test_id)
+        data = {
+            "extras": self._process_extras(report, test_id),
+        }
         links = [
             extra
             for extra in data["extras"]
             if extra["format_type"] in ["json", "text", "url"]
         ]
         cells = [
-            f'<td class="col-result">{data["result"]}</td>',
-            f'<td class="col-name">{data["testId"]}</td>',
-            f'<td class="col-duration">{data["duration"]}</td>',
+            f'<td class="col-result">{outcome}</td>',
+            f'<td class="col-testId">{test_id}</td>',
+            f'<td class="col-duration">{duration}</td>',
             f'<td class="col-links">{_process_links(links)}</td>',
         ]
-
         self._config.hook.pytest_html_results_table_row(report=report, cells=cells)
         if not cells:
             return
 
         cells = _fix_py(cells)
+        self._hydrate_data(data, cells)
         data["resultsTableRow"] = cells
 
         # don't count passed setups and teardowns

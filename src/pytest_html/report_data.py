@@ -41,7 +41,6 @@ class ReportData:
         self._data = {
             "environment": {},
             "tests": defaultdict(list),
-            "resultsTableRow": None,
         }
 
         collapsed = config.getini("render_collapsed")

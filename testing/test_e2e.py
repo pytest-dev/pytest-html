@@ -54,6 +54,23 @@ def _encode_query_params(params):
     return urllib.parse.urlencode(params)
 
 
+def _parse_result_table(driver):
+    table = driver.find_element(By.ID, "results-table")
+    headers = table.find_elements(By.CSS_SELECTOR, "thead th")
+    rows = table.find_elements(By.CSS_SELECTOR, "tbody tr.collapsible")
+    table_data = []
+    for row in rows:
+        data_dict = {}
+
+        cells = row.find_elements(By.TAG_NAME, "td")
+        for header, cell in zip(headers, cells):
+            data_dict[header.text.lower()] = cell.text
+
+        table_data.append(data_dict)
+
+    return table_data
+
+
 def test_visible(pytester, path, driver):
     pytester.makepyfile(
         """
@@ -76,3 +93,45 @@ def test_visible(pytester, path, driver):
     )
     result = driver.find_elements(By.CSS_SELECTOR, "tr.collapsible")
     assert_that(result).is_length(0)
+
+
+def test_custom_sorting(pytester, path, driver):
+    pytester.makeconftest(
+        """
+        def pytest_html_results_table_header(cells):
+            cells.append(
+                '<th class="sortable alpha" data-column-type="alpha">Alpha</th>'
+            )
+
+        def pytest_html_results_table_row(report, cells):
+            data = report.nodeid.split("_")[-1]
+            cells.append(f'<td class="col-alpha">{data}</td>')
+    """
+    )
+    pytester.makepyfile(
+        """
+        def test_AAA(): pass
+        def test_BBB(): pass
+    """
+    )
+    query_params = _encode_query_params({"sort": "alpha"})
+    driver.get(f"file:///reports{path()}?{query_params}")
+    WebDriverWait(driver, 5).until(
+        ec.visibility_of_all_elements_located((By.CSS_SELECTOR, "#results-table"))
+    )
+
+    rows = _parse_result_table(driver)
+    assert_that(rows).is_length(2)
+    assert_that(rows[0]["test"]).contains("AAA")
+    assert_that(rows[0]["alpha"]).is_equal_to("AAA")
+    assert_that(rows[1]["test"]).contains("BBB")
+    assert_that(rows[1]["alpha"]).is_equal_to("BBB")
+
+    driver.find_element(By.CSS_SELECTOR, "th[data-column-type='alpha']").click()
+    # we might need some wait here to ensure sorting happened
+    rows = _parse_result_table(driver)
+    assert_that(rows).is_length(2)
+    assert_that(rows[0]["test"]).contains("BBB")
+    assert_that(rows[0]["alpha"]).is_equal_to("BBB")
+    assert_that(rows[1]["test"]).contains("AAA")
+    assert_that(rows[1]["alpha"]).is_equal_to("AAA")

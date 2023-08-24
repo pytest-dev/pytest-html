@@ -1,4 +1,4 @@
-const { dom, findAll } = require('./dom.js')
+const { dom, find, findAll } = require('./dom.js')
 const { manager } = require('./datamanager.js')
 const { doSort } = require('./sort.js')
 const { doFilter } = require('./filter.js')
@@ -67,6 +67,9 @@ const renderContent = (tests) => {
         rows.forEach((row) => {
             if (!!row) {
                 findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                find('.logexpander', row).addEventListener('click',
+                    (evt) => evt.target.parentNode.classList.toggle('expanded'),
+                )
                 newTable.appendChild(row)
             }
         })

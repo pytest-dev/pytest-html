@@ -104,19 +104,48 @@ span.xpassed,
 /*------------------
  * 2. Extra
  *------------------*/
-.log {
+.logwrapper {
+  max-height: 230px;
+  overflow-y: scroll;
   background-color: #e6e6e6;
+}
+.logwrapper.expanded {
+  max-height: none;
+}
+.logwrapper.expanded .logexpander:after {
+  content: "collapse [-]";
+}
+.logwrapper .logexpander {
+  z-index: 1;
+  position: sticky;
+  top: 10px;
+  width: max-content;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin: 10px 0 10px calc(100% - 80px);
+  cursor: pointer;
+  background-color: #e6e6e6;
+}
+.logwrapper .logexpander:after {
+  content: "expand [+]";
+}
+.logwrapper .logexpander:hover {
+  color: #000;
+  border-color: #000;
+}
+.logwrapper .log {
+  min-height: 40px;
+  position: relative;
+  top: -50px;
+  height: calc(100% + 50px);
   border: 1px solid #e6e6e6;
   color: black;
   display: block;
   font-family: "Courier New", Courier, monospace;
-  max-height: 230px;
-  overflow-y: scroll;
   padding: 5px;
+  padding-right: 80px;
   white-space: pre-wrap;
-}
-.log:only-child {
-  height: inherit;
 }
 
 div.media {
@@ -177,6 +206,9 @@ div.media {
   cursor: pointer;
 }
 
+.col-result {
+  width: 130px;
+}
 .col-result:hover::after {
   content: " (hide details)";
 }

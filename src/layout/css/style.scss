@@ -123,22 +123,51 @@ span.xpassed,
 $extra-height: 240px;
 $extra-media-width: 320px;
 
-.log {
-  background-color: #e6e6e6;
-  border: $border-width solid #e6e6e6;
-  color: black;
-  display: block;
-  font-family: 'Courier New', Courier, monospace;
-  max-height: $extra-height - 2 * $spacing;
-  overflow-y: scroll;
-  padding: $spacing;
-  white-space: pre-wrap;
-
-  &:only-child {
-    height: inherit;
+.logwrapper {
+    max-height: $extra-height - 2 * $spacing;
+    overflow-y: scroll;
+    background-color: #e6e6e6;
+    &.expanded {
+      max-height: none;
+      .logexpander {
+        &:after {
+          content: 'collapse [-]';
+        }
+      }
+    }
+  .logexpander {
+    z-index: 1;
+    position: sticky;
+    top: 10px;
+    width: max-content;
+    border: 1px solid;
+    border-radius: 3px;
+    padding: 5px 7px;
+    margin: 10px 0 10px calc(100% - 80px);
+    cursor: pointer;
+    background-color: #e6e6e6;
+    &:after {
+      content: 'expand [+]';
+    }
+    &:hover {
+      color: #000;
+      border-color: #000;
+    }
+  }
+  .log {
+    min-height: 40px;
+    position: relative;
+    top: -50px;
+    height: calc(100% + 50px);
+    border: $border-width solid #e6e6e6;
+    color: black;
+    display: block;
+    font-family: 'Courier New', Courier, monospace;
+    padding: $spacing;
+    padding-right: 80px;
+    white-space: pre-wrap;
   }
 }
-
 div.media {
   border: $border-width solid #e6e6e6;
   float: right;
@@ -200,6 +229,7 @@ div.media {
 }
 
 .col-result {
+  width: 130px;
   &:hover::after {
     content: ' (hide details)';
   }

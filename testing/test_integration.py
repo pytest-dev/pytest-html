@@ -156,6 +156,21 @@ class TestHTML:
             assert_that(duration).matches(expectation)
             assert_that(total_duration).matches(r"\d{2}:\d{2}:\d{2}")
 
+    def test_duration_format_hook(self, pytester):
+        pytester.makeconftest(
+            """
+            def pytest_html_duration_format(duration):
+                return str(round(duration * 1000)) + " seconds"
+            """
+        )
+
+        pytester.makepyfile("def test_pass(): pass")
+        page = run(pytester)
+        assert_results(page, passed=1)
+
+        duration = get_text(page, "#results-table td[class='col-duration']")
+        assert_that(duration).contains("seconds")
+
     def test_total_number_of_tests_zero(self, pytester):
         page = run(pytester)
         assert_results(page)

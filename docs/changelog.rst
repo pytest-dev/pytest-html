@@ -6,6 +6,22 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
+4.0.0 (2023-09-01)
+~~~~~~~~~~~~~~~~~~
+
+This release is the result of more than two years of rewrites.
+
+We've tried our best to keep this release backwards-compatible with v3.
+
+If you find something that seems to be a regression, please consult the documentation first,
+before filing an issue.
+
+Thanks to all the users who have contributed with ideas, solutions and beta-testing.
+You're too many to name, but you know who you are.
+
+A special thanks to `@drRedflint <https://github.com/drRedflint>`_ and `@jeffwright13 <https://github.com/jeffwright13>`_
+for all the javascript and testing respectively.
+
 3.2.0 (2022-10-25)
 ~~~~~~~~~~~~~~~~~~
 

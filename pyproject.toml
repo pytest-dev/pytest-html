@@ -41,7 +41,7 @@ classifiers = [
 ]
 dependencies = [
   "pytest>=7.0.0",
-  "pytest-metadata>=3.0.0",
+  "pytest-metadata>=2.0.0",
   "Jinja2>=3.0.0",
 ]
 dynamic = [

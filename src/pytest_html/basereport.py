@@ -197,12 +197,19 @@ class BaseReport:
     def pytest_runtest_logreport(self, report):
         if hasattr(report, "duration_formatter"):
             warnings.warn(
-                "'duration_formatter' has been removed and no longer has any effect!",
+                "'duration_formatter' has been removed and no longer has any effect!"
+                "Please use the 'pytest_html_duration_format' hook instead.",
                 DeprecationWarning,
             )
 
         outcome = _process_outcome(report)
-        duration = _format_duration(report.duration)
+        try:
+            # hook returns as list for some reason
+            duration = self._config.hook.pytest_html_duration_format(
+                duration=report.duration
+            )[0]
+        except IndexError:
+            duration = _format_duration(report.duration)
         self._report.total_duration += report.duration
 
         test_id = report.nodeid

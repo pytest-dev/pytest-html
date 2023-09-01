@@ -304,6 +304,28 @@ Note that the values are case *sensitive*.
 If tests are run in parallel (with `pytest-xdist`_ for example), then the order may not be
 in the correct order.
 
+Formatting the Duration Column
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The formatting of the timestamp used in the :code:`Durations` column can be modified by using the
+:code:`pytest_html_duration_format` hook. The default timestamp will be `nnn ms` for durations
+less than one second and `hh:mm:ss` for durations equal to or greater than one second.
+
+Below is an example of a :code:`conftest.py` file setting :code:`pytest_html_duration_format`:
+
+.. code-block:: python
+
+  import datetime
+
+
+  def pytest_html_duration_format(duration):
+      duration_timedelta = datetime.timedelta(seconds=duration)
+      time = datetime.datetime(1, 1, 1) + duration_timedelta
+      return time.strftime("%H:%M:%S")
+
+**NOTE**: The behavior of sorting the duration column is not guaranteed when providing a custom format.
+
+**NOTE**: The formatting of the total duration is not affected by this hook.
 
 .. _@pytest.hookimpl(tryfirst=True): https://docs.pytest.org/en/stable/writing_plugins.html#hook-function-ordering-call-example
 .. _ansi2html: https://pypi.python.org/pypi/ansi2html/

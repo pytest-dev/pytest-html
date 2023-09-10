@@ -25,7 +25,7 @@ class ReportData:
             "failed": {"label": "Failed", "value": 0},
             "passed": {"label": "Passed", "value": 0},
             "skipped": {"label": "Skipped", "value": 0},
-            "xfailed": {"label": "Unexpected failures", "value": 0},
+            "xfailed": {"label": "Expected failures", "value": 0},
             "xpassed": {"label": "Unexpected passes", "value": 0},
             "error": {"label": "Errors", "value": 0},
             "rerun": {"label": "Reruns", "value": 0},

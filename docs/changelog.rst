@@ -6,6 +6,13 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
+4.0.1 (2023-09-10)
+~~~~~~~~~~~~~~~~~~
+
+* Fix incorrectly labeled outcome.
+
+  * Thanks to `@lodagro <https://github.com/lodagro>`_ for reporting
+
 4.0.0 (2023-09-01)
 ~~~~~~~~~~~~~~~~~~
 

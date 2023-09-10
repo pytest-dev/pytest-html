@@ -20,7 +20,7 @@ OUTCOMES = {
     "skipped": "Skipped",
     "failed": "Failed",
     "error": "Errors",
-    "xfailed": "Unexpected failures",
+    "xfailed": "Expected failures",
     "xpassed": "Unexpected passes",
     "rerun": "Reruns",
 }

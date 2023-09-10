@@ -21,6 +21,8 @@ repos:
       - id: check-yaml
       - id: debug-statements
         language_version: python3
+      - id: no-commit-to-branch
+        args: ['--branch', 'master']
 
   - repo: https://github.com/PyCQA/flake8
     rev: 4.0.1

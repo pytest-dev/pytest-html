@@ -70,6 +70,26 @@ def test_html_results_summary_hook(pytester):
     result.assert_outcomes(passed=1)
 
 
+def test_chdir(tmp_path, pytester):
+    pytester.makepyfile(
+        """
+        import pytest
+
+        @pytest.fixture
+        def changing_dir(tmp_path, monkeypatch):
+            monkeypatch.chdir(tmp_path)
+
+        def test_function(changing_dir):
+            pass
+    """
+    )
+    page = pytester.runpytest("--html", "reports/report.html")
+    assert page.ret == 0
+    assert (
+        f"Generated html report: file://{tmp_path / 'reports' / 'report.html'}"
+    ).replace("test_chdir0", "test_chdir1") in page.outlines[-2]
+
+
 @pytest.fixture
 def css_file_path(pytester):
     css_one = """

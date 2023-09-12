@@ -377,6 +377,21 @@ class TestHTML:
         assert_that(col_name).contains("::setup")
         assert_that(get_log(page)).contains("ValueError")
 
+    def test_chdir(self, pytester):
+        pytester.makepyfile(
+            """
+            import pytest
+            @pytest.fixture
+            def changing_dir(tmp_path, monkeypatch):
+                monkeypatch.chdir(tmp_path)
+                yield tmp_path
+            def test_function(changing_dir):
+                pass
+        """
+        )
+        page = run(pytester)
+        assert_results(page, passed=1)
+
     @pytest.mark.parametrize("title", ["", "Special Report"])
     def test_report_title(self, pytester, title):
         pytester.makepyfile("def test_pass(): pass")

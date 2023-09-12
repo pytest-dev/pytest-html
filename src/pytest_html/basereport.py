@@ -18,7 +18,9 @@ from pytest_html.util import cleanup_unserializable
 
 class BaseReport:
     def __init__(self, report_path, config, report_data, template, css):
-        self._report_path = Path(os.path.expandvars(report_path)).expanduser()
+        self._report_path = (
+            Path(os.path.expandvars(report_path)).expanduser().absolute()
+        )
         self._report_path.parent.mkdir(parents=True, exist_ok=True)
         self._config = config
         self._template = template

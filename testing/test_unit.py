@@ -70,7 +70,7 @@ def test_html_results_summary_hook(pytester):
     result.assert_outcomes(passed=1)
 
 
-def test_chdir(tmp_path, pytester):
+def test_chdir(pytester):
     pytester.makepyfile(
         """
         import pytest
@@ -86,8 +86,8 @@ def test_chdir(tmp_path, pytester):
     page = pytester.runpytest("--html", "reports/report.html")
     assert page.ret == 0
     assert (
-        f"Generated html report: file://{tmp_path / 'reports' / 'report.html'}"
-    ).replace("test_chdir0", "test_chdir1") in page.outlines[-2]
+        f"Generated html report: file://{pytester.path / 'reports' / 'report.html'}"
+    ) in page.outlines[-2]
 
 
 @pytest.fixture

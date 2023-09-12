@@ -6,6 +6,13 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
+4.0.2 (2023-09-12)
+~~~~~~~~~~~~~~~~~~
+
+* Use absolute path to the report file.
+
+  * Thanks to `@adrien-berchet <https://github.com/adrien-berchet>`_ for reporting and for the PR.
+
 4.0.1 (2023-09-10)
 ~~~~~~~~~~~~~~~~~~
 

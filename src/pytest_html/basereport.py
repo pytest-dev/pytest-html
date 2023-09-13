@@ -186,7 +186,7 @@ class BaseReport:
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep(
             "-",
-            f"Generated html report: file://{self._report_path.as_posix()}",
+            f"Generated html report: {self._report_path.as_uri()}",
         )
 
     @pytest.hookimpl(trylast=True)

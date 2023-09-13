@@ -1,6 +1,7 @@
 import importlib.resources
 import os
 import sys
+from pathlib import Path
 
 import pkg_resources
 import pytest
@@ -83,10 +84,11 @@ def test_chdir(pytester):
             pass
     """
     )
-    page = pytester.runpytest("--html", "reports/report.html")
+    report_path = Path("reports") / "report.html"
+    page = pytester.runpytest("--html", str(report_path))
     assert page.ret == 0
     assert (
-        f"Generated html report: {(pytester.path / 'reports' / 'report.html').as_uri()}"
+        f"Generated html report: {(pytester.path / report_path).as_uri()}"
     ) in page.outlines[-2]
 
 

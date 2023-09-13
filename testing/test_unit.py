@@ -86,7 +86,7 @@ def test_chdir(pytester):
     page = pytester.runpytest("--html", "reports/report.html")
     assert page.ret == 0
     assert (
-        f"Generated html report: file://{pytester.path / 'reports' / 'report.html'}"
+        f"Generated html report: {(pytester.path / 'reports' / 'report.html').as_uri()}"
     ) in page.outlines[-2]
 
 

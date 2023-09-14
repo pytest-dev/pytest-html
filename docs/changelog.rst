@@ -6,6 +6,10 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
+4.0.3 (2023-09-14)
+~~~~~~~~~~~~~~~~~~
+* Fix typo ("ge" instead of "get") in green Reload button in report file.
+
 4.0.2 (2023-09-12)
 ~~~~~~~~~~~~~~~~~~
 

@@ -1,6 +1,7 @@
 import importlib.resources
 import os
 import sys
+from pathlib import Path
 
 import pkg_resources
 import pytest
@@ -68,6 +69,27 @@ def test_html_results_summary_hook(pytester):
     pytester.makepyfile("def test_pass(): pass")
     result = run(pytester)
     result.assert_outcomes(passed=1)
+
+
+def test_chdir(pytester):
+    pytester.makepyfile(
+        """
+        import pytest
+
+        @pytest.fixture
+        def changing_dir(tmp_path, monkeypatch):
+            monkeypatch.chdir(tmp_path)
+
+        def test_function(changing_dir):
+            pass
+    """
+    )
+    report_path = Path("reports") / "report.html"
+    page = pytester.runpytest("--html", str(report_path))
+    assert page.ret == 0
+    assert (
+        f"Generated html report: {(pytester.path / report_path).as_uri()}"
+    ) in page.outlines[-2]
 
 
 @pytest.fixture

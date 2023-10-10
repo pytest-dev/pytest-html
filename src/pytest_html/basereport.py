@@ -152,9 +152,10 @@ class BaseReport:
         return f"{counts}/{self._report.collected_items} {'tests' if plural else 'test'} done."
 
     def _hydrate_data(self, data, cells):
+        table_len = len(self._report.table_header)
         for index, cell in enumerate(cells):
             # extract column name and data if column is sortable
-            if "sortable" in self._report.table_header[index]:
+            if index < table_len and "sortable" in self._report.table_header[index]:
                 name_match = re.search(r"col-(\w+)", cell)
                 data_match = re.search(r"<td.*?>(.*?)</td>", cell)
                 if name_match and data_match:

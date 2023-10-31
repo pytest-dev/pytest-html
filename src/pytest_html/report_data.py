@@ -127,7 +127,7 @@ class ReportData:
     def set_data(self, key, value):
         self._data[key] = value
 
-    def add_test(self, test_data, report, logs):
+    def add_test(self, test_data, report, outcome, logs):
         # regardless of pass or fail we must add teardown logging to "call"
         if report.when == "teardown":
             self.append_teardown_log(report)
@@ -137,10 +137,8 @@ class ReportData:
             report.when in ["setup", "teardown"] and report.outcome != "passed"
         ):
             test_data["log"] = _handle_ansi("\n".join(logs))
+            self.outcomes = outcome
             self._data["tests"][report.nodeid].append(test_data)
-            return True
-
-        return False
 
     def append_teardown_log(self, report):
         log = []

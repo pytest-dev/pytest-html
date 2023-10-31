@@ -7,6 +7,7 @@ import math
 import os
 import re
 import warnings
+from collections import defaultdict
 from pathlib import Path
 
 import pytest
@@ -29,6 +30,7 @@ class BaseReport:
             config.getini("max_asset_filename_length")
         )
 
+        self._reports = defaultdict(dict)
         self._report = report_data
         self._report.title = self._report_path.name
 
@@ -204,15 +206,50 @@ class BaseReport:
                 DeprecationWarning,
             )
 
+        # "reruns" makes this code a mess.
+        # We store each combination of when and outcome
+        # exactly once, unless that outcome is a "rerun"
+        # then we store all of them.
+        key = (report.when, report.outcome)
+        if report.outcome == "rerun":
+            if key not in self._reports[report.nodeid]:
+                self._reports[report.nodeid][key] = list()
+            self._reports[report.nodeid][key].append(report)
+        else:
+            self._reports[report.nodeid][key] = [report]
+
+        self._report.total_duration += report.duration
+
+        finished = report.when == "teardown" and report.outcome != "rerun"
+        if not finished:
+            return
+
+        # Calculate total duration for a single test.
+        # This is needed to add the "teardown" duration
+        # to tests total duration.
+        test_duration = 0
+        for key, reports in self._reports[report.nodeid].items():
+            _, outcome = key
+            if outcome != "rerun":
+                test_duration += reports[0].duration
+
+        for key, reports in self._reports[report.nodeid].items():
+            when, _ = key
+            for each in reports:
+                dur = test_duration if when == "call" else each.duration
+                self._process_report(each, dur)
+
+        self._generate_report()
+
+    def _process_report(self, report, duration):
         outcome = _process_outcome(report)
         try:
             # hook returns as list for some reason
-            duration = self._config.hook.pytest_html_duration_format(
-                duration=report.duration
+            formatted_duration = self._config.hook.pytest_html_duration_format(
+                duration=duration
             )[0]
         except IndexError:
-            duration = _format_duration(report.duration)
-        self._report.total_duration += report.duration
+            formatted_duration = _format_duration(duration)
 
         test_id = report.nodeid
         if report.when != "call":
@@ -229,7 +266,7 @@ class BaseReport:
         cells = [
             f'<td class="col-result">{outcome}</td>',
             f'<td class="col-testId">{test_id}</td>',
-            f'<td class="col-duration">{duration}</td>',
+            f'<td class="col-duration">{formatted_duration}</td>',
             f'<td class="col-links">{_process_links(links)}</td>',
         ]
         self._config.hook.pytest_html_results_table_row(report=report, cells=cells)
@@ -240,17 +277,12 @@ class BaseReport:
         self._hydrate_data(data, cells)
         data["resultsTableRow"] = cells
 
-        # don't count passed setups and teardowns
-        if not (report.when in ["setup", "teardown"] and report.outcome == "passed"):
-            self._report.outcomes = outcome
-
         processed_logs = _process_logs(report)
         self._config.hook.pytest_html_results_table_html(
             report=report, data=processed_logs
         )
 
-        if self._report.add_test(data, report, processed_logs):
-            self._generate_report()
+        self._report.add_test(data, report, outcome, processed_logs)
 
 
 def _format_duration(duration):

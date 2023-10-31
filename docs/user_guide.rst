@@ -9,6 +9,18 @@ of a less permissive license, this package is not included as a dependency. If
 you have this package installed, then ANSI codes will be converted to HTML in
 your report.
 
+Report streaming
+----------------
+
+In order to stream the result, basically generating the report for each finished test
+instead of waiting until the full run is finished, you can set the ``generate_report_on_test``
+ini-value:
+
+.. code-block:: ini
+
+  [pytest]
+  generate_report_on_test = True
+
 Creating a self-contained report
 --------------------------------
 

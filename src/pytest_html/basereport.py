@@ -14,7 +14,6 @@ import pytest
 
 from pytest_html import __version__
 from pytest_html import extras
-from pytest_html.util import cleanup_unserializable
 
 
 class BaseReport:
@@ -49,7 +48,7 @@ class BaseReport:
 
     def _generate_report(self, self_contained=False):
         generated = datetime.datetime.now()
-        test_data = cleanup_unserializable(self._report.data)
+        test_data = self._report.data
         test_data = json.dumps(test_data)
         rendered_report = self._template.render(
             title=self._report.title,
@@ -239,7 +238,8 @@ class BaseReport:
                 dur = test_duration if when == "call" else each.duration
                 self._process_report(each, dur)
 
-        self._generate_report()
+        if self._config.getini("generate_report_on_test"):
+            self._generate_report()
 
     def _process_report(self, report, duration):
         outcome = _process_outcome(report)

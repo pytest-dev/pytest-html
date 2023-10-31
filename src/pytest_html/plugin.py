@@ -72,6 +72,13 @@ def pytest_addoption(parser):
         default="result",
         help="column to initially sort on.",
     )
+    parser.addini(
+        "generate_report_on_test",
+        type="bool",
+        default=False,
+        help="the HTML report will be generated after each test "
+        "instead of at the end of the run.",
+    )
 
 
 def pytest_configure(config):

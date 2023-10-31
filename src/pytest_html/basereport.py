@@ -14,7 +14,6 @@ import pytest
 
 from pytest_html import __version__
 from pytest_html import extras
-from pytest_html.util import cleanup_unserializable
 
 
 class BaseReport:
@@ -49,7 +48,7 @@ class BaseReport:
 
     def _generate_report(self, self_contained=False):
         generated = datetime.datetime.now()
-        test_data = cleanup_unserializable(self._report.data)
+        test_data = self._report.data
         test_data = json.dumps(test_data)
         rendered_report = self._template.render(
             title=self._report.title,

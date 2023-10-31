@@ -1,10 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import json
 from functools import partial
-from typing import Any
-from typing import Dict
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -21,18 +18,6 @@ except ImportError:
 
     _handle_ansi = _remove_ansi_escape_sequences
     _ansi_styles = []
-
-
-def cleanup_unserializable(d: Dict[str, Any]) -> Dict[str, Any]:
-    """Return new dict with entries that are not json serializable by their str()."""
-    result = {}
-    for k, v in d.items():
-        try:
-            json.dumps({k: v})
-        except TypeError:
-            v = str(v)
-        result[k] = v
-    return result
 
 
 def _read_template(search_paths, template_name="index.jinja2"):

@@ -239,7 +239,8 @@ class BaseReport:
                 dur = test_duration if when == "call" else each.duration
                 self._process_report(each, dur)
 
-        self._generate_report()
+        if self._config.getini("generate_report_on_test"):
+            self._generate_report()
 
     def _process_report(self, report, duration):
         outcome = _process_outcome(report)

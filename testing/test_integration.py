@@ -787,6 +787,42 @@ class TestHTML:
         log = get_log(page)
         assert_that(log).does_not_match(r"测试用例名称")
 
+    @pytest.mark.parametrize("outcome, occurrence", [(True, 1), (False, 2)])
+    def test_log_escaping(self, pytester, outcome, occurrence):
+        """
+        Not the best test, but it does a simple verification
+        that the string is escaped properly and not rendered as HTML
+        """
+        texts = [
+            "0 Checking object <Chopstick Container> and more",
+            "1 Checking object <  > and more",
+            "2 Checking object <> and more",
+            "3 Checking object < C > and more",
+            "4 Checking object <C > and more",
+            "5 Checking object <   and more",
+            "6 Checking object < and more",
+            "7 Checking object < C  and more",
+            "8 Checking object <C  and more",
+            '9 Checking object "<Chopstick Container>" and more',
+            '10 Checking object "<  >" and more',
+            '11 Checking object "<>" and more',
+            '12 Checking object "< C >" and more',
+            '13 Checking object "<C >" and more',
+        ]
+        test_file = "def test_escape():\n"
+        for t in texts:
+            test_file += f"\tprint('{t}')\n"
+        test_file += f"\tassert {outcome}"
+        pytester.makepyfile(test_file)
+
+        page = run(pytester)
+        assert_results(page, passed=1 if outcome else 0, failed=1 if not outcome else 0)
+
+        log = get_log(page)
+        for each in texts:
+            count = log.count(each)
+            assert_that(count).is_equal_to(occurrence)
+
 
 class TestLogCapturing:
     LOG_LINE_REGEX = r"\s+this is {}"

@@ -8,6 +8,7 @@ import os
 import re
 import warnings
 from collections import defaultdict
+from html import escape
 from pathlib import Path
 
 import pytest
@@ -312,11 +313,11 @@ def _is_error(report):
 def _process_logs(report):
     log = []
     if report.longreprtext:
-        log.append(report.longreprtext.replace("<", "&lt;").replace(">", "&gt;") + "\n")
+        log.append(escape(report.longreprtext) + "\n")
     # Don't add captured output to reruns
     if report.outcome != "rerun":
         for section in report.sections:
-            header, content = section
+            header, content = map(escape, section)
             log.append(f"{' ' + header + ' ':-^80}\n{content}")
 
             # weird formatting related to logs

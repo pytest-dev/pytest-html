@@ -758,6 +758,20 @@ class TestHTML:
                     assert_that(log).matches(f"- Captured {stream} {when} -")
                     assert_that(log).matches(f"this is {when} {stream}")
 
+    def test_collect_error(self, pytester):
+        error_msg = "Non existent module"
+        pytester.makepyfile(
+            f"""
+            import pytest
+            raise ImportError("{error_msg}")
+        """
+        )
+        page = run(pytester)
+        assert_results(page, error=1)
+
+        log = get_log(page)
+        assert_that(log).matches(rf"E\s+ImportError: {error_msg}")
+
 
 class TestLogCapturing:
     LOG_LINE_REGEX = r"\s+this is {}"

@@ -193,6 +193,11 @@ class BaseReport:
         )
 
     @pytest.hookimpl(trylast=True)
+    def pytest_collectreport(self, report):
+        if report.failed:
+            self._process_report(report, 0)
+
+    @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
         self._report.collected_items = len(session.items)
 
@@ -299,7 +304,9 @@ def _format_duration(duration):
 
 
 def _is_error(report):
-    return report.when in ["setup", "teardown"] and report.outcome == "failed"
+    return (
+        report.when in ["setup", "teardown", "collect"] and report.outcome == "failed"
+    )
 
 
 def _process_logs(report):

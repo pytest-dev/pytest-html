@@ -133,7 +133,7 @@ class ReportData:
             self.append_teardown_log(report)
 
         # passed "setup" and "teardown" are not added to the html
-        if report.when == "call" or (
+        if report.when in ["call", "collect"] or (
             report.when in ["setup", "teardown"] and report.outcome != "passed"
         ):
             test_data["log"] = _handle_ansi("\n".join(logs))

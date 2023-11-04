@@ -772,6 +772,21 @@ class TestHTML:
         log = get_log(page)
         assert_that(log).matches(rf"E\s+ImportError: {error_msg}")
 
+    def test_report_display_utf8(self, pytester):
+        pytester.makepyfile(
+            """
+            import pytest
+            @pytest.mark.parametrize("utf8", [("测试用例名称")])
+            def test_pass(utf8):
+                assert True
+        """
+        )
+        page = run(pytester)
+        assert_results(page, passed=1)
+
+        log = get_log(page)
+        assert_that(log).does_not_match(r"测试用例名称")
+
 
 class TestLogCapturing:
     LOG_LINE_REGEX = r"\s+this is {}"

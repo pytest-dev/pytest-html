@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import warnings
 from collections import defaultdict
+from html import escape
 
 from pytest_html.util import _handle_ansi
 
@@ -146,7 +147,7 @@ class ReportData:
             # Last index is "call"
             test = self._data["tests"][report.nodeid][-1]
             for section in report.sections:
-                header, content = section
+                header, content = map(escape, section)
                 if "teardown" in header:
                     log.append(f"{' ' + header + ' ':-^80}\n{content}")
             test["log"] += _handle_ansi("\n".join(log))

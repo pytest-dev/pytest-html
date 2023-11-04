@@ -6,9 +6,22 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
-4.0.3 (2023-09-14)
+4.1.0 (2023-11-04)
 ~~~~~~~~~~~~~~~~~~
+
 * Fix typo ("ge" instead of "get") in green Reload button in report file.
+
+* Fix results table modification documentation.
+
+  * Thanks to `@michalkaptur <https://github.com/michalkaptur>`_ for the reporting and PR.
+
+* Fix broken duration.
+
+* Revert report generation to full run.
+
+* Add collections errors to report.
+
+* Fix escaping HTML in the log.
 
 4.0.2 (2023-09-12)
 ~~~~~~~~~~~~~~~~~~

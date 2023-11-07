@@ -6,6 +6,13 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
+Unreleased
+~~~~~~~~~~
+
+* Fix original initial sort INI-setting.
+
+  * Thanks to `@sturmf <https://github.com/sturmf>`_ for reporting.
+
 4.1.0 (2023-11-04)
 ~~~~~~~~~~~~~~~~~~
 

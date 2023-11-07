@@ -6,8 +6,8 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
-Unreleased
-~~~~~~~~~~
+4.1.1 (2023-11-07)
+~~~~~~~~~~~~~~~~~~
 
 * Fix original initial sort INI-setting.
 

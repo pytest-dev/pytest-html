@@ -57,7 +57,7 @@ const renderContent = (tests) => {
 
     // remove all sorting classes and set the relevant
     findAll('.sortable', tableHeader).forEach((elem) => elem.classList.remove('asc', 'desc'))
-    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`).classList.add(sortAsc ? 'desc' : 'asc')
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
     newTable.appendChild(tableHeader)
 
     if (!rows.length) {

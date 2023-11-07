@@ -823,6 +823,52 @@ class TestHTML:
             count = log.count(each)
             assert_that(count).is_equal_to(occurrence)
 
+    @pytest.mark.parametrize(
+        "sort, order",
+        [
+            (None, ["BBB", "AAA", "CCC"]),
+            ("result", ["BBB", "AAA", "CCC"]),
+            ("testId", ["AAA", "BBB", "CCC"]),
+            ("duration", ["CCC", "BBB", "AAA"]),
+            ("original", ["AAA", "BBB", "CCC"]),
+        ],
+    )
+    def test_initial_sort(self, pytester, sort, order):
+        if sort is not None:
+            pytester.makeini(
+                f"""
+                [pytest]
+                initial_sort = {sort}
+            """
+            )
+
+        pytester.makepyfile(
+            """
+            import pytest
+            from time import sleep
+
+            def test_AAA():
+                sleep(0.3)
+                assert True
+
+            def test_BBB():
+                sleep(0.2)
+                assert False
+
+            def test_CCC():
+                sleep(0.1)
+                assert True
+        """
+        )
+
+        page = run(pytester)
+        assert_results(page, passed=2, failed=1)
+
+        result = page.select("td.col-testId")
+        assert_that(result).is_length(3)
+        for row, expected in zip(result, order):
+            assert_that(row.string).contains(expected)
+
 
 class TestLogCapturing:
     LOG_LINE_REGEX = r"\s+this is {}"

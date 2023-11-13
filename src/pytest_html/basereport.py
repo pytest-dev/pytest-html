@@ -10,36 +10,56 @@ import warnings
 from collections import defaultdict
 from html import escape
 from pathlib import Path
+from typing import Any
+from typing import DefaultDict
+from typing import Dict
+from typing import List
 
 import pytest
+from _pytest.config import Config
+from _pytest.main import Session
+from _pytest.reports import CollectReport
+from _pytest.reports import TestReport
+from _pytest.terminal import TerminalReporter
+from jinja2.environment import Template
 
 from pytest_html import __version__
 from pytest_html import extras
+from pytest_html.report_data import ReportData
 
 
 class BaseReport:
-    def __init__(self, report_path, config, report_data, template, css):
-        self._report_path = (
+    def __init__(
+        self,
+        report_path: Path,
+        config: Config,
+        report_data: ReportData,
+        template: Template,
+        css: str,
+    ) -> None:
+        self._report_path: Path = (
             Path.cwd() / Path(os.path.expandvars(report_path)).expanduser()
         )
         self._report_path.parent.mkdir(parents=True, exist_ok=True)
-        self._config = config
-        self._template = template
-        self._css = css
-        self._max_asset_filename_length = int(
+        self._config: Config = config
+        self._template: Template = template
+        self._css: str = css
+        self._max_asset_filename_length: int = int(
             config.getini("max_asset_filename_length")
         )
 
-        self._reports = defaultdict(dict)
-        self._report = report_data
-        self._report.title = self._report_path.name
+        self._reports: DefaultDict = defaultdict(dict)
+        self._report: ReportData = report_data
+        self._report.title: str = self._report_path.name
 
     @property
     def css(self):
         # implement in subclasses
         return
 
-    def _asset_filename(self, test_id, extra_index, test_index, file_extension):
+    def _asset_filename(
+        self, test_id: str, extra_index: int, test_index: int, file_extension: str
+    ) -> str:
         return "{}_{}_{}.{}".format(
             re.sub(r"[^\w.]", "_", test_id),
             str(extra_index),
@@ -47,7 +67,7 @@ class BaseReport:
             file_extension,
         )[-self._max_asset_filename_length :]
 
-    def _generate_report(self, self_contained=False):
+    def _generate_report(self, self_contained: bool = False) -> None:
         generated = datetime.datetime.now()
         test_data = self._report.data
         test_data = json.dumps(test_data)
@@ -68,7 +88,7 @@ class BaseReport:
 
         self._write_report(rendered_report)
 
-    def _generate_environment(self):
+    def _generate_environment(self) -> Dict[str, Any]:
         try:
             from pytest_metadata.plugin import metadata_key
 
@@ -89,7 +109,7 @@ class BaseReport:
 
         return metadata
 
-    def _is_redactable_environment_variable(self, environment_variable):
+    def _is_redactable_environment_variable(self, environment_variable: str) -> bool:
         redactable_regexes = self._config.getini("environment_table_redact_list")
         for redactable_regex in redactable_regexes:
             if re.match(redactable_regex, environment_variable):
@@ -97,13 +117,13 @@ class BaseReport:
 
         return False
 
-    def _data_content(self, *args, **kwargs):
+    def _data_content(self, *args, **kwargs) -> None:
         pass
 
-    def _media_content(self, *args, **kwargs):
+    def _media_content(self, *args, **kwargs) -> None:
         pass
 
-    def _process_extras(self, report, test_id):
+    def _process_extras(self, report: CollectReport, test_id: str) -> List[Any]:
         test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
         report_extras = getattr(report, "extras", [])
         for extra_index, extra in enumerate(report_extras):
@@ -134,12 +154,12 @@ class BaseReport:
 
         return report_extras
 
-    def _write_report(self, rendered_report):
+    def _write_report(self, rendered_report: str) -> None:
         with self._report_path.open("w", encoding="utf-8") as f:
             f.write(rendered_report)
 
-    def _run_count(self):
-        relevant_outcomes = ["passed", "failed", "xpassed", "xfailed"]
+    def _run_count(self) -> str:
+        relevant_outcomes: List[str] = ["passed", "failed", "xpassed", "xfailed"]
         counts = 0
         for outcome in self._report.outcomes.keys():
             if outcome in relevant_outcomes:
@@ -153,7 +173,7 @@ class BaseReport:
 
         return f"{counts}/{self._report.collected_items} {'tests' if plural else 'test'} done."
 
-    def _hydrate_data(self, data, cells):
+    def _hydrate_data(self, data: Dict[str, List], cells: List[str]) -> None:
         for index, cell in enumerate(cells):
             # extract column name and data if column is sortable
             if "sortable" in self._report.table_header[index]:
@@ -163,7 +183,7 @@ class BaseReport:
                     data[name_match.group(1)] = data_match.group(1)
 
     @pytest.hookimpl(trylast=True)
-    def pytest_sessionstart(self, session):
+    def pytest_sessionstart(self, session: Session) -> None:
         self._report.set_data("environment", self._generate_environment())
 
         session.config.hook.pytest_html_report_title(report=self._report)
@@ -176,7 +196,7 @@ class BaseReport:
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
-    def pytest_sessionfinish(self, session):
+    def pytest_sessionfinish(self, session: Session) -> None:
         session.config.hook.pytest_html_results_summary(
             prefix=self._report.additional_summary["prefix"],
             summary=self._report.additional_summary["summary"],
@@ -187,23 +207,23 @@ class BaseReport:
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
-    def pytest_terminal_summary(self, terminalreporter):
+    def pytest_terminal_summary(self, terminalreporter: TerminalReporter) -> None:
         terminalreporter.write_sep(
             "-",
             f"Generated html report: {self._report_path.as_uri()}",
         )
 
     @pytest.hookimpl(trylast=True)
-    def pytest_collectreport(self, report):
+    def pytest_collectreport(self, report: CollectReport) -> None:
         if report.failed:
             self._process_report(report, 0)
 
     @pytest.hookimpl(trylast=True)
-    def pytest_collection_finish(self, session):
+    def pytest_collection_finish(self, session: Session) -> None:
         self._report.collected_items = len(session.items)
 
     @pytest.hookimpl(trylast=True)
-    def pytest_runtest_logreport(self, report):
+    def pytest_runtest_logreport(self, report: TestReport) -> None:
         if hasattr(report, "duration_formatter"):
             warnings.warn(
                 "'duration_formatter' has been removed and no longer has any effect!"
@@ -247,7 +267,7 @@ class BaseReport:
         if self._config.getini("generate_report_on_test"):
             self._generate_report()
 
-    def _process_report(self, report, duration):
+    def _process_report(self, report: TestReport, duration: int) -> None:
         outcome = _process_outcome(report)
         try:
             # hook returns as list for some reason
@@ -291,9 +311,9 @@ class BaseReport:
         self._report.add_test(data, report, outcome, processed_logs)
 
 
-def _format_duration(duration):
+def _format_duration(duration: float) -> str:
     if duration < 1:
-        return "{} ms".format(round(duration * 1000))
+        return f"{round(duration * 1000)} ms"
 
     hours = math.floor(duration / 3600)
     remaining_seconds = duration % 3600
@@ -304,13 +324,13 @@ def _format_duration(duration):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
-def _is_error(report):
+def _is_error(report: BaseReport) -> bool:
     return (
         report.when in ["setup", "teardown", "collect"] and report.outcome == "failed"
     )
 
 
-def _process_logs(report):
+def _process_logs(report) -> List[str]:
     log = []
     if report.longreprtext:
         log.append(escape(report.longreprtext) + "\n")
@@ -330,7 +350,7 @@ def _process_logs(report):
     return log
 
 
-def _process_outcome(report):
+def _process_outcome(report: TestReport) -> str:
     if _is_error(report):
         return "Error"
     if hasattr(report, "wasxfail"):
@@ -342,12 +362,12 @@ def _process_outcome(report):
     return report.outcome.capitalize()
 
 
-def _process_links(links):
+def _process_links(links) -> str:
     a_tag = '<a target="_blank" href="{content}" class="col-links__extra {format_type}">{name}</a>'
     return "".join([a_tag.format_map(link) for link in links])
 
 
-def _fix_py(cells):
+def _fix_py(cells: List[str]) -> List[str]:
     # backwards-compat
     new_cells = []
     for html in cells:

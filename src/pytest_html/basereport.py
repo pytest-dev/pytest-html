@@ -6,6 +6,7 @@ import json
 import math
 import os
 import re
+import time
 import warnings
 from collections import defaultdict
 from html import escape
@@ -51,6 +52,7 @@ class BaseReport:
         self._reports: DefaultDict = defaultdict(dict)
         self._report: ReportData = report_data
         self._report.title: str = self._report_path.name
+        self._suite_start_time: float = time.time()
 
     @property
     def css(self):

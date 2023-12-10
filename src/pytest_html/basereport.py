@@ -196,7 +196,7 @@ class BaseReport:
     @pytest.hookimpl(trylast=True)
     def pytest_collectreport(self, report):
         if report.failed:
-            self._process_report(report, 0)
+            self._process_report(report, 0, [])
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session):
@@ -238,16 +238,25 @@ class BaseReport:
             if outcome != "rerun":
                 test_duration += reports[0].duration
 
+        processed_extras = []
+        for key, reports in self._reports[report.nodeid].items():
+            when, _ = key
+            for each in reports:
+                test_id = report.nodeid
+                if when != "call":
+                    test_id += f"::{when}"
+                processed_extras += self._process_extras(each, test_id)
+
         for key, reports in self._reports[report.nodeid].items():
             when, _ = key
             for each in reports:
                 dur = test_duration if when == "call" else each.duration
-                self._process_report(each, dur)
+                self._process_report(each, dur, processed_extras)
 
         if self._config.getini("generate_report_on_test"):
             self._generate_report()
 
-    def _process_report(self, report, duration):
+    def _process_report(self, report, duration, processed_extras):
         outcome = _process_outcome(report)
         try:
             # hook returns as list for some reason
@@ -262,8 +271,9 @@ class BaseReport:
             test_id += f"::{report.when}"
 
         data = {
-            "extras": self._process_extras(report, test_id),
+            "extras": processed_extras,
         }
+
         links = [
             extra
             for extra in data["extras"]

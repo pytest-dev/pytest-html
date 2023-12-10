@@ -518,26 +518,27 @@ class TestHTML:
         )
 
     def test_extra_url(self, pytester):
-        content = str(random.random())
         pytester.makeconftest(
-            f"""
+            """
             import pytest
 
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
-                if report.when == 'call':
-                    from pytest_html import extras
-                    report.extras = [extras.url('{content}')]
+                from pytest_html import extras
+                report.extras = [extras.url(f'{report.when}')]
         """
         )
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        element = page.select_one("a[class='col-links__extra url']")
-        assert_that(element.string).is_equal_to("URL")
-        assert_that(element["href"]).is_equal_to(content)
+        elements = page.select("a[class='col-links__extra url']")
+        assert_that(elements).is_length(3)
+        for each in zip(elements, ["setup", "call", "teardown"]):
+            element, when = each
+            assert_that(element.string).is_equal_to("URL")
+            assert_that(element["href"]).is_equal_to(when)
 
     @pytest.mark.parametrize(
         "mime_type, extension",

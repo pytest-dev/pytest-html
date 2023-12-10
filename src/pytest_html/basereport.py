@@ -267,7 +267,9 @@ class BaseReport:
         if self._config.getini("generate_report_on_test"):
             self._generate_report()
 
-    def _process_report(self, report: TestReport, duration: int) -> None:
+    def _process_report(
+        self, report: TestReport, duration: int, processed_extras: List
+    ) -> None:
         outcome = _process_outcome(report)
         try:
             # hook returns as list for some reason

@@ -6,6 +6,7 @@ import json
 import math
 import os
 import re
+import time
 import warnings
 from collections import defaultdict
 from html import escape
@@ -33,6 +34,7 @@ class BaseReport:
         self._reports = defaultdict(dict)
         self._report = report_data
         self._report.title = self._report_path.name
+        self._suite_start_time = time.time()
 
     @property
     def css(self):
@@ -173,7 +175,8 @@ class BaseReport:
         self._report.table_header = _fix_py(headers)
 
         self._report.running_state = "started"
-        self._generate_report()
+        if self._config.getini("generate_report_on_test"):
+            self._generate_report()
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionfinish(self, session):
@@ -184,6 +187,8 @@ class BaseReport:
             session=session,
         )
         self._report.running_state = "finished"
+        suite_stop_time = time.time()
+        self._report.total_duration = suite_stop_time - self._suite_start_time
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
@@ -222,8 +227,6 @@ class BaseReport:
             self._reports[report.nodeid][key].append(report)
         else:
             self._reports[report.nodeid][key] = [report]
-
-        self._report.total_duration += report.duration
 
         finished = report.when == "teardown" and report.outcome != "rerun"
         if not finished:

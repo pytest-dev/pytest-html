@@ -97,3 +97,6 @@ version-file = "src/pytest_html/__version.py"
 
 [tool.hatch.build.hooks.custom]
 path = "scripts/npm.py"
+
+[tool.djlint]
+profile="jinja"

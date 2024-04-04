@@ -63,6 +63,15 @@ repos:
         language: python
         additional_dependencies: [pygments, restructuredtext_lint]
 
+  - repo: local
+    hooks:
+      - id: djlint
+        name: djlint
+        entry: djlint
+        files: \.jinja2$
+        language: python
+        additional_dependencies: [djlint]
+
   - repo: https://github.com/elidupuis/mirrors-sass-lint
     rev: "5cc45653263b423398e4af2561fae362903dd45d"
     hooks:

@@ -82,7 +82,7 @@
         <div class="controls">
           <div class="filters">
           {%- for result, values in outcomes.items() %}
-            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}/>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}>
             <span class="{{ result }}">{{ values["value"] }} {{ values["label"] }}{{ "," if result != "rerun" }}</span>
           {%- endfor %}
           </div>

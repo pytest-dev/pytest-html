@@ -57,10 +57,10 @@ const dom = {
         }
 
         if (collapsed) {
-            resultBody.querySelector('.collapsible > col-result')?.classList.add('collapsed')
+            resultBody.querySelector('.collapsible > .col-result')?.classList.add('collapsed')
             resultBody.querySelector('.extras-row').classList.add('hidden')
         } else {
-            resultBody.querySelector('.collapsible > col-result')?.classList.remove('collapsed')
+            resultBody.querySelector('.collapsible > .col-result')?.classList.remove('collapsed')
         }
 
         const media = []

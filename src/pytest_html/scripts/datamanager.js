@@ -57,6 +57,10 @@ class DataManager {
     get initialSort() {
         return this.data.initialSort
     }
+
+    get expandLogs() {
+        return this.data.expandLogs
+    }
 }
 
 module.exports = {

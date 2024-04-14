@@ -48,7 +48,7 @@ const showCategory = (categoryToShow) => {
 }
 
 const getExpandLogs = (expandLogs) => {
-    if (expandLogs === "true") {
+    if (expandLogs === 'true') {
         return true
     }
     if (expandLogs) {

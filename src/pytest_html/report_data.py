@@ -61,6 +61,9 @@ class ReportData:
         initial_sort = config.getini("initial_sort")
         self._data["initialSort"] = initial_sort
 
+        expand_logs = config.getini("expand_logs")
+        self._data["expandLogs"] = expand_logs
+
     @property
     def additional_summary(self):
         return self._additional_summary

@@ -47,6 +47,16 @@ const showCategory = (categoryToShow) => {
     window.history.pushState({}, null, unescape(url.href))
 }
 
+const getExpandLogs = (expandLogs) => {
+    if (expandLogs === "true") {
+        return true
+    }
+    if (expandLogs) {
+        return true
+    }
+    return false
+}
+
 const getSort = (initialSort) => {
     const url = new URL(window.location.href)
     let sort = new URLSearchParams(url.search).get('sort')
@@ -99,6 +109,7 @@ module.exports = {
     showCategory,
     getCollapsedIds,
     setCollapsedIds,
+    getExpandLogs,
     getSort,
     setSort,
     getSortDirection,

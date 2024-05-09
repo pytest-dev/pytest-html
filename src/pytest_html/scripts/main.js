@@ -53,7 +53,7 @@ const renderContent = (tests) => {
     const rows = tests.map(dom.getResultTBody)
     const table = document.getElementById('results-table')
     const tableHeader = document.getElementById('results-table-head')
-    const clickEvent = new Event('click');
+    const clickEvent = new Event('click')
 
     const newTable = document.createElement('table')
     newTable.id = 'results-table'

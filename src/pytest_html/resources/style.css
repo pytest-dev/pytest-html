@@ -4,20 +4,23 @@ body {
   /* do not increase min-width as some may use split screens */
   min-width: 800px;
   color: #999;
+  margin: 50px 150px 100px 150px;
 }
 
 h1 {
-  font-size: 24px;
-  color: black;
+  font-size: 28px;
+  color: #45B39D;
 }
 
 h2 {
-  font-size: 16px;
-  color: black;
+  font-size: 20px;
+  color: #45B39D;
+  margin: 30px 0px;
 }
 
 p {
-  color: black;
+  color: #34495E;
+  font-size: 15px;
 }
 
 a {
@@ -26,6 +29,7 @@ a {
 
 table {
   border-collapse: collapse;
+  color: #34495E
 }
 
 /******************************
@@ -49,7 +53,10 @@ table {
  ******************************/
 span.passed,
 .passed .col-result {
-  color: green;
+  color: #58D68D;
+  font-size: 15px;
+  margin-right: 10px;
+  white-space: nowrap;
 }
 
 span.skipped,
@@ -58,7 +65,10 @@ span.rerun,
 .skipped .col-result,
 .xfailed .col-result,
 .rerun .col-result {
-  color: orange;
+  color: #F1C40F;
+  font-size: 15px;
+  margin-right: 10px;
+  white-space: nowrap;
 }
 
 span.error,
@@ -67,7 +77,10 @@ span.xpassed,
 .error .col-result,
 .failed .col-result,
 .xpassed .col-result {
-  color: red;
+  color: #EC7063;
+  font-size: 15px;
+  margin-right: 10px;
+  white-space: nowrap;
 }
 
 .col-links__extra {
@@ -88,24 +101,40 @@ span.xpassed,
 #results-table {
   border: 1px solid #e6e6e6;
   color: #999;
-  font-size: 12px;
+  font-size: 13px;
   width: 100%;
+  margin-top: 20px;
 }
-#results-table th,
-#results-table td {
+
+#results-table-head {
+  color: #34495E;
+}
+
+#results-table th{
+  padding: 15px;
+  border: 1px solid #e6e6e6;
+  text-align: left;
+  font-weight: bold;
+}
+
+.col-result{
+border: 1px solid #e6e6e6;
+}
+
+.col-testId,
+.col-duration,
+.col-links{
   padding: 5px;
   border: 1px solid #e6e6e6;
   text-align: left;
-}
-#results-table th {
-  font-weight: bold;
+  color: #34495E;
 }
 
 /*------------------
  * 2. Extra
  *------------------*/
 .logwrapper {
-  max-height: 230px;
+  max-height: 260px;
   overflow-y: scroll;
   background-color: #e6e6e6;
 }
@@ -140,7 +169,7 @@ span.xpassed,
   top: -50px;
   height: calc(100% + 50px);
   border: 1px solid #e6e6e6;
-  color: black;
+  color: #34495E;
   display: block;
   font-family: "Courier New", Courier, monospace;
   padding: 5px;
@@ -300,6 +329,7 @@ div.media {
 .collapse {
   display: flex;
   align-items: center;
+  margin: 15px 0 10px 0;
 }
 .filters button,
 .collapse button {
@@ -308,6 +338,7 @@ div.media {
   background: none;
   cursor: pointer;
   text-decoration: underline;
+  white-space: nowrap;
 }
 .filters button:hover,
 .collapse button:hover {

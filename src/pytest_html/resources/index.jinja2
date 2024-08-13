@@ -1,120 +1,183 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8"/>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.1/dist/echarts.min.js"></script>
     <title id="head-title">{{ title }}</title>
     {%- if self_contained %}
-      <style type="text/css">
-        {{- styles|safe }}
-      </style>
+        <style type="text/css">
+            {{- styles|safe }}
+        </style>
     {% else %}
-      <link href="{{ styles }}" rel="stylesheet" type="text/css"/>
+        <link href="{{ styles }}" rel="stylesheet" type="text/css"/>
     {%- endif %}
-  </head>
-  <body>
-    <h1 id="title">{{ title }}</h1>
-    <p>Report generated on {{ date }} at {{ time }} by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
-        v{{ version }}</p>
-    <div id="environment-header">
-      <h2>Environment</h2>
-    </div>
-    <table id="environment"></table>
-    <!-- TEMPLATES -->
-      <template id="template_environment_row">
-      <tr>
-        <td></td>
-        <td></td>
-      </tr>
-    </template>
-    <template id="template_results-table__body--empty">
-      <tbody class="results-table-row">
-        <tr id="not-found-message">
-          <td colspan="{{ table_head|length }}">No results found. Check the filters.</th>
-        </tr>
-    </template>
-    <template id="template_results-table__tbody">
-      <tbody class="results-table-row">
-        <tr class="collapsible">
-        </tr>
-        <tr class="extras-row">
-          <td class="extra" colspan="{{ table_head|length }}">
-            <div class="extraHTML"></div>
-            <div class="media">
-              <div class="media-container">
-                  <div class="media-container__nav--left"><</div>
-                  <div class="media-container__viewport">
-                    <img src="" />
-                    <video controls>
-                      <source src="" type="video/mp4">
-                    </video>
-                  </div>
-                  <div class="media-container__nav--right">></div>
-                </div>
-                <div class="media__name"></div>
-                <div class="media__counter"></div>
-            </div>
-            <div class="logwrapper">
-              <div class="logexpander"></div>
-              <div class="log"></div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </template>
-    <!-- END TEMPLATES -->
-    <div class="summary">
-      <div class="summary__data">
-        <h2>Summary</h2>
+</head>
+<body>
+<h1 id="title">{{ title }}</h1>
+<p>{{ date }} at {{ time }} </p>
+
+
+<div id="main" style="width: 550px;height:400px;"></div>
+
+
+<!-- END TEMPLATES -->
+<div class="summary">
+    <div class="summary__data">
         <div class="additional-summary prefix">
-          {%- for p in additional_summary['prefix'] %}
-          {{ p|safe }}
-          {%- endfor %}
+            {%- for p in additional_summary['prefix'] %}
+                {{ p|safe }}
+            {%- endfor %}
         </div>
         <p class="run-count">{{ run_count }}</p>
-        <p class="filter">(Un)check the boxes to filter the results.</p>
+
         <div class="summary__reload">
-          <div class="summary__reload__button {{ 'hidden' if running_state == 'finished' }}" onclick="location.reload()">
-            <div>There are still tests running. <br />Reload this page to get the latest results!</div>
-          </div>
+            <div class="summary__reload__button {{ 'hidden' if running_state == 'finished' }}"
+                 onclick="location.reload()">
+                <div>There are still tests running. <br/>Reload this page to get the latest results!</div>
+            </div>
         </div>
         <div class="summary__spacer"></div>
         <div class="controls">
-          <div class="filters">
-          {%- for result, values in outcomes.items() %}
-            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}/>
-            <span class="{{ result }}">{{ values["value"] }} {{ values["label"] }}{{ "," if result != "rerun" }}</span>
-          {%- endfor %}
-          </div>
-          <div class="collapse">
-            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
-          </div>
+            <div class="filters">
+                {%- for result, values in outcomes.items() %}
+                    <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
+                           data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}/>
+                    <span class="{{ result }}">{{ values["value"] }}
+                        {{ values["label"] }}{{ "," if result != "rerun" }}</span>
+                {%- endfor %}
+            </div>
+            <div class="collapse">
+                <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide
+                all details
+            </button>
+            </div>
         </div>
-      </div>
-      <div class="additional-summary summary">
-        {%- for s in additional_summary['summary'] %}
-        {{ s|safe }}
-        {%- endfor %}
-      </div>
-      <div class="additional-summary postfix">
-        {%- for p in additional_summary['postfix'] %}
-        {{ p|safe }}
-        {%- endfor %}
-      </div>
     </div>
-    <table id="results-table">
-      <thead id="results-table-head">
-        <tr>
-        {%- for th in table_head %}
-          {{ th|safe }}
+    <div class="additional-summary summary">
+        {%- for s in additional_summary['summary'] %}
+            {{ s|safe }}
         {%- endfor %}
+    </div>
+    <div class="additional-summary postfix">
+        {%- for p in additional_summary['postfix'] %}
+            {{ p|safe }}
+        {%- endfor %}
+    </div>
+</div>
+<table id="results-table">
+    <thead id="results-table-head">
+    <tr>
+        {%- for th in table_head %}
+            {{ th|safe }}
+        {%- endfor %}
+    </tr>
+    </thead>
+</table>
+
+
+<div>
+    <div id="environment-header">
+        <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <!-- TEMPLATES -->
+    <template id="template_environment_row">
+        <tr>
+            <td></td>
+            <td></td>
         </tr>
-      </thead>
-    </table>
-  </body>
-  <footer>
+    </template>
+    <template id="template_results-table__body--empty">
+        <tbody class="results-table-row">
+        <tr id="not-found-message">
+            <td colspan="{{ table_head|length }}">No results found. Check the filters.</th>
+        </tr>
+    </template>
+    <template id="template_results-table__tbody">
+        <tbody class="results-table-row">
+        <tr class="collapsible">
+        </tr>
+        <tr class="extras-row">
+            <td class="extra" colspan="{{ table_head|length }}">
+                <div class="extraHTML"></div>
+                <div class="media">
+                    <div class="media-container">
+                        <div class="media-container__nav--left"><</div>
+                        <div class="media-container__viewport">
+                            <img src=""/>
+                            <video controls>
+                                <source src="" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="media-container__nav--right">></div>
+                    </div>
+                    <div class="media__name"></div>
+                    <div class="media__counter"></div>
+                </div>
+                <div class="logwrapper">
+                    <div class="logexpander"></div>
+                    <div class="log"></div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </template>
+</div>
+
+
+<script type="text/javascript">
+    let chatData = []
+    {%- for result, values in outcomes.items() %}
+        chatData.push({value: {{values["value"]}}, name: '{{result}}'})
+    {%- endfor %}
+
+    var chartDom = document.getElementById('main');
+    var myChart = echarts.init(document.getElementById('main'));
+    var option = {
+        color :['#ee6666','#91cc75','#fac858','#5470c6','#fbb1a2','#859382','#da995f'],
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            botoom: '4%',
+            left: 'center'
+        },
+        series: [
+            {
+                name: 'run result',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 35,
+                        fontWeight: 'bold'
+                    }
+                },
+                data: chatData
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+</script>
+
+
+</body>
+<footer>
     <div id="data-container" data-jsonblob="{{ test_data }}"></div>
     <script>
-      {% include "app.js" %}
+        {% include "app.js" %}
     </script>
-  </footer>
+</footer>
 </html>

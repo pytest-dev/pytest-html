@@ -30,6 +30,8 @@ class ReportData:
             "xpassed": {"label": "Unexpected passes", "value": 0},
             "error": {"label": "Errors", "value": 0},
             "rerun": {"label": "Reruns", "value": 0},
+            # Used by pytest-retries
+            "retried": {"label": "Retried", "value": 0},
         }
 
         self._results_table_header = [

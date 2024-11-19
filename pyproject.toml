@@ -10,7 +10,7 @@ name = "pytest-html"
 description = "pytest plugin for generating HTML reports"
 readme = "README.rst"
 license = "MPL-2.0"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 keywords = [
   "pytest",
   "html",

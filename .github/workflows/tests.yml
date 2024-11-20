@@ -93,6 +93,15 @@ jobs:
             python-version: "3.10"
             with-coverage: true
 
+          - os: ubuntu-latest
+            python-version: 3.13
+            tox-env: devel
+          - os: windows-latest
+            python-version: 3.13
+            tox-env: devel
+          - os: macos-latest
+            python-version: 3.13
+            tox-env: devel
 
     steps:
       - name: Set newline behavior
@@ -158,6 +167,8 @@ jobs:
         include:
           - python-version: "3.10"
             with-coverage: true
+          - python-version: 3.13
+            tox-env: devel
 
     steps:
       - name: Set newline behavior
@@ -223,6 +234,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9"]
+        include:
+          - python-version: 3.13
+            tox-env: devel
 
     steps:
       - name: Set newline behavior

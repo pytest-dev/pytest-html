@@ -195,7 +195,8 @@ class BaseReport:
         self._report.table_header = _fix_py(headers)
 
         self._report.running_state = "started"
-        self._generate_report()
+        if self._config.getini("generate_report_on_test"):
+            self._generate_report()
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionfinish(self, session: Session) -> None:
@@ -206,6 +207,8 @@ class BaseReport:
             session=session,
         )
         self._report.running_state = "finished"
+        suite_stop_time = time.time()
+        self._report.total_duration = suite_stop_time - self._suite_start_time
         self._generate_report()
 
     @pytest.hookimpl(trylast=True)
@@ -218,7 +221,7 @@ class BaseReport:
     @pytest.hookimpl(trylast=True)
     def pytest_collectreport(self, report: CollectReport) -> None:
         if report.failed:
-            self._process_report(report, 0)
+            self._process_report(report, 0, [])
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_finish(self, session: Session) -> None:
@@ -245,8 +248,6 @@ class BaseReport:
         else:
             self._reports[report.nodeid][key] = [report]
 
-        self._report.total_duration += report.duration
-
         finished = report.when == "teardown" and report.outcome != "rerun"
         if not finished:
             return
@@ -260,11 +261,20 @@ class BaseReport:
             if outcome != "rerun":
                 test_duration += reports[0].duration
 
+        processed_extras = []
+        for key, reports in self._reports[report.nodeid].items():
+            when, _ = key
+            for each in reports:
+                test_id = report.nodeid
+                if when != "call":
+                    test_id += f"::{when}"
+                processed_extras += self._process_extras(each, test_id)
+
         for key, reports in self._reports[report.nodeid].items():
             when, _ = key
             for each in reports:
                 dur = test_duration if when == "call" else each.duration
-                self._process_report(each, dur)
+                self._process_report(each, dur, processed_extras)
 
         if self._config.getini("generate_report_on_test"):
             self._generate_report()
@@ -286,8 +296,9 @@ class BaseReport:
             test_id += f"::{report.when}"
 
         data = {
-            "extras": self._process_extras(report, test_id),
+            "extras": processed_extras,
         }
+
         links = [
             extra
             for extra in data["extras"]

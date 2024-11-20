@@ -518,26 +518,27 @@ class TestHTML:
         )
 
     def test_extra_url(self, pytester):
-        content = str(random.random())
         pytester.makeconftest(
-            f"""
+            """
             import pytest
 
             @pytest.hookimpl(hookwrapper=True)
             def pytest_runtest_makereport(item, call):
                 outcome = yield
                 report = outcome.get_result()
-                if report.when == 'call':
-                    from pytest_html import extras
-                    report.extras = [extras.url('{content}')]
+                from pytest_html import extras
+                report.extras = [extras.url(f'{report.when}')]
         """
         )
         pytester.makepyfile("def test_pass(): pass")
         page = run(pytester)
 
-        element = page.select_one("a[class='col-links__extra url']")
-        assert_that(element.string).is_equal_to("URL")
-        assert_that(element["href"]).is_equal_to(content)
+        elements = page.select("a[class='col-links__extra url']")
+        assert_that(elements).is_length(3)
+        for each in zip(elements, ["setup", "call", "teardown"]):
+            element, when = each
+            assert_that(element.string).is_equal_to("URL")
+            assert_that(element["href"]).is_equal_to(when)
 
     @pytest.mark.parametrize(
         "mime_type, extension",
@@ -868,6 +869,24 @@ class TestHTML:
         assert_that(result).is_length(3)
         for row, expected in zip(result, order):
             assert_that(row.string).contains(expected)
+
+    def test_collapsed_class_when_results_table_order_changed(self, pytester):
+        pytester.makeconftest(
+            """
+            def pytest_html_results_table_header(cells):
+                cells.append(cells.pop(0))
+
+            def pytest_html_results_table_row(report, cells):
+                cells.append(cells.pop(0))
+        """
+        )
+        pytester.makepyfile("def test_pass(): pass")
+        page = run(pytester)
+        assert_results(page, passed=1)
+
+        assert_that(
+            get_text(page, "#results-table td[class='col-result collapsed']")
+        ).is_true()
 
 
 class TestLogCapturing:

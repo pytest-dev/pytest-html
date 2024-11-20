@@ -7,7 +7,7 @@ else
 fi
 
 if [[ "${1}" == "down" ]]; then
-  docker-compose -f <(sed -e "s;%%VOLUME%%;${volume};g" docker-compose.tmpl.yml) down
+  docker compose -f <(sed -e "s;%%VOLUME%%;${volume};g" docker-compose.tmpl.yml) down
 else
-  docker-compose -f <(sed -e "s;%%VOLUME%%;${volume};g" docker-compose.tmpl.yml) up -d
+  docker compose -f <(sed -e "s;%%VOLUME%%;${volume};g" docker-compose.tmpl.yml) up -d
 fi

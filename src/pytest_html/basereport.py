@@ -47,9 +47,9 @@ class BaseReport:
             config.getini("max_asset_filename_length")
         )
 
-        self._reports: DefaultDict = defaultdict(dict)
+        self._reports: DefaultDict = defaultdict(dict)  # type: ignore
         self._report: ReportData = report_data
-        self._report.title: str = self._report_path.name
+        self._report.title = self._report_path.name
         self._suite_start_time: float = time.time()
 
     @property
@@ -88,7 +88,7 @@ class BaseReport:
 
         self._write_report(rendered_report)
 
-    def _generate_environment(self) -> dict[str, Any]:
+    def _generate_environment(self) -> Any:
         try:
             from pytest_metadata.plugin import metadata_key
 
@@ -117,10 +117,10 @@ class BaseReport:
 
         return False
 
-    def _data_content(self, *args, **kwargs) -> None:
+    def _data_content(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         pass
 
-    def _media_content(self, *args, **kwargs) -> None:
+    def _media_content(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         pass
 
     def _process_extras(self, report: CollectReport, test_id: str) -> list[Any]:
@@ -136,19 +136,19 @@ class BaseReport:
             )
             if extra["format_type"] == extras.FORMAT_JSON:
                 content = json.dumps(content)
-                extra["content"] = self._data_content(
+                extra["content"] = self._data_content(  # type: ignore[no-untyped-call]
                     content, asset_name=asset_name, mime_type=extra["mime_type"]
                 )
 
             if extra["format_type"] == extras.FORMAT_TEXT:
                 if isinstance(content, bytes):
                     content = content.decode("utf-8")
-                extra["content"] = self._data_content(
+                extra["content"] = self._data_content(  # type: ignore[no-untyped-call]
                     content, asset_name=asset_name, mime_type=extra["mime_type"]
                 )
 
             if extra["format_type"] in [extras.FORMAT_IMAGE, extras.FORMAT_VIDEO]:
-                extra["content"] = self._media_content(
+                extra["content"] = self._media_content(  # type: ignore[no-untyped-call]
                     content, asset_name=asset_name, mime_type=extra["mime_type"]
                 )
 

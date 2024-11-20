@@ -9,26 +9,27 @@ requires = [
 name = "pytest-html"
 description = "pytest plugin for generating HTML reports"
 readme = "README.rst"
-license = "MPL-2.0"
-requires-python = ">=3.9"
 keywords = [
-  "pytest",
   "html",
+  "pytest",
   "report",
 ]
+license = "MPL-2.0"
 authors = [
-  { name = "Dave Hunt", email =  "dhunt@mozilla.com" },
+  { name = "Dave Hunt", email = "dhunt@mozilla.com" },
   { name = "Jim Brannlund", email = "jimbrannlund@fastmail.com" },
 ]
+requires-python = ">=3.9"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Framework :: Pytest",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
   "Natural Language :: English",
-  "Operating System :: POSIX",
-  "Operating System :: Microsoft :: Windows",
   "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
@@ -40,40 +41,35 @@ classifiers = [
   "Topic :: Software Development :: Testing",
   "Topic :: Utilities",
 ]
-dependencies = [
-  "pytest>=7.0.0",
-  "pytest-metadata>=2.0.0",
-  "Jinja2>=3.0.0",
-]
 dynamic = [
   "version",
 ]
 
-[project.optional-dependencies]
-docs = [
-  "pip-tools>=6.13.0",
+dependencies = [
+  "jinja2>=3",
+  "pytest>=7",
+  "pytest-metadata>=2",
 ]
-test = [
+optional-dependencies.docs = [
+  "pip-tools>=6.13",
+]
+optional-dependencies.test = [
   "assertpy>=1.1",
   "beautifulsoup4>=4.11.1",
-  "black>=22.1.0",
+  "black>=22.1",
   "flake8>=4.0.1",
-  "pre-commit>=2.17.0",
-  "pytest-xdist>=2.4.0",
-  "pytest-mock>=3.7.0",
+  "pre-commit>=2.17",
+  "pytest-mock>=3.7",
   "pytest-rerunfailures>=11.1.2",
-  "selenium>=4.3.0",
+  "pytest-xdist>=2.4",
+  "selenium>=4.3",
   "tox>=3.24.5",
 ]
-
-[project.urls]
-Homepage = "https://github.com/pytest-dev/pytest-html"
-Tracker = "https://github.com/pytest-dev/pytest-html/issues"
-Source = "https://github.com/pytest-dev/pytest-html"
-
-[project.entry-points.pytest11]
-html = "pytest_html.plugin"
-html_fixtures = "pytest_html.fixtures"
+urls.Homepage = "https://github.com/pytest-dev/pytest-html"
+urls.Source = "https://github.com/pytest-dev/pytest-html"
+urls.Tracker = "https://github.com/pytest-dev/pytest-html/issues"
+entry-points.pytest11.html = "pytest_html.plugin"
+entry-points.pytest11.html_fixtures = "pytest_html.fixtures"
 
 [tool.hatch.envs.test]
 features = [

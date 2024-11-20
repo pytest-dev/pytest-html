@@ -58,6 +58,8 @@ repos:
     hooks:
       - id: mypy
         files: ^(src/pytest_html|testing)
+        additional_dependencies:
+          - types-setuptools
   - repo: local
     hooks:
       - id: rst

@@ -28,7 +28,7 @@ def read_html(path):
 
 def assert_results_by_outcome(html, test_outcome, test_outcome_number, label=None):
     # Asserts if the test number of this outcome in the summary is correct
-    regex_summary = r"(\d)+ {}".format(label or test_outcome)
+    regex_summary = rf"(\d)+ {label or test_outcome}"
     assert int(re.search(regex_summary, html).group(1)) == test_outcome_number
 
     # Asserts if the generated checkbox of this outcome is correct

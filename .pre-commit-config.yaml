@@ -50,7 +50,7 @@ repos:
     rev: v3.19.0
     hooks:
       - id: pyupgrade
-        args: [--py3-plus]
+        args: [--py39-plus]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.15.0

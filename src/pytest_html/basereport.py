@@ -13,8 +13,6 @@ from html import escape
 from pathlib import Path
 from typing import Any
 from typing import DefaultDict
-from typing import Dict
-from typing import List
 
 import pytest
 from _pytest.config import Config
@@ -90,7 +88,7 @@ class BaseReport:
 
         self._write_report(rendered_report)
 
-    def _generate_environment(self) -> Dict[str, Any]:
+    def _generate_environment(self) -> dict[str, Any]:
         try:
             from pytest_metadata.plugin import metadata_key
 
@@ -125,7 +123,7 @@ class BaseReport:
     def _media_content(self, *args, **kwargs) -> None:
         pass
 
-    def _process_extras(self, report: CollectReport, test_id: str) -> List[Any]:
+    def _process_extras(self, report: CollectReport, test_id: str) -> list[Any]:
         test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
         report_extras = getattr(report, "extras", [])
         for extra_index, extra in enumerate(report_extras):
@@ -161,7 +159,7 @@ class BaseReport:
             f.write(rendered_report)
 
     def _run_count(self) -> str:
-        relevant_outcomes: List[str] = ["passed", "failed", "xpassed", "xfailed"]
+        relevant_outcomes: list[str] = ["passed", "failed", "xpassed", "xfailed"]
         counts = 0
         for outcome in self._report.outcomes.keys():
             if outcome in relevant_outcomes:
@@ -175,7 +173,7 @@ class BaseReport:
 
         return f"{counts}/{self._report.collected_items} {'tests' if plural else 'test'} done."
 
-    def _hydrate_data(self, data: Dict[str, List], cells: List[str]) -> None:
+    def _hydrate_data(self, data: dict[str, list], cells: list[str]) -> None:
         for index, cell in enumerate(cells):
             # extract column name and data if column is sortable
             if "sortable" in self._report.table_header[index]:
@@ -280,7 +278,7 @@ class BaseReport:
             self._generate_report()
 
     def _process_report(
-        self, report: TestReport, duration: int, processed_extras: List
+        self, report: TestReport, duration: int, processed_extras: list
     ) -> None:
         outcome = _process_outcome(report)
         try:
@@ -345,7 +343,7 @@ def _is_error(report: BaseReport) -> bool:
     )
 
 
-def _process_logs(report) -> List[str]:
+def _process_logs(report) -> list[str]:
     log = []
     if report.longreprtext:
         log.append(escape(report.longreprtext) + "\n")
@@ -382,7 +380,7 @@ def _process_links(links) -> str:
     return "".join([a_tag.format_map(link) for link in links])
 
 
-def _fix_py(cells: List[str]) -> List[str]:
+def _fix_py(cells: list[str]) -> list[str]:
     # backwards-compat
     new_cells = []
     for html in cells:

@@ -9,6 +9,18 @@ of a less permissive license, this package is not included as a dependency. If
 you have this package installed, then ANSI codes will be converted to HTML in
 your report.
 
+Report streaming
+----------------
+
+In order to stream the result, basically generating the report for each finished test
+instead of waiting until the full run is finished, you can set the ``generate_report_on_test``
+ini-value:
+
+.. code-block:: ini
+
+  [pytest]
+  generate_report_on_test = True
+
 Creating a self-contained report
 --------------------------------
 
@@ -61,27 +73,43 @@ To modify the *Environment* section **before** tests are run, use :code:`pytest_
 
 .. code-block:: python
 
+  from pytest_metadata.plugin import metadata_key
+
+
   def pytest_configure(config):
-      config._metadata["foo"] = "bar"
+      config.stash[metadata_key]["foo"] = "bar"
 
 To modify the *Environment* section **after** tests are run, use :code:`pytest_sessionfinish`:
 
 .. code-block:: python
 
   import pytest
+  from pytest_metadata.plugin import metadata_key
 
 
   @pytest.hookimpl(tryfirst=True)
   def pytest_sessionfinish(session, exitstatus):
-      session.config._metadata["foo"] = "bar"
+      session.config.stash[metadata_key]["foo"] = "bar"
 
 Note that in the above example `@pytest.hookimpl(tryfirst=True)`_ is important, as this ensures that a best effort attempt is made to run your
 :code:`pytest_sessionfinish` **before** any other plugins ( including :code:`pytest-html` and :code:`pytest-metadata` ) run theirs.
 If this line is omitted, then the *Environment* table will **not** be updated since the :code:`pytest_sessionfinish` of the plugins will execute first,
 and thus not pick up your change.
 
-The generated table will be sorted alphabetically unless the metadata is a
-:code:`collections.OrderedDict`.
+The generated table will be sorted alphabetically unless the metadata is a :code:`collections.OrderedDict`.
+
+It is possible to redact variables from the environment table. Redacted variables will have their names displayed, but their values grayed out.
+This can be achieved by setting :code:`environment_table_redact_list` in your INI configuration file (e.g.: :code:`pytest.ini`).
+:code:`environment_table_redact_list` is a :code:`linelist` of regexes. Any environment table variable that matches a regex in this list has its value redacted.
+
+For example, the following will redact all environment table variables that match the regexes :code:`^foo$`, :code:`.*redact.*`, or :code:`bar`:
+
+.. code-block:: ini
+
+  [pytest]
+  environment_table_redact_list = ^foo$
+      .*redact.*
+      bar
 
 Additional summary information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,28 +118,25 @@ You can edit the *Summary* section by using the :code:`pytest_html_results_summa
 
 .. code-block:: python
 
-   from py.xml import html
-
-
    def pytest_html_results_summary(prefix, summary, postfix):
-       prefix.extend([html.p("foo: bar")])
+       prefix.extend(["<p>foo: bar</p>"])
 
 Extra content
 ~~~~~~~~~~~~~
 
-You can add details to the HTML report by creating an 'extra' list on the
+You can add details to the HTML report by creating an 'extras' list on the
 report object. Here are the types of extra content that can be added:
 
 ==========  ============================================
 Type        Example
 ==========  ============================================
-Raw HTML    ``extra.html('<div>Additional HTML</div>')``
-`JSON`_     ``extra.json({'name': 'pytest'})``
-Plain text  ``extra.text('Add some simple Text')``
-URL         ``extra.url('http://www.example.com/')``
-Image       ``extra.image(image, mime_type='image/gif', extension='gif')``
-Image       ``extra.image('/path/to/file.png')``
-Image       ``extra.image('http://some_image.png')``
+Raw HTML    ``extras.html('<div>Additional HTML</div>')``
+`JSON`_     ``extras.json({'name': 'pytest'})``
+Plain text  ``extras.text('Add some simple Text')``
+URL         ``extras.url('http://www.example.com/')``
+Image       ``extras.image(image, mime_type='image/gif', extension='gif')``
+Image       ``extras.image('/path/to/file.png')``
+Image       ``extras.image('http://some_image.png')``
 ==========  ============================================
 
 **Note**: When adding an image from file, the path can be either absolute
@@ -126,9 +151,9 @@ There are also convenient types for several image formats:
 ============  ====================
 Image format  Example
 ============  ====================
-PNG           ``extra.png(image)``
-JPEG          ``extra.jpg(image)``
-SVG           ``extra.svg(image)``
+PNG           ``extras.png(image)``
+JPEG          ``extras.jpg(image)``
+SVG           ``extras.svg(image)``
 ============  ====================
 
 The following example adds the various types of extras using a
@@ -138,42 +163,44 @@ conftest.py file:
 .. code-block:: python
 
   import pytest
+  import pytest_html
 
 
   @pytest.hookimpl(hookwrapper=True)
   def pytest_runtest_makereport(item, call):
-      pytest_html = item.config.pluginmanager.getplugin("html")
       outcome = yield
       report = outcome.get_result()
-      extra = getattr(report, "extra", [])
+      extras = getattr(report, "extras", [])
       if report.when == "call":
           # always add url to report
-          extra.append(pytest_html.extras.url("http://www.example.com/"))
+          extras.append(pytest_html.extras.url("http://www.example.com/"))
           xfail = hasattr(report, "wasxfail")
           if (report.skipped and xfail) or (report.failed and not xfail):
               # only add additional html on failure
-              extra.append(pytest_html.extras.html("<div>Additional HTML</div>"))
-          report.extra = extra
+              extras.append(pytest_html.extras.html("<div>Additional HTML</div>"))
+          report.extras = extras
 
 You can also specify the :code:`name` argument for all types other than :code:`html` which will change the title of the
 created hyper link:
 
 .. code-block:: python
 
-    extra.append(pytest_html.extras.text("some string", name="Different title"))
+    extras.append(pytest_html.extras.text("some string", name="Different title"))
 
-It is also possible to use the fixture :code:`extra` to add content directly
+It is also possible to use the fixture :code:`extras` to add content directly
 in a test function without implementing hooks. These will generally end up
 before any extras added by plugins.
 
 .. code-block:: python
 
-   from pytest_html import extras
+   import pytest_html
 
 
-   def test_extra(extra):
-       extra.append(extras.text("some string"))
+   def test_extra(extras):
+       extras.append(pytest_html.extras.text("some string"))
 
+
+.. _modifying-results-table:
 
 Modifying the results table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -184,21 +211,18 @@ adds a sortable time column, and removes the links column:
 
 .. code-block:: python
 
-  from datetime import datetime
-  from py.xml import html
   import pytest
+  from datetime import datetime
 
 
   def pytest_html_results_table_header(cells):
-      cells.insert(2, html.th("Description"))
-      cells.insert(1, html.th("Time", class_="sortable time", col="time"))
-      cells.pop()
+      cells.insert(2, "<th>Description</th>")
+      cells.insert(1, '<th class="sortable time" data-column-type="time">Time</th>')
 
 
   def pytest_html_results_table_row(report, cells):
-      cells.insert(2, html.td(report.description))
-      cells.insert(1, html.td(datetime.utcnow(), class_="col-time"))
-      cells.pop()
+      cells.insert(2, f"<td>{report.description}</td>")
+      cells.insert(1, f'<td class="col-time">{datetime.utcnow()}</td>')
 
 
   @pytest.hookimpl(hookwrapper=True)
@@ -223,34 +247,37 @@ additional HTML and log output with a notice that the log is empty:
 
 .. code-block:: python
 
-  from py.xml import html
-
-
   def pytest_html_results_table_html(report, data):
       if report.passed:
           del data[:]
-          data.append(html.div("No log output captured.", class_="empty log"))
+          data.append("<div class='empty log'>No log output captured.</div>")
 
 Display options
 ---------------
+
+.. _render-collapsed:
 
 Auto Collapsing Table Rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, all rows in the **Results** table will be expanded except those that have :code:`Passed`.
 
-This behavior can be customized either with a query parameter: :code:`?collapsed=Passed,XFailed,Skipped`
-or by setting the :code:`render_collapsed` in a configuration file (pytest.ini, setup.cfg, etc).
+This behavior can be customized with a query parameter: :code:`?collapsed=Passed,XFailed,Skipped`.
+If you want all rows to be collapsed you can pass :code:`?collapsed=All`.
+By setting the query parameter to empty string :code:`?collapsed=""` **none** of the rows will be collapsed.
+
+Note that the query parameter is case insensitive, so passing :code:`PASSED` and :code:`passed` has the same effect.
+
+You can also set the collapsed behaviour by setting :code:`render_collapsed` in a configuration file (pytest.ini, setup.cfg, etc).
+Note that the query parameter takes precedence.
 
 .. code-block:: ini
 
   [pytest]
-  render_collapsed = True
+  render_collapsed = failed,error
 
-**NOTE:** Setting :code:`render_collapsed` will, unlike the query parameter, affect all statuses.
-
-Controlling Test Result Visibility Via Query Params
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Controlling Test Result Visibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, all tests are visible, regardless of their results. It is possible to control which tests are visible on
 page load by passing the :code:`visible` query parameter. To use this parameter, please pass a comma separated list
@@ -259,7 +286,7 @@ tests in the report that have outcome :code:`passed` or :code:`skipped`.
 
 Note that this match is case insensitive, so passing :code:`PASSED` and :code:`passed` has the same effect.
 
-The following query parameters may be passed:
+The following values may be passed:
 
 * :code:`passed`
 * :code:`skipped`
@@ -269,32 +296,54 @@ The following query parameters may be passed:
 * :code:`xpassed`
 * :code:`rerun`
 
+Results Table Sorting
+~~~~~~~~~~~~~~~~~~~~~
+
+You can change which column the results table is sorted on, on page load by passing the :code:`sort` query parameter.
+
+You can also set the initial sorting by setting :code:`initial_sort` in a configuration file (pytest.ini, setup.cfg, etc).
+Note that the query parameter takes precedence.
+
+The following values may be passed:
+
+* :code:`result`
+* :code:`testId`
+* :code:`duration`
+* :code:`original`
+
+Note that the values are case *sensitive*.
+
+``original`` means that a best effort is made to sort the table in the order of execution.
+If tests are run in parallel (with `pytest-xdist`_ for example), then the order may not be
+in the correct order.
+
 Formatting the Duration Column
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The formatting of the timestamp used in the :code:`Durations` column can be modified by setting :code:`duration_formatter`
-on the :code:`report` attribute. All `time.strftime`_ formatting directives are supported. In addition, it is possible
-to supply :code:`%f` to get duration milliseconds. If this value is not set, the values in the :code:`Durations` column are
-displayed in :code:`%S.%f` format where :code:`%S` is the total number of seconds a test ran for.
+The formatting of the timestamp used in the :code:`Durations` column can be modified by using the
+:code:`pytest_html_duration_format` hook. The default timestamp will be `nnn ms` for durations
+less than one second and `hh:mm:ss` for durations equal to or greater than one second.
 
-Below is an example of a :code:`conftest.py` file setting :code:`duration_formatter`:
+Below is an example of a :code:`conftest.py` file setting :code:`pytest_html_duration_format`:
 
 .. code-block:: python
 
-   import pytest
+  import datetime
 
 
-   @pytest.hookimpl(hookwrapper=True)
-   def pytest_runtest_makereport(item, call):
-       outcome = yield
-       report = outcome.get_result()
-       setattr(report, "duration_formatter", "%H:%M:%S.%f")
+  def pytest_html_duration_format(duration):
+      duration_timedelta = datetime.timedelta(seconds=duration)
+      time = datetime.datetime(1, 1, 1) + duration_timedelta
+      return time.strftime("%H:%M:%S")
 
-**NOTE**: Milliseconds are always displayed with a precision of 2
+**NOTE**: The behavior of sorting the duration column is not guaranteed when providing a custom format.
+
+**NOTE**: The formatting of the total duration is not affected by this hook.
 
 .. _@pytest.hookimpl(tryfirst=True): https://docs.pytest.org/en/stable/writing_plugins.html#hook-function-ordering-call-example
 .. _ansi2html: https://pypi.python.org/pypi/ansi2html/
 .. _Content Security Policy (CSP): https://developer.mozilla.org/docs/Web/Security/CSP/
 .. _JSON: https://json.org/
 .. _pytest-metadata: https://pypi.python.org/pypi/pytest-metadata/
+.. _pytest-xdist: https://pypi.python.org/pypi/pytest-xdist/
 .. _time.strftime: https://docs.python.org/3/library/time.html#time.strftime

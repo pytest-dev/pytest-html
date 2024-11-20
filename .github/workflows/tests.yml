@@ -1,0 +1,275 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ ! contains(github.ref, github.event.repository.default_branch) }}
+
+jobs:
+  build_docs:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Ensure latest pip
+      run: python -m pip install --upgrade pip
+
+    - name: Install tox
+      run: python -m pip install --upgrade tox
+
+    - name: Build docs with tox
+      run: tox -e docs
+
+  build_package:
+    name: Build Package
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    - name: Build and Check Package
+      uses: hynek/build-and-inspect-python-package@v1
+
+  test_javascript:
+    name: Run javascript unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linting
+        run: npm run lint
+      - name: Run tests
+        run: npm run unit
+      - name: Upload coverage to codecov
+        if: >-
+          ${{
+            ! github.event.schedule &&
+            github.repository_owner == 'pytest-dev'
+          }}
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          files: ./cobertura-coverage.xml
+          flags: js_tests
+          name: ubuntu-latest-node-16
+          verbose: true
+
+  test_unit:
+    name: ${{ matrix.os }} - ${{ matrix.python-version }} - unit
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9"]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.10"
+            with-coverage: true
+
+          - os: ubuntu-latest
+            python-version: 3.13
+            tox-env: devel
+          - os: windows-latest
+            python-version: 3.13
+            tox-env: devel
+          - os: macos-latest
+            python-version: 3.13
+            tox-env: devel
+
+    steps:
+      - name: Set newline behavior
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Ensure latest pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install tox
+        run: python -m pip install --upgrade tox
+
+      - name: Cache tox virtual environment
+        uses: actions/cache@v3
+        with:
+          path: .tox
+          key: ${{ matrix.os }}-tox-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
+          restore-keys: |
+            ${{ matrix.os }}-tox-${{ matrix.python-version }}-
+
+      - name: Run unit tests with coverage
+        if: ${{ matrix.with-coverage }}
+        run: tox -e ${{ matrix.python-version }}-cov -- testing/test_unit.py
+
+      - name: Run unit tests without coverage
+        if: ${{ ! matrix.with-coverage }}
+        run: tox -e ${{ matrix.tox-env || matrix.python-version }} -- testing/test_unit.py
+
+      - name: Upload coverage to codecov
+        if: >-
+          ${{
+            ! github.event.schedule &&
+            matrix.with-coverage &&
+            github.repository_owner == 'pytest-dev'
+          }}
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          files: ./coverage.xml
+          flags: py_unit_tests
+          name: ${{ matrix.os }}-python-${{ matrix.python-version }}
+          verbose: true
+
+  test_integration:
+    name: ubuntu - ${{ matrix.python-version }} - integration
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9"]
+        include:
+          - python-version: "3.10"
+            with-coverage: true
+          - python-version: 3.13
+            tox-env: devel
+
+    steps:
+      - name: Set newline behavior
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v3
+
+      - name: Start chrome
+        run: ./start
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Ensure latest pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install tox
+        run: python -m pip install --upgrade tox
+
+      - name: Cache tox virtual environment
+        uses: actions/cache@v3
+        with:
+          path: .tox
+          key: ubuntu-latest-tox-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
+          restore-keys: |
+            ubuntu-latest-tox-${{ matrix.python-version }}-
+
+      - name: Run integration tests with coverage
+        if: ${{ matrix.with-coverage }}
+        run: tox -e ${{ matrix.python-version }}-cov -- testing/test_integration.py
+
+      - name: Run integration tests without coverage
+        if: ${{ ! matrix.with-coverage }}
+        run: tox -e ${{ matrix.tox-env || matrix.python-version }} -- testing/test_integration.py
+
+      - name: Upload coverage to codecov
+        if: >-
+          ${{
+            ! github.event.schedule &&
+            matrix.with-coverage &&
+            github.repository_owner == 'pytest-dev'
+          }}
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          files: ./coverage.xml
+          flags: py_integration_tests
+          name: ubuntu-latest-${{ matrix.python-version }}
+          verbose: true
+
+  test_e2e:
+    name: ubuntu - ${{ matrix.python-version }} - e2e
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9"]
+        include:
+          - python-version: 3.13
+            tox-env: devel
+
+    steps:
+      - name: Set newline behavior
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v3
+
+      - name: Start chrome
+        run: ./start
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Ensure latest pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install tox
+        run: python -m pip install --upgrade tox
+
+      - name: Cache tox virtual environment
+        uses: actions/cache@v3
+        with:
+          path: .tox
+          key: ubuntu-latest-tox-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
+          restore-keys: |
+            ubuntu-latest-tox-${{ matrix.python-version }}-
+
+      - name: Run e2e tests
+        run: tox -e ${{ matrix.tox-env || matrix.python-version }} -- testing/test_e2e.py

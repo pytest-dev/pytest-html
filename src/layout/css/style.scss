@@ -6,36 +6,34 @@ $border-width: 1px;
 
 $spacing: 5px;
 
-
-
 body {
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: $font-size-text;
-	/* do not increase min-width as some may use split screens */
-	min-width: 800px;
-	color: #999;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: $font-size-text;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
 }
 
 h1 {
-	font-size: $font-size-h1;
-	color: black;
+  font-size: $font-size-h1;
+  color: black;
 }
 
 h2 {
-	font-size: $font-size-h2;
-	color: black;
+  font-size: $font-size-h2;
+  color: black;
 }
 
 p {
-	color: black;
+  color: black;
 }
 
 a {
-	color: #999;
+  color: #999;
 }
 
 table {
-	border-collapse: collapse;
+  border-collapse: collapse;
 }
 
 /******************************
@@ -43,14 +41,18 @@ table {
  ******************************/
 
 #environment {
-	td {
-		padding: $spacing;
-		border: $border-width solid #E6E6E6;
-	}
-
-	tr:nth-child(odd) {
-		background-color: #f6f6f6;
-	}
+  td {
+    padding: $spacing;
+    border: $border-width solid #e6e6e6;
+    vertical-align: top;
+  }
+  tr:nth-child(odd) {
+    background-color: #f6f6f6;
+  }
+  ul {
+    margin: 0;
+    padding: 0 20px;
+  }
 }
 
 /******************************
@@ -58,7 +60,7 @@ table {
  ******************************/
 span.passed,
 .passed .col-result {
-	color: green;
+  color: green;
 }
 
 span.skipped,
@@ -67,7 +69,7 @@ span.rerun,
 .skipped .col-result,
 .xfailed .col-result,
 .rerun .col-result {
-	color: orange;
+  color: orange;
 }
 
 span.error,
@@ -76,9 +78,12 @@ span.xpassed,
 .error .col-result,
 .failed .col-result,
 .xpassed .col-result {
-	color: red;
+  color: red;
 }
 
+.col-links__extra {
+  margin-right: 3px;
+}
 
 /******************************
  * RESULTS TABLE
@@ -94,21 +99,21 @@ span.xpassed,
  *------------------*/
 
 #results-table {
-	border: $border-width solid #e6e6e6;
-	color: #999;
-	font-size: $font-size-text;
-	width: 100%;
+  border: $border-width solid #e6e6e6;
+  color: #999;
+  font-size: $font-size-text;
+  width: 100%;
 
-	th,
-	td {
-		padding: $spacing;
-		border: $border-width solid #E6E6E6;
-		text-align: left;
-	}
+  th,
+  td {
+    padding: $spacing;
+    border: $border-width solid #e6e6e6;
+    text-align: left;
+  }
 
-	th {
-		font-weight: bold;
-	}
+  th {
+    font-weight: bold;
+  }
 }
 
 /*------------------
@@ -118,100 +123,247 @@ span.xpassed,
 $extra-height: 240px;
 $extra-media-width: 320px;
 
-.log {
-	background-color: #e6e6e6;
-	border: $border-width solid #e6e6e6;
-	color: black;
-	display: block;
-	font-family: "Courier New", Courier, monospace;
-	height: $extra-height - 2 * $spacing;
-	overflow-y: scroll;
-	padding: $spacing;
-	white-space: pre-wrap;
-
-	&:only-child {
-		height: inherit;
-	}
+.logwrapper {
+    max-height: $extra-height - 2 * $spacing;
+    overflow-y: scroll;
+    background-color: #e6e6e6;
+    &.expanded {
+      max-height: none;
+      .logexpander {
+        &:after {
+          content: 'collapse [-]';
+        }
+      }
+    }
+  .logexpander {
+    z-index: 1;
+    position: sticky;
+    top: 10px;
+    width: max-content;
+    border: 1px solid;
+    border-radius: 3px;
+    padding: 5px 7px;
+    margin: 10px 0 10px calc(100% - 80px);
+    cursor: pointer;
+    background-color: #e6e6e6;
+    &:after {
+      content: 'expand [+]';
+    }
+    &:hover {
+      color: #000;
+      border-color: #000;
+    }
+  }
+  .log {
+    min-height: 40px;
+    position: relative;
+    top: -50px;
+    height: calc(100% + 50px);
+    border: $border-width solid #e6e6e6;
+    color: black;
+    display: block;
+    font-family: 'Courier New', Courier, monospace;
+    padding: $spacing;
+    padding-right: 80px;
+    white-space: pre-wrap;
+  }
+}
+div.media {
+  border: $border-width solid #e6e6e6;
+  float: right;
+  height: $extra-height;
+  margin: 0 $spacing;
+  overflow: hidden;
+  width: $extra-media-width;
 }
 
-div.image {
-	border: $border-width solid #e6e6e6;
-	float: right;
-	height: $extra-height;
-	margin-left: $spacing;
-	overflow: hidden;
-	width: $extra-media-width;
-
-	img {
-		width: $extra-media-width;
-	}
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 200px;
+}
+.media-container--fullscreen {
+  grid-template-columns: 0px auto 0px;
+}
+.media-container__nav--right,
+.media-container__nav--left {
+  text-align: center;
+  cursor: pointer;
 }
 
-div.video {
-	border: $border-width solid #e6e6e6;
-	float: right;
-	height: $extra-height;
-	margin-left: $spacing;
-	overflow: hidden;
-	width: $extra-media-width;
-
-	video {
-		overflow: hidden;
-		width: $extra-media-width;
-		height: $extra-height;
-	}
+.media-container__viewport {
+  cursor: pointer;
+  text-align: center;
+  height: inherit;
+  img,
+  video {
+    object-fit: cover;
+    width: 100%;
+    max-height: 100%;
+  }
 }
 
-.collapsed {
-	display: none;
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
 }
 
-.expander::after {
-	content: " (show details)";
-	color: #BBB;
-	font-style: italic;
-	cursor: pointer;
+@mixin rowToggle {
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
 }
 
-.collapser::after {
-	content: " (hide details)";
-	color: #BBB;
-	font-style: italic;
-	cursor: pointer;
+.collapsible td:not(.col-links) {
+  cursor: pointer;
+  &:hover::after {
+    @include rowToggle;
+  }
+}
+
+.col-result {
+  width: 130px;
+  &:hover::after {
+    content: ' (hide details)';
+  }
+}
+.col-result.collapsed {
+  &:hover::after {
+    content: ' (show details)';
+  }
+}
+
+#environment-header h2 {
+  &:hover::after {
+    content: ' (hide details)';
+    @include rowToggle;
+    font-size: $font-size-text;
+  }
+}
+#environment-header.collapsed h2 {
+  &:hover::after {
+    content: ' (show details)';
+    @include rowToggle;
+    font-size: $font-size-text;
+  }
 }
 
 /*------------------
  * 3. Sorting items
  *------------------*/
 .sortable {
-	cursor: pointer;
+  cursor: pointer;
+  &.desc {
+    &:after {
+      content: ' ';
+      position: relative;
+      left: 5px;
+      bottom: -12.5px;
+      border: 10px solid #4caf50;
+      border-bottom: 0;
+      border-left-color: transparent;
+      border-right-color: transparent;
+    }
+  }
+  &.asc {
+    &:after {
+      content: ' ';
+      position: relative;
+      left: 5px;
+      bottom: 12.5px;
+      border: 10px solid #4caf50;
+      border-top: 0;
+      border-left-color: transparent;
+      border-right-color: transparent;
+    }
+  }
 }
 
 .sort-icon {
-	font-size: 0px;
-	float: left;
-	margin-right: $spacing;
-	margin-top: $spacing;
+  // font-size: 0px;
+  // float: left;
+  // margin-right: $spacing;
+  // margin-top: $spacing;
 
-	/*triangle*/
-	$triangle-width: 8px;
-	width: 0;
-	height: 0;
-	border-left: $triangle-width solid transparent;
-	border-right: $triangle-width solid transparent;
+  // /*triangle*/
+  // $triangle-width: 8px;
+  // width: 0;
+  // height: 0;
+  // border-left: $triangle-width solid transparent;
+  // border-right: $triangle-width solid transparent;
 
-	.inactive & {
-		/*finish triangle*/
-		border-top: $triangle-width solid #E6E6E6;
-	}
+  // .asc {
+  //   /*finish triangle*/
+  //   border-bottom: $triangle-width solid #999;
+  // }
 
-	.asc.active & {
-		/*finish triangle*/
-		border-bottom: $triangle-width solid #999;
-	}
+  // .desc {
+  //   /*finish triangle*/
+  //   border-top: $triangle-width solid #999;
+  // }
+}
 
-	.desc.active & {
-		/*finish triangle*/
-		border-top: $triangle-width solid #999;
-	}
+.hidden {
+  display: none;
+}
+
+.summary {
+  &__data {
+    flex: 0 0 550px;
+  }
+  &__reload {
+    flex: 1 1;
+    display: flex;
+    justify-content: center;
+    &__button {
+      flex: 0 0 300px;
+      display: flex;
+      color: white;
+      font-weight: bold;
+      background-color: #4caf50;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      border-radius: 3px;
+      cursor: pointer;
+      &.hidden {
+        @extend .hidden;
+      }
+      &:hover {
+        background-color: #46a049;
+      }
+    }
+  }
+  &__spacer {
+    flex: 0 0 550px;
+  }
+}
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+.filters,
+.collapse {
+  display: flex;
+  align-items: center;
+  button {
+    color: #999;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-decoration: underline;
+    &:hover {
+      color: #ccc;
+    }
+  }
+}
+.filter__label {
+  margin-right: 10px;
 }

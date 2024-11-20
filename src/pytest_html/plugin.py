@@ -3,15 +3,22 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # type: ignore
 import os
+import warnings
+from pathlib import Path
 
 import pytest
 
-from . import extras  # noqa: F401
-from .html_report import HTMLReport
+from pytest_html import extras  # noqa: F401
+from pytest_html.fixtures import extras_stash_key
+from pytest_html.report import Report
+from pytest_html.report_data import ReportData
+from pytest_html.selfcontained_report import SelfContainedReport
+from pytest_html.util import _process_css
+from pytest_html.util import _read_template
 
 
 def pytest_addhooks(pluginmanager):
-    from . import hooks
+    from pytest_html import hooks
 
     pluginmanager.add_hookspecs(hooks)
 
@@ -44,9 +51,9 @@ def pytest_addoption(parser):
     )
     parser.addini(
         "render_collapsed",
-        type="bool",
-        default=False,
-        help="Open the report with all rows collapsed. Useful for very large reports",
+        type="string",
+        default="passed",
+        help="row(s) to render collapsed on open.",
     )
     parser.addini(
         "max_asset_filename_length",
@@ -54,33 +61,66 @@ def pytest_addoption(parser):
         help="set the maximum filename length for assets "
         "attached to the html report.",
     )
+    parser.addini(
+        "environment_table_redact_list",
+        type="linelist",
+        help="a list of regexes corresponding to environment "
+        "table variables whose values should be redacted from the report",
+    )
+    parser.addini(
+        "initial_sort",
+        type="string",
+        default="result",
+        help="column to initially sort on.",
+    )
+    parser.addini(
+        "generate_report_on_test",
+        type="bool",
+        default=False,
+        help="the HTML report will be generated after each test "
+        "instead of at the end of the run.",
+    )
 
 
 def pytest_configure(config):
-    htmlpath = config.getoption("htmlpath")
-    if htmlpath:
+    html_path = config.getoption("htmlpath")
+    if html_path:
+        extra_css = [
+            Path(os.path.expandvars(css)).expanduser()
+            for css in config.getoption("css")
+        ]
         missing_css_files = []
-        for csspath in config.getoption("css"):
-            if not os.path.exists(csspath):
-                missing_css_files.append(csspath)
+        for css_path in extra_css:
+            if not css_path.exists():
+                missing_css_files.append(str(css_path))
 
         if missing_css_files:
-            oserror = (
+            os_error = (
                 f"Missing CSS file{'s' if len(missing_css_files) > 1 else ''}:"
                 f" {', '.join(missing_css_files)}"
             )
-            raise OSError(oserror)
+            raise OSError(os_error)
 
         if not hasattr(config, "workerinput"):
-            # prevent opening htmlpath on worker nodes (xdist)
-            config._html = HTMLReport(htmlpath, config)
-            config.pluginmanager.register(config._html)
+            # prevent opening html_path on worker nodes (xdist)
+            resources_path = Path(__file__).parent.joinpath("resources")
+            default_css = Path(resources_path, "style.css")
+            template = _read_template([resources_path])
+            processed_css = _process_css(default_css, extra_css)
+            report_data = ReportData(config)
+            if config.getoption("self_contained_html"):
+                html = SelfContainedReport(
+                    html_path, config, report_data, template, processed_css
+                )
+            else:
+                html = Report(html_path, config, report_data, template, processed_css)
+
+            config.pluginmanager.register(html)
 
 
 def pytest_unconfigure(config):
-    html = getattr(config, "_html", None)
+    html = config.pluginmanager.getplugin("html")
     if html:
-        del config._html
         config.pluginmanager.unregister(html)
 
 
@@ -89,23 +129,13 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     if report.when == "call":
-        fixture_extras = getattr(item.config, "extras", [])
-        plugin_extras = getattr(report, "extra", [])
-        report.extra = fixture_extras + plugin_extras
-
-
-@pytest.fixture
-def extra(pytestconfig):
-    """Add details to the HTML reports.
-
-    .. code-block:: python
-
-        import pytest_html
-
-
-        def test_foo(extra):
-            extra.append(pytest_html.extras.url("http://www.example.com/"))
-    """
-    pytestconfig.extras = []
-    yield pytestconfig.extras
-    del pytestconfig.extras[:]
+        deprecated_extra = getattr(report, "extra", [])
+        if deprecated_extra:
+            warnings.warn(
+                "The 'report.extra' attribute is deprecated and will be removed in a future release"
+                ", use 'report.extras' instead.",
+                DeprecationWarning,
+            )
+        fixture_extras = item.config.stash.get(extras_stash_key, [])
+        plugin_extras = getattr(report, "extras", [])
+        report.extras = fixture_extras + plugin_extras + deprecated_extra

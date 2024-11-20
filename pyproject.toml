@@ -1,13 +1,100 @@
 [build-system]
+build-backend = "hatchling.build"
 requires = [
-  "pip >= 19.3.1",
-  "setuptools >= 42",
-  "setuptools_scm[toml] >= 3.5.0",
-  "setuptools_scm_git_archive >= 1.1",
-  "wheel >= 0.33.6",
+  "hatch-vcs>=0.3",
+  "hatchling>=1.13",
 ]
-build-backend = "setuptools.build_meta"
 
-[tool.setuptools_scm]
-local_scheme = "no-local-version"
-write_to = "src/pytest_html/__version.py"
+[project]
+name = "pytest-html"
+description = "pytest plugin for generating HTML reports"
+readme = "README.rst"
+license = "MPL-2.0"
+requires-python = ">=3.9"
+keywords = [
+  "pytest",
+  "html",
+  "report",
+]
+authors = [
+  { name = "Dave Hunt", email =  "dhunt@mozilla.com" },
+  { name = "Jim Brannlund", email = "jimbrannlund@fastmail.com" },
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Framework :: Pytest",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+  "Natural Language :: English",
+  "Operating System :: POSIX",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS :: MacOS X",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Utilities",
+]
+dependencies = [
+  "pytest>=7.0.0",
+  "pytest-metadata>=2.0.0",
+  "Jinja2>=3.0.0",
+]
+dynamic = [
+  "version",
+]
+
+[project.optional-dependencies]
+docs = [
+  "pip-tools>=6.13.0",
+]
+test = [
+  "assertpy>=1.1",
+  "beautifulsoup4>=4.11.1",
+  "black>=22.1.0",
+  "flake8>=4.0.1",
+  "pre-commit>=2.17.0",
+  "pytest-xdist>=2.4.0",
+  "pytest-mock>=3.7.0",
+  "pytest-rerunfailures>=11.1.2",
+  "selenium>=4.3.0",
+  "tox>=3.24.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/pytest-dev/pytest-html"
+Tracker = "https://github.com/pytest-dev/pytest-html/issues"
+Source = "https://github.com/pytest-dev/pytest-html"
+
+[project.entry-points.pytest11]
+html = "pytest_html.plugin"
+html_fixtures = "pytest_html.fixtures"
+
+[tool.hatch.envs.test]
+features = [
+  "test",
+]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+exclude = [
+  "src/pytest_html/scripts/*",
+]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/pytest_html/__version.py"
+
+[tool.hatch.build.hooks.custom]
+path = "scripts/npm.py"

@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  chrome:
+    image: seleniarm/standalone-chromium:110.0
+    container_name: chrome
+    shm_size: '2gb'
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    volumes:
+      - "%%VOLUME%%:Z"

@@ -9,6 +9,7 @@ dist
 # Codecov
 .coverage
 coverage.xml
+cobertura-coverage.xml
 
 # IDE Specific files/folders
 ## Pycharm IDE - Jetbrains
@@ -35,7 +36,6 @@ local.properties
 # JS files/folders
 ## node / npm
 node_modules/
-package-lock.json
 
 # MacOS files
 .DS_Store
@@ -51,3 +51,10 @@ Pipfile.lock
 
 # sphinx/read the docs
 docs/_build/
+
+*.html
+assets/
+
+.nyc_output
+
+.venv/

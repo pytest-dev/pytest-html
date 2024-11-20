@@ -1,13 +1,21 @@
 {
-  "main": "Gruntfile.js",
-  "devDependencies": {
-    "grunt": "^1.3.0",
-    "grunt-cli": "^1.3.2",
-    "grunt-contrib-qunit": "^4.0.0",
-    "sass": "^1.29.0"
-  },
   "scripts": {
-    "test": "grunt test",
-    "build:css": "sass --no-source-map --no-error-css src/layout/css/style.scss src/pytest_html/resources/style.css"
+    "build": "npm run build:css && npm run build:jsapp",
+    "build:css": "sass --no-source-map --no-error-css src/layout/css/style.scss src/pytest_html/resources/style.css",
+    "build:jsapp": "browserify ./src/pytest_html/scripts/index.js > ./src/pytest_html/resources/app.js",
+    "lint": "eslint src/pytest_html/scripts/ testing/",
+    "unit": "nyc mocha testing/**/unittest.js --require mock-local-storage",
+    "all": "npm run lint && npm run unit && npm run build:css && npm run build:jsapp"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "chai": "^4.3.6",
+    "eslint": "^8.20.0",
+    "eslint-config-google": "^0.14.0",
+    "mocha": "^10.0.0",
+    "mock-local-storage": "^1.1.24",
+    "nyc": "^15.1.0",
+    "sass": "^1.52.3",
+    "sinon": "^14.0.0"
   }
 }

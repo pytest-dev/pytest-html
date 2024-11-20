@@ -6,8 +6,66 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
-3.2.0 (unreleased)
+4.1.1 (2023-11-07)
 ~~~~~~~~~~~~~~~~~~
+
+* Fix original initial sort INI-setting.
+
+  * Thanks to `@sturmf <https://github.com/sturmf>`_ for reporting.
+
+4.1.0 (2023-11-04)
+~~~~~~~~~~~~~~~~~~
+
+* Fix typo ("ge" instead of "get") in green Reload button in report file.
+
+* Fix results table modification documentation.
+
+  * Thanks to `@michalkaptur <https://github.com/michalkaptur>`_ for the reporting and PR.
+
+* Fix broken duration.
+
+* Revert report generation to full run.
+
+* Add collections errors to report.
+
+* Fix escaping HTML in the log.
+
+4.0.2 (2023-09-12)
+~~~~~~~~~~~~~~~~~~
+
+* Use absolute path to the report file.
+
+  * Thanks to `@adrien-berchet <https://github.com/adrien-berchet>`_ for reporting and for the PR.
+
+4.0.1 (2023-09-10)
+~~~~~~~~~~~~~~~~~~
+
+* Fix incorrectly labeled outcome.
+
+  * Thanks to `@lodagro <https://github.com/lodagro>`_ for reporting
+
+4.0.0 (2023-09-01)
+~~~~~~~~~~~~~~~~~~
+
+This release is the result of more than two years of rewrites.
+
+We've tried our best to keep this release backwards-compatible with v3.
+
+If you find something that seems to be a regression, please consult the documentation first,
+before filing an issue.
+
+Thanks to all the users who have contributed with ideas, solutions and beta-testing.
+You're too many to name, but you know who you are.
+
+A special thanks to `@drRedflint <https://github.com/drRedflint>`_ and `@jeffwright13 <https://github.com/jeffwright13>`_
+for all the javascript and testing respectively.
+
+3.2.0 (2022-10-25)
+~~~~~~~~~~~~~~~~~~
+
+* Explicitly add py.xml dependency.
+
+  * Thanks to `@smartEBL <https://github.com/smartEBL>`_ for the PR
 
 * Implement the ``visible`` URL query parameter to control visibility of test results on page load. (`#399 <https://github.com/pytest-dev/pytest-html/issues/399>`_)
 
@@ -16,6 +74,10 @@ Version History
 * Make the report tab title reflect the report name. (`#412 <https://github.com/pytest-dev/pytest-html/issues/412>`_)
 
   * Thanks to `@gnikonorov <https://github.com/gnikonorov>`_ for the PR
+
+* Implement :code:`environment_table_redact_list` to allow for redaction of environment table values. (`#233 <https://github.com/pytest-dev/pytest-html/issues/233>`_)
+
+  * Thanks to `@fenchu <https://github.com/fenchu>`_ for reporting and `@gnikonorov <https://github.com/gnikonorov>`_ for the PR
 
 3.1.1 (2020-12-13)
 ~~~~~~~~~~~~~~~~~~

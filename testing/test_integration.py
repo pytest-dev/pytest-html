@@ -870,6 +870,24 @@ class TestHTML:
         for row, expected in zip(result, order):
             assert_that(row.string).contains(expected)
 
+    def test_collapsed_class_when_results_table_order_changed(self, pytester):
+        pytester.makeconftest(
+            """
+            def pytest_html_results_table_header(cells):
+                cells.append(cells.pop(0))
+
+            def pytest_html_results_table_row(report, cells):
+                cells.append(cells.pop(0))
+        """
+        )
+        pytester.makepyfile("def test_pass(): pass")
+        page = run(pytester)
+        assert_results(page, passed=1)
+
+        assert_that(
+            get_text(page, "#results-table td[class='col-result collapsed']")
+        ).is_true()
+
 
 class TestLogCapturing:
     LOG_LINE_REGEX = r"\s+this is {}"

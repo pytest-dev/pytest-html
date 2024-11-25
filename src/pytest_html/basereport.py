@@ -306,7 +306,7 @@ class BaseReport:
 
 def _format_duration(duration):
     if duration < 1:
-        return "{} ms".format(round(duration * 1000))
+        return f"{round(duration * 1000)} ms"
 
     hours = math.floor(duration / 3600)
     remaining_seconds = duration % 3600

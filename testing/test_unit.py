@@ -1,9 +1,7 @@
 import importlib.resources
-import os
 import sys
 from pathlib import Path
 
-import pkg_resources
 import pytest
 from assertpy import assert_that
 
@@ -17,19 +15,13 @@ def run(pytester, path="report.html", cmd_flags=None):
 
 
 def file_content():
-    try:
-        return (
-            importlib.resources.files("pytest_html")
-            .joinpath("assets", "style.css")
-            .read_bytes()
-            .decode("utf-8")
-            .strip()
-        )
-    except AttributeError:
-        # Needed for python < 3.9
-        return pkg_resources.resource_string(
-            "pytest_html", os.path.join("assets", "style.css")
-        ).decode("utf-8")
+    return (
+        importlib.resources.files("pytest_html")
+        .joinpath("assets", "style.css")
+        .read_bytes()
+        .decode("utf-8")
+        .strip()
+    )
 
 
 def test_duration_format_deprecation_warning(pytester):

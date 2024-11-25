@@ -95,10 +95,6 @@ version-file = "src/pytest_html/__version.py"
 [tool.hatch.build.hooks.custom]
 path = "scripts/npm.py"
 
-[tool.djlint]
-profile="jinja"
-ignore="H005,H016,H030,H031,H006,H013"
-
 [tool.mypy]
 check_untyped_defs = false         # TODO
 disallow_any_generics = true
@@ -116,3 +112,6 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 
+[tool.djlint]
+profile = "jinja"
+ignore = "H005,H016,H030,H031,H006,H013"

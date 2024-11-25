@@ -31,6 +31,7 @@
         <tr id="not-found-message">
           <td colspan="{{ table_head|length }}">No results found. Check the filters.</td>
         </tr>
+      </tbody>
     </template>
     <template id="template_results-table__tbody">
       <tbody class="results-table-row">
@@ -41,14 +42,14 @@
             <div class="extraHTML"></div>
             <div class="media">
               <div class="media-container">
-                  <div class="media-container__nav--left"><</div>
+                  <div class="media-container__nav--left">&lt;</div>
                   <div class="media-container__viewport">
                     <img src="" />
                     <video controls>
                       <source src="" type="video/mp4">
                     </video>
                   </div>
-                  <div class="media-container__nav--right">></div>
+                  <div class="media-container__nav--right">&gt;</div>
                 </div>
                 <div class="media__name"></div>
                 <div class="media__counter"></div>
@@ -81,7 +82,7 @@
         <div class="controls">
           <div class="filters">
           {%- for result, values in outcomes.items() %}
-            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}/>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}>
             <span class="{{ result }}">{{ values["value"] }} {{ values["label"] }}{{ "," if result != "rerun" }}</span>
           {%- endfor %}
           </div>

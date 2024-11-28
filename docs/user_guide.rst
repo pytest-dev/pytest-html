@@ -276,6 +276,16 @@ Note that the query parameter takes precedence.
   [pytest]
   render_collapsed = failed,error
 
+Expand all logs
+~~~~~~~~~~~~~~~
+
+By default, logs are shown in short form. To display them in full form use ini option `expand_logs`.
+
+.. code-block:: ini
+
+  [pytest]
+  expand_logs = true
+
 Controlling Test Result Visibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

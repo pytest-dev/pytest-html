@@ -180,6 +180,16 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionfinish(self, session):
+        generate_with_tags = session.config.getoption("generate_reports_with_tags")
+        self._report.set_data("environment", self._generate_environment())
+        session.config.hook.pytest_html_report_title(report=self._report)
+        if generate_with_tags:
+            headers = self._report.table_header
+            session.config.hook.pytest_html_results_table_header(cells=headers)
+            self._report.table_header = _fix_py(headers)
+            self._report.running_state = "started"
+            self._generate_report()
+            
         session.config.hook.pytest_html_results_summary(
             prefix=self._report.additional_summary["prefix"],
             summary=self._report.additional_summary["summary"],

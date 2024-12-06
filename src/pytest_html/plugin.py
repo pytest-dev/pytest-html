@@ -83,8 +83,7 @@ def pytest_addoption(parser):
         "--generate_reports_with_tags",
         action="store_true",
         help="the HTML report will be generated while running with tags",
-
-    ) 
+    )
 
 
 def pytest_configure(config):

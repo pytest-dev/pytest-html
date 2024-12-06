@@ -189,7 +189,7 @@ class BaseReport:
             self._report.table_header = _fix_py(headers)
             self._report.running_state = "started"
             self._generate_report()
-            
+
         session.config.hook.pytest_html_results_summary(
             prefix=self._report.additional_summary["prefix"],
             summary=self._report.additional_summary["summary"],

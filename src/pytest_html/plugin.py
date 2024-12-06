@@ -85,6 +85,7 @@ def pytest_addoption(parser):
         "instead of at the end of the run.",
     )
 
+
 def pytest_configure(config):
     html_path = config.getoption("htmlpath")
     if html_path:

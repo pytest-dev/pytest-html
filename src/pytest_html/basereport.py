@@ -356,7 +356,8 @@ def _process_outcome(report):
 
 
 def _process_links(links):
-    a_tag = '<a href="{content}" class="col-links__extra {format_type}" target="_blank" rel="noopener noreferrer">{name}</a>'
+    a_tag = ('<a href="{content}" class="col-links__extra {format_type}" target="_blank" rel="noopener noreferrer">'
+             '{name}</a>')
     return "".join([a_tag.format_map(link) for link in links])
 
 

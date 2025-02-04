@@ -8,10 +8,13 @@
     "all": "npm run lint && npm run unit && npm run build:css && npm run build:jsapp"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.19.0",
     "browserify": "^17.0.0",
     "chai": "^4.3.6",
     "eslint": "^9.19.0",
     "eslint-config-google": "^0.14.0",
+    "globals": "^15.14.0",
     "mocha": "^10.0.0",
     "mock-local-storage": "^1.1.24",
     "nyc": "^15.1.0",

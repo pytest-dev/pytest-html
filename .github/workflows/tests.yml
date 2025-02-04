@@ -71,7 +71,7 @@ jobs:
             ! github.event.schedule &&
             github.repository_owner == 'pytest-dev'
           }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
@@ -148,7 +148,7 @@ jobs:
             matrix.with-coverage &&
             github.repository_owner == 'pytest-dev'
           }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
@@ -218,7 +218,7 @@ jobs:
             matrix.with-coverage &&
             github.repository_owner == 'pytest-dev'
           }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false

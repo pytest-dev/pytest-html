@@ -11,13 +11,13 @@ jobs:
     if: github.repository == 'pytest-dev/pytest-html'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
         persist-credentials: false
 
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '16.x'
 
@@ -25,7 +25,7 @@ jobs:
       uses: hynek/build-and-inspect-python-package@v2
 
     - name: Download Package
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Packages
         path: dist

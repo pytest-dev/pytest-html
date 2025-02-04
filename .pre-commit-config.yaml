@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
       - id: black
         args: [--safe, --quiet, --line-length=88]
@@ -47,13 +47,13 @@ repos:
         args: ["--application-directories=.:src:testing", --py3-plus]
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
         args: [--py39-plus]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.16.0
+    rev: v9.19.0
     hooks:
       - id: eslint
         additional_dependencies:
@@ -61,7 +61,7 @@ repos:
           - eslint-config-google@0.14.0
         args: ["--fix"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.14.1
     hooks:
       - id: mypy
         files: ^(src/pytest_html|testing)

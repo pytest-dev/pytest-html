@@ -57,9 +57,9 @@ repos:
     hooks:
       - id: eslint
         additional_dependencies:
-          - globals@15.14.0
           - eslint@9.19.0
           - eslint-config-google@0.14.0
+          - globals@15.14.0
           - "@eslint/eslintrc@3.2.0"
           - "@eslint/js@9.19.0"
         args: ["--fix"]

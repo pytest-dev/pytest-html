@@ -22,7 +22,7 @@ jobs:
         node-version: '16.x'
 
     - name: Build and Check Package
-      uses: hynek/build-and-inspect-python-package@v1
+      uses: hynek/build-and-inspect-python-package@v2
 
     - name: Download Package
       uses: actions/download-artifact@v3

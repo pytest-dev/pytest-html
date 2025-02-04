@@ -48,7 +48,7 @@ jobs:
         node-version: '16.x'
 
     - name: Build and Check Package
-      uses: hynek/build-and-inspect-python-package@v1
+      uses: hynek/build-and-inspect-python-package@v2
 
   test_javascript:
     name: Run javascript unit tests

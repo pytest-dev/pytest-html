@@ -36,11 +36,11 @@ snowballstemmer==2.2.0
     # via sphinx
 sphinx==6.2.1
     # via
-    #   -r requirements.in
+    #   -r docs/requirements.in
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
-sphinx-rtd-theme==1.2.0
-    # via -r requirements.in
+sphinx-rtd-theme==3.0.2
+    # via -r docs/requirements.in
 sphinxcontrib-applehelp==1.0.4
     # via sphinx
 sphinxcontrib-devhelp==1.0.2

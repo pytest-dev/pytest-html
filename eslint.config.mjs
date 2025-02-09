@@ -23,8 +23,6 @@ export default [...compat.extends('google'), {
     },
     rules: {
         'valid-jsdoc': 'off',
-        'no-cond-assign': 'error',
-        'array-bracket-spacing': 'error',
         'block-scoped-var': 'error',
         'block-spacing': 'error',
         'brace-style': 'error',

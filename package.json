@@ -8,7 +8,7 @@
     "all": "npm run lint && npm run unit && npm run build:css && npm run build:jsapp"
   },
   "devDependencies": {
-    "browserify": "^17.0.0",
+    "browserify": "^17.0.1",
     "chai": "^4.3.6",
     "eslint": "^8.20.0",
     "eslint-config-google": "^0.14.0",

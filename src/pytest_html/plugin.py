@@ -73,6 +73,12 @@ def pytest_addoption(parser):
         help="column to initially sort on.",
     )
     parser.addini(
+        "expand_logs",
+        type="string",
+        default=False,
+        help="expand all logs by default.",
+    )
+    parser.addini(
         "generate_report_on_test",
         type="bool",
         default=False,

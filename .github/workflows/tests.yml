@@ -17,10 +17,10 @@ jobs:
     name: Build Docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -48,15 +48,15 @@ jobs:
         node-version: '16.x'
 
     - name: Build and Check Package
-      uses: hynek/build-and-inspect-python-package@v1
+      uses: hynek/build-and-inspect-python-package@v2
 
   test_javascript:
     name: Run javascript unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '16.x'
       - name: Install dependencies
@@ -71,7 +71,7 @@ jobs:
             ! github.event.schedule &&
             github.repository_owner == 'pytest-dev'
           }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
@@ -107,15 +107,15 @@ jobs:
       - name: Set newline behavior
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '16.x'
 
       - name: Set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -126,7 +126,7 @@ jobs:
         run: python -m pip install --upgrade tox
 
       - name: Cache tox virtual environment
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .tox
           key: ${{ matrix.os }}-tox-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
@@ -148,7 +148,7 @@ jobs:
             matrix.with-coverage &&
             github.repository_owner == 'pytest-dev'
           }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
@@ -174,18 +174,18 @@ jobs:
       - name: Set newline behavior
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Start chrome
         run: ./start
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '16.x'
 
       - name: Set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -196,7 +196,7 @@ jobs:
         run: python -m pip install --upgrade tox
 
       - name: Cache tox virtual environment
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .tox
           key: ubuntu-latest-tox-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
@@ -218,7 +218,7 @@ jobs:
             matrix.with-coverage &&
             github.repository_owner == 'pytest-dev'
           }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
@@ -242,18 +242,18 @@ jobs:
       - name: Set newline behavior
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Start chrome
         run: ./start
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '16.x'
 
       - name: Set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -264,7 +264,7 @@ jobs:
         run: python -m pip install --upgrade tox
 
       - name: Cache tox virtual environment
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .tox
           key: ubuntu-latest-tox-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}

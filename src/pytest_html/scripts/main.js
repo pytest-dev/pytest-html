@@ -6,6 +6,7 @@ const {
     getVisible,
     getCollapsedIds,
     setCollapsedIds,
+    getExpandLogs,
     getSort,
     getSortDirection,
     possibleFilters,
@@ -47,10 +48,12 @@ const addItemToggleListener = (elem) => {
 
 const renderContent = (tests) => {
     const sortAttr = getSort(manager.initialSort)
+    const expandLogs = getExpandLogs(manager.expandLogs)
     const sortAsc = JSON.parse(getSortDirection())
     const rows = tests.map(dom.getResultTBody)
     const table = document.getElementById('results-table')
     const tableHeader = document.getElementById('results-table-head')
+    const clickEvent = new Event('click')
 
     const newTable = document.createElement('table')
     newTable.id = 'results-table'
@@ -70,6 +73,9 @@ const renderContent = (tests) => {
                 find('.logexpander', row).addEventListener('click',
                     (evt) => evt.target.parentNode.classList.toggle('expanded'),
                 )
+                if (expandLogs) {
+                    find('.logexpander', row).dispatchEvent(clickEvent)
+                }
                 newTable.appendChild(row)
             }
         })

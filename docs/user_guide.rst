@@ -218,11 +218,13 @@ adds a sortable time column, and removes the links column:
   def pytest_html_results_table_header(cells):
       cells.insert(2, "<th>Description</th>")
       cells.insert(1, '<th class="sortable time" data-column-type="time">Time</th>')
+      cells.pop()
 
 
   def pytest_html_results_table_row(report, cells):
       cells.insert(2, f"<td>{report.description}</td>")
       cells.insert(1, f'<td class="col-time">{datetime.utcnow()}</td>')
+      cells.pop()
 
 
   @pytest.hookimpl(hookwrapper=True)

@@ -19,7 +19,7 @@ repos:
         additional_dependencies: [black==24.10.0]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -53,7 +53,7 @@ repos:
         args: [--py39-plus]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.29.0
+    rev: v9.33.0
     hooks:
       - id: eslint
         additional_dependencies:
@@ -61,7 +61,7 @@ repos:
           - eslint-config-google@0.14.0
         args: ["--fix"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.1
+    rev: v1.17.1
     hooks:
       - id: mypy
         files: ^(src/pytest_html|testing)

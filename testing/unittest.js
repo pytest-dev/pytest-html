@@ -1,10 +1,13 @@
-const { expect } = await import('chai')
 const sinon = require('sinon')
 const { doInitFilter, doFilter } = require('../src/pytest_html/scripts/filter.js')
 const { doInitSort, doSort } = require('../src/pytest_html/scripts/sort.js')
 const dataModule = require('../src/pytest_html/scripts/datamanager.js')
 const storageModule = require('../src/pytest_html/scripts/storage.js')
 
+let expect
+(async () => {
+  ({ expect } = await import('chai'))
+})()
 
 const setTestData = () => {
     const jsonData = {

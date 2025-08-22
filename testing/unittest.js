@@ -6,7 +6,7 @@ const storageModule = require('../src/pytest_html/scripts/storage.js')
 
 let expect
 (async () => {
-  ({ expect } = await import('chai'))
+    ({ expect } = await import('chai'))
 })()
 
 const setTestData = () => {

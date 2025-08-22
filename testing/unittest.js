@@ -1,4 +1,4 @@
-const { expect } = require('chai')
+const { expect } = await import('chai')
 const sinon = require('sinon')
 const { doInitFilter, doFilter } = require('../src/pytest_html/scripts/filter.js')
 const { doInitSort, doSort } = require('../src/pytest_html/scripts/sort.js')

@@ -1,9 +1,9 @@
 import { expect } from 'chai'
-import sinon from 'sinon';
-import { doInitFilter, doFilter } from '../src/pytest_html/scripts/filter.js';
-import { doInitSort, doSort } from '../src/pytest_html/scripts/sort.js';
-import * as dataModule from '../src/pytest_html/scripts/datamanager.js';
-import * as storageModule from '../src/pytest_html/scripts/storage.js';
+import sinon from 'sinon'
+import { doInitFilter, doFilter } from '../src/pytest_html/scripts/filter.js'
+import { doInitSort, doSort } from '../src/pytest_html/scripts/sort.js'
+import * as dataModule from '../src/pytest_html/scripts/datamanager.js'
+import * as storageModule from '../src/pytest_html/scripts/storage.js'
 
 
 const setTestData = () => {

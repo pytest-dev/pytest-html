@@ -51,7 +51,7 @@ repos:
         args: [--py39-plus]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.33.0
+    rev: v9.34.0
     hooks:
       - id: eslint
         additional_dependencies:

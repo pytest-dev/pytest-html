@@ -79,6 +79,13 @@ def pytest_addoption(parser):
         help="the HTML report will be generated after each test "
         "instead of at the end of the run.",
     )
+    parser.addini(
+        "generate_report_on_test_rate",
+        type="float",
+        default=0.0,
+        help="limit how often the report can be generated "
+        "expects a value in seconds",
+    )
 
 
 def pytest_configure(config):

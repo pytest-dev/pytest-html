@@ -45,7 +45,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v5
       with:
-        node-version: '16.x'
+        node-version: '24.x'
 
     - name: Build and Check Package
       uses: hynek/build-and-inspect-python-package@v2
@@ -58,7 +58,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '16.x'
+          node-version: '24.x'
       - name: Install dependencies
         run: npm ci
       - name: Run linting
@@ -77,7 +77,7 @@ jobs:
           fail_ci_if_error: false
           files: ./cobertura-coverage.xml
           flags: js_tests
-          name: ubuntu-latest-node-16
+          name: ubuntu-latest-node-24
           verbose: true
 
   test_unit:
@@ -112,7 +112,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '16.x'
+          node-version: '24.x'
 
       - name: Set up python
         uses: actions/setup-python@v6
@@ -182,7 +182,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '16.x'
+          node-version: '24.x'
 
       - name: Set up python
         uses: actions/setup-python@v6
@@ -250,7 +250,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '16.x'
+          node-version: '24.x'
 
       - name: Set up python
         uses: actions/setup-python@v6

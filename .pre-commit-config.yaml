@@ -1,12 +1,12 @@
 repos:
-  - repo: https://github.com/psf/black
+  - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 25.9.0
     hooks:
       - id: black
         args: [--safe, --quiet, --line-length=88]
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.6.0"
+    rev: "v2.7.0"
     hooks:
       - id: pyproject-fmt
         # https://pyproject-fmt.readthedocs.io/en/latest/#calculating-max-supported-python-version
@@ -51,7 +51,7 @@ repos:
         args: [--py39-plus]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.36.0
+    rev: v9.37.0
     hooks:
       - id: eslint
         additional_dependencies:

@@ -22,7 +22,7 @@ from pytest_html import extras
 class BaseReport:
     def __init__(self, report_path, config, report_data, template, css):
         self._generated = datetime.now(tz=timezone.utc)
-        
+
         report_path_expanded = self._expand_path(report_path)
         self._report_path = (
             Path.cwd() / Path(report_path_expanded).expanduser()

@@ -1,7 +1,6 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-from datetime import datetime, timezone
 import json
 import math
 import os
@@ -9,6 +8,8 @@ import re
 import time
 import warnings
 from collections import defaultdict
+from datetime import datetime
+from datetime import timezone
 from html import escape
 from pathlib import Path
 
@@ -42,7 +43,7 @@ class BaseReport:
     def css(self):
         # implement in subclasses
         return
-    
+
     def _expand_path(self, report_path):
         # generated_time: UTC date and time, in ISO format with : replaced with -.
         # report-%(generated_time).html will become report-2025-10-08T21-45-08.237134.html
@@ -51,7 +52,7 @@ class BaseReport:
             "generated_time": self._generated.isoformat().replace(":", "-"),
         }
         return path_expanded
-    
+
     def _asset_filename(self, test_id, extra_index, test_index, file_extension):
         return "{}_{}_{}.{}".format(
             re.sub(r"[^\w.]", "_", test_id),

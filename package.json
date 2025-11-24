@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "browserify": "^17.0.1",
-    "chai": "^6.2.0",
+    "chai": "^6.2.1",
     "eslint": "^8.20.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^11.7.5",

@@ -45,13 +45,13 @@ repos:
         args: ["--application-directories=.:src:testing", --py3-plus]
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.1
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
         args: [--py39-plus]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.1
+    rev: v10.0.0-alpha.0
     hooks:
       - id: eslint
         additional_dependencies:

@@ -17,7 +17,7 @@ jobs:
     name: Build Docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Set up Python
       uses: actions/setup-python@v6
@@ -37,7 +37,7 @@ jobs:
     name: Build Package
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
         persist-credentials: false
@@ -54,7 +54,7 @@ jobs:
     name: Run javascript unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
@@ -107,7 +107,7 @@ jobs:
       - name: Set newline behavior
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Use Node.js
         uses: actions/setup-node@v6
@@ -174,7 +174,7 @@ jobs:
       - name: Set newline behavior
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Start chrome
         run: ./start
@@ -242,7 +242,7 @@ jobs:
       - name: Set newline behavior
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Start chrome
         run: ./start

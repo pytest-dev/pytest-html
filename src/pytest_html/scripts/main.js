@@ -70,6 +70,10 @@ const renderContent = (tests) => {
                 find('.logexpander', row).addEventListener('click',
                     (evt) => evt.target.parentNode.classList.toggle('expanded'),
                 )
+                const copyBtn = find('.copy-btn', row)
+                if (copyBtn) {
+                    copyBtn.addEventListener('click', handleCopyTestId)
+                }
                 newTable.appendChild(row)
             }
         })
@@ -83,6 +87,21 @@ const renderDerived = () => {
     possibleFilters.forEach((result) => {
         const input = document.querySelector(`input[data-test-result="${result}"]`)
         input.checked = currentFilter.includes(result)
+    })
+}
+
+const handleCopyTestId = (evt) => {
+    evt.stopPropagation()
+    const button = evt.currentTarget
+    const testId = button.dataset.testId
+
+    navigator.clipboard.writeText(testId).then(() => {
+        button.classList.add('copied')
+        setTimeout(() => {
+            button.classList.remove('copied')
+        }, 500)
+    }).catch(() => {
+        // Silently fail if clipboard API unavailable
     })
 }
 

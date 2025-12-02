@@ -1,30 +1,28 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 24.10.0
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 25.11.0
     hooks:
       - id: black
         args: [--safe, --quiet, --line-length=88]
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.5.0"
+    rev: "v2.11.1"
     hooks:
       - id: pyproject-fmt
         # https://pyproject-fmt.readthedocs.io/en/latest/#calculating-max-supported-python-version
         additional_dependencies: ["tox>=4.9"]
 
   - repo: https://github.com/asottile/blacken-docs
-    rev: 1.19.1
+    rev: 1.20.0
     hooks:
       - id: blacken-docs
         additional_dependencies: [black==24.10.0]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
-      - id: fix-encoding-pragma
-        args: [--remove]
       - id: check-yaml
       - id: debug-statements
         language_version: python3
@@ -32,7 +30,7 @@ repos:
         args: ['--branch', 'master']
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.1
+    rev: 7.3.0
     hooks:
       - id: flake8
         language_version: python3
@@ -41,19 +39,19 @@ repos:
           - flake8-typing-imports==1.12.0
 
   - repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.14.0
+    rev: v3.16.0
     hooks:
       - id: reorder-python-imports
         args: ["--application-directories=.:src:testing", --py3-plus]
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.0
+    rev: v3.21.1
     hooks:
       - id: pyupgrade
         args: [--py39-plus]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.16.0
+    rev: v9.39.1
     hooks:
       - id: eslint
         additional_dependencies:
@@ -61,7 +59,7 @@ repos:
           - eslint-config-google@0.14.0
         args: ["--fix"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.18.2
     hooks:
       - id: mypy
         files: ^(src/pytest_html|testing)

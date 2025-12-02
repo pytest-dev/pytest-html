@@ -8,14 +8,14 @@
     "all": "npm run lint && npm run unit && npm run build:css && npm run build:jsapp"
   },
   "devDependencies": {
-    "browserify": "^17.0.0",
-    "chai": "^4.3.6",
+    "browserify": "^17.0.1",
+    "chai": "^6.2.1",
     "eslint": "^8.20.0",
     "eslint-config-google": "^0.14.0",
-    "mocha": "^10.0.0",
+    "mocha": "^11.7.5",
     "mock-local-storage": "^1.1.24",
-    "nyc": "^15.1.0",
-    "sass": "^1.52.3",
-    "sinon": "^14.0.0"
+    "nyc": "^17.1.0",
+    "sass": "^1.94.2",
+    "sinon": "^21.0.0"
   }
 }

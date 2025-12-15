@@ -25,7 +25,7 @@ jobs:
       uses: hynek/build-and-inspect-python-package@v2
 
     - name: Download Package
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: Packages
         path: dist

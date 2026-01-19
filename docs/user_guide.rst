@@ -14,7 +14,16 @@ Report streaming
 
 In order to stream the result, basically generating the report for each finished test
 instead of waiting until the full run is finished, you can set the ``generate_report_on_test``
-ini-value:
+value.
+
+Using `pyproject.toml` file:
+
+.. code-block:: toml
+
+  [tool.pytest.ini_options]
+  generate_report_on_test = true
+
+or using `pytest.ini` file:
 
 .. code-block:: ini
 

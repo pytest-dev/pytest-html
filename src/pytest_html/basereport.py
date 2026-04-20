@@ -193,10 +193,9 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_terminal_summary(self, terminalreporter):
-        terminalreporter.write_sep(
-            "-",
-            f"Generated html report: {self._report_path.as_uri()}",
-        )
+        uri = self._report_path.as_uri()
+        params = self._config.getini("summary_query_parameters")
+        terminalreporter.write_sep("-", f"Generated html report: {uri}{params}")
 
     @pytest.hookimpl(trylast=True)
     def pytest_collectreport(self, report):

@@ -48,6 +48,11 @@ def pytest_addoption(parser):
         default=[],
         help="append given css file content to report style file.",
     )
+    group.addoption(
+        "--generate_reports_with_tags",
+        action="store_true",
+        help="the HTML report will be generated while running with tags",
+    )
     parser.addini(
         "render_collapsed",
         type="string",

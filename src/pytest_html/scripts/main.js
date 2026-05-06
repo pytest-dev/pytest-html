@@ -66,7 +66,7 @@ const renderContent = (tests) => {
     } else {
         rows.forEach((row) => {
             if (!!row) {
-                findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                findAll('.collapsible td:not(.col-links)', row).forEach(addItemToggleListener)
                 find('.logexpander', row).addEventListener('click',
                     (evt) => evt.target.parentNode.classList.toggle('expanded'),
                 )
@@ -87,14 +87,42 @@ const handleCopyTestId = (evt) => {
     const button = evt.currentTarget
     const testId = button.dataset.testId
 
-    navigator.clipboard.writeText(testId).then(() => {
-        button.classList.add('copied')
-        setTimeout(() => {
-            button.classList.remove('copied')
-        }, 500)
-    }).catch(() => {
-        // Silently fail if clipboard API unavailable
-    })
+    const copyToClipboard = () => {
+        // Try modern Clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(testId)
+        }
+
+        // Fallback for older browsers / file:// contexts
+        const textArea = document.createElement('textarea')
+        textArea.value = testId
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.select()
+
+        try {
+            document.execCommand('copy')
+            document.body.removeChild(textArea)
+            return Promise.resolve()
+        } catch (err) {
+            document.body.removeChild(textArea)
+            return Promise.reject(err)
+        }
+    }
+
+    try {
+        copyToClipboard().then(() => {
+            button.classList.add('copied')
+            setTimeout(() => {
+                button.classList.remove('copied')
+            }, 500)
+        }).catch(() => {
+            // Silently fail if clipboard API unavailable
+        })
+    } catch (_err) {
+        // Silently fail on unexpected errors
+    }
 }
 
 const renderDerived = () => {

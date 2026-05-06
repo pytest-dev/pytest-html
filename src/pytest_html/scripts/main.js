@@ -82,14 +82,6 @@ const renderContent = (tests) => {
     table.replaceWith(newTable)
 }
 
-const renderDerived = () => {
-    const currentFilter = getVisible()
-    possibleFilters.forEach((result) => {
-        const input = document.querySelector(`input[data-test-result="${result}"]`)
-        input.checked = currentFilter.includes(result)
-    })
-}
-
 const handleCopyTestId = (evt) => {
     evt.stopPropagation()
     const button = evt.currentTarget
@@ -102,6 +94,14 @@ const handleCopyTestId = (evt) => {
         }, 500)
     }).catch(() => {
         // Silently fail if clipboard API unavailable
+    })
+}
+
+const renderDerived = () => {
+    const currentFilter = getVisible()
+    possibleFilters.forEach((result) => {
+        const input = document.querySelector(`input[data-test-result="${result}"]`)
+        input.checked = currentFilter.includes(result)
     })
 }
 

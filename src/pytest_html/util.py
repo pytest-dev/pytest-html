@@ -20,7 +20,7 @@ except ImportError:
     _ansi_styles = []
 
 
-def _read_template(search_paths, template_name="index.jinja2"):
+def _read_template(search_paths, template_name="layout.jinja2"):
     env = Environment(
         loader=FileSystemLoader(search_paths),
         autoescape=select_autoescape(

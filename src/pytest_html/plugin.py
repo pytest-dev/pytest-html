@@ -113,7 +113,13 @@ def _resolve_theme(config: pytest.Config, resources_path: Path) -> Path:
         if ep.name == theme_name:
             theme_module = ep.load()
             theme_traversable = importlib.resources.files(theme_module)
-            return Path(str(theme_traversable))
+            theme_path = Path(str(theme_traversable))
+            if not (theme_path / "layout.jinja2").exists():
+                raise pytest.UsageError(
+                    f"Theme '{theme_name}' (from entry point '{ep.value}') "
+                    "does not contain layout.jinja2"
+                )
+            return theme_path
 
     raise pytest.UsageError(
         f"Unknown html_theme '{theme_name}'. "

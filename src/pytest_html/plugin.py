@@ -146,7 +146,11 @@ def pytest_configure(config):
             theme_path = _resolve_theme(config, resources_path)
 
             theme_css = theme_path / "style.css"
-            default_css = theme_css if theme_css.exists() else resources_path / "classic" / "style.css"
+            default_css = (
+                theme_css
+                if theme_css.exists()
+                else resources_path / "classic" / "style.css"
+            )
 
             template = _read_template([theme_path, resources_path])
             processed_css = _process_css(default_css, extra_css)

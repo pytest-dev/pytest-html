@@ -60,9 +60,7 @@ class TestThemePath:
             '<h1 id="title">CUSTOM THEME: {{ title }}</h1>\n'
             "{% endblock header %}\n"
         )
-        pytester.makeini(
-            f"[pytest]\nhtml_theme_path = {theme_dir}\n"
-        )
+        pytester.makeini(f"[pytest]\nhtml_theme_path = {theme_dir}\n")
         pytester.makepyfile("def test_pass(): pass")
         result = run(pytester)
         result.assert_outcomes(passed=1)
@@ -74,9 +72,7 @@ class TestThemePath:
         theme_dir.mkdir()
         (theme_dir / "layout.jinja2").write_text('{% extends "base.jinja2" %}\n')
         (theme_dir / "style.css").write_text("body { background: pink; }\n")
-        pytester.makeini(
-            f"[pytest]\nhtml_theme_path = {theme_dir}\n"
-        )
+        pytester.makeini(f"[pytest]\nhtml_theme_path = {theme_dir}\n")
         pytester.makepyfile("def test_pass(): pass")
         result = run(pytester)
         result.assert_outcomes(passed=1)
@@ -87,9 +83,7 @@ class TestThemePath:
     def test_theme_path_without_layout_raises_error(self, pytester):
         theme_dir = pytester.path / "bad_theme"
         theme_dir.mkdir()
-        pytester.makeini(
-            f"[pytest]\nhtml_theme_path = {theme_dir}\n"
-        )
+        pytester.makeini(f"[pytest]\nhtml_theme_path = {theme_dir}\n")
         pytester.makepyfile("def test_pass(): pass")
         result = run(pytester)
         result.stderr.fnmatch_lines(["*does not contain layout.jinja2*"])
@@ -98,9 +92,7 @@ class TestThemePath:
         theme_dir = pytester.path / "minimal_theme"
         theme_dir.mkdir()
         (theme_dir / "layout.jinja2").write_text('{% extends "base.jinja2" %}\n')
-        pytester.makeini(
-            f"[pytest]\nhtml_theme_path = {theme_dir}\n"
-        )
+        pytester.makeini(f"[pytest]\nhtml_theme_path = {theme_dir}\n")
         pytester.makepyfile("def test_pass(): pass")
         result = run(pytester)
         result.assert_outcomes(passed=1)

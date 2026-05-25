@@ -7,6 +7,43 @@
 </header>
 {% endblock header %}
 
+{% block environment %}
+<div class="top-grid">
+  <div class="environment-card">
+    <div id="environment-header">
+      <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+  </div>
+  <div class="result-cards">
+    {%- for result, values in outcomes.items() %}
+    <div class="result-card {{ result }}">
+      <span class="result-card__icon">
+        {%- if result == "passed" %}✔
+        {%- elif result == "failed" %}✘
+        {%- elif result == "error" %}⚠
+        {%- elif result == "skipped" %}⏭
+        {%- elif result == "xfailed" %}↳
+        {%- elif result == "xpassed" %}‼
+        {%- elif result == "rerun" %}↻
+        {%- elif result == "retried" %}↻
+        {%- else %}•
+        {%- endif %}
+      </span>
+      <span class="count {{ result }}">{{ values["value"] }}</span>
+      <span class="label">{{ values["label"] }}</span>
+    </div>
+    {%- endfor %}
+  </div>
+</div>
+{% endblock environment %}
+
 {% block summary %}
 <template id="template_results-table__body--empty">
   <tbody class="results-table-row">
@@ -44,34 +81,32 @@
     </tr>
   </tbody>
 </template>
-<div class="dashboard">
-  <div class="stat-cards">
-    {%- for result, values in outcomes.items() %}
-    <div class="stat-card {{ result }}">
-      <span class="stat-card__value">{{ values["value"] }}</span>
-      <span class="stat-card__label">{{ values["label"] }}</span>
-    </div>
-    {%- endfor %}
-  </div>
-  <p class="run-count">{{ run_count }}</p>
-  <div class="summary__reload">
-    <div class="summary__reload__button {{ 'hidden' if running_state == 'finished' }}" onclick="location.reload()">
-      <div>There are still tests running. <br />Reload this page to get the latest results!</div>
+
+<div class="summary-panel">
+  <div class="summary-panel__header">
+    <p class="run-count">{{ run_count }}</p>
+    <div class="summary__reload">
+      <div class="summary__reload__button {{ 'hidden' if running_state == 'finished' }}" onclick="location.reload()">
+        <div>Tests still running — reload for latest results</div>
+      </div>
     </div>
   </div>
   <div class="controls">
     <div class="filters">
     {%- for result, values in outcomes.items() %}
-      <label class="filter-toggle {{ result }}">
-        <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
-               data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}>
-        <span>{{ values["label"] }}</span>
+      <label class="filter-switch filter-switch--{{ result }}{{ ' disabled' if values['value'] == 0 }}"{{ ' data-disabled' if values['value'] == 0 }}>
+        <span class="switch-track">
+          <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
+                 data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}>
+          <span class="switch-thumb"></span>
+        </span>
+        <span class="switch-label-text">{{ values["label"] }}</span>
       </label>
     {%- endfor %}
     </div>
     <div class="collapse">
-      <button id="show_all_details">Expand all</button>
-      <button id="hide_all_details">Collapse all</button>
+      <button id="show_all_details" class="btn btn--primary">Show details</button>
+      <button id="hide_all_details" class="btn btn--outline">Show summary</button>
     </div>
   </div>
   <div class="additional-summary prefix">

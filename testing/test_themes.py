@@ -33,7 +33,7 @@ class TestBuiltinModernTheme:
         result.assert_outcomes(passed=1)
         report = (pytester.path / "report.html").read_text()
         assert "modern-header" in report
-        assert "stat-card" in report
+        assert "result-card" in report
 
     def test_modern_theme_uses_modern_css(self, pytester):
         pytester.makeini("[pytest]\nhtml_theme = modern")
@@ -42,8 +42,8 @@ class TestBuiltinModernTheme:
         result.assert_outcomes(passed=1)
         css_path = pytester.path / "assets" / "style.css"
         css = css_path.read_text()
-        assert ".dashboard" in css
-        assert ".stat-card" in css
+        assert ".result-card" in css
+        assert ".filter-switch" in css
 
 
 class TestThemePath:
@@ -115,5 +115,5 @@ class TestThemeWithExtraCss:
         result.assert_outcomes(passed=1)
         css_path = pytester.path / "assets" / "style.css"
         css = css_path.read_text()
-        assert ".dashboard" in css
+        assert ".result-card" in css
         assert "margin: 99px" in css

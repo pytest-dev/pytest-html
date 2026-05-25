@@ -6,7 +6,6 @@ import random
 import re
 import urllib.parse
 from base64 import b64encode
-from pathlib import Path
 
 import pytest
 from assertpy import assert_that
@@ -400,7 +399,7 @@ class TestHTML:
         page = run(pytester)
 
         assert_that(page.select_one("head link")["href"]).is_equal_to(
-            str(Path("assets", "style.css"))
+            "./assets/style.css"
         )
 
     def test_custom_content_in_summary(self, pytester):

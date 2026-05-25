@@ -21,7 +21,7 @@ class Report(BaseReport):
 
     @property
     def css(self):
-        return Path(self._assets_path.name, "style.css")
+        return f"./{self._assets_path.name}/style.css"
 
     def _data_content(self, content, asset_name, *args, **kwargs):
         content = content.encode("utf-8")
@@ -38,4 +38,5 @@ class Report(BaseReport):
     def _write_content(self, content, asset_name):
         content_relative_path = Path(self._assets_path, asset_name)
         content_relative_path.write_bytes(content)
-        return str(content_relative_path.relative_to(self._report_path.parent))
+        rel = content_relative_path.relative_to(self._report_path.parent)
+        return f"./{rel}"

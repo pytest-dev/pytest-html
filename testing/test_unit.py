@@ -17,7 +17,7 @@ def run(pytester, path="report.html", cmd_flags=None):
 def file_content():
     return (
         importlib.resources.files("pytest_html")
-        .joinpath("assets", "style.css")
+        .joinpath("resources", "classic", "style.css")
         .read_bytes()
         .decode("utf-8")
         .strip()

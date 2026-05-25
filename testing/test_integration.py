@@ -111,21 +111,13 @@ def get_log(page, test_id=None):
 
 
 def file_content():
-    try:
-        return (
-            importlib.resources.files("pytest_html")
-            .joinpath("resources", "style.css")
-            .read_bytes()
-            .decode("utf-8")
-            .strip()
-        )
-    except AttributeError:
-        # Needed for python < 3.9
-        import pkg_resources
-
-        return pkg_resources.resource_string(
-            "pytest_html", os.path.join("resources", "style.css")
-        ).decode("utf-8")
+    return (
+        importlib.resources.files("pytest_html")
+        .joinpath("resources", "classic", "style.css")
+        .read_bytes()
+        .decode("utf-8")
+        .strip()
+    )
 
 
 class TestHTML:

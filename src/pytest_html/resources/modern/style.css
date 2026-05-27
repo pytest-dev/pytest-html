@@ -82,8 +82,8 @@ table {
  ******************************/
 .top-grid {
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 24px;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
   margin-bottom: 24px;
   align-items: start;
 }
@@ -129,34 +129,42 @@ table {
  ******************************/
 .result-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .result-card {
-  flex: 1;
-  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background-color: white;
   border-radius: var(--border-radius);
-  padding: 16px 20px;
-  box-shadow: var(--box-shadow);
-  text-align: center;
+  padding: 8px 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
 }
 .result-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.result-card__body {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
 }
 
 .result-card__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  font-size: 16px;
-  margin-bottom: 8px;
+  font-size: 13px;
+  flex-shrink: 0;
   background-color: #f0f0f0;
 }
 .result-card.passed .result-card__icon {
@@ -193,36 +201,42 @@ table {
 }
 
 .result-card.passed {
-  border-top: 4px solid var(--success-color);
+  border-left: 3px solid var(--success-color);
 }
 .result-card.failed {
-  border-top: 4px solid var(--danger-color);
+  border-left: 3px solid var(--danger-color);
 }
 .result-card.error {
-  border-top: 4px solid var(--danger-color);
+  border-left: 3px solid var(--danger-color);
 }
 .result-card.skipped {
-  border-top: 4px solid var(--skipped-color);
+  border-left: 3px solid var(--skipped-color);
 }
 .result-card.xfailed {
-  border-top: 4px solid var(--warning-color);
+  border-left: 3px solid var(--warning-color);
 }
 .result-card.xpassed {
-  border-top: 4px solid var(--info-color);
+  border-left: 3px solid var(--info-color);
 }
 .result-card.rerun {
-  border-top: 4px solid var(--accent);
+  border-left: 3px solid var(--accent);
 }
 .result-card.retried {
-  border-top: 4px solid #f97316;
+  border-left: 3px solid #f97316;
 }
 
 .result-card .count {
-  display: block;
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.result-card .label {
+  font-size: 12px;
+  color: #7f8c8d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .result-card .count.passed {
   color: var(--success-color);
@@ -249,13 +263,6 @@ table {
   color: #f97316;
 }
 
-.result-card .label {
-  display: block;
-  color: #7f8c8d;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
 
 /******************************
  * SUMMARY PANEL
@@ -722,22 +729,30 @@ div.media {
 /******************************
  * RESPONSIVE
  ******************************/
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
+  .result-card .label {
+    display: none;
+  }
+  .result-cards {
+    grid-template-columns: repeat(3, auto);
+    gap: 6px;
+    justify-content: start;
+  }
+  .result-card {
+    padding: 6px 10px;
+    gap: 6px;
+  }
+}
+@media (max-width: 600px) {
   .top-grid {
     grid-template-columns: 1fr;
   }
-}
-@media (max-width: 992px) {
+  .result-card .label {
+    display: inline;
+  }
   body {
     min-width: auto;
     padding: 16px;
-  }
-  .result-cards {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 8px;
-  }
-  .result-card {
-    padding: 12px;
   }
   .controls {
     flex-direction: column;

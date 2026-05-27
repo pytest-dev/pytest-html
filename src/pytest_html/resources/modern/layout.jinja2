@@ -23,7 +23,7 @@
   </div>
   <div class="result-cards">
     {%- for result, values in outcomes.items() %}
-    <div class="result-card {{ result }}">
+    <div class="result-card {{ result }}" title="{{ values['label'] }}">
       <span class="result-card__icon">
         {%- if result == "passed" %}✔
         {%- elif result == "failed" %}✘
@@ -36,8 +36,10 @@
         {%- else %}•
         {%- endif %}
       </span>
-      <span class="count {{ result }}">{{ values["value"] }}</span>
-      <span class="label">{{ values["label"] }}</span>
+      <span class="result-card__body">
+        <span class="count {{ result }}">{{ values["value"] }}</span>
+        <span class="label">{{ values["label"] }}</span>
+      </span>
     </div>
     {%- endfor %}
   </div>

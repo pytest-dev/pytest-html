@@ -1,9 +1,11 @@
 import importlib.resources
+import json
 import sys
 from pathlib import Path
 
 import pytest
 from assertpy import assert_that
+from bs4 import BeautifulSoup
 
 pytest_plugins = ("pytester",)
 
@@ -146,3 +148,29 @@ def test_custom_css_selfcontained(pytester, css_file_path, expandvar):
     with open(pytester.path / "report.html") as f:
         html = f.read()
         assert_that(html).contains("* " + str(css_file_path)).contains("* two.css")
+
+
+def test_html_in_test_id_is_escaped(pytester):
+    pytester.makepyfile(
+        """
+        import pytest
+
+
+        @pytest.mark.parametrize("value", ["<b>pwned</b>"])
+        def test_id_escaping(value):
+            pass
+    """
+    )
+    result = run(pytester)
+    result.assert_outcomes(passed=1)
+
+    html = (pytester.path / "report.html").read_text(encoding="utf-8")
+    blob = BeautifulSoup(html, "html.parser").find(id="data-container")["data-jsonblob"]
+    tests = json.loads(blob)["tests"]
+    nodeid = next(key for key in tests if "test_id_escaping" in key)
+    row = tests[nodeid][0]["resultsTableRow"]
+    test_id_cell = next(cell for cell in row if "col-testId" in cell)
+
+    assert_that(test_id_cell).does_not_contain("<b>pwned</b>").contains(
+        "&lt;b&gt;pwned&lt;/b&gt;"
+    )

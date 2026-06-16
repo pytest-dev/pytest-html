@@ -35,6 +35,7 @@ class BaseReport:
         self._report = report_data
         self._report.title = self._report_path.name
         self._suite_start_time = time.time()
+        self._last_generated_time = None
 
     @property
     def css(self):
@@ -49,14 +50,31 @@ class BaseReport:
             file_extension,
         )[-self._max_asset_filename_length :]
 
+    def _should_generate_report_on_test(self):
+        if not self._config.getini("generate_report_on_test"):
+            return False
+
+        if self._last_generated_time is None:
+            return True
+
+        seconds = self._config.getini("generate_report_on_test_rate")
+
+        if seconds == 0.0:
+            return True
+
+        return (
+            datetime.datetime.now() - self._last_generated_time
+            >= datetime.timedelta(seconds=seconds)
+        )
+
     def _generate_report(self, self_contained=False):
-        generated = datetime.datetime.now()
+        self._last_generated_time = datetime.datetime.now()
         test_data = self._report.data
         test_data = json.dumps(test_data)
         rendered_report = self._template.render(
             title=self._report.title,
-            date=generated.strftime("%d-%b-%Y"),
-            time=generated.strftime("%H:%M:%S"),
+            date=self._last_generated_time.strftime("%d-%b-%Y"),
+            time=self._last_generated_time.strftime("%H:%M:%S"),
             version=__version__,
             styles=self.css,
             run_count=self._run_count(),
@@ -175,7 +193,7 @@ class BaseReport:
         self._report.table_header = _fix_py(headers)
 
         self._report.running_state = "started"
-        if self._config.getini("generate_report_on_test"):
+        if self._should_generate_report_on_test():
             self._generate_report()
 
     @pytest.hookimpl(trylast=True)
@@ -256,7 +274,7 @@ class BaseReport:
                 dur = test_duration if when == "call" else each.duration
                 self._process_report(each, dur, processed_extras)
 
-        if self._config.getini("generate_report_on_test"):
+        if self._should_generate_report_on_test():
             self._generate_report()
 
     def _process_report(self, report, duration, processed_extras):

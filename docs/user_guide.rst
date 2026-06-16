@@ -30,6 +30,14 @@ or using `pytest.ini` file:
   [pytest]
   generate_report_on_test = True
 
+If you have many tests report streaming may slow down pytest. You can limit how often
+tests generate the report using ``generate_report_on_test_rate`` ini-value:
+
+.. code-block:: ini
+
+  [pytest]
+  generate_report_on_test_rate = 1.0
+
 Creating a self-contained report
 --------------------------------
 

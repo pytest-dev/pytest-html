@@ -51,10 +51,117 @@ The plugin will issue a warning when adding files or links to the standalone rep
 Enhancing reports
 -----------------
 
+Themes
+~~~~~~
+
+pytest-html supports pluggable themes via Jinja2 template inheritance. Two
+built-in themes are included: **classic** (the default, preserving the
+traditional appearance) and **modern** (a card-based dashboard style).
+
+Selecting a theme
+^^^^^^^^^^^^^^^^^
+
+Set the ``html_theme`` option in your pytest configuration:
+
+Using ``pyproject.toml``:
+
+.. code-block:: toml
+
+  [tool.pytest.ini_options]
+  html_theme = "modern"
+
+Using ``pytest.ini``:
+
+.. code-block:: ini
+
+  [pytest]
+  html_theme = modern
+
+Using a local theme directory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can point to a custom theme directory using ``html_theme_path``. This
+overrides entry point-based theme discovery and does not require packaging:
+
+.. code-block:: toml
+
+  [tool.pytest.ini_options]
+  html_theme_path = "./my_theme"
+
+The theme directory must contain at least a ``layout.jinja2`` file that extends
+the base template:
+
+.. code-block:: jinja
+
+  {% extends "base.jinja2" %}
+
+  {% block header %}
+  <h1 id="title">{{ title }}</h1>
+  <p>Custom header content here</p>
+  {% endblock header %}
+
+Optionally include a ``style.css`` to replace the default stylesheet entirely.
+If no ``style.css`` is present, the classic theme's CSS is used as a fallback.
+
+The ``--css`` flag continues to work and appends additional CSS on top of
+whatever the theme provides.
+
+Creating a theme package
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Theme packages register via the ``pytest_html.themes`` entry point group. The
+entry point value must be a Python package (directory with ``__init__.py``)
+containing the theme resources.
+
+Example package structure:
+
+.. code-block:: text
+
+  pytest-html-dark/
+    src/
+      pytest_html_dark/
+        __init__.py
+        theme/
+          __init__.py
+          layout.jinja2
+          style.css
+    pyproject.toml
+
+Register the entry point in ``pyproject.toml``:
+
+.. code-block:: toml
+
+  [project.entry-points."pytest_html.themes"]
+  dark = "pytest_html_dark.theme"
+
+Users can then select the theme:
+
+.. code-block:: toml
+
+  [tool.pytest.ini_options]
+  html_theme = "dark"
+
+Available template blocks
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The base template (``base.jinja2``) provides the following overridable blocks:
+
+- ``styles`` -- CSS delivery (inline ``<style>`` or ``<link>``)
+- ``head_extra`` -- additional content in ``<head>``
+- ``header`` -- page title and generation info
+- ``environment`` -- environment table and its row template
+- ``summary`` -- run statistics, filters, controls, and row templates
+- ``results_table`` -- the results ``<table>`` with its ``<thead>``
+- ``footer`` -- data container and script include
+
+All template variables (``title``, ``date``, ``time``, ``version``, ``styles``,
+``run_count``, ``outcomes``, ``table_head``, ``test_data``, etc.) are available
+in every block.
+
 Appearance
 ~~~~~~~~~~
 
-Custom CSS (Cascasding Style Sheets) can be passed on the command line using
+Custom CSS (Cascading Style Sheets) can be passed on the command line using
 the :code:`--css` option. These will be applied in the order specified, and can
 be used to change the appearance of the report.
 

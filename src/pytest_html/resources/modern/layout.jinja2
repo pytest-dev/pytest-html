@@ -1,0 +1,130 @@
+{% extends "base.jinja2" %}
+
+{% block header %}
+<header class="modern-header">
+  <h1 id="title">{{ title }}</h1>
+  <div class="meta">Report generated on {{ date }} at {{ time }} · <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v{{ version }}</div>
+</header>
+{% endblock header %}
+
+{% block environment %}
+<div class="top-grid">
+  <div class="environment-card">
+    <div id="environment-header">
+      <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+  </div>
+  <div class="result-cards">
+    {%- for result, values in outcomes.items() %}
+    <div class="result-card {{ result }}" title="{{ values['label'] }}">
+      <span class="result-card__icon">
+        {%- if result == "passed" %}✔
+        {%- elif result == "failed" %}✘
+        {%- elif result == "error" %}⚠
+        {%- elif result == "skipped" %}⏭
+        {%- elif result == "xfailed" %}↳
+        {%- elif result == "xpassed" %}‼
+        {%- elif result == "rerun" %}↻
+        {%- elif result == "retried" %}↻
+        {%- else %}•
+        {%- endif %}
+      </span>
+      <span class="result-card__body">
+        <span class="count {{ result }}">{{ values["value"] }}</span>
+        <span class="label">{{ values["label"] }}</span>
+      </span>
+    </div>
+    {%- endfor %}
+  </div>
+</div>
+{% endblock environment %}
+
+{% block summary %}
+<template id="template_results-table__body--empty">
+  <tbody class="results-table-row">
+    <tr id="not-found-message">
+      <td colspan="{{ table_head|length }}">No results found. Check the filters.</td>
+    </tr>
+  </tbody>
+</template>
+<template id="template_results-table__tbody">
+  <tbody class="results-table-row">
+    <tr class="collapsible">
+    </tr>
+    <tr class="extras-row">
+      <td class="extra" colspan="{{ table_head|length }}">
+        <div class="extraHTML"></div>
+        <div class="media">
+          <div class="media-container">
+              <div class="media-container__nav--left">&lt;</div>
+              <div class="media-container__viewport">
+                <img src="" />
+                <video controls>
+                  <source src="" type="video/mp4">
+                </video>
+              </div>
+              <div class="media-container__nav--right">&gt;</div>
+            </div>
+            <div class="media__name"></div>
+            <div class="media__counter"></div>
+        </div>
+        <div class="logwrapper">
+          <div class="logexpander"></div>
+          <div class="log"></div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</template>
+
+<div class="summary-panel">
+  <div class="summary-panel__header">
+    <p class="run-count">{{ run_count }}</p>
+    <div class="summary__reload">
+      <div class="summary__reload__button {{ 'hidden' if running_state == 'finished' }}" onclick="location.reload()">
+        <div>Tests still running — reload for latest results</div>
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="filters">
+    {%- for result, values in outcomes.items() %}
+      <label class="filter-switch filter-switch--{{ result }}{{ ' disabled' if values['value'] == 0 }}"{{ ' data-disabled' if values['value'] == 0 }}>
+        <span class="switch-track">
+          <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
+                 data-test-result="{{ result }}" {{ "disabled" if values["value"] == 0 }}>
+          <span class="switch-thumb"></span>
+        </span>
+        <span class="switch-label-text">{{ values["label"] }}</span>
+      </label>
+    {%- endfor %}
+    </div>
+    <div class="collapse">
+      <button id="show_all_details" class="btn btn--primary">Show details</button>
+      <button id="hide_all_details" class="btn btn--outline">Show summary</button>
+    </div>
+  </div>
+  <div class="additional-summary prefix">
+    {%- for p in additional_summary['prefix'] %}
+    {{ p|safe }}
+    {%- endfor %}
+  </div>
+  <div class="additional-summary summary">
+    {%- for s in additional_summary['summary'] %}
+    {{ s|safe }}
+    {%- endfor %}
+  </div>
+  <div class="additional-summary postfix">
+    {%- for p in additional_summary['postfix'] %}
+    {{ p|safe }}
+    {%- endfor %}
+  </div>
+</div>
+{% endblock summary %}

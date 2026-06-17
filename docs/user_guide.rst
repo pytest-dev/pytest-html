@@ -305,6 +305,16 @@ The following values may be passed:
 * :code:`xpassed`
 * :code:`rerun`
 
+Summary Report Line
+~~~~~~~~~~~~~~~~~~~
+
+It is possible to add query parameters to the printed URI in the terminal summary.
+
+.. code-block:: ini
+
+  [pytest]
+  summary_query_parameters = ?sort=result&visible=failed,error
+
 Results Table Sorting
 ~~~~~~~~~~~~~~~~~~~~~
 

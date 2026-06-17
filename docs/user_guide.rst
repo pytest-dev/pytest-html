@@ -1,6 +1,31 @@
 User Guide
 ==========
 
+Make sure the pytest-html plugin is installed in your test or development environment,
+e.g. by manually installing it with ``pip install pytest-html``.
+For more streamlined reproducibility: consider listing it as a (test/development) dependency
+in the appropriate project configuration file (e.g. ``pyproject.toml`` or ``requirements.txt``).
+
+Once installed, you can produce a HTML report from a ``pytest`` run
+by adding the ``--html`` command line option, e.g.:
+
+.. code-block:: bash
+
+   $ pytest --html=report.html
+
+By default, this will create a HTML file ``report.html`` and an ``assets`` folder
+for additional resources like CSS files and images.
+
+.. tip::
+   Use a dedicated parent folder for reports,
+   e.g. with ``--html=test-reports/report.html``,
+   to avoid polluting your project root with report assets.
+   pytest-html will automatically create parent folders when necessary.
+
+   Also consider setting up appropriate version control ignore rules (e.g. ``.gitignore``)
+   to avoid accidental commit of these output resources.
+
+
 ANSI codes
 ----------
 

@@ -53,6 +53,7 @@ class ReportData:
                 "will be removed in the next major release. "
                 "Please use 'render_collapsed = all' instead.",
                 DeprecationWarning,
+                stacklevel=2,
             )
             collapsed = "all"
 

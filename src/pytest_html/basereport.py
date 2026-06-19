@@ -14,7 +14,8 @@ from pathlib import Path
 
 import pytest
 
-from pytest_html import __version__, extras
+from pytest_html import __version__
+from pytest_html import extras
 
 
 class BaseReport:
@@ -119,19 +120,25 @@ class BaseReport:
             if extra["format_type"] == extras.FORMAT_JSON:
                 content = json.dumps(content)
                 extra["content"] = self._data_content(
-                    content, asset_name=asset_name, mime_type=extra["mime_type"],
+                    content,
+                    asset_name=asset_name,
+                    mime_type=extra["mime_type"],
                 )
 
             if extra["format_type"] == extras.FORMAT_TEXT:
                 if isinstance(content, bytes):
                     content = content.decode("utf-8")
                 extra["content"] = self._data_content(
-                    content, asset_name=asset_name, mime_type=extra["mime_type"],
+                    content,
+                    asset_name=asset_name,
+                    mime_type=extra["mime_type"],
                 )
 
             if extra["format_type"] in [extras.FORMAT_IMAGE, extras.FORMAT_VIDEO]:
                 extra["content"] = self._media_content(
-                    content, asset_name=asset_name, mime_type=extra["mime_type"],
+                    content,
+                    asset_name=asset_name,
+                    mime_type=extra["mime_type"],
                 )
 
         return report_extras
@@ -299,7 +306,8 @@ class BaseReport:
 
         processed_logs = _process_logs(report)
         self._config.hook.pytest_html_results_table_html(
-            report=report, data=processed_logs,
+            report=report,
+            data=processed_logs,
         )
 
         self._report.add_test(data, report, outcome, processed_logs)

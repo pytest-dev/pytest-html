@@ -12,7 +12,8 @@ from pytest_html.fixtures import extras_stash_key
 from pytest_html.report import Report
 from pytest_html.report_data import ReportData
 from pytest_html.selfcontained_report import SelfContainedReport
-from pytest_html.util import _process_css, _read_template
+from pytest_html.util import _process_css
+from pytest_html.util import _read_template
 
 
 def pytest_addhooks(pluginmanager):
@@ -108,7 +109,11 @@ def pytest_configure(config):
             report_data = ReportData(config)
             if config.getoption("self_contained_html"):
                 html = SelfContainedReport(
-                    html_path, config, report_data, template, processed_css,
+                    html_path,
+                    config,
+                    report_data,
+                    template,
+                    processed_css,
                 )
             else:
                 html = Report(html_path, config, report_data, template, processed_css)

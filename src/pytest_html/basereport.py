@@ -14,8 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_html import __version__
-from pytest_html import extras
+from pytest_html import __version__, extras
 
 
 class BaseReport:
@@ -28,7 +27,7 @@ class BaseReport:
         self._template = template
         self._css = css
         self._max_asset_filename_length = int(
-            config.getini("max_asset_filename_length")
+            config.getini("max_asset_filename_length"),
         )
 
         self._reports = defaultdict(dict)
@@ -107,7 +106,7 @@ class BaseReport:
         pass
 
     def _process_extras(self, report, test_id):
-        test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
+        test_index = (hasattr(report, "rerun") and report.rerun + 1) or 0
         report_extras = getattr(report, "extras", [])
         for extra_index, extra in enumerate(report_extras):
             content = extra["content"]
@@ -120,19 +119,19 @@ class BaseReport:
             if extra["format_type"] == extras.FORMAT_JSON:
                 content = json.dumps(content)
                 extra["content"] = self._data_content(
-                    content, asset_name=asset_name, mime_type=extra["mime_type"]
+                    content, asset_name=asset_name, mime_type=extra["mime_type"],
                 )
 
             if extra["format_type"] == extras.FORMAT_TEXT:
                 if isinstance(content, bytes):
                     content = content.decode("utf-8")
                 extra["content"] = self._data_content(
-                    content, asset_name=asset_name, mime_type=extra["mime_type"]
+                    content, asset_name=asset_name, mime_type=extra["mime_type"],
                 )
 
             if extra["format_type"] in [extras.FORMAT_IMAGE, extras.FORMAT_VIDEO]:
                 extra["content"] = self._media_content(
-                    content, asset_name=asset_name, mime_type=extra["mime_type"]
+                    content, asset_name=asset_name, mime_type=extra["mime_type"],
                 )
 
         return report_extras
@@ -266,7 +265,7 @@ class BaseReport:
         try:
             # hook returns as list for some reason
             formatted_duration = self._config.hook.pytest_html_duration_format(
-                duration=duration
+                duration=duration,
             )[0]
         except IndexError:
             formatted_duration = _format_duration(duration)
@@ -300,7 +299,7 @@ class BaseReport:
 
         processed_logs = _process_logs(report)
         self._config.hook.pytest_html_results_table_html(
-            report=report, data=processed_logs
+            report=report, data=processed_logs,
         )
 
         self._report.add_test(data, report, outcome, processed_logs)

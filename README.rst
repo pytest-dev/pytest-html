@@ -1,13 +1,13 @@
 pytest-html
 ===========
 
-pytest-html is a plugin for `pytest <http://pytest.org>`_ that generates a HTML report for test results.
+pytest-html is a plugin for `pytest <https://pytest.org>`_ that generates a HTML report for test results.
 
 .. image:: https://img.shields.io/badge/license-MPL%202.0-blue.svg
    :target: https://github.com/pytest-dev/pytest-html/blob/master/LICENSE
    :alt: License
 .. image:: https://img.shields.io/pypi/v/pytest-html.svg
-   :target: https://pypi.python.org/pypi/pytest-html/
+   :target: https://pypi.org/project/pytest-html/
    :alt: PyPI
 .. image:: https://img.shields.io/conda/vn/conda-forge/pytest-html.svg
    :target: https://anaconda.org/conda-forge/pytest-html
@@ -27,8 +27,8 @@ Resources
 
 - `Documentation <https://pytest-html.readthedocs.io/en/latest/>`_
 - `Release Notes <https://pytest-html.readthedocs.io/en/latest/changelog.html>`_
-- `Issue Tracker <http://github.com/pytest-dev/pytest-html/issues>`_
-- `Code <http://github.com/pytest-dev/pytest-html/>`_
+- `Issue Tracker <https://github.com/pytest-dev/pytest-html/issues>`_
+- `Code <https://github.com/pytest-dev/pytest-html/>`_
 
 Contributing
 ------------

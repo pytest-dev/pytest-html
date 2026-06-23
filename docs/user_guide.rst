@@ -54,7 +54,7 @@ Enhancing reports
 Appearance
 ~~~~~~~~~~
 
-Custom CSS (Cascasding Style Sheets) can be passed on the command line using
+Custom CSS (Cascading Style Sheets) can be passed on the command line using
 the :code:`--css` option. These will be applied in the order specified, and can
 be used to change the appearance of the report.
 
@@ -350,9 +350,9 @@ Below is an example of a :code:`conftest.py` file setting :code:`pytest_html_dur
 **NOTE**: The formatting of the total duration is not affected by this hook.
 
 .. _@pytest.hookimpl(tryfirst=True): https://docs.pytest.org/en/stable/writing_plugins.html#hook-function-ordering-call-example
-.. _ansi2html: https://pypi.python.org/pypi/ansi2html/
+.. _ansi2html: https://pypi.org/project/ansi2html/
 .. _Content Security Policy (CSP): https://developer.mozilla.org/docs/Web/Security/CSP/
 .. _JSON: https://json.org/
-.. _pytest-metadata: https://pypi.python.org/pypi/pytest-metadata/
-.. _pytest-xdist: https://pypi.python.org/pypi/pytest-xdist/
+.. _pytest-metadata: https://pypi.org/project/pytest-metadata/
+.. _pytest-xdist: https://pypi.org/project/pytest-xdist/
 .. _time.strftime: https://docs.python.org/3/library/time.html#time.strftime

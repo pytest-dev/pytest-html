@@ -31,7 +31,8 @@ class SelfContainedReport(BaseReport):
             warnings.warn(
                 "Self-contained HTML report "
                 "includes link to external "
-                f"resource: {content}"
+                f"resource: {content}",
+                stacklevel=2,
             )
             return content
 

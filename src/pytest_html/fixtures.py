@@ -24,6 +24,7 @@ def extra(pytestconfig):
         "The 'extra' fixture is deprecated and will be removed in a future release"
         ", use 'extras' instead.",
         DeprecationWarning,
+        stacklevel=2,
     )
     pytestconfig.stash[extras_stash_key] = []
     yield pytestconfig.stash[extras_stash_key]

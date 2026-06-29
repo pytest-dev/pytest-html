@@ -284,7 +284,7 @@ class BaseReport:
         ]
         cells = [
             f'<td class="col-result">{outcome}</td>',
-            f'<td class="col-testId">{test_id}</td>',
+            f'<td class="col-testId">{escape(test_id)}</td>',
             f'<td class="col-duration">{formatted_duration}</td>',
             f'<td class="col-links">{_process_links(links)}</td>',
         ]

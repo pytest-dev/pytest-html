@@ -51,12 +51,13 @@ repos:
         args: [--py39-plus]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.0.0-beta.0
+    rev: v10.6.0
     hooks:
       - id: eslint
         additional_dependencies:
-          - eslint@8.20.0
-          - eslint-config-google@0.14.0
+          - eslint@10.6.0
+          - "@stylistic/eslint-plugin@5.10.0"
+          - globals@17.7.0
         args: ["--fix"]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1

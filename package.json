@@ -8,10 +8,11 @@
     "all": "npm run lint && npm run unit && npm run build:css && npm run build:jsapp"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
     "browserify": "^17.0.1",
     "chai": "^6.2.2",
     "eslint": "^10.6.0",
-    "eslint-config-google": "^0.14.0",
+    "globals": "^17.7.0",
     "mocha": "^11.7.6",
     "mock-local-storage": "^1.1.24",
     "nyc": "^18.0.0",

@@ -11,7 +11,7 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "browserify": "^17.0.1",
     "chai": "^6.2.2",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.0",
     "globals": "^17.7.0",
     "mocha": "^11.7.6",
     "mock-local-storage": "^1.1.24",

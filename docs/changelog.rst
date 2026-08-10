@@ -6,6 +6,11 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
+Unreleased (2023-11-13)
+~~~~~~~~~~~~~~~~~~~~~~~
+* Type annotations for basereport.py (issue 434)
+
+
 4.1.1 (2023-11-07)
 ~~~~~~~~~~~~~~~~~~
 

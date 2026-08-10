@@ -335,7 +335,7 @@ class TestHTML:
         assert result.ret == 0
 
         content = pkg_resources.resource_string(
-            "pytest_html", os.path.join("resources", "style.css")
+            "pytest_html", os.path.join("resources", "classic", "style.css")
         )
         content = content.decode("utf-8")
         assert content
@@ -352,7 +352,7 @@ class TestHTML:
         content = content.decode("utf-8")
         assert content
         assert content in html
-        regex_css_link = '<link href="assets/style.css" rel="stylesheet"'
+        regex_css_link = '<link href="./assets/style.css" rel="stylesheet"'
         assert re.search(regex_css_link, html) is not None
 
     @pytest.mark.parametrize("result", ["pass", "fail"])

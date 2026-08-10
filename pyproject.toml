@@ -19,7 +19,7 @@ authors = [
   { name = "Dave Hunt", email = "dhunt@mozilla.com" },
   { name = "Jim Brannlund", email = "jimbrannlund@fastmail.com" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Framework :: Pytest",
@@ -30,7 +30,6 @@ classifiers = [
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -71,6 +70,8 @@ urls.Source = "https://github.com/pytest-dev/pytest-html"
 urls.Tracker = "https://github.com/pytest-dev/pytest-html/issues"
 entry-points.pytest11.html = "pytest_html.plugin"
 entry-points.pytest11.html_fixtures = "pytest_html.fixtures"
+entry-points."pytest_html.themes".classic = "pytest_html.resources.classic"
+entry-points."pytest_html.themes".modern = "pytest_html.resources.modern"
 
 [tool.hatch.envs.test]
 features = [

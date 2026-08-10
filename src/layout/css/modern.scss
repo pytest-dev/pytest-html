@@ -1,0 +1,520 @@
+$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-mono: "JetBrains Mono", "Fira Code", "Courier New", Courier, monospace;
+$font-size-text: 14px;
+$font-size-h1: 28px;
+$font-size-h2: 18px;
+$font-size-small: 13px;
+$font-size-xs: 12px;
+$font-size-label: 11px;
+
+$color-passed: #2e7d32;
+$color-failed: #c62828;
+$color-error: #c62828;
+$color-skipped: #f57c00;
+$color-xfailed: #f57c00;
+$color-xpassed: #c62828;
+$color-rerun: #f57c00;
+$color-retried: #f57c00;
+
+$color-bg: #fafafa;
+$color-surface: #ffffff;
+$color-border: #e0e0e0;
+$color-text: #212121;
+$color-text-secondary: #616161;
+$color-accent: #1976d2;
+
+$radius: 8px;
+$shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+
+$spacing: 8px;
+$spacing-sm: 4px;
+$spacing-lg: 12px;
+$spacing-xl: 16px;
+$spacing-xxl: 24px;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family;
+  font-size: $font-size-text;
+  min-width: 800px;
+  color: $color-text-secondary;
+  background: $color-bg;
+  margin: 0;
+  padding: $spacing-xxl;
+  line-height: 1.5;
+}
+
+h1 {
+  font-size: $font-size-h1;
+  color: $color-text;
+  margin: 0 0 $spacing-sm 0;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: $font-size-h2;
+  color: $color-text;
+  font-weight: 600;
+}
+
+p {
+  color: $color-text-secondary;
+}
+
+a {
+  color: $color-accent;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * HEADER
+ ******************************/
+.modern-header {
+  margin-bottom: $spacing-xxl;
+  padding-bottom: $spacing-xl;
+  border-bottom: 1px solid $color-border;
+
+  .meta {
+    color: $color-text-secondary;
+    font-size: $font-size-small;
+  }
+}
+
+/******************************
+ * ENVIRONMENT
+ ******************************/
+#environment-header {
+  cursor: pointer;
+
+  h2 {
+    &:hover::after {
+      content: ' (hide details)';
+      color: $color-text-secondary;
+      font-style: italic;
+      cursor: pointer;
+      font-size: $font-size-xs;
+    }
+  }
+
+  &.collapsed h2 {
+    &:hover::after {
+      content: ' (show details)';
+      color: $color-text-secondary;
+      font-style: italic;
+      cursor: pointer;
+      font-size: $font-size-xs;
+    }
+  }
+}
+
+#environment {
+  td {
+    padding: $spacing $spacing-lg;
+    border: 1px solid $color-border;
+    vertical-align: top;
+  }
+  tr:nth-child(odd) {
+    background-color: $color-bg;
+  }
+  ul {
+    margin: 0;
+    padding: 0 20px;
+  }
+}
+
+/******************************
+ * DASHBOARD
+ ******************************/
+.dashboard {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius;
+  padding: $spacing-xxl;
+  margin-bottom: $spacing-xxl;
+  box-shadow: $shadow;
+}
+
+.stat-cards {
+  display: flex;
+  gap: $spacing-lg;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-xl;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl $spacing-xxl;
+  border-radius: $radius;
+  border: 1px solid $color-border;
+  background: $color-bg;
+  min-width: 100px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow;
+  }
+
+  &__value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  &__label {
+    font-size: $font-size-label;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: $color-text-secondary;
+    margin-top: $spacing-sm;
+  }
+
+  &.passed .stat-card__value { color: $color-passed; }
+  &.failed .stat-card__value { color: $color-failed; }
+  &.error .stat-card__value { color: $color-error; }
+  &.skipped .stat-card__value { color: $color-skipped; }
+  &.xfailed .stat-card__value { color: $color-xfailed; }
+  &.xpassed .stat-card__value { color: $color-xpassed; }
+  &.rerun .stat-card__value { color: $color-rerun; }
+  &.retried .stat-card__value { color: $color-retried; }
+}
+
+.run-count {
+  color: $color-text;
+  font-weight: 500;
+  margin: $spacing 0 $spacing-xl 0;
+}
+
+/******************************
+ * CONTROLS & FILTERS
+ ******************************/
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-lg 0;
+  border-top: 1px solid $color-border;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: $font-size-small;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: $color-bg;
+  }
+
+  input[type="checkbox"] {
+    cursor: pointer;
+  }
+
+  &.passed span { color: $color-passed; }
+  &.failed span { color: $color-failed; }
+  &.error span { color: $color-error; }
+  &.skipped span { color: $color-skipped; }
+  &.xfailed span { color: $color-xfailed; }
+  &.xpassed span { color: $color-xpassed; }
+  &.rerun span { color: $color-rerun; }
+  &.retried span { color: $color-retried; }
+}
+
+.collapse {
+  display: flex;
+  align-items: center;
+  gap: $spacing;
+
+  button {
+    color: $color-accent;
+    border: 1px solid $color-border;
+    background: $color-surface;
+    cursor: pointer;
+    padding: 6px $spacing-lg;
+    border-radius: 4px;
+    font-size: $font-size-small;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: $color-bg;
+    }
+  }
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: $color-passed;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: $color-skipped;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: $color-failed;
+}
+
+.col-links__extra {
+  margin-right: 5px;
+  color: $color-accent;
+}
+
+/******************************
+ * RESULTS TABLE
+ ******************************/
+#results-table {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius;
+  color: $color-text-secondary;
+  font-size: $font-size-small;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: $shadow;
+
+  th,
+  td {
+    padding: 10px $spacing-lg;
+    border: 1px solid $color-border;
+    text-align: left;
+  }
+
+  th {
+    font-weight: 600;
+    background: $color-bg;
+    color: $color-text;
+    font-size: $font-size-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+}
+
+/******************************
+ * LOG & EXTRAS
+ ******************************/
+$extra-height: 240px;
+$extra-media-width: 320px;
+
+.logwrapper {
+  max-height: $extra-height - 2 * $spacing;
+  overflow-y: scroll;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+
+  &.expanded {
+    max-height: none;
+    .logexpander:after {
+      content: 'collapse [-]';
+    }
+  }
+
+  .logexpander {
+    z-index: 1;
+    position: sticky;
+    top: 10px;
+    width: max-content;
+    border: 1px solid $color-border;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin: 10px 0 10px calc(100% - 90px);
+    cursor: pointer;
+    background-color: $color-surface;
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+
+    &:after {
+      content: 'expand [+]';
+    }
+    &:hover {
+      color: $color-text;
+      border-color: $color-text-secondary;
+    }
+  }
+
+  .log {
+    min-height: 40px;
+    position: relative;
+    top: -50px;
+    height: calc(100% + 50px);
+    border: 1px solid $color-border;
+    color: $color-text;
+    display: block;
+    font-family: $font-family-mono;
+    font-size: $font-size-xs;
+    padding: $spacing $spacing-lg;
+    padding-right: 80px;
+    white-space: pre-wrap;
+  }
+}
+
+div.media {
+  border: 1px solid $color-border;
+  border-radius: 4px;
+  float: right;
+  height: $extra-height;
+  margin: 0 5px;
+  overflow: hidden;
+  width: $extra-media-width;
+}
+
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 200px;
+
+  &--fullscreen {
+    grid-template-columns: 0px auto 0px;
+  }
+
+  &__nav--right,
+  &__nav--left {
+    text-align: center;
+    cursor: pointer;
+  }
+
+  &__viewport {
+    cursor: pointer;
+    text-align: center;
+    height: inherit;
+
+    img,
+    video {
+      object-fit: cover;
+      width: 100%;
+      max-height: 100%;
+    }
+  }
+}
+
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
+}
+
+/******************************
+ * COLLAPSIBLE ROWS
+ ******************************/
+.collapsible td:not(.col-links) {
+  cursor: pointer;
+  &:hover::after {
+    color: #bbb;
+    font-style: italic;
+    cursor: pointer;
+  }
+}
+
+.col-result {
+  width: 130px;
+  font-weight: 500;
+
+  &:hover::after {
+    content: ' (hide details)';
+  }
+
+  &.collapsed:hover::after {
+    content: ' (show details)';
+  }
+}
+
+/******************************
+ * SORTING
+ ******************************/
+.sortable {
+  cursor: pointer;
+
+  &.desc:after {
+    content: ' ';
+    position: relative;
+    left: 5px;
+    bottom: -12.5px;
+    border: 10px solid $color-accent;
+    border-bottom: 0;
+    border-left-color: transparent;
+    border-right-color: transparent;
+  }
+
+  &.asc:after {
+    content: ' ';
+    position: relative;
+    left: 5px;
+    bottom: 12.5px;
+    border: 10px solid $color-accent;
+    border-top: 0;
+    border-left-color: transparent;
+    border-right-color: transparent;
+  }
+}
+
+/******************************
+ * RELOAD & UTILITIES
+ ******************************/
+.hidden, .summary__reload__button.hidden {
+  display: none;
+}
+
+.summary__reload {
+  display: flex;
+  justify-content: center;
+  margin: $spacing-lg 0;
+
+  &__button {
+    display: flex;
+    color: white;
+    font-weight: 600;
+    background-color: $color-accent;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: $radius;
+    cursor: pointer;
+    padding: $spacing-lg $spacing-xxl;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}

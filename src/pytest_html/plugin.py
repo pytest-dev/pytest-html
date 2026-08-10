@@ -1,6 +1,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import importlib.metadata
+import importlib.resources
 import os
 import warnings
 from pathlib import Path
@@ -79,6 +81,50 @@ def pytest_addoption(parser):
         help="the HTML report will be generated after each test "
         "instead of at the end of the run.",
     )
+    parser.addini(
+        "html_theme",
+        type="string",
+        default="classic",
+        help="HTML report theme name (default: 'classic').",
+    )
+    parser.addini(
+        "html_theme_path",
+        type="string",
+        default="",
+        help="path to a custom theme directory containing layout.jinja2 "
+        "(overrides html_theme entry point lookup).",
+    )
+
+
+def _resolve_theme(config: pytest.Config, resources_path: Path) -> Path:
+    theme_name = config.getini("html_theme")
+
+    theme_path_str = config.getini("html_theme_path")
+    if theme_path_str:
+        theme_path = Path(os.path.expandvars(theme_path_str)).expanduser().resolve()
+        if not (theme_path / "layout.jinja2").exists():
+            raise pytest.UsageError(
+                f"html_theme_path '{theme_path}' does not contain layout.jinja2"
+            )
+        return theme_path
+
+    eps = importlib.metadata.entry_points(group="pytest_html.themes")
+    for ep in eps:
+        if ep.name == theme_name:
+            theme_module = ep.load()
+            theme_traversable = importlib.resources.files(theme_module)
+            theme_path = Path(str(theme_traversable))
+            if not (theme_path / "layout.jinja2").exists():
+                raise pytest.UsageError(
+                    f"Theme '{theme_name}' (from entry point '{ep.value}') "
+                    "does not contain layout.jinja2"
+                )
+            return theme_path
+
+    raise pytest.UsageError(
+        f"Unknown html_theme '{theme_name}'. "
+        "Install a theme package or set html_theme_path."
+    )
 
 
 def pytest_configure(config):
@@ -103,8 +149,16 @@ def pytest_configure(config):
         if not hasattr(config, "workerinput"):
             # prevent opening html_path on worker nodes (xdist)
             resources_path = Path(__file__).parent.joinpath("resources")
-            default_css = Path(resources_path, "style.css")
-            template = _read_template([resources_path])
+            theme_path = _resolve_theme(config, resources_path)
+
+            theme_css = theme_path / "style.css"
+            default_css = (
+                theme_css
+                if theme_css.exists()
+                else resources_path / "classic" / "style.css"
+            )
+
+            template = _read_template([theme_path, resources_path])
             processed_css = _process_css(default_css, extra_css)
             report_data = ReportData(config)
             if config.getoption("self_contained_html"):

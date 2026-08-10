@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8"/>
     <title id="head-title">{{ title }}</title>
+    {% block styles %}
     {%- if self_contained %}
       <style type="text/css">
         {{- styles|safe }}
@@ -10,11 +11,16 @@
     {% else %}
       <link href="{{ styles }}" rel="stylesheet" type="text/css"/>
     {%- endif %}
+    {% endblock styles %}
+    {% block head_extra %}{% endblock head_extra %}
   </head>
   <body>
+    {% block header %}
     <h1 id="title">{{ title }}</h1>
     <p>Report generated on {{ date }} at {{ time }} by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
         v{{ version }}</p>
+    {% endblock header %}
+    {% block environment %}
     <div id="environment-header">
       <h2>Environment</h2>
     </div>
@@ -26,6 +32,8 @@
         <td></td>
       </tr>
     </template>
+    {% endblock environment %}
+    {% block summary %}
     <template id="template_results-table__body--empty">
       <tbody class="results-table-row">
         <tr id="not-found-message">
@@ -102,6 +110,8 @@
         {%- endfor %}
       </div>
     </div>
+    {% endblock summary %}
+    {% block results_table %}
     <table id="results-table">
       <thead id="results-table-head">
         <tr>
@@ -111,11 +121,14 @@
         </tr>
       </thead>
     </table>
+    {% endblock results_table %}
+  {% block footer %}
   <footer>
     <div id="data-container" data-jsonblob="{{ test_data }}"></div>
     <script>
       {% include "app.js" %}
     </script>
   </footer>
+  {% endblock footer %}
   </body>
 </html>

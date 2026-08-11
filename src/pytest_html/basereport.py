@@ -1,7 +1,6 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import datetime
 import json
 import math
 import os
@@ -9,6 +8,8 @@ import re
 import time
 import warnings
 from collections import defaultdict
+from datetime import datetime
+from datetime import timezone
 from html import escape
 from pathlib import Path
 
@@ -20,8 +21,11 @@ from pytest_html import extras
 
 class BaseReport:
     def __init__(self, report_path, config, report_data, template, css):
+        self._generated = datetime.now(tz=timezone.utc)
+
+        report_path_expanded = self._expand_path(report_path)
         self._report_path = (
-            Path.cwd() / Path(os.path.expandvars(report_path)).expanduser()
+            Path.cwd() / Path(report_path_expanded).expanduser()
         )
         self._report_path.parent.mkdir(parents=True, exist_ok=True)
         self._config = config
@@ -41,6 +45,15 @@ class BaseReport:
         # implement in subclasses
         return
 
+    def _expand_path(self, report_path):
+        # generated_time: UTC date and time, in ISO format with : replaced with -.
+        # report-%(generated_time).html will become report-2025-10-08T21-45-08.237134.html
+        path_expanded = os.path.expandvars(report_path)
+        path_expanded := path_expanded % {
+            "generated_time": self._generated.isoformat().replace(":", "-"),
+        }
+        return path_expanded
+
     def _asset_filename(self, test_id, extra_index, test_index, file_extension):
         return "{}_{}_{}.{}".format(
             re.sub(r"[^\w.]", "_", test_id),
@@ -50,13 +63,12 @@ class BaseReport:
         )[-self._max_asset_filename_length :]
 
     def _generate_report(self, self_contained=False):
-        generated = datetime.datetime.now()
         test_data = self._report.data
         test_data = json.dumps(test_data)
         rendered_report = self._template.render(
             title=self._report.title,
-            date=generated.strftime("%d-%b-%Y"),
-            time=generated.strftime("%H:%M:%S"),
+            date=self._generated.strftime("%d-%b-%Y"),
+            time=self._generated.strftime("%H:%M:%S"),
             version=__version__,
             styles=self.css,
             run_count=self._run_count(),

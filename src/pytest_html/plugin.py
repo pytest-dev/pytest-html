@@ -55,6 +55,12 @@ def pytest_addoption(parser):
         help="row(s) to render collapsed on open.",
     )
     parser.addini(
+        "summary_query_parameters",
+        type="string",
+        default="",
+        help="query parameters to be printed in the terminal summary",
+    )
+    parser.addini(
         "max_asset_filename_length",
         default=255,
         help="set the maximum filename length for assets "

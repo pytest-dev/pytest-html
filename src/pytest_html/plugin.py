@@ -114,7 +114,7 @@ def pytest_configure(config):
             else:
                 html = Report(html_path, config, report_data, template, processed_css)
 
-            config.pluginmanager.register(html)
+            config.pluginmanager.register(html, "html_report")
 
 
 def pytest_unconfigure(config):

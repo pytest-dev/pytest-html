@@ -30,7 +30,7 @@ const hideCategory = (categoryToHide) => {
     const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
 
     url.searchParams.set('visible', settings)
-    window.history.pushState({}, null, unescape(url.href))
+    window.history.pushState({}, null, decodeURI(url.href))
 }
 
 const showCategory = (categoryToShow) => {
@@ -44,7 +44,7 @@ const showCategory = (categoryToShow) => {
     const noFilter = possibleFilters.length === settings.length || !settings.length
 
     noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
-    window.history.pushState({}, null, unescape(url.href))
+    window.history.pushState({}, null, decodeURI(url.href))
 }
 
 const getSort = (initialSort) => {
@@ -59,7 +59,7 @@ const getSort = (initialSort) => {
 const setSort = (type) => {
     const url = new URL(window.location.href)
     url.searchParams.set('sort', type)
-    window.history.pushState({}, null, unescape(url.href))
+    window.history.pushState({}, null, decodeURI(url.href))
 }
 
 const getCollapsedCategory = (renderCollapsed) => {

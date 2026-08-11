@@ -15,10 +15,10 @@
     <h1 id="title">{{ title }}</h1>
     <p>Report generated on {{ date }} at {{ time }} by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
         v{{ version }}</p>
-    <div id="environment-header">
+    <div id="environment-header" class="collapsable collapsed">
       <h2>Environment</h2>
     </div>
-    <table id="environment"></table>
+    <table id="environment" class="hidden"></table>
     <!-- TEMPLATES -->
       <template id="template_environment_row">
       <tr>

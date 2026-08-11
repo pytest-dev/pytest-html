@@ -6,6 +6,11 @@ Versions follow `Semantic Versioning`_ (``<major>.<minor>.<patch>``).
 Version History
 ---------------
 
+4.1.2 (2025-07-07)
+~~~~~~~~~~~~~~~~~~
+
+* Environment table was made hidden by default
+
 4.1.1 (2023-11-07)
 ~~~~~~~~~~~~~~~~~~
 

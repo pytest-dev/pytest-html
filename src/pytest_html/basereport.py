@@ -157,8 +157,8 @@ class BaseReport:
 
     def _hydrate_data(self, data, cells):
         for index, cell in enumerate(cells):
-            # extract column name and data if column is sortable
-            if "sortable" in self._report.table_header[index]:
+            table_len = len(self._report.table_header)
+            if index < table_len and "sortable" in self._report.table_header[index]:
                 name_match = re.search(r"col-(\w+)", cell)
                 data_match = re.search(r"<td.*?>(.*?)</td>", cell)
                 if name_match and data_match:
@@ -180,6 +180,16 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionfinish(self, session):
+        generate_with_tags = session.config.getoption("generate_reports_with_tags")
+        self._report.set_data("environment", self._generate_environment())
+        session.config.hook.pytest_html_report_title(report=self._report)
+        if generate_with_tags:
+            headers = self._report.table_header
+            session.config.hook.pytest_html_results_table_header(cells=headers)
+            self._report.table_header = _fix_py(headers)
+            self._report.running_state = "started"
+            self._generate_report()
+
         session.config.hook.pytest_html_results_summary(
             prefix=self._report.additional_summary["prefix"],
             summary=self._report.additional_summary["summary"],

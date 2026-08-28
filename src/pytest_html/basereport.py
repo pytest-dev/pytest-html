@@ -282,9 +282,12 @@ class BaseReport:
             for extra in data["extras"]
             if extra["format_type"] in ["json", "text", "url"]
         ]
+        escaped_test_id = escape(test_id, quote=True)
         cells = [
             f'<td class="col-result">{outcome}</td>',
-            f'<td class="col-testId">{test_id}</td>',
+            f'<td class="col-testId">{escaped_test_id}'
+            f'<button class="copy-btn" data-test-id="{escaped_test_id}"'
+            f' title="Copy test ID" aria-label="Copy test ID">&#x1F4CB;</button></td>',
             f'<td class="col-duration">{formatted_duration}</td>',
             f'<td class="col-links">{_process_links(links)}</td>',
         ]

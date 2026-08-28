@@ -101,6 +101,30 @@ span.xpassed,
   font-weight: bold;
 }
 
+.col-testId .copy-btn {
+  margin-left: 8px;
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  vertical-align: middle;
+  transition: all 0.15s ease;
+}
+.col-testId .copy-btn:hover {
+  background-color: #f6f6f6;
+  border-color: #999;
+}
+.col-testId .copy-btn:active {
+  background-color: #e6e6e6;
+}
+.col-testId .copy-btn.copied {
+  background-color: #e6e6e6;
+  border-color: #999;
+}
+
 /*------------------
  * 2. Extra
  *------------------*/

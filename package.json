@@ -7,6 +7,9 @@
     "unit": "nyc mocha testing/**/unittest.js --require mock-local-storage",
     "all": "npm run lint && npm run unit && npm run build:css && npm run build:jsapp"
   },
+  "overrides": {
+    "serialize-javascript": "^7.0.7"
+  },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "browserify": "^17.0.1",

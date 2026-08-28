@@ -134,6 +134,7 @@ def pytest_runtest_makereport(item, call):
                 "The 'report.extra' attribute is deprecated and will be removed in a future release"
                 ", use 'report.extras' instead.",
                 DeprecationWarning,
+                stacklevel=2,
             )
         fixture_extras = item.config.stash.get(extras_stash_key, [])
         plugin_extras = getattr(report, "extras", [])

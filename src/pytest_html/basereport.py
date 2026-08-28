@@ -81,6 +81,7 @@ class BaseReport:
             warnings.warn(
                 "'pytest-metadata < 3.0.0' is deprecated and support will be dropped in next major version",
                 DeprecationWarning,
+                stacklevel=2,
             )
 
         for key in metadata.keys():
@@ -214,6 +215,7 @@ class BaseReport:
                 "'duration_formatter' has been removed and no longer has any effect!"
                 "Please use the 'pytest_html_duration_format' hook instead.",
                 DeprecationWarning,
+                stacklevel=2,
             )
 
         # "reruns" makes this code a mess.
@@ -370,6 +372,7 @@ def _fix_py(cells):
                     "The 'py' module is deprecated and support "
                     "will be removed in a future release.",
                     DeprecationWarning,
+                    stacklevel=2,
                 )
             html = str(html)
             html = html.replace("col=", "data-column-type=")

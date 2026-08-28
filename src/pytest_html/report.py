@@ -32,8 +32,13 @@ class Report(BaseReport):
             media_data = base64.b64decode(content.encode("utf-8"), validate=True)
             return self._write_content(media_data, asset_name)
         except binascii.Error:
-            # if not base64 content, just return as it's a file or link
-            return content
+            # if not base64 content, try to make it relative to the report
+            try:
+                abs_path = Path(content).resolve()
+                return str(abs_path.relative_to(self._report_path.parent.resolve()))
+            except (ValueError, OSError):
+                # On different drives (Windows) or unresolvable, return as-is
+                return content
 
     def _write_content(self, content, asset_name):
         content_relative_path = Path(self._assets_path, asset_name)

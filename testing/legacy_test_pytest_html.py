@@ -681,8 +681,9 @@ class TestHTML:
         """
         )
         result, html = run(testdir, "report.html")
+        truncated_length = max(1, max_asset_filename_length - len("assets/"))
         file_name = f"test_very_long_test_name.py__{test_name}_0_0.png"[
-            -max_asset_filename_length:
+            -truncated_length:
         ]
         src = "assets/" + file_name
         link = f'<a class="image" href="{src}" target="_blank">'

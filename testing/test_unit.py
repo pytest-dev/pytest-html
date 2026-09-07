@@ -5,6 +5,8 @@ from pathlib import Path
 import pytest
 from assertpy import assert_that
 
+from pytest_html.basereport import BaseReport
+
 pytest_plugins = ("pytester",)
 
 
@@ -146,3 +148,24 @@ def test_custom_css_selfcontained(pytester, css_file_path, expandvar):
     with open(pytester.path / "report.html") as f:
         html = f.read()
         assert_that(html).contains("* " + str(css_file_path)).contains("* two.css")
+
+
+def test_asset_filename_accounts_for_assets_directory_prefix():
+    """Relative asset paths must stay within max_asset_filename_length (#906)."""
+
+    class _Report:
+        _max_asset_filename_length = 255
+        _assets_path = Path("report_dir") / "assets"
+
+    filename = BaseReport._asset_filename(
+        _Report(),
+        "test_" + "a" * 300,
+        extra_index=0,
+        test_index=0,
+        file_extension="png",
+    )
+    relative_path = str(Path("assets") / filename).replace("\\", "/")
+    assert_that(len(filename)).is_less_than_or_equal_to(255 - len("assets/"))
+    assert_that(len(relative_path)).is_less_than_or_equal_to(255)
+    assert_that(relative_path).starts_with("assets/")
+    assert_that(filename).ends_with(".png")

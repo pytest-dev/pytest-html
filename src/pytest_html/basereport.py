@@ -42,12 +42,20 @@ class BaseReport:
         return
 
     def _asset_filename(self, test_id, extra_index, test_index, file_extension):
-        return "{}_{}_{}.{}".format(
+        filename = "{}_{}_{}.{}".format(
             re.sub(r"[^\w.]", "_", test_id),
             str(extra_index),
             str(test_index),
             file_extension,
-        )[-self._max_asset_filename_length :]
+        )
+        max_length = self._max_asset_filename_length
+        assets_dir = getattr(self, "_assets_path", None)
+        if assets_dir is not None:
+            # Files are written under this directory (see Report._write_content).
+            # Reserve the directory name plus separator so the relative path
+            # stays within max_asset_filename_length on path-limited systems.
+            max_length -= len(assets_dir.name) + 1
+        return filename[-max(1, max_length) :]
 
     def _generate_report(self, self_contained=False):
         generated = datetime.datetime.now()

@@ -138,3 +138,18 @@ def pytest_runtest_makereport(item, call):
         fixture_extras = item.config.stash.get(extras_stash_key, [])
         plugin_extras = getattr(report, "extras", [])
         report.extras = fixture_extras + plugin_extras + deprecated_extra
+        # Remember how many stash entries "call" already claimed, so that
+        # anything a fixture appends during its own teardown (which the
+        # stash still holds at this point) isn't attached twice below.
+        item._html_report_extras_seen = len(fixture_extras)
+    elif report.when == "teardown":
+        fixture_extras = item.config.stash.get(extras_stash_key, [])
+        already_seen = getattr(item, "_html_report_extras_seen", 0)
+        new_extras = fixture_extras[already_seen:]
+        if new_extras:
+            report.extras = new_extras + getattr(report, "extras", [])
+        # The "extras"/"extra" fixtures no longer clear the stash on their
+        # own teardown, since a fixture depending on them may still append
+        # to it during its own teardown afterwards. Do it here instead,
+        # once nothing else is left to read it for this test.
+        del fixture_extras[:]

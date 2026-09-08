@@ -8,6 +8,7 @@ import random
 import re
 import sys
 from base64 import b64encode
+from html import unescape
 
 import pkg_resources
 import pytest
@@ -705,6 +706,38 @@ class TestHTML:
         assert result.ret == 0
         src = f"data:image/png;base64,{content}"
         assert f'<img src="{src}"/>' in html
+
+    def test_extra_fixture_teardown(self, testdir):
+        content = str(random.random())
+        testdir.makepyfile(
+            f"""
+            import pytest
+
+            @pytest.fixture
+            def cleanup(extras):
+                yield
+                from pytest_html import extras as extras_module
+                extras.append(extras_module.text('{content}'))
+
+            def test_pass(cleanup):
+                pass
+        """
+        )
+        result, html = run(testdir, "report.html", "--self-contained-html")
+        assert result.ret == 0
+
+        match = re.search(r'data-jsonblob="([^"]*)"', html)
+        assert match
+        report_data = json.loads(unescape(match.group(1)))
+        test_extras = report_data["tests"]["test_extra_fixture_teardown.py::test_pass"][
+            0
+        ]["extras"]
+        assert len(test_extras) == 1
+        encoded = b64encode(content.encode("utf-8")).decode("ascii")
+        assert (
+            test_extras[0]["content"]
+            == f"data:text/plain;charset=utf-8;base64,{encoded}"
+        )
 
     def test_no_invalid_characters_in_filename(self, testdir):
         testdir.makeconftest(

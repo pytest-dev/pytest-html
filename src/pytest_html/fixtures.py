@@ -27,7 +27,10 @@ def extra(pytestconfig):
     )
     pytestconfig.stash[extras_stash_key] = []
     yield pytestconfig.stash[extras_stash_key]
-    del pytestconfig.stash[extras_stash_key][:]
+    # Deliberately not cleared here: a fixture that depends on this one may
+    # still append to the list during its own teardown, which runs after
+    # this point. pytest_runtest_makereport reads it once more for the
+    # "teardown" phase and clears it there instead.
 
 
 @pytest.fixture
@@ -44,4 +47,7 @@ def extras(pytestconfig):
     """
     pytestconfig.stash[extras_stash_key] = []
     yield pytestconfig.stash[extras_stash_key]
-    del pytestconfig.stash[extras_stash_key][:]
+    # Deliberately not cleared here: a fixture that depends on this one may
+    # still append to the list during its own teardown, which runs after
+    # this point. pytest_runtest_makereport reads it once more for the
+    # "teardown" phase and clears it there instead.

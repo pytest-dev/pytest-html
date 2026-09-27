@@ -209,6 +209,13 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
+        # pytest 9+ subtests emit a separate report for each subtest. Those
+        # reports share the parent test's nodeid but have their own outcome,
+        # so storing them would create duplicate rows. The parent test's own
+        # "call" report already contains the subtest details, so skip them.
+        if getattr(report, "context", None) is not None:
+            return
+
         if hasattr(report, "duration_formatter"):
             warnings.warn(
                 "'duration_formatter' has been removed and no longer has any effect!"

@@ -1,4 +1,7 @@
+import html
 import importlib.resources
+import json
+import re
 import sys
 from pathlib import Path
 
@@ -146,3 +149,28 @@ def test_custom_css_selfcontained(pytester, css_file_path, expandvar):
     with open(pytester.path / "report.html") as f:
         html = f.read()
         assert_that(html).contains("* " + str(css_file_path)).contains("* two.css")
+
+
+def test_subtests_single_row(pytester):
+    """A test with mixed subtest outcomes must produce one report row."""
+    pytest.importorskip("pytest", minversion="9.0")
+    pytester.makepyfile(
+        test_mixed="""
+        from pytest import Subtests
+
+        def test_mixed(subtests: Subtests):
+            for i in range(6):
+                with subtests.test(i):
+                    assert i % 2 == 0
+        """
+    )
+    result = run(pytester)
+    assert result.ret == 1
+
+    report = pytester.path.joinpath("report.html").read_text()
+    data = json.loads(
+        html.unescape(re.search(r'data-jsonblob="(.*?)"', report, re.S).group(1))
+    )
+    rows = data["tests"]["test_mixed.py::test_mixed"]
+    assert_that(rows).is_length(1)
+    assert_that(rows[0]["result"]).is_equal_to("Failed")

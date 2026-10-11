@@ -8,6 +8,7 @@ import os
 import re
 import time
 import warnings
+from weakref import WeakSet
 from collections import defaultdict
 from html import escape
 from pathlib import Path
@@ -34,6 +35,10 @@ class BaseReport:
         self._reports = {}
         self._implicit_attempts = defaultdict(int)
         self._completed_attempts = defaultdict(set)
+        # Keep report delivery idempotent without retaining every TestReport
+        # after its owner has released it. Distinct phase reports may share a
+        # nodeid, phase and outcome; only object identity proves a replay.
+        self._seen_reports = WeakSet()
         self._report = report_data
         self._report.title = self._report_path.name
         self._suite_start_time = time.time()
@@ -214,6 +219,10 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
+        if report in self._seen_reports:
+            return
+        self._seen_reports.add(report)
+
         if hasattr(report, "duration_formatter"):
             warnings.warn(
                 "'duration_formatter' has been removed and no longer has any effect!"
@@ -252,12 +261,10 @@ class BaseReport:
                 current = None
 
         if current is None:
-            if (
-                marker is None
-                and report.when == "teardown"
-                and self._completed_attempts[nodeid]
-            ):
-                # A teardown following a completed attempt cannot reopen it.
+            if report.when == "teardown" and report.outcome == "passed":
+                # With no open attempt, a passed teardown has no visible row
+                # to receive extras. Do not consume the next attempt's asset
+                # suffix; a separate failed teardown *does* get its own row.
                 return
             index = self._implicit_attempts[nodeid]
             if marker is None:

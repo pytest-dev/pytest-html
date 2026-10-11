@@ -246,6 +246,20 @@ def test_no_cross_phase_asset_rows(pytester, mode):
                 ("A", "setup", "passed"),
                 ("A", "call", "passed"),
                 ("A", "teardown", "passed"),
+                ("A", "teardown", "passed"),
+                ("B", "setup", "passed"),
+                ("B", "call", "passed"),
+                ("B", "teardown", "passed"),
+            ],
+            ["Passed", "Passed"],
+            [["A-setup", "A-call", "A-teardown"], ["B-setup", "B-call", "B-teardown"]],
+            [["A"], ["B"]],
+        ),
+        (
+            [
+                ("A", "setup", "passed"),
+                ("A", "call", "passed"),
+                ("A", "teardown", "passed"),
                 ("B", "setup", "passed"),
                 ("B", "call", "passed"),
                 ("B", "teardown", "passed"),
@@ -438,3 +452,105 @@ def test_explicit_retry_does_not_consume_implicit_asset_suffix(pytester, mode):
                     "data:text/plain;charset=utf-8;base64,"
                 )
                 assert base64.b64decode(extra["content"].partition(",")[2]) == payload
+
+
+@pytest.mark.parametrize("mode", ["assets", "self-contained"])
+def test_distinct_failed_teardown_after_completed_attempt_is_visible(pytester, mode):
+    pytester.makeconftest(
+        """
+        import pytest
+        from pytest_html import extras
+
+        @pytest.hookimpl(tryfirst=True)
+        def pytest_runtest_protocol(item, nextitem):
+            for when, outcome, label in (
+                ('setup', 'passed', 'first-setup'),
+                ('call', 'passed', 'first-call'),
+                ('teardown', 'passed', 'first-teardown'),
+                ('teardown', 'failed', 'second-teardown'),
+            ):
+                report = pytest.TestReport(
+                    nodeid=item.nodeid, location=item.location, keywords={},
+                    outcome=outcome, longrepr='distinct teardown failed'
+                    if outcome == 'failed' else None,
+                    when=when, duration=0.01,
+                    sections=[('Captured stdout teardown', label)]
+                    if when == 'teardown' else [],
+                )
+                report.extras = [extras.text(label)]
+                item.ihook.pytest_runtest_logreport(report=report)
+            return True
+        """
+    )
+    pytester.makepyfile("def test_case(): pass")
+    pytester.makeini("[pytest]\ngenerate_report_on_test = true")
+    path = pytester.path / "report.html"
+    flags = ["--self-contained-html"] if mode == "self-contained" else []
+    pytester.runpytest("--html", str(path), *flags)
+    document = BeautifulSoup(path.read_text(encoding="utf-8"), "html.parser")
+    data = json.loads(document.select_one("#data-container")["data-jsonblob"])
+    rows = next(iter(data["tests"].values()))
+    assert [row["result"] for row in rows] == ["Passed", "Error"]
+    assert [len(row["extras"]) for row in rows] == [3, 1]
+    assert "first-teardown" in rows[0]["log"]
+    assert "second-teardown" not in rows[0]["log"]
+    assert "second-teardown" in rows[1]["log"]
+    for row, payloads in zip(
+        rows, (("first-setup", "first-call", "first-teardown"), ("second-teardown",))
+    ):
+        for extra, payload in zip(row["extras"], payloads):
+            assert extra["format_type"] == "text"
+            if mode == "assets":
+                assert (
+                    pytester.path / extra["content"]
+                ).read_bytes() == payload.encode()
+            else:
+                assert (
+                    base64.b64decode(extra["content"].partition(",")[2])
+                    == payload.encode()
+                )
+
+
+@pytest.mark.parametrize("mode", ["assets", "self-contained"])
+def test_replaying_same_call_report_object_is_exactly_once(pytester, mode):
+    pytester.makeconftest(
+        """
+        import pytest
+        from pytest_html import extras
+
+        @pytest.hookimpl(tryfirst=True)
+        def pytest_runtest_protocol(item, nextitem):
+            for when in ('setup', 'call', 'teardown'):
+                report = pytest.TestReport(
+                    nodeid=item.nodeid, location=item.location, keywords={},
+                    outcome='passed', longrepr=None, when=when, duration=0.01,
+                    sections=[],
+                )
+                report.extras = [extras.text(f'once-{when}')]
+                item.ihook.pytest_runtest_logreport(report=report)
+                if when == 'call':
+                    # A hook redelivers the identical report object before teardown.
+                    item.ihook.pytest_runtest_logreport(report=report)
+            return True
+        """
+    )
+    pytester.makepyfile("def test_case(): pass")
+    pytester.makeini("[pytest]\ngenerate_report_on_test = true")
+    path = pytester.path / "report.html"
+    flags = ["--self-contained-html"] if mode == "self-contained" else []
+    pytester.runpytest("--html", str(path), *flags)
+    document = BeautifulSoup(path.read_text(encoding="utf-8"), "html.parser")
+    data = json.loads(document.select_one("#data-container")["data-jsonblob"])
+    rows = next(iter(data["tests"].values()))
+    assert [row["result"] for row in rows] == ["Passed"]
+    assert len(rows[0]["extras"]) == 3
+    for extra, payload in zip(
+        rows[0]["extras"], ("once-setup", "once-call", "once-teardown")
+    ):
+        assert extra["format_type"] == "text"
+        if mode == "assets":
+            assert (pytester.path / extra["content"]).read_bytes() == payload.encode()
+        else:
+            assert (
+                base64.b64decode(extra["content"].partition(",")[2]) == payload.encode()
+            )

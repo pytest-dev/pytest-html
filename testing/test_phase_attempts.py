@@ -23,6 +23,7 @@ pytest_plugins = ("pytester",)
 def test_phase_extras_public_html(pytester, case, mode):
     pytester.makeconftest(
         """
+        import json
         import pytest
         from pytest_html import extras
 
@@ -31,7 +32,15 @@ def test_phase_extras_public_html(pytester, case, mode):
             outcome = yield
             report = outcome.get_result()
             attempt = getattr(item, "execution_count", 1)
+            report._html_test_attempt = attempt
             report.extras = [extras.html(f'<span>phase-{report.when}-attempt-{attempt}</span>')]
+
+        @pytest.hookimpl(tryfirst=True)
+        def pytest_runtest_logreport(report):
+            attempt = getattr(report, "_html_test_attempt", None)
+            if attempt is not None:
+                with open("phase_emissions.jsonl", "a", encoding="utf-8") as stream:
+                    stream.write(json.dumps({"attempt": attempt, "when": report.when}) + "\\n")
     """
     )
     setup = (
@@ -98,11 +107,29 @@ def test_phase_extras_public_html(pytester, case, mode):
         "setup_skip": [[phase("setup"), phase("teardown")]],
         "call_fail": [[phase("setup"), phase("call"), phase("teardown")]],
         "call_skip": [[phase("setup"), phase("call"), phase("teardown")]],
-        "rerun": [
-            [phase("setup"), phase("call")],
-            [phase("setup", 2), phase("call", 2), phase("teardown", 2)],
-        ],
+        "rerun": None,
     }[case]
+    if case == "rerun":
+        # pytest-rerunfailures versions differ on whether the first attempt's
+        # successful teardown reaches pytest_runtest_logreport. Assert every
+        # *emitted* phase survives exactly once in the owning attempt's row.
+        events = [
+            json.loads(line)
+            for line in (pytester.path / "phase_emissions.jsonl")
+            .read_text()
+            .splitlines()
+        ]
+        by_attempt = [
+            [event["when"] for event in events if event["attempt"] == attempt]
+            for attempt in (1, 2)
+        ]
+        assert by_attempt[0] in (["setup", "call"], ["setup", "call", "teardown"])
+        assert by_attempt[1] == ["setup", "call", "teardown"]
+        assert [row["result"] for row in rows] == ["Rerun", "Passed"]
+        expected = [
+            [phase(when, attempt) for when in phases]
+            for attempt, phases in enumerate(by_attempt, start=1)
+        ]
     assert got == expected, f"{case} {mode}: expected {expected}, got {got}"
 
 

@@ -11,6 +11,7 @@ import warnings
 from collections import defaultdict
 from html import escape
 from pathlib import Path
+from weakref import WeakSet
 
 import pytest
 
@@ -31,7 +32,13 @@ class BaseReport:
             config.getini("max_asset_filename_length")
         )
 
-        self._reports = defaultdict(dict)
+        self._reports = {}
+        self._implicit_attempts = defaultdict(int)
+        self._completed_attempts = defaultdict(set)
+        # Keep report delivery idempotent without retaining every TestReport
+        # after its owner has released it. Distinct phase reports may share a
+        # nodeid, phase and outcome; only object identity proves a replay.
+        self._seen_reports = WeakSet()
         self._report = report_data
         self._report.title = self._report_path.name
         self._suite_start_time = time.time()
@@ -105,8 +112,9 @@ class BaseReport:
     def _media_content(self, *args, **kwargs):
         pass
 
-    def _process_extras(self, report, test_id):
-        test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
+    def _process_extras(self, report, test_id, test_index=None):
+        if test_index is None:
+            test_index = hasattr(report, "rerun") and report.rerun + 1 or 0
         report_extras = getattr(report, "extras", [])
         for extra_index, extra in enumerate(report_extras):
             content = extra["content"]
@@ -180,6 +188,8 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_sessionfinish(self, session):
+        for nodeid in list(self._reports):
+            self._finalize_attempt(nodeid)
         session.config.hook.pytest_html_results_summary(
             prefix=self._report.additional_summary["prefix"],
             summary=self._report.additional_summary["summary"],
@@ -209,6 +219,10 @@ class BaseReport:
 
     @pytest.hookimpl(trylast=True)
     def pytest_runtest_logreport(self, report):
+        if report in self._seen_reports:
+            return
+        self._seen_reports.add(report)
+
         if hasattr(report, "duration_formatter"):
             warnings.warn(
                 "'duration_formatter' has been removed and no longer has any effect!"
@@ -216,50 +230,109 @@ class BaseReport:
                 DeprecationWarning,
             )
 
-        # "reruns" makes this code a mess.
-        # We store each combination of when and outcome
-        # exactly once, unless that outcome is a "rerun"
-        # then we store all of them.
-        key = (report.when, report.outcome)
-        if report.outcome == "rerun":
-            if key not in self._reports[report.nodeid]:
-                self._reports[report.nodeid][key] = list()
-            self._reports[report.nodeid][key].append(report)
-        else:
-            self._reports[report.nodeid][key] = [report]
+        nodeid = report.nodeid
+        rerun = getattr(report, "rerun", None)
+        marker = ("rerun", rerun) if rerun is not None else None
+        current = self._reports.get(nodeid)
 
-        finished = report.when == "teardown" and report.outcome != "rerun"
-        if not finished:
+        if marker is not None and marker in self._completed_attempts[nodeid]:
             return
 
-        # Calculate total duration for a single test.
-        # This is needed to add the "teardown" duration
-        # to tests total duration.
-        test_duration = 0
-        for key, reports in self._reports[report.nodeid].items():
-            _, outcome = key
-            if outcome != "rerun":
-                test_duration += reports[0].duration
+        if current is not None:
+            if marker is not None and current["marker"] != marker:
+                if (
+                    current["marker"][0] == "implicit"
+                    and "call" not in current["phases"]
+                ):
+                    # The provisional setup belongs to a marked attempt, so
+                    # do not consume an unmarked attempt's asset namespace.
+                    self._implicit_attempts[nodeid] -= 1
+                    current["marker"] = marker
+                    current["test_index"] = rerun + 1
+                else:
+                    self._finalize_attempt(nodeid)
+                    current = None
+            elif (
+                marker is None
+                and report.when == "setup"
+                and ("call" in current["phases"] or "teardown" in current["phases"])
+            ):
+                self._finalize_attempt(nodeid)
+                current = None
 
-        processed_extras = []
-        for key, reports in self._reports[report.nodeid].items():
-            when, _ = key
-            for each in reports:
-                test_id = report.nodeid
-                if when != "call":
-                    test_id += f"::{when}"
-                processed_extras += self._process_extras(each, test_id)
+        if current is None:
+            if report.when == "teardown" and report.outcome == "passed":
+                # With no open attempt, a passed teardown has no visible row
+                # to receive extras. Do not consume the next attempt's asset
+                # suffix; a separate failed teardown *does* get its own row.
+                return
+            index = self._implicit_attempts[nodeid]
+            if marker is None:
+                marker = ("implicit", index)
+                test_index = -index
+                self._implicit_attempts[nodeid] += 1
+            else:
+                test_index = rerun + 1
+            current = {
+                "marker": marker,
+                "test_index": test_index,
+                "phases": set(),
+                "reports": [],
+            }
+            self._reports[nodeid] = current
 
-        for key, reports in self._reports[report.nodeid].items():
-            when, _ = key
-            for each in reports:
-                dur = test_duration if when == "call" else each.duration
-                self._process_report(each, dur, processed_extras)
+        current["reports"].append(report)
+        current["phases"].add(report.when)
+        if report.when == "teardown":
+            self._finalize_attempt(nodeid)
+
+    def _finalize_attempt(self, nodeid):
+        attempt = self._reports.pop(nodeid)
+        reports = attempt["reports"]
+        self._completed_attempts[nodeid].add(attempt["marker"])
+        duration = sum(each.duration for each in reports if each.outcome != "rerun")
+
+        def is_visible(each):
+            return each.when in ("call", "collect") or (
+                each.when in ("setup", "teardown") and each.outcome != "passed"
+            )
+
+        visible = [each for each in reports if is_visible(each)]
+        recipient = next((each for each in visible if each.when == "call"), None)
+        if recipient is None:
+            recipient = next((each for each in visible if each.when == "setup"), None)
+        if recipient is None:
+            recipient = next(
+                (each for each in visible if each.when == "teardown"), None
+            )
+
+        report_extras = {id(each): [] for each in reports}
+        for each in reports:
+            target = each if is_visible(each) else recipient
+            if target is None:
+                continue
+            test_id = each.nodeid
+            if each.when != "call":
+                test_id += f"::{each.when}"
+            report_extras[id(target)].extend(
+                self._process_extras(each, test_id, attempt["test_index"])
+            )
+
+        previous_row = None
+        for each in reports:
+            report_duration = duration if each.when == "call" else each.duration
+            row = self._process_report(
+                each, report_duration, report_extras[id(each)], previous_row
+            )
+            if row is not None:
+                previous_row = row
 
         if self._config.getini("generate_report_on_test"):
             self._generate_report()
 
-    def _process_report(self, report, duration, processed_extras):
+    def _process_report(
+        self, report, duration, processed_extras, teardown_recipient=None
+    ):
         outcome = _process_outcome(report)
         try:
             # hook returns as list for some reason
@@ -301,7 +374,9 @@ class BaseReport:
             report=report, data=processed_logs
         )
 
-        self._report.add_test(data, report, outcome, processed_logs)
+        return self._report.add_test(
+            data, report, outcome, processed_logs, teardown_recipient
+        )
 
 
 def _format_duration(duration):

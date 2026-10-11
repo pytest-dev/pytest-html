@@ -130,10 +130,10 @@ class ReportData:
     def set_data(self, key, value):
         self._data[key] = value
 
-    def add_test(self, test_data, report, outcome, logs):
-        # regardless of pass or fail we must add teardown logging to "call"
+    def add_test(self, test_data, report, outcome, logs, teardown_recipient=None):
+        # Captured teardown sections belong to an earlier row of this attempt.
         if report.when == "teardown":
-            self.append_teardown_log(report)
+            self.append_teardown_log(report, teardown_recipient)
 
         # passed "setup" and "teardown" are not added to the html
         if report.when in ["call", "collect"] or (
@@ -142,14 +142,13 @@ class ReportData:
             test_data["log"] = _handle_ansi("\n".join(logs))
             self.outcomes = outcome
             self._data["tests"][report.nodeid].append(test_data)
+            return test_data
 
-    def append_teardown_log(self, report):
+    def append_teardown_log(self, report, recipient):
         log = []
-        if self._data["tests"][report.nodeid]:
-            # Last index is "call"
-            test = self._data["tests"][report.nodeid][-1]
+        if recipient is not None:
             for section in report.sections:
                 header, content = map(escape, section)
                 if "teardown" in header:
                     log.append(f"{' ' + header + ' ':-^80}\n{content}")
-            test["log"] += _handle_ansi("\n".join(log))
+            recipient["log"] += _handle_ansi("\n".join(log))

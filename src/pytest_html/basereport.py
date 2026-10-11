@@ -8,10 +8,10 @@ import os
 import re
 import time
 import warnings
-from weakref import WeakSet
 from collections import defaultdict
 from html import escape
 from pathlib import Path
+from weakref import WeakSet
 
 import pytest
 

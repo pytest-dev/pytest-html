@@ -1,7 +1,8 @@
 import base64
 import json
-from bs4 import BeautifulSoup
+
 import pytest
+from bs4 import BeautifulSoup
 
 pytest_plugins = ("pytester",)
 

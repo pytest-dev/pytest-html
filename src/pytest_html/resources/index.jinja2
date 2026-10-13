@@ -4,11 +4,11 @@
     <meta charset="utf-8"/>
     <title id="head-title">{{ title }}</title>
     {%- if self_contained %}
-      <style type="text/css">
+      <style>
         {{- styles|safe }}
       </style>
     {% else %}
-      <link href="{{ styles }}" rel="stylesheet" type="text/css"/>
+      <link href="{{ styles }}" rel="stylesheet"/>
     {%- endif %}
   </head>
   <body>
@@ -87,7 +87,7 @@
           {%- endfor %}
           </div>
           <div class="collapse">
-            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
+            <button id="show_all_details" type="button">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details" type="button">Hide all details</button>
           </div>
         </div>
       </div>

@@ -115,4 +115,6 @@ warn_unused_configs = true
 
 [tool.djlint]
 profile = "jinja"
-ignore = "H005,H016,H030,H031,H006,H013"
+# H056/H057: the media <img>/<source> src is intentionally empty (populated at
+# runtime by report.js), and the <video> has no caption source to track.
+ignore = "H005,H016,H030,H031,H006,H013,H056,H057"

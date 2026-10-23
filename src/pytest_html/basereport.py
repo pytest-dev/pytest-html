@@ -111,7 +111,7 @@ class BaseReport:
         for extra_index, extra in enumerate(report_extras):
             content = extra["content"]
             asset_name = self._asset_filename(
-                test_id.encode("utf-8").decode("unicode_escape"),
+                _unescape_test_id(test_id),
                 extra_index,
                 test_index,
                 extra["extension"],
@@ -353,6 +353,16 @@ def _process_outcome(report):
             return "XFailed"
 
     return report.outcome.capitalize()
+
+
+def _unescape_test_id(test_id):
+    # Restore the non-ASCII characters pytest escapes in test ids (e.g. "\u00e9").
+    # Unescaped non-ASCII characters (e.g. in function names) are preserved, and
+    # ids that aren't valid escape sequences (e.g. "\N") are returned as-is.
+    try:
+        return test_id.encode("ascii", "backslashreplace").decode("unicode_escape")
+    except UnicodeDecodeError:
+        return test_id
 
 
 def _process_links(links):

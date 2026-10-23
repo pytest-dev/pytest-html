@@ -146,3 +146,68 @@ def test_custom_css_selfcontained(pytester, css_file_path, expandvar):
     with open(pytester.path / "report.html") as f:
         html = f.read()
         assert_that(html).contains("* " + str(css_file_path)).contains("* two.css")
+
+
+@pytest.fixture
+def text_extra(pytester):
+    pytester.makeconftest(
+        """
+        import pytest
+
+        @pytest.hookimpl(hookwrapper=True)
+        def pytest_runtest_makereport(item, call):
+            outcome = yield
+            report = outcome.get_result()
+            if report.when == "call":
+                from pytest_html import extras
+                report.extras = [extras.text("content")]
+    """
+    )
+
+
+@pytest.mark.parametrize(
+    "test_file, asset_name",
+    [
+        ("def test_pass(): pass", "test_pass_0_0.txt"),
+        ("def test_pässed(): pass", "test_pässed_0_0.txt"),
+        (
+            """
+            import pytest
+            @pytest.mark.parametrize("value", ["ä"])
+            def test_pass(value): pass
+            """,
+            "test_pass_ä__0_0.txt",
+        ),
+    ],
+    ids=["ascii", "non-ascii-name", "non-ascii-param"],
+)
+def test_extra_asset_name(pytester, text_extra, test_file, asset_name):
+    pytester.makepyfile(test_extra_asset_name=test_file)
+    result = run(pytester)
+    result.assert_outcomes(passed=1)
+
+    path = pytester.path.joinpath("assets", f"test_extra_asset_name.py__{asset_name}")
+    assert_that(str(path)).exists()
+
+
+def test_extra_asset_name_invalid_escape_sequence(pytester, text_extra):
+    pytester.makeini(
+        """
+        [pytest]
+        disable_test_id_escaping_and_forfeit_all_rights_to_community_support = true
+    """
+    )
+    pytester.makepyfile(
+        test_extra_asset_name=r"""
+        import pytest
+        @pytest.mark.parametrize("path", ["C:\\New Folder"])
+        def test_pass(path): pass
+        """
+    )
+    result = run(pytester)
+    result.assert_outcomes(passed=1)
+
+    path = pytester.path.joinpath(
+        "assets", "test_extra_asset_name.py__test_pass_C__New_Folder__0_0.txt"
+    )
+    assert_that(str(path)).exists()

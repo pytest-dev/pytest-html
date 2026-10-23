@@ -578,7 +578,13 @@ class TestHTML:
         element = page.select_one(".media img")
         assert_that(str(element)).is_equal_to(f'<img src="{src}"/>')
 
-    @pytest.mark.parametrize("mime_type, extension", [("video/mp4", "mp4")])
+    @pytest.mark.parametrize(
+        "mime_type, extension",
+        [
+            ("video/mp4", "mp4"),
+            ("video/webm", "webm"),
+        ],
+    )
     def test_extra_video(self, pytester, mime_type, extension):
         content = str(random.random())
         charset = "utf-8"
@@ -592,7 +598,9 @@ class TestHTML:
                 report = outcome.get_result()
                 if report.when == 'call':
                     from pytest_html import extras
-                    report.extras = [extras.{extension}('{data}')]
+                    report.extras = [
+                        extras.video('{data}', mime_type='{mime_type}', extension='{extension}')
+                    ]
         """
         )
         pytester.makepyfile("def test_pass(): pass")

@@ -146,6 +146,7 @@ URL         ``extras.url('http://www.example.com/')``
 Image       ``extras.image(image, mime_type='image/gif', extension='gif')``
 Image       ``extras.image('/path/to/file.png')``
 Image       ``extras.image('http://some_image.png')``
+Video       ``extras.video(video, mime_type='video/webm', extension='webm')``
 ==========  ============================================
 
 **Note**: When adding an image from file, the path can be either absolute

@@ -48,6 +48,11 @@ const setup = (resultBody, assets) => {
             videoEl.classList.add('hidden')
         } else if (media?.format_type === 'video') {
             sourceEl.src = media.path
+            if (media.mime_type) {
+                sourceEl.type = media.mime_type
+            } else {
+                sourceEl.removeAttribute('type')
+            }
 
             videoEl.classList.remove('hidden')
             imageEl.classList.add('hidden')

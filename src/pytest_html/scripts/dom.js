@@ -64,9 +64,9 @@ const dom = {
         }
 
         const media = []
-        extras?.forEach(({ name, format_type, content }) => {
+        extras?.forEach(({ name, format_type, content, mime_type }) => {
             if (['image', 'video'].includes(format_type)) {
-                media.push({ path: content, name, format_type })
+                media.push({ path: content, name, format_type, mime_type })
             }
 
             if (format_type === 'html') {

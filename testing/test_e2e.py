@@ -135,3 +135,38 @@ def test_custom_sorting(pytester, path, driver):
     assert_that(rows[0]["alpha"]).is_equal_to("BBB")
     assert_that(rows[1]["test"]).contains("AAA")
     assert_that(rows[1]["alpha"]).is_equal_to("AAA")
+
+
+def test_custom_numeric_sorting(pytester, path, driver):
+    pytester.makeconftest(
+        """
+        def pytest_html_results_table_header(cells):
+            cells.append(
+                '<th class="sortable speedup" data-column-type="speedup">Speedup</th>'
+            )
+
+        def pytest_html_results_table_row(report, cells):
+            data = report.nodeid.split("[")[-1].rstrip("]")
+            cells.append(f'<td class="col-speedup">{data}</td>')
+    """
+    )
+    pytester.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.parametrize("speedup", ["10.5", "9.25", "100"])
+        def test_speedup(speedup): pass
+    """
+    )
+    query_params = _encode_query_params({"sort": "speedup"})
+    driver.get(f"file:///reports{path()}?{query_params}")
+    WebDriverWait(driver, 5).until(
+        ec.visibility_of_all_elements_located((By.CSS_SELECTOR, "#results-table"))
+    )
+
+    rows = _parse_result_table(driver)
+    assert_that([row["speedup"] for row in rows]).is_equal_to(["9.25", "10.5", "100"])
+
+    driver.find_element(By.CSS_SELECTOR, "th[data-column-type='speedup']").click()
+    rows = _parse_result_table(driver)
+    assert_that([row["speedup"] for row in rows]).is_equal_to(["100", "10.5", "9.25"])

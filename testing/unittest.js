@@ -205,6 +205,22 @@ describe('Sort tests', () => {
                 'failed', 'passed', 'passed', 'passed', 'passed', 'passed',
             ])
         })
+        it('sort on numeric column', () => {
+            dataModule.manager.setManager({
+                tests: ['10.5', 'n/a', '9.25', '100', '-1', '0'].map((speedup) => ({ result: 'passed', speedup })),
+            })
+            getSortMock = sinon.stub(storageModule, 'getSort').returns(null)
+            setSortMock = sinon.stub(storageModule, 'setSort')
+            getSortDirectionMock = sinon.stub(storageModule, 'getSortDirection').returns(null)
+            setSortDirection = sinon.stub(storageModule, 'setSortDirection')
+            managerSpy = sinon.spy(dataModule.manager, 'setRender')
+
+            doSort('speedup')
+            expect(managerSpy.callCount).to.eql(1)
+            expect(dataModule.manager.testSubset.map(({ speedup }) => speedup)).to.eql([
+                '-1', '0', '9.25', '10.5', '100', 'n/a',
+            ])
+        })
     })
 })
 

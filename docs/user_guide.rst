@@ -326,6 +326,9 @@ Note that the values are case *sensitive*.
 If tests are run in parallel (with `pytest-xdist`_ for example), then the order may not be
 in the correct order.
 
+Columns containing numbers, such as a custom sortable column (see :ref:`modifying-results-table`),
+are sorted numerically rather than alphabetically.
+
 Formatting the Duration Column
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

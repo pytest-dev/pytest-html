@@ -1,6 +1,24 @@
 const { manager } = require('./datamanager.js')
 const storageModule = require('./storage.js')
 
+const toNumber = (value) => typeof value === 'string' && value.trim() !== '' ? Number(value) : NaN
+
+const compareValues = (a, b) => {
+    const aNumber = toNumber(a)
+    const bNumber = toNumber(b)
+    const aIsNumber = Number.isFinite(aNumber)
+    const bIsNumber = Number.isFinite(bNumber)
+
+    if (aIsNumber && bIsNumber) {
+        return aNumber - bNumber
+    }
+    if (aIsNumber !== bIsNumber) {
+        // Numeric values are sorted before non-numeric ones
+        return aIsNumber ? -1 : 1
+    }
+    return a === b ? 0 : a > b ? 1 : -1
+}
+
 const genericSort = (list, key, ascending, customOrder) => {
     let sorted
     if (customOrder) {
@@ -15,7 +33,7 @@ const genericSort = (list, key, ascending, customOrder) => {
             return aIndex - bIndex
         })
     } else {
-        sorted = list.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1)
+        sorted = list.sort((a, b) => compareValues(a[key], b[key]))
     }
 
     if (ascending) {

@@ -32,6 +32,7 @@ class BaseReport:
         )
 
         self._reports = defaultdict(dict)
+        self._pending_reruns = set()
         self._report = report_data
         self._report.title = self._report_path.name
         self._suite_start_time = time.time()
@@ -225,7 +226,14 @@ class BaseReport:
             if key not in self._reports[report.nodeid]:
                 self._reports[report.nodeid][key] = list()
             self._reports[report.nodeid][key].append(report)
+            self._pending_reruns.add(report.nodeid)
         else:
+            if report.nodeid in self._pending_reruns:
+                self._pending_reruns.discard(report.nodeid)
+                # pytest-rerunfailures >= 16.7 reports a teardown after each
+                # rerun attempt: it does not mark the end of the test.
+                if report.when == "teardown":
+                    return
             self._reports[report.nodeid][key] = [report]
 
         finished = report.when == "teardown" and report.outcome != "rerun"

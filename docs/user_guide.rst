@@ -216,7 +216,8 @@ Modifying the results table
 
 You can modify the columns of the report by implementing custom hooks for the header and rows.
 The following example :code:`conftest.py` adds a description column with the test function docstring,
-adds a sortable time column, and removes the links column:
+adds a sortable approximate end-time column (populated when the result row is
+created), and removes the links column:
 
 .. code-block:: python
 
